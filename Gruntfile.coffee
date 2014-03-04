@@ -10,7 +10,7 @@ module.exports = (grunt) ->
           join: true
           sourceMap: true
         files:
-          'src/js/wordlift-tinymce-plugin.js': [
+          'app/js/wordlift-plugin.js': [
             'src/coffee/app.config.coffee',
             'src/coffee/app.directives.coffee',
             'src/coffee/app.services.AnalysisService.coffee',

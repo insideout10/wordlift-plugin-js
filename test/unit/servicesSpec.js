@@ -3,12 +3,11 @@
 /* jasmine specs for services go here */
 
 describe('service', function() {
-  beforeEach(module('myApp.services'));
+  beforeEach(module('wordlift.tinymce.plugin.services'));
 
-
-  describe('version', function() {
-    it('should return current version', inject(function(version) {
-      expect(version).toEqual('0.1');
+  describe('AnalysisService', function() {
+    it('should not be running', inject(function(AnalysisService) {
+      expect(AnalysisService.isRunning).toEqual(false);
     }));
   });
 });
