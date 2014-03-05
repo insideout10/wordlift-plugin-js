@@ -2,15 +2,35 @@ module.exports = function(config){
     config.set({
     basePath : '../',
 
+    preprocessors: {
+        '**/*.html': [ ],
+        '**/*.coffee': ['coffee']
+    },
+
     files : [
+        // Serve TinyMCE scripts.
+        {pattern: 'app/lib/tinymce/jscripts/tiny_mce/plugins/**/*.js', watched: false, served: true, included: false },
+        {pattern: 'app/lib/tinymce/jscripts/tiny_mce/plugins/**/*.css', watched: false, served: true, included: false },
+        {pattern: 'app/lib/tinymce/jscripts/tiny_mce/themes/**/*.js', watched: false, served: true, included: false },
+        {pattern: 'app/lib/tinymce/jscripts/tiny_mce/themes/**/*.css', watched: false, served: true, included: false },
+        {pattern: 'app/lib/tinymce/jscripts/tiny_mce/themes/**/*.gif', watched: false, served: true, included: false },
+        {pattern: 'app/lib/tinymce/jscripts/tiny_mce/themes/**/*.png', watched: false, served: true, included: false },
+        {pattern: 'app/lib/tinymce/jscripts/tiny_mce/langs/**/*.js', watched: false, served: true, included: false },
+
+        // Serve HTML files.
+        {pattern: '**/*.html', watched: false, served: true, included: false },
+
         'app/lib/angular/angular.js',
         'app/lib/angular/angular-*.js',
         'app/lib/jquery/jquery-1.10.2.min.js',
         'app/lib/jquery-ui-1.10.3/ui/jquery-ui.js',
+        'app/lib/jasmine-jquery.js',
+        'app/lib/tinymce/jscripts/tiny_mce/tiny_mce.js',
+        'app/js/test.init.coffee',
         'app/js/wordlift-plugin.js',
         'test/lib/angular/angular-mocks.js',
-        'app/js/**/*.js',
-        'test/unit/**/*.js'
+        'test/unit/**/*.js',
+        'test/unit/**/*.coffee'
     ],
 
     exclude : [
@@ -24,17 +44,21 @@ module.exports = function(config){
     frameworks: ['jasmine'],
 
     browsers : [
-        'Chrome',
-        'Firefox',
-        'Safari'
+        'Chrome'
+//        'Firefox',
+//        'Safari'
     ],
+
+//    logLevel : 'DEBUG',
 
     plugins : [
         'karma-junit-reporter',
         'karma-chrome-launcher',
         'karma-firefox-launcher',
         'karma-safari-launcher',
-        'karma-jasmine'
+        'karma-jasmine',
+        'karma-html2js-preprocessor',
+        'karma-coffee-preprocessor'
     ],
 
     junitReporter : {

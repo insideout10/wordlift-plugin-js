@@ -1,5 +1,5 @@
 (function() {
-  var $, ajaxurl, container, injector;
+  var $, container, injector;
 
   angular.module('wordlift.tinymce.plugin.config', []).constant('Configuration', {
     supportedTypes: ['schema:Place', 'schema:Event', 'schema:CreativeWork', 'schema:Product', 'schema:Person', 'schema:Organization'],
@@ -552,10 +552,6 @@
 
   $ = jQuery;
 
-  if (typeof ajaxurl === "undefined" || ajaxurl === null) {
-    ajaxurl = '';
-  }
-
   angular.module('wordlift.tinymce.plugin', ['wordlift.tinymce.plugin.controllers', 'wordlift.tinymce.plugin.directives']);
 
   $(container = $('<div id="wordlift-disambiguation-popover" class="metabox-holder">\n\n  <div class="postbox">\n    <div class="handlediv" title="Click to toggle"><br></div>\n    <h3 class="hndle"><span>Semantic Web</span></h3>\n    <div class="inside">\n      <form role="form">\n        <div class="form-group">\n          <div class="ui-widget">\n            <input type="text" class="form-control" id="search" placeholder="search or create">\n          </div>\n        </div>\n        <div>\n          <ul>\n            <li ng-repeat="(id, entityAnnotation) in textAnnotation.entityAnnotations | orderObjectBy:\'confidence\':true">\n              <div class="entity {{entityAnnotation.entity.type}}" ng-class="{selected: true==entityAnnotation.selected}" ng-click="onEntityClicked(id, entityAnnotation)" ng-show="entityAnnotation.entity.label">\n                <div class="thumbnail" ng-show="entityAnnotation.entity.thumbnail" title="{{entityAnnotation.entity.id}}" style="background-image: url({{entityAnnotation.entity.thumbnail}})"></div>\n                <div class="thumbnail empty" ng-hide="entityAnnotation.entity.thumbnail" title="{{entityAnnotation.entity.id}}"></div>\n                <div class="confidence" ng-bind="entityAnnotation.confidence"></div>\n                <div class="label" ng-bind="entityAnnotation.entity.label"></div>\n                <div class="type"></div>\n                <div class="source" ng-class="entityAnnotation.entity.source" ng-bind="entityAnnotation.entity.source"></div>\n              </div>\n            </li>\n          </ul>\n        </div>\n      </form>\n    </div>\n  </div>\n</div>').appendTo('body').css({
@@ -574,7 +570,21 @@
     return $("<li>").append("<li>\n  <div class=\"entity " + item.types + "\">\n    <!-- div class=\"thumbnail\" style=\"background-image: url('')\"></div -->\n    <div class=\"thumbnail empty\"></div>\n    <div class=\"confidence\"></div>\n    <div class=\"label\">" + item.label + "</div>\n    <div class=\"type\"></div>\n    <div class=\"source\"></div>\n  </div>\n</li>").appendTo(ul);
   }, $('#wordlift-disambiguation-popover .handlediv').click(function(e) {
     return container.hide();
-  }), $('body').attr('ng-controller', 'HelloController'), injector = angular.bootstrap(document, ['wordlift.tinymce.plugin']));
+  }), $('body').attr('ng-controller', 'HelloController'), injector = angular.bootstrap(document, ['wordlift.tinymce.plugin']), tinymce.PluginManager.add('wordlift', function(editor, url) {
+    return editor.addButton('wordlift', {
+      text: 'WordLift',
+      icon: false,
+      onclick: function() {
+        return injector.invoke([
+          'EditorService', function(EditorService) {
+            return EditorService.analyze(tinyMCE.activeEditor.getContent({
+              format: 'text'
+            }));
+          }
+        ]);
+      }
+    });
+  }));
 
 }).call(this);
 

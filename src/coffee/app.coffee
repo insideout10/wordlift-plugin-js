@@ -1,9 +1,6 @@
 # Set the well-known $ reference to jQuery.
 $ = jQuery
 
-# The AJAX URL should be provided by WordPress. If it's not set, create an empty var.
-if not ajaxurl? then ajaxurl = ''
-
 # Create the main AngularJS module, and set it dependent on controllers and directives.
 angular.module('wordlift.tinymce.plugin', ['wordlift.tinymce.plugin.controllers', 'wordlift.tinymce.plugin.directives'])
 
@@ -83,6 +80,7 @@ $(
 
   # Add WordLift as a plugin of the TinyMCE editor.
   tinymce.PluginManager.add 'wordlift', (editor, url) ->
+
     # Add a WordLift button the TinyMCE editor.
     editor.addButton 'wordlift',
       text   : 'WordLift'
