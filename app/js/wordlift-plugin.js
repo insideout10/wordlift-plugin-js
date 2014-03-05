@@ -42,9 +42,11 @@
           return $http.post(ajaxurl + '?action=wordlift_analyze', {
             data: content
           }).success(function(data, status, headers, config) {
+            console.log('analysis received');
             $rootScope.$broadcast('analysisReceived', that.parse(data));
             return that.isRunning = false;
           }).error(function(data, status, headers, config) {
+            console.log('error received');
             return that.isRunning = false;
           });
         },

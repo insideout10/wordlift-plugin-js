@@ -18,7 +18,13 @@ module.exports = function(config){
         {pattern: 'app/lib/tinymce/jscripts/tiny_mce/langs/**/*.js', watched: false, served: true, included: false },
 
         // Serve HTML files.
-        {pattern: '**/*.html', watched: false, served: true, included: false },
+        {pattern: 'app/**/*.html', watched: false, served: true, included: false },
+
+        // Serve JSON files.
+        {pattern: 'app/**/*.json', watched: false, served: true, included: false },
+
+        // Serve TXT files
+        {pattern: 'app/**/*.txt', watched: false, served: true, included: false },
 
         'app/lib/angular/angular.js',
         'app/lib/angular/angular-*.js',

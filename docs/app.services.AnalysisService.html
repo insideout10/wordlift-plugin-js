@@ -213,6 +213,7 @@ Analyze the provided content. Only one analysis at a time is run.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>      .success <span class="hljs-function"><span class="hljs-params">(data, status, headers, config)</span> -&gt;</span>
+        <span class="hljs-built_in">console</span>.log <span class="hljs-string">'analysis received'</span>
         $rootScope.$broadcast <span class="hljs-string">'analysisReceived'</span>, that.parse data</pre></div></div>
             
         </li>
@@ -243,7 +244,8 @@ Analyze the provided content. Only one analysis at a time is run.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      .error  <span class="hljs-function"><span class="hljs-params">(data, status, headers, config)</span> -&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>      .error  <span class="hljs-function"><span class="hljs-params">(data, status, headers, config)</span> -&gt;</span>
+        <span class="hljs-built_in">console</span>.log <span class="hljs-string">'error received'</span></pre></div></div>
             
         </li>
         

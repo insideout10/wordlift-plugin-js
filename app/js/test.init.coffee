@@ -6,7 +6,8 @@ __karma__.loaded = ->
 document.body.innerHTML = '<textarea id="content"></textarea>'
 
 editor  = undefined
-ajaxurl = ''
+# Set the AJAX URL to the mock up response.
+ajaxurl = '/base/app/assets/english.json'
 
 tinymce.init
     # General options
