@@ -64,8 +64,11 @@ describe "TinyMCE tests", ->
     # Spy on the analyze method of the AnalysisService
     spyOn(AnalysisService, 'analyze').and.callThrough()
 
+    # Spy on the editor embedAnalysis method of the EditorService
+    spyOn(EditorService, 'embedAnalysis').and.callThrough()
+
     # Spy on the root scope.
-    spyOn($rootScope, '$broadcast')
+    spyOn($rootScope, '$broadcast').and.callThrough()
 
     # By default the analysis is running is false
     expect(AnalysisService.isRunning).toEqual false
@@ -110,4 +113,54 @@ describe "TinyMCE tests", ->
       $httpBackend.flush()
 
       expect($rootScope.$broadcast.calls.count()).toEqual 1
+
+      # The analysis service shouldn't have been called
+      expect(EditorService.embedAnalysis).toHaveBeenCalledWith(jasmine.any(Object))
+
+
+    it "sends the analysis results", inject (AnalysisService, EditorService, $httpBackend, $rootScope) ->
+
+      # Get a reference to the argument passed with the event.
+      args     = $rootScope.$broadcast.calls.argsFor 0
+      # Get a reference to the analysis structure.
+      analysis = args[1]
+
+      # Check that the analysis results conform.
+      expect(analysis.language).not.toBe undefined
+      expect(analysis.entities).not.toBe undefined
+      expect(analysis.entityAnnotations).not.toBe undefined
+      expect(analysis.textAnnotations).not.toBe undefined
+      expect(analysis.languages).not.toBe undefined
+
+      expect(analysis.language).toEqual 'en'
+      expect(Object.keys(analysis.entities).length).toEqual 25
+      expect(Object.keys(analysis.entityAnnotations).length).toEqual 27
+      expect(Object.keys(analysis.textAnnotations).length).toEqual 10
+      expect(Object.keys(analysis.languages).length).toEqual 1
+
+
+    # Check that the text annotations have been embedded in the content.
+    it "embeds the analysis results in the editor contents", inject (EditorService, $rootScope) ->
+
+      # Get the editor raw content
+      content = ed.getContent { format : 'raw' }
+
+      expect(content.length).toBeGreaterThan 0
+
+      # Get a reference to the argument passed with the event.
+      args     = $rootScope.$broadcast.calls.argsFor 0
+      # Get a reference to the analysis structure.
+      analysis = args[1]
+      # Get the text annotations.
+      textAnnotations = analysis.textAnnotations
+
+      # Look for SPANs in the content.
+      regex = new RegExp(/<span id="([^"]+)" class="textannotation">([^<]+)<\/span>/g)
+      while match = regex.exec content
+        # Check that every span matches a text annotation.
+        id   = match[1]
+        text = match[2]
+        expect(textAnnotations[id]).not.toBe null
+        expect(textAnnotations[id].selectedText).toEqual text
+
 

@@ -38,7 +38,6 @@ angular.module( 'AnalysisService', [] )
       )
       # If successful, broadcast an *analysisReceived* event.
       .success (data, status, headers, config) ->
-        console.log 'analysis received'
         $rootScope.$broadcast 'analysisReceived', that.parse data
         # Set that the analysis is complete.
         that.isRunning = false

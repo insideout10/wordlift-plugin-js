@@ -42,7 +42,6 @@
           return $http.post(ajaxurl + '?action=wordlift_analyze', {
             data: content
           }).success(function(data, status, headers, config) {
-            console.log('analysis received');
             $rootScope.$broadcast('analysisReceived', that.parse(data));
             return that.isRunning = false;
           }).error(function(data, status, headers, config) {
@@ -340,59 +339,45 @@
 
   angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tinymce.plugin.config', 'AnalysisService']).service('EditorService', [
     'AnalysisService', '$rootScope', '$log', 'Configuration', function(AnalysisService, $rootScope, $log, Configuration) {
-      $rootScope.$on('analysisReceived', function() {
-        $('.mce_wordlift').removeClass('running');
-        return tinyMCE.get('content').getBody().setAttribute('contenteditable', true);
-      });
-      $rootScope.$on('DisambiguationWidget.entitySelected', function(event, obj) {
-        var cssClasses, dom, elem, id;
-        cssClasses = "textannotation highlight " + obj.entity.type + " disambiguated";
-        dom = tinyMCE.get("content").dom;
-        id = obj.relation.id;
-        elem = dom.get(id);
-        dom.setAttrib(id, 'class', cssClasses);
-        dom.setAttrib(id, 'itemscope', 'itemscope');
-        dom.setAttrib(id, 'itemtype', obj.entity.type);
-        return dom.setAttrib(id, 'itemid', obj.entity.id);
-      });
-      $rootScope.$on('analysisReceived', function(event, analysis) {
-        var cleanUp, currentHtmlContent, id, isDirty, r, replace, selPrefix, selSuffix, selText, spanre, textAnnotation, _ref;
-        cleanUp = function(text) {
-          return text.replace('\\', '\\\\').replace('\(', '\\(').replace('\)', '\\)').replace('\n', '\\n?').replace('-', '\\-').replace('\x20', '\\s').replace('\xa0', '&nbsp;');
-        };
-        currentHtmlContent = tinyMCE.get('content').getContent({
-          format: 'raw'
-        });
-        spanre = /<span class="textannotation"[^>]*>([^<]*)<\/span>/gi;
-        while (spanre.test(currentHtmlContent)) {
-          currentHtmlContent = currentHtmlContent.replace(spanre, '$1');
-        }
-        _ref = analysis.textAnnotations;
-        for (id in _ref) {
-          textAnnotation = _ref[id];
-          selPrefix = cleanUp(textAnnotation.selectionPrefix.substr(-1));
-          if ('' === selPrefix) {
-            selPrefix = '^|\\W';
+      var service;
+      service = {
+        embedAnalysis: function(analysis) {
+          var cleanUp, currentHtmlContent, id, isDirty, r, replace, selPrefix, selSuffix, selText, spanre, textAnnotation, _ref;
+          cleanUp = function(text) {
+            return text.replace('\\', '\\\\').replace('\(', '\\(').replace('\)', '\\)').replace('\n', '\\n?').replace('-', '\\-').replace('\x20', '\\s').replace('\xa0', '&nbsp;');
+          };
+          currentHtmlContent = tinyMCE.get('content').getContent({
+            format: 'raw'
+          });
+          spanre = /<span class="textannotation"[^>]*>([^<]*)<\/span>/gi;
+          while (spanre.test(currentHtmlContent)) {
+            currentHtmlContent = currentHtmlContent.replace(spanre, '$1');
           }
-          selSuffix = cleanUp(textAnnotation.selectionSuffix.substr(0, 1));
-          if ('' === selSuffix) {
-            selSuffix = '$|\\W';
+          _ref = analysis.textAnnotations;
+          for (id in _ref) {
+            textAnnotation = _ref[id];
+            selPrefix = cleanUp(textAnnotation.selectionPrefix.substr(-1));
+            if ('' === selPrefix) {
+              selPrefix = '^|\\W';
+            }
+            selSuffix = cleanUp(textAnnotation.selectionSuffix.substr(0, 1));
+            if ('' === selSuffix) {
+              selSuffix = '$|\\W';
+            }
+            selText = textAnnotation.selectedText;
+            r = new RegExp("(" + selPrefix + "(?:<[^>]+>){0,})(" + selText + ")((?:<[^>]+>){0,}" + selSuffix + ")(?![^<]*\"[^<]*>)");
+            replace = "$1<span class=\"textannotation\" id=\"" + id + "\" typeof=\"http://fise.iks-project.eu/ontology/TextAnnotation\">$2</span>$3";
+            currentHtmlContent = currentHtmlContent.replace(r, replace);
           }
-          selText = textAnnotation.selectedText;
-          r = new RegExp("(" + selPrefix + "(?:<[^>]+>){0,})(" + selText + ")((?:<[^>]+>){0,}" + selSuffix + ")(?![^<]*\"[^<]*>)");
-          replace = "$1<span class=\"textannotation\" id=\"" + id + "\" typeof=\"http://fise.iks-project.eu/ontology/TextAnnotation\">$2</span>$3";
-          currentHtmlContent = currentHtmlContent.replace(r, replace);
-        }
-        isDirty = tinyMCE.get('content').isDirty();
-        tinyMCE.get('content').setContent(currentHtmlContent);
-        if (!isDirty) {
-          tinyMCE.get('content').isNotDirty = 1;
-        }
-        return tinyMCE.get('content').onClick.add(function(editor, e) {
-          return $rootScope.$apply($log.debug("Going to notify click on annotation with id " + e.target.id), $rootScope.$broadcast('textAnnotationClicked', e.target.id, e));
-        });
-      });
-      return {
+          isDirty = tinyMCE.get('content').isDirty();
+          tinyMCE.get('content').setContent(currentHtmlContent);
+          if (!isDirty) {
+            tinyMCE.get('content').isNotDirty = 1;
+          }
+          return tinyMCE.get('content').onClick.add(function(editor, e) {
+            return $rootScope.$apply($log.debug("Going to notify click on annotation with id " + e.target.id), $rootScope.$broadcast('textAnnotationClicked', e.target.id, e));
+          });
+        },
         ping: function(message) {
           return $log.debug(message);
         },
@@ -425,6 +410,24 @@
           };
         }
       };
+      $rootScope.$on('DisambiguationWidget.entitySelected', function(event, obj) {
+        var cssClasses, dom, elem, id;
+        cssClasses = "textannotation highlight " + obj.entity.type + " disambiguated";
+        dom = tinyMCE.get("content").dom;
+        id = obj.relation.id;
+        elem = dom.get(id);
+        dom.setAttrib(id, 'class', cssClasses);
+        dom.setAttrib(id, 'itemscope', 'itemscope');
+        dom.setAttrib(id, 'itemtype', obj.entity.type);
+        return dom.setAttrib(id, 'itemid', obj.entity.id);
+      });
+      $rootScope.$on('analysisReceived', function(event, analysis) {
+        $log.info('analysisReceived [ analysis :: ' + analysis + ' ]');
+        service.embedAnalysis(analysis);
+        $('.mce_wordlift').removeClass('running');
+        return tinyMCE.get('content').getBody().setAttribute('contenteditable', true);
+      });
+      return service;
     }
   ]);
 

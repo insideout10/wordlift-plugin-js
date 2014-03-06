@@ -58,6 +58,11 @@
                 app.services.coffee
               </a>
             
+              
+              <a class="source" href="tinymce.spec.html">
+                tinymce.spec.coffee
+              </a>
+            
           </div>
         </li>
       </ul>
@@ -95,12 +100,11 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
-              <p>When an analysis is completed, remove the <em>running</em> class from the WordLift toolbar button.
-(The button is set to running when <a href="#analyze">an analysis is called</a>.</p>
+              <p>Define the service.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    $rootScope.$<span class="hljs-literal">on</span> <span class="hljs-string">'analysisReceived'</span>,<span class="hljs-function"> -&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>    service =</pre></div></div>
             
         </li>
         
@@ -111,11 +115,11 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-3">&#182;</a>
               </div>
-              <p>Remove the <em>running</em> class.</p>
+              <p>Embed the provided analysis in the editor.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      $(<span class="hljs-string">'.mce_wordlift'</span>).removeClass <span class="hljs-string">'running'</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-attribute">embedAnalysis</span>: <span class="hljs-function"><span class="hljs-params">(analysis)</span> -&gt;</span></pre></div></div>
             
         </li>
         
@@ -126,11 +130,17 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
-              <p>Make the editor read/write.</p>
+              <p>Clean up the selection prefix/suffix text.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      tinyMCE.get(<span class="hljs-string">'content'</span>).getBody().setAttribute <span class="hljs-string">'contenteditable'</span>, <span class="hljs-literal">true</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-function"><span class="hljs-title">cleanUp</span> = <span class="hljs-params">(text)</span> -&gt;</span>
+          text
+            .replace(<span class="hljs-string">'\\'</span>, <span class="hljs-string">'\\\\'</span>).replace( <span class="hljs-string">'\('</span>, <span class="hljs-string">'\\('</span> ).replace( <span class="hljs-string">'\)'</span>, <span class="hljs-string">'\\)'</span>).replace(<span class="hljs-string">'\n'</span>, <span class="hljs-string">'\\n?'</span>)
+            .replace(<span class="hljs-string">'-'</span>, <span class="hljs-string">'\\-'</span>).replace(<span class="hljs-string">'\x20'</span>, <span class="hljs-string">'\\s'</span>).replace(<span class="hljs-string">'\xa0'</span>, <span class="hljs-string">'&amp;nbsp;'</span>)
+
+
+        currentHtmlContent = tinyMCE.get(<span class="hljs-string">'content'</span>).getContent({format : <span class="hljs-string">'raw'</span>})</pre></div></div>
             
         </li>
         
@@ -141,12 +151,15 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
-              <p>this event is captured when an entity is selected in the disambiguation popover.</p>
+              <p>Remove the existing text annotation spans.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    $rootScope.$<span class="hljs-literal">on</span> <span class="hljs-string">'DisambiguationWidget.entitySelected'</span>, <span class="hljs-function"><span class="hljs-params">(event, obj)</span> -&gt;</span>
-      cssClasses = <span class="hljs-string">"textannotation highlight <span class="hljs-subst">#{obj.entity.type}</span> disambiguated"</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>        spanre = <span class="hljs-regexp">/&lt;span class="textannotation"[^&gt;]*&gt;([^&lt;]*)&lt;\/span&gt;/gi</span>
+        <span class="hljs-keyword">while</span> spanre.test currentHtmlContent
+          currentHtmlContent = currentHtmlContent.replace spanre, <span class="hljs-string">'$1'</span>
+
+        <span class="hljs-keyword">for</span> id, textAnnotation <span class="hljs-keyword">of</span> analysis.textAnnotations</pre></div></div>
             
         </li>
         
@@ -157,11 +170,16 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
-              <p>create a reference to the TinyMCE editor dom.</p>
+              <p>get the selection prefix and suffix for the regexp.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      dom  = tinyMCE.get(<span class="hljs-string">"content"</span>).dom</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          selPrefix = cleanUp(textAnnotation.selectionPrefix.substr(-<span class="hljs-number">1</span>))
+          selPrefix = <span class="hljs-string">'^|\\W'</span> <span class="hljs-keyword">if</span> <span class="hljs-string">''</span> <span class="hljs-keyword">is</span> selPrefix
+          selSuffix = cleanUp(textAnnotation.selectionSuffix.substr(<span class="hljs-number">0</span>, <span class="hljs-number">1</span>))
+          selSuffix = <span class="hljs-string">'$|\\W'</span> <span class="hljs-keyword">if</span> <span class="hljs-string">''</span> <span class="hljs-keyword">is</span> selSuffix
+
+          selText   = textAnnotation.selectedText</pre></div></div>
             
         </li>
         
@@ -172,17 +190,20 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
-              <p>the element id containing the attributes for the text annotation.</p>
+              <p>the new regular expression, may not match everything.
+TODO: enhance the matching.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      id   = obj.relation.id
-      elem = dom.get(id)
- 
-      dom.setAttrib(id, <span class="hljs-string">'class'</span>, cssClasses);
-      dom.setAttrib(id, <span class="hljs-string">'itemscope'</span>, <span class="hljs-string">'itemscope'</span>);
-      dom.setAttrib(id, <span class="hljs-string">'itemtype'</span>,  obj.entity.type);
-      dom.setAttrib(id, <span class="hljs-string">'itemid'</span>, obj.entity.id);</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          r = <span class="hljs-keyword">new</span> RegExp(<span class="hljs-string">"(<span class="hljs-subst">#{selPrefix}</span>(?:&lt;[^&gt;]+&gt;){0,})(<span class="hljs-subst">#{selText}</span>)((?:&lt;[^&gt;]+&gt;){0,}<span class="hljs-subst">#{selSuffix}</span>)(?![^&lt;]*\"[^&lt;]*&gt;)"</span>)
+
+          replace = <span class="hljs-string">"$1&lt;span class=\"textannotation\" id=\"<span class="hljs-subst">#{id}</span>\" typeof=\"http://fise.iks-project.eu/ontology/TextAnnotation\"&gt;$2&lt;/span&gt;$3"</span>
+
+          currentHtmlContent = currentHtmlContent.replace( r, replace )
+
+        isDirty = tinyMCE.get(<span class="hljs-string">'content'</span>).isDirty()
+        tinyMCE.get(<span class="hljs-string">'content'</span>).setContent currentHtmlContent
+        tinyMCE.get(<span class="hljs-string">'content'</span>).isNotDirty = <span class="hljs-number">1</span> <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> isDirty</pre></div></div>
             
         </li>
         
@@ -193,12 +214,11 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
-              <p>Receive annotations from the analysis (there is a mirror method in PHP for testing purposes, please try to keep
-the two aligned - tests/functions.php <em>wl_embed_analysis</em> )</p>
+              <p>this event is raised when a textannotation is selected in the TinyMCE editor.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    $rootScope.$<span class="hljs-literal">on</span> <span class="hljs-string">'analysisReceived'</span>, <span class="hljs-function"><span class="hljs-params">(event, analysis)</span> -&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>        tinyMCE.get<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'content'</span>)</span>.<span class="hljs-title">onClick</span>.<span class="hljs-title">add</span> <span class="hljs-params">(editor, e)</span> -&gt;</span></pre></div></div>
             
         </li>
         
@@ -209,17 +229,12 @@ the two aligned - tests/functions.php <em>wl_embed_analysis</em> )</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
-              <p>Clean up the selection prefix/suffix text.</p>
+              <p>execute the following commands in the angular js context.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      <span class="hljs-function"><span class="hljs-title">cleanUp</span> = <span class="hljs-params">(text)</span> -&gt;</span>
-        text
-          .replace(<span class="hljs-string">'\\'</span>, <span class="hljs-string">'\\\\'</span>).replace( <span class="hljs-string">'\('</span>, <span class="hljs-string">'\\('</span> ).replace( <span class="hljs-string">'\)'</span>, <span class="hljs-string">'\\)'</span>).replace(<span class="hljs-string">'\n'</span>, <span class="hljs-string">'\\n?'</span>)
-          .replace(<span class="hljs-string">'-'</span>, <span class="hljs-string">'\\-'</span>).replace(<span class="hljs-string">'\x20'</span>, <span class="hljs-string">'\\s'</span>).replace(<span class="hljs-string">'\xa0'</span>, <span class="hljs-string">'&amp;nbsp;'</span>)
-
-
-      currentHtmlContent = tinyMCE.get(<span class="hljs-string">'content'</span>).getContent({format : <span class="hljs-string">'raw'</span>})</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          $rootScope.$apply(
+            $log.debug <span class="hljs-string">"Going to notify click on annotation with id <span class="hljs-subst">#{e.target.id}</span>"</span></pre></div></div>
             
         </li>
         
@@ -230,15 +245,14 @@ the two aligned - tests/functions.php <em>wl_embed_analysis</em> )</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
-              <p>Remove the existing text annotation spans.</p>
+              <p>send a message about the currently clicked annotation.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      spanre = <span class="hljs-regexp">/&lt;span class="textannotation"[^&gt;]*&gt;([^&lt;]*)&lt;\/span&gt;/gi</span>
-      <span class="hljs-keyword">while</span> spanre.test currentHtmlContent
-        currentHtmlContent = currentHtmlContent.replace spanre, <span class="hljs-string">'$1'</span>
+            <div class="content"><div class='highlight'><pre>            $rootScope.$broadcast <span class="hljs-string">'textAnnotationClicked'</span>, e.target.id, e
+          )
 
-      <span class="hljs-keyword">for</span> id, textAnnotation <span class="hljs-keyword">of</span> analysis.textAnnotations</pre></div></div>
+      <span class="hljs-attribute">ping</span>: <span class="hljs-function"><span class="hljs-params">(message)</span>    -&gt;</span> $log.debug message</pre></div></div>
             
         </li>
         
@@ -249,16 +263,13 @@ the two aligned - tests/functions.php <em>wl_embed_analysis</em> )</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
-              <p>get the selection prefix and suffix for the regexp.</p>
+              <p><a name="analyze"></a>
+Send the provided content for analysis using the <a href="app.services.AnalysisService.html#analyze">AnalysisService.analyze</a> method.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        selPrefix = cleanUp(textAnnotation.selectionPrefix.substr(-<span class="hljs-number">1</span>))
-        selPrefix = <span class="hljs-string">'^|\\W'</span> <span class="hljs-keyword">if</span> <span class="hljs-string">''</span> <span class="hljs-keyword">is</span> selPrefix
-        selSuffix = cleanUp(textAnnotation.selectionSuffix.substr(<span class="hljs-number">0</span>, <span class="hljs-number">1</span>))
-        selSuffix = <span class="hljs-string">'$|\\W'</span> <span class="hljs-keyword">if</span> <span class="hljs-string">''</span> <span class="hljs-keyword">is</span> selSuffix
-
-        selText   = textAnnotation.selectedText</pre></div></div>
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-attribute">analyze</span>: <span class="hljs-function"><span class="hljs-params">(content)</span> -&gt;</span>
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">if</span> AnalysisService.isRunning</pre></div></div>
             
         </li>
         
@@ -269,20 +280,11 @@ the two aligned - tests/functions.php <em>wl_embed_analysis</em> )</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
-              <p>the new regular expression, may not match everything.
-TODO: enhance the matching.</p>
+              <p>Disable the button and set the spinner while analysis is running.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        r = <span class="hljs-keyword">new</span> RegExp(<span class="hljs-string">"(<span class="hljs-subst">#{selPrefix}</span>(?:&lt;[^&gt;]+&gt;){0,})(<span class="hljs-subst">#{selText}</span>)((?:&lt;[^&gt;]+&gt;){0,}<span class="hljs-subst">#{selSuffix}</span>)(?![^&lt;]*\"[^&lt;]*&gt;)"</span>)
-
-        replace = <span class="hljs-string">"$1&lt;span class=\"textannotation\" id=\"<span class="hljs-subst">#{id}</span>\" typeof=\"http://fise.iks-project.eu/ontology/TextAnnotation\"&gt;$2&lt;/span&gt;$3"</span>
-
-        currentHtmlContent = currentHtmlContent.replace( r, replace )
-
-      isDirty = tinyMCE.get(<span class="hljs-string">'content'</span>).isDirty()
-      tinyMCE.get(<span class="hljs-string">'content'</span>).setContent currentHtmlContent
-      tinyMCE.get(<span class="hljs-string">'content'</span>).isNotDirty = <span class="hljs-number">1</span> <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> isDirty</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        $(<span class="hljs-string">'.mce_wordlift'</span>).addClass <span class="hljs-string">'running'</span></pre></div></div>
             
         </li>
         
@@ -293,11 +295,11 @@ TODO: enhance the matching.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
-              <p>this event is raised when a textannotation is selected in the TinyMCE editor.</p>
+              <p>Make the editor read-obly.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      tinyMCE.get<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'content'</span>)</span>.<span class="hljs-title">onClick</span>.<span class="hljs-title">add</span> <span class="hljs-params">(editor, e)</span> -&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>        tinyMCE.get(<span class="hljs-string">'content'</span>).getBody().setAttribute <span class="hljs-string">'contenteditable'</span>, <span class="hljs-literal">false</span></pre></div></div>
             
         </li>
         
@@ -308,12 +310,11 @@ TODO: enhance the matching.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
-              <p>execute the following commands in the angular js context.</p>
+              <p>Call the <a href="AnalysisService.html">AnalysisService</a> to analyze the provided content.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        $rootScope.$apply(
-          $log.debug <span class="hljs-string">"Going to notify click on annotation with id <span class="hljs-subst">#{e.target.id}</span>"</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>        AnalysisService.analyze content</pre></div></div>
             
         </li>
         
@@ -324,14 +325,13 @@ TODO: enhance the matching.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
-              <p>send a message about the currently clicked annotation.</p>
+              <p>set some predefined variables.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          $rootScope.$broadcast <span class="hljs-string">'textAnnotationClicked'</span>, e.target.id, e
-        )
-
-    <span class="hljs-attribute">ping</span>: <span class="hljs-function"><span class="hljs-params">(message)</span>    -&gt;</span> $log.debug message</pre></div></div>
+            <div class="content"><div class='highlight'><pre>      getEditor :<span class="hljs-function"> -&gt;</span> tinyMCE.get(<span class="hljs-string">'content'</span>)
+      getBody   :<span class="hljs-function"> -&gt;</span> <span class="hljs-property">@getEditor</span>().getBody()
+      getDOM    :<span class="hljs-function"> -&gt;</span> <span class="hljs-property">@getEditor</span>().dom</pre></div></div>
             
         </li>
         
@@ -342,13 +342,12 @@ TODO: enhance the matching.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
-              <p><a name="analyze"></a>
-Send the provided content for analysis using the <a href="app.services.AnalysisService.html#analyze">AnalysisService.analyze</a> method.</p>
+              <p>get the window position of an element inside the editor.
+@param element elem The element.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">analyze</span>: <span class="hljs-function"><span class="hljs-params">(content)</span> -&gt;</span>
-      <span class="hljs-keyword">return</span> <span class="hljs-keyword">if</span> AnalysisService.isRunning</pre></div></div>
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-attribute">getWinPos</span>: <span class="hljs-function"><span class="hljs-params">(elem)</span> -&gt;</span></pre></div></div>
             
         </li>
         
@@ -359,11 +358,18 @@ Send the provided content for analysis using the <a href="app.services.AnalysisS
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
-              <p>Disable the button and set the spinner while analysis is running.</p>
+              <p>get a reference to the editor and its body</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      $(<span class="hljs-string">'.mce_wordlift'</span>).addClass <span class="hljs-string">'running'</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>        ed   = <span class="hljs-property">@getEditor</span>()
+        el   = elem.target
+
+        top  = $(<span class="hljs-string">'#content_ifr'</span>).offset().top - $(<span class="hljs-string">'body'</span>).scrollTop() +
+               el.offsetTop - $(ed.getBody()).scrollTop()
+
+        left = $(<span class="hljs-string">'#content_ifr'</span>).offset().left - $(<span class="hljs-string">'body'</span>).scrollLeft() +
+               el.offsetLeft - $(ed.getBody()).scrollLeft()</pre></div></div>
             
         </li>
         
@@ -374,11 +380,11 @@ Send the provided content for analysis using the <a href="app.services.AnalysisS
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
-              <p>Make the editor read-obly.</p>
+              <p>Return the coordinates.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      tinyMCE.get(<span class="hljs-string">'content'</span>).getBody().setAttribute <span class="hljs-string">'contenteditable'</span>, <span class="hljs-literal">false</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>        {<span class="hljs-attribute">top</span>: top, <span class="hljs-attribute">left</span>: left}</pre></div></div>
             
         </li>
         
@@ -389,11 +395,12 @@ Send the provided content for analysis using the <a href="app.services.AnalysisS
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
-              <p>Call the <a href="AnalysisService.html">AnalysisService</a> to analyze the provided content.</p>
+              <p>Hook the service to the events. This event is captured when an entity is selected in the disambiguation popover.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      AnalysisService.analyze content</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    $rootScope.$<span class="hljs-literal">on</span> <span class="hljs-string">'DisambiguationWidget.entitySelected'</span>, <span class="hljs-function"><span class="hljs-params">(event, obj)</span> -&gt;</span>
+      cssClasses = <span class="hljs-string">"textannotation highlight <span class="hljs-subst">#{obj.entity.type}</span> disambiguated"</span></pre></div></div>
             
         </li>
         
@@ -404,13 +411,11 @@ Send the provided content for analysis using the <a href="app.services.AnalysisS
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
-              <p>set some predefined variables.</p>
+              <p>create a reference to the TinyMCE editor dom.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    getEditor :<span class="hljs-function"> -&gt;</span> tinyMCE.get(<span class="hljs-string">'content'</span>)
-    getBody   :<span class="hljs-function"> -&gt;</span> <span class="hljs-property">@getEditor</span>().getBody()
-    getDOM    :<span class="hljs-function"> -&gt;</span> <span class="hljs-property">@getEditor</span>().dom</pre></div></div>
+            <div class="content"><div class='highlight'><pre>      dom  = tinyMCE.get(<span class="hljs-string">"content"</span>).dom</pre></div></div>
             
         </li>
         
@@ -421,12 +426,17 @@ Send the provided content for analysis using the <a href="app.services.AnalysisS
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-21">&#182;</a>
               </div>
-              <p>get the window position of an element inside the editor.
-@param element elem The element.</p>
+              <p>the element id containing the attributes for the text annotation.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">getWinPos</span>: <span class="hljs-function"><span class="hljs-params">(elem)</span> -&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>      id   = obj.relation.id
+      elem = dom.get(id)
+
+      dom.setAttrib(id, <span class="hljs-string">'class'</span>, cssClasses);
+      dom.setAttrib(id, <span class="hljs-string">'itemscope'</span>, <span class="hljs-string">'itemscope'</span>);
+      dom.setAttrib(id, <span class="hljs-string">'itemtype'</span>,  obj.entity.type);
+      dom.setAttrib(id, <span class="hljs-string">'itemid'</span>, obj.entity.id);</pre></div></div>
             
         </li>
         
@@ -437,18 +447,18 @@ Send the provided content for analysis using the <a href="app.services.AnalysisS
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
-              <p>get a reference to the editor and its body</p>
+              <p>Receive annotations from the analysis (there is a mirror method in PHP for testing purposes, please try to keep
+the two aligned - tests/functions.php <em>wl_embed_analysis</em> )
+When an analysis is completed, remove the <em>running</em> class from the WordLift toolbar button.
+(The button is set to running when <a href="#analyze">an analysis is called</a>.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      ed   = <span class="hljs-property">@getEditor</span>()
-      el   = elem.target
+            <div class="content"><div class='highlight'><pre>    $rootScope.$<span class="hljs-literal">on</span> <span class="hljs-string">'analysisReceived'</span>, <span class="hljs-function"><span class="hljs-params">(event, analysis)</span> -&gt;</span>
 
-      top  = $(<span class="hljs-string">'#content_ifr'</span>).offset().top - $(<span class="hljs-string">'body'</span>).scrollTop() +
-             el.offsetTop - $(ed.getBody()).scrollTop()
+      $log.info <span class="hljs-string">'analysisReceived [ analysis :: '</span> + analysis + <span class="hljs-string">' ]'</span>
 
-      left = $(<span class="hljs-string">'#content_ifr'</span>).offset().left - $(<span class="hljs-string">'body'</span>).scrollLeft() +
-             el.offsetLeft - $(ed.getBody()).scrollLeft()</pre></div></div>
+      service.embedAnalysis analysis</pre></div></div>
             
         </li>
         
@@ -459,11 +469,11 @@ Send the provided content for analysis using the <a href="app.services.AnalysisS
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
-              <p>Return the coordinates.</p>
+              <p>Remove the <em>running</em> class.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      {<span class="hljs-attribute">top</span>: top, <span class="hljs-attribute">left</span>: left}</pre></div></div>
+            <div class="content"><div class='highlight'><pre>      $(<span class="hljs-string">'.mce_wordlift'</span>).removeClass <span class="hljs-string">'running'</span></pre></div></div>
             
         </li>
         
@@ -474,15 +484,26 @@ Send the provided content for analysis using the <a href="app.services.AnalysisS
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-24">&#182;</a>
               </div>
-              <p><a name="onChange"></a>
-Receive onChange events from the editor (this method is hooked in the <a href="app.html#editor.onChange.add">app</a> file.
-   onChange: (editor, l) -&gt;
-     $log.debug l</p>
-<h1 id="-analyze-tinymce-activeeditor-getcontent-format-text-">@analyze tinyMCE.activeEditor.getContent({format : ‘text’})</h1>
+              <p>Make the editor read/write.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>
+            <div class="content"><div class='highlight'><pre>      tinyMCE.get(<span class="hljs-string">'content'</span>).getBody().setAttribute <span class="hljs-string">'contenteditable'</span>, <span class="hljs-literal">true</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-25">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-25">&#182;</a>
+              </div>
+              <p>Return the service definition.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    service
   ])</pre></div></div>
             
         </li>

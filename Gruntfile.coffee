@@ -64,7 +64,10 @@ module.exports = (grunt) ->
 
     docco:
       doc:
-        src: ['src/coffee/**/*.coffee']
+        src: [
+          'src/coffee/**/*.coffee',
+          'test/unit/**/*.coffee',
+        ]
         options:
           output: 'docs/'
 
