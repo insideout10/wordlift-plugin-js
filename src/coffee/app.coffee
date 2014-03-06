@@ -40,6 +40,7 @@ $(
     ''')
     .appendTo('body')
     .css(
+      display: 'none'
       height: $('body').height() - $('#wpadminbar').height() + 32
       top: $('#wpadminbar').height() - 1
       right: 0

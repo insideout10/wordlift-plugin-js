@@ -608,8 +608,10 @@ angular.module('wordlift.tinymce.plugin.controllers', [ 'wordlift.tinymce.plugin
 
     # When a text annotation is clicked, open the disambiguation popover.
     $scope.$on 'textAnnotationClicked', (event, id, sourceElement) ->
+
       # Set or reset properly $scope.selectedEntity
       $scope.selectedEntity = undefined
+
       # Get the text annotation with the provided id.
       $scope.textAnnotationSpan = angular.element(sourceElement.target)
       
@@ -673,6 +675,7 @@ $(
     ''')
     .appendTo('body')
     .css(
+      display: 'none'
       height: $('body').height() - $('#wpadminbar').height() + 32
       top: $('#wpadminbar').height() - 1
       right: 0

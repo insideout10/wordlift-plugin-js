@@ -75,15 +75,21 @@ describe "EditorController tests", ->
       # Check that the analysis saved in the scope equals the one sent by the AnalysisService.
       expect($scope.analysis).toEqual analysis
 
-      # Send the textAnnotationClicked.
-      $rootScope.$broadcast 'textAnnotationClicked', '123', {target: $('body')[0]}
+      # Check that the disambiguation popover is not visible.
+      expect($('#wordlift-disambiguation-popover')).not.toBeVisible()
 
-      # Check that the textAnnotationClicked event has been received.
-      expect($scope.$on).toHaveBeenCalledWith('textAnnotationClicked', jasmine.any(Function))
+      for id, textAnnotation of analysis.textAnnotations
 
+        # Send the textAnnotationClicked.
+        $rootScope.$broadcast 'textAnnotationClicked', id, {target: $('body')[0]}
+
+        # Check that the textAnnotationClicked event has been received.
+        expect($scope.$on).toHaveBeenCalledWith('textAnnotationClicked', jasmine.any(Function))
+
+        expect($scope.selectedEntity).toEqual undefined
+
+        # Check that the disambiguation popover is visible.
+        expect($('#wordlift-disambiguation-popover')).toBeVisible()
+
+        # dump $('#wordlift-disambiguation-popover .entity').length
   )
-
-#
-#    expect(EntitiesController).not.toBe undefined
-#    expect(EntitiesController.scope).not.toBe undefined
-#    $scope.$on 'textAnnotationClicked', (event, id, sourceElement) ->
