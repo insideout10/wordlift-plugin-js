@@ -486,7 +486,7 @@
       }
       return filtered;
     };
-  }).controller('HelloController', [
+  }).controller('EntitiesController', [
     'EditorService', 'EntityService', '$log', '$scope', 'Configuration', function(EditorService, EntityService, $log, $scope, Configuration) {
       var el, scroll, setArrowTop;
       $scope.analysis = null;
@@ -575,7 +575,7 @@
     return $("<li>").append("<li>\n  <div class=\"entity " + item.types + "\">\n    <!-- div class=\"thumbnail\" style=\"background-image: url('')\"></div -->\n    <div class=\"thumbnail empty\"></div>\n    <div class=\"confidence\"></div>\n    <div class=\"label\">" + item.label + "</div>\n    <div class=\"type\"></div>\n    <div class=\"source\"></div>\n  </div>\n</li>").appendTo(ul);
   }, $('#wordlift-disambiguation-popover .handlediv').click(function(e) {
     return container.hide();
-  }), $('body').attr('ng-controller', 'HelloController'), injector = angular.bootstrap(document, ['wordlift.tinymce.plugin']), tinymce.PluginManager.add('wordlift', function(editor, url) {
+  }), $('body').attr('ng-controller', 'EntitiesController'), injector = angular.bootstrap(document, ['wordlift.tinymce.plugin']), tinymce.PluginManager.add('wordlift', function(editor, url) {
     return editor.addButton('wordlift', {
       text: 'WordLift',
       icon: false,

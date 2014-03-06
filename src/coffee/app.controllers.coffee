@@ -11,7 +11,7 @@ angular.module('wordlift.tinymce.plugin.controllers', [ 'wordlift.tinymce.plugin
 
       filtered
   )
-  .controller('HelloController', ['EditorService', 'EntityService', '$log', '$scope', 'Configuration', (EditorService, EntityService, $log, $scope, Configuration) ->
+  .controller('EntitiesController', ['EditorService', 'EntityService', '$log', '$scope', 'Configuration', (EditorService, EntityService, $log, $scope, Configuration) ->
 
     # holds a reference to the current analysis results.
     $scope.analysis       = null
@@ -97,10 +97,12 @@ angular.module('wordlift.tinymce.plugin.controllers', [ 'wordlift.tinymce.plugin
         $('#wordlift-disambiguation-popover').hide()
       # show the popover.
       else
+
         # get the position of the clicked element.
         pos = EditorService.getWinPos(sourceElement)
         # set the popover arrow to the element position.
         setArrowTop(pos.top - 50)
+
         # show the popover.
         $('#wordlift-disambiguation-popover').show()
 

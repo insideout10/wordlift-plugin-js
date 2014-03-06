@@ -73,7 +73,7 @@ $(
   $('#wordlift-disambiguation-popover .handlediv').click (e) -> container.hide()
 
   # Declare ng-controller as main app controller.
-  $('body').attr 'ng-controller', 'HelloController'
+  $('body').attr 'ng-controller', 'EntitiesController'
 
   # Declare the whole document as bootstrap scope.
   injector = angular.bootstrap(document, ['wordlift.tinymce.plugin']);

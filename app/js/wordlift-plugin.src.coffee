@@ -332,7 +332,7 @@ angular.module( 'AnalysisService', [] )
 angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tinymce.plugin.config', 'AnalysisService'])
   .service('EditorService', ['AnalysisService', '$rootScope', '$log', 'Configuration', (AnalysisService, $rootScope, $log, Configuration) ->
 
-    # Define the service.
+    # Define the EditorService.
     service =
       # Embed the provided analysis in the editor.
       embedAnalysis: (analysis) ->
@@ -534,7 +534,7 @@ angular.module('wordlift.tinymce.plugin.controllers', [ 'wordlift.tinymce.plugin
 
       filtered
   )
-  .controller('HelloController', ['EditorService', 'EntityService', '$log', '$scope', 'Configuration', (EditorService, EntityService, $log, $scope, Configuration) ->
+  .controller('EntitiesController', ['EditorService', 'EntityService', '$log', '$scope', 'Configuration', (EditorService, EntityService, $log, $scope, Configuration) ->
 
     # holds a reference to the current analysis results.
     $scope.analysis       = null
@@ -620,10 +620,12 @@ angular.module('wordlift.tinymce.plugin.controllers', [ 'wordlift.tinymce.plugin
         $('#wordlift-disambiguation-popover').hide()
       # show the popover.
       else
+
         # get the position of the clicked element.
         pos = EditorService.getWinPos(sourceElement)
         # set the popover arrow to the element position.
         setArrowTop(pos.top - 50)
+
         # show the popover.
         $('#wordlift-disambiguation-popover').show()
 
@@ -704,7 +706,7 @@ $(
   $('#wordlift-disambiguation-popover .handlediv').click (e) -> container.hide()
 
   # Declare ng-controller as main app controller.
-  $('body').attr 'ng-controller', 'HelloController'
+  $('body').attr 'ng-controller', 'EntitiesController'
 
   # Declare the whole document as bootstrap scope.
   injector = angular.bootstrap(document, ['wordlift.tinymce.plugin']);

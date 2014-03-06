@@ -1,7 +1,7 @@
 angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tinymce.plugin.config', 'AnalysisService'])
   .service('EditorService', ['AnalysisService', '$rootScope', '$log', 'Configuration', (AnalysisService, $rootScope, $log, Configuration) ->
 
-    # Define the service.
+    # Define the EditorService.
     service =
       # Embed the provided analysis in the editor.
       embedAnalysis: (analysis) ->
