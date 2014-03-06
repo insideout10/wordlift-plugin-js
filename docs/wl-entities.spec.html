@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>app.directives.coffee</title>
+  <title>wl-entities.spec.coffee</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="docco.css" />
@@ -81,7 +81,7 @@
         
           <li id="title">
               <div class="annotation">
-                  <h1>app.directives.coffee</h1>
+                  <h1>wl-entities.spec.coffee</h1>
               </div>
           </li>
         
@@ -96,40 +96,33 @@
               
             </div>
             
-            <div class="content"><div class='highlight'><pre>angular.<span class="hljs-built_in">module</span>(<span class="hljs-string">'wordlift.tinymce.plugin.directives'</span>, [<span class="hljs-string">'wordlift.tinymce.plugin.controllers'</span>])
-.directive(<span class="hljs-string">'wlMetaBoxSelectedEntity'</span>,<span class="hljs-function"> -&gt;</span>
-    <span class="hljs-attribute">restrict</span>: <span class="hljs-string">'AE'</span>
-    <span class="hljs-attribute">scope</span>:
-      <span class="hljs-attribute">index</span>: <span class="hljs-string">'='</span>
-      <span class="hljs-attribute">entity</span>: <span class="hljs-string">'='</span>
-    <span class="hljs-attribute">template</span>: <span class="hljs-string">"""
-      &lt;span&gt;{{entity.label}} (&lt;small&gt;{{entity.type}}&lt;/span&gt;)\n
-      &lt;br /&gt;&lt;small&gt;{{entity.thumbnail}}&lt;/small&gt;
-      &lt;input type="hidden" name="entities[{{index}}]['id']" value="{{entity.id}}" /&gt;\n
-      &lt;input type="hidden" name="entities[{{index}}]['label']" value="{{entity.label}}" /&gt;\n
-      &lt;input type="hidden" name="entities[{{index}}]['description']" value="{{entity.description}}" /&gt;\n
-      &lt;input type="hidden" name="entities[{{index}}]['type']" value="{{entity.type}}" /&gt;\n
-      &lt;input type="hidden" name="entities[{{index}}]['thumbnail']" value="{{entity.thumbnail}}" /&gt;\n
-    """</span>
-  )</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-2">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-2">&#182;</a>
-              </div>
-              <p>The wlEntities directive provides a UI for disambiguating the entities for a provided text annotation.</p>
+            <div class="content"><div class='highlight'><pre><span class="hljs-string">'use strict'</span>;
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>.directive(<span class="hljs-string">'wlEntities'</span>,<span class="hljs-function"> -&gt;</span>
-    <span class="hljs-attribute">restrict</span>: <span class="hljs-string">'E'</span>
-    <span class="hljs-attribute">template</span>: <span class="hljs-string">''</span>
-  )</pre></div></div>
+describe <span class="hljs-string">'directives'</span>,<span class="hljs-function"> -&gt;</span>
+
+  beforeEach <span class="hljs-built_in">module</span>(<span class="hljs-string">'wordlift.tinymce.plugin.directives'</span>)
+
+  describe <span class="hljs-string">'wl-entities'</span>,<span class="hljs-function"> -&gt;</span>
+
+    scope = <span class="hljs-literal">undefined</span>
+    element = <span class="hljs-literal">undefined</span>
+
+    beforeEach inject<span class="hljs-function"><span class="hljs-params">( ($rootScope) -&gt;
+      scope = $rootScope
+      element = angular.element <span class="hljs-string">'&lt;wl-entities&gt;&lt;/wl-entities&gt;'</span>
+    )</span>
+
+    <span class="hljs-title">it</span> '<span class="hljs-title">should</span> <span class="hljs-title">print</span> <span class="hljs-title">current</span> <span class="hljs-title">version</span>', <span class="hljs-title">inject</span><span class="hljs-params">( ($compile) -&gt;
+
+      $compile(element)(scope)
+      scope.$digest()
+
+      dump element
+
+      expect(element.text()).toEqual <span class="hljs-string">'I am born again'</span>
+    )</span>
+
+</span></pre></div></div>
             
         </li>
         

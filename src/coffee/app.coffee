@@ -8,6 +8,7 @@ angular.module('wordlift.tinymce.plugin', ['wordlift.tinymce.plugin.controllers'
 $(
   container = $('''
     <div id="wordlift-disambiguation-popover" class="metabox-holder">
+      <wl-entities></wl-entities>
 
       <div class="postbox">
         <div class="handlediv" title="Click to toggle"><br></div>
@@ -23,7 +24,7 @@ $(
               <ul>
                 <li ng-repeat="(id, entityAnnotation) in textAnnotation.entityAnnotations | orderObjectBy:'confidence':true">
                   <div class="entity {{entityAnnotation.entity.type}}" ng-class="{selected: true==entityAnnotation.selected}" ng-click="onEntityClicked(id, entityAnnotation)" ng-show="entityAnnotation.entity.label">
-                    <div class="thumbnail" ng-show="entityAnnotation.entity.thumbnail" title="{{entityAnnotation.entity.id}}" style="background-image: url({{entityAnnotation.entity.thumbnail}})"></div>
+                    <div class="thumbnail" ng-show="entityAnnotation.entity.thumbnail" title="{{entityAnnotation.entity.id}}" ng-attr-style="background-image: url({{entityAnnotation.entity.thumbnail}})"></div>
                     <div class="thumbnail empty" ng-hide="entityAnnotation.entity.thumbnail" title="{{entityAnnotation.entity.id}}"></div>
                     <div class="confidence" ng-bind="entityAnnotation.confidence"></div>
                     <div class="label" ng-bind="entityAnnotation.entity.label"></div>
@@ -38,14 +39,14 @@ $(
       </div>
     </div>
     ''')
-    .appendTo('body')
-    .css(
+  .appendTo('body')
+  .css(
       display: 'none'
       height: $('body').height() - $('#wpadminbar').height() + 32
       top: $('#wpadminbar').height() - 1
       right: 0
     )
-    .draggable()
+  .draggable()
 
   $('#search').autocomplete
     source: ajaxurl + '?action=wordlift_search',
@@ -53,10 +54,10 @@ $(
     select: (event, ui) ->
       console.log event
       console.log ui
-  .data( "ui-autocomplete" )._renderItem = ( ul, item ) ->
+  .data("ui-autocomplete")._renderItem = (ul, item) ->
     console.log ul
-    $( "<li>" )
-      .append("""
+    $("<li>")
+    .append("""
         <li>
           <div class="entity #{item.types}">
             <!-- div class="thumbnail" style="background-image: url('')"></div -->
@@ -68,10 +69,11 @@ $(
           </div>
         </li>
     """)
-    .appendTo( ul )
+    .appendTo(ul)
 
   # When the user clicks on the handle, hide the popover.
-  $('#wordlift-disambiguation-popover .handlediv').click (e) -> container.hide()
+  $('#wordlift-disambiguation-popover .handlediv').click (e) ->
+    container.hide()
 
   # Declare ng-controller as main app controller.
   $('body').attr 'ng-controller', 'EntitiesController'
@@ -84,16 +86,16 @@ $(
 
     # Add a WordLift button the TinyMCE editor.
     editor.addButton 'wordlift',
-      text   : 'WordLift'
-      icon   : false
-      # When the editor is clicked, the [EditorService.analyze](app.services.EditorService.html#analyze) method is invoked.
+      text: 'WordLift'
+      icon: false
+    # When the editor is clicked, the [EditorService.analyze](app.services.EditorService.html#analyze) method is invoked.
       onclick: ->
         injector.invoke(['EditorService', (EditorService) ->
-          EditorService.analyze tinyMCE.activeEditor.getContent({format : 'text'})
+          EditorService.analyze tinyMCE.activeEditor.getContent({format: 'text'})
         ])
 
-    # <a name="editor.onChange.add"></a>
-    # Map the editor onChange event to the [EditorService.onChange](app.services.EditorService.html#onChange) method.
+  # <a name="editor.onChange.add"></a>
+  # Map the editor onChange event to the [EditorService.onChange](app.services.EditorService.html#onChange) method.
 #    editor.onChange.add (ed, l) ->
 #      # The [EditorService](app.services.EditorService.html) is invoked via the AngularJS injector.
 #      injector.invoke(['EditorService', (EditorService) ->

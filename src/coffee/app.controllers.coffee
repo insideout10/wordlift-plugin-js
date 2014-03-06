@@ -90,8 +90,9 @@ angular.module('wordlift.tinymce.plugin.controllers', [ 'wordlift.tinymce.plugin
       $scope.selectedEntity = undefined
 
       # Get the text annotation with the provided id.
-      $scope.textAnnotationSpan = angular.element(sourceElement.target)
-      
+      $scope.textAnnotationSpan = angular.element sourceElement.target
+
+      # Set the current text annotation to the one specified.
       $scope.textAnnotation = $scope.analysis.textAnnotations[id]
 
       # hide the popover if there are no entities.

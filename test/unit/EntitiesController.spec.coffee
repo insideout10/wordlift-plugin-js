@@ -69,6 +69,19 @@ describe "EditorController tests", ->
 
       expect(analysis).not.toBe undefined
 
+      # Check that the analysis results conform.
+      expect(analysis.language).not.toBe undefined
+      expect(analysis.entities).not.toBe undefined
+      expect(analysis.entityAnnotations).not.toBe undefined
+      expect(analysis.textAnnotations).not.toBe undefined
+      expect(analysis.languages).not.toBe undefined
+
+      expect(analysis.language).toEqual 'en'
+      expect(Object.keys(analysis.entities).length).toEqual 25
+      expect(Object.keys(analysis.entityAnnotations).length).toEqual 27
+      expect(Object.keys(analysis.textAnnotations).length).toEqual 10
+      expect(Object.keys(analysis.languages).length).toEqual 1
+
       # Check that the scope has been called with analysisReceived.
       expect($scope.$on).toHaveBeenCalledWith('analysisReceived', jasmine.any(Function))
 
@@ -86,10 +99,13 @@ describe "EditorController tests", ->
         # Check that the textAnnotationClicked event has been received.
         expect($scope.$on).toHaveBeenCalledWith('textAnnotationClicked', jasmine.any(Function))
 
+        # Check that information inside the scope are updated accordingly.
         expect($scope.selectedEntity).toEqual undefined
+        expect($scope.textAnnotation.id).toEqual id
+        expect($scope.textAnnotation).toEqual textAnnotation
+        expect(Object.keys($scope.textAnnotation.entityAnnotations).length).toBeGreaterThan 0
 
         # Check that the disambiguation popover is visible.
         expect($('#wordlift-disambiguation-popover')).toBeVisible()
 
-        # dump $('#wordlift-disambiguation-popover .entity').length
   )

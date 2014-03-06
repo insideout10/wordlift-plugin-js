@@ -68,6 +68,11 @@
                 tinymce.spec.coffee
               </a>
             
+              
+              <a class="source" href="wl-entities.spec.html">
+                wl-entities.spec.coffee
+              </a>
+            
           </div>
         </li>
       </ul>
@@ -125,6 +130,7 @@
             <div class="content"><div class='highlight'><pre>$(
   container = $(<span class="hljs-string">'''
     &lt;div id="wordlift-disambiguation-popover" class="metabox-holder"&gt;
+      &lt;wl-entities&gt;&lt;/wl-entities&gt;
 
       &lt;div class="postbox"&gt;
         &lt;div class="handlediv" title="Click to toggle"&gt;&lt;br&gt;&lt;/div&gt;
@@ -140,7 +146,7 @@
               &lt;ul&gt;
                 &lt;li ng-repeat="(id, entityAnnotation) in textAnnotation.entityAnnotations | orderObjectBy:'confidence':true"&gt;
                   &lt;div class="entity {{entityAnnotation.entity.type}}" ng-class="{selected: true==entityAnnotation.selected}" ng-click="onEntityClicked(id, entityAnnotation)" ng-show="entityAnnotation.entity.label"&gt;
-                    &lt;div class="thumbnail" ng-show="entityAnnotation.entity.thumbnail" title="{{entityAnnotation.entity.id}}" style="background-image: url({{entityAnnotation.entity.thumbnail}})"&gt;&lt;/div&gt;
+                    &lt;div class="thumbnail" ng-show="entityAnnotation.entity.thumbnail" title="{{entityAnnotation.entity.id}}" ng-attr-style="background-image: url({{entityAnnotation.entity.thumbnail}})"&gt;&lt;/div&gt;
                     &lt;div class="thumbnail empty" ng-hide="entityAnnotation.entity.thumbnail" title="{{entityAnnotation.entity.id}}"&gt;&lt;/div&gt;
                     &lt;div class="confidence" ng-bind="entityAnnotation.confidence"&gt;&lt;/div&gt;
                     &lt;div class="label" ng-bind="entityAnnotation.entity.label"&gt;&lt;/div&gt;
@@ -155,14 +161,14 @@
       &lt;/div&gt;
     &lt;/div&gt;
     '''</span>)
-    .appendTo(<span class="hljs-string">'body'</span>)
-    .css(
+  .appendTo(<span class="hljs-string">'body'</span>)
+  .css(
       <span class="hljs-attribute">display</span>: <span class="hljs-string">'none'</span>
       <span class="hljs-attribute">height</span>: $(<span class="hljs-string">'body'</span>).height() - $(<span class="hljs-string">'#wpadminbar'</span>).height() + <span class="hljs-number">32</span>
       <span class="hljs-attribute">top</span>: $(<span class="hljs-string">'#wpadminbar'</span>).height() - <span class="hljs-number">1</span>
       <span class="hljs-attribute">right</span>: <span class="hljs-number">0</span>
     )
-    .draggable()
+  .draggable()
 
   $(<span class="hljs-string">'#search'</span>).autocomplete
     <span class="hljs-attribute">source</span>: ajaxurl + <span class="hljs-string">'?action=wordlift_search'</span>,
@@ -170,10 +176,10 @@
     <span class="hljs-attribute">select</span>: <span class="hljs-function"><span class="hljs-params">(event, ui)</span> -&gt;</span>
       <span class="hljs-built_in">console</span>.log event
       <span class="hljs-built_in">console</span>.log ui
-  .data<span class="hljs-function"><span class="hljs-params">( <span class="hljs-string">"ui-autocomplete"</span> )</span>.<span class="hljs-title">_renderItem</span> = <span class="hljs-params">( ul, item )</span> -&gt;</span>
+  .data<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">"ui-autocomplete"</span>)</span>.<span class="hljs-title">_renderItem</span> = <span class="hljs-params">(ul, item)</span> -&gt;</span>
     <span class="hljs-built_in">console</span>.log ul
-    $( <span class="hljs-string">"&lt;li&gt;"</span> )
-      .append(<span class="hljs-string">"""
+    $(<span class="hljs-string">"&lt;li&gt;"</span>)
+    .append(<span class="hljs-string">"""
         &lt;li&gt;
           &lt;div class="entity <span class="hljs-subst">#{item.types}</span>"&gt;
             &lt;!-- div class="thumbnail" style="background-image: url('')"&gt;&lt;/div --&gt;
@@ -185,7 +191,7 @@
           &lt;/div&gt;
         &lt;/li&gt;
     """</span>)
-    .appendTo( ul )</pre></div></div>
+    .appendTo(ul)</pre></div></div>
             
         </li>
         
@@ -200,7 +206,8 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  $<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'#wordlift-disambiguation-popover .handlediv'</span>)</span>.<span class="hljs-title">click</span> <span class="hljs-params">(e)</span> -&gt;</span> container.hide()</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  $<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'#wordlift-disambiguation-popover .handlediv'</span>)</span>.<span class="hljs-title">click</span> <span class="hljs-params">(e)</span> -&gt;</span>
+    container.hide()</pre></div></div>
             
         </li>
         
@@ -261,8 +268,8 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>    editor.addButton <span class="hljs-string">'wordlift'</span>,
-      text   : <span class="hljs-string">'WordLift'</span>
-      icon   : <span class="hljs-literal">false</span></pre></div></div>
+      <span class="hljs-attribute">text</span>: <span class="hljs-string">'WordLift'</span>
+      <span class="hljs-attribute">icon</span>: <span class="hljs-literal">false</span></pre></div></div>
             
         </li>
         
@@ -279,7 +286,7 @@
             
             <div class="content"><div class='highlight'><pre>      <span class="hljs-attribute">onclick</span>:<span class="hljs-function"> -&gt;</span>
         injector.invoke<span class="hljs-function"><span class="hljs-params">([<span class="hljs-string">'EditorService'</span>, (EditorService) -&gt;
-          EditorService.analyze tinyMCE.activeEditor.getContent({format : <span class="hljs-string">'text'</span>})
+          EditorService.analyze tinyMCE.activeEditor.getContent({format: <span class="hljs-string">'text'</span>})
         ])</span>
 
 </span></pre></div></div>
