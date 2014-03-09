@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>app.config.coffee</title>
+  <title>wlEntities.spec.coffee</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="docco.css" />
@@ -81,7 +81,7 @@
         
           <li id="title">
               <div class="annotation">
-                  <h1>app.config.coffee</h1>
+                  <h1>wlEntities.spec.coffee</h1>
               </div>
           </li>
         
@@ -96,27 +96,7 @@
               
             </div>
             
-            <div class="content"><div class='highlight'><pre>angular.<span class="hljs-built_in">module</span>(<span class="hljs-string">'wordlift.tinymce.plugin.config'</span>, [])
-	.constant <span class="hljs-string">'Configuration'</span>, 
-		<span class="hljs-attribute">supportedTypes</span>: [
-			<span class="hljs-string">'schema:Place'</span>
-			<span class="hljs-string">'schema:Event'</span>
-			<span class="hljs-string">'schema:CreativeWork'</span>
-			<span class="hljs-string">'schema:Product'</span>
-			<span class="hljs-string">'schema:Person'</span>
-			<span class="hljs-string">'schema:Organization'</span>
-		]
-		<span class="hljs-attribute">entityLabels</span>:
-			<span class="hljs-string">'entityLabel'</span>: <span class="hljs-string">'enhancer:entity-label'</span>
-			<span class="hljs-string">'entityType'</span>: <span class="hljs-string">'enhancer:entity-type'</span>
-			<span class="hljs-string">'entityReference'</span>: <span class="hljs-string">'enhancer:entity-reference'</span>
-			<span class="hljs-string">'textAnnotation'</span>: <span class="hljs-string">'enhancer:TextAnnotation'</span>
-			<span class="hljs-string">'entityAnnotation'</span>: <span class="hljs-string">'enhancer:EntityAnnotation'</span>
-			<span class="hljs-string">'selectionPrefix'</span>: <span class="hljs-string">'enhancer:selection-prefix'</span>
-			<span class="hljs-string">'selectionSuffix'</span>: <span class="hljs-string">'enhancer:selection-suffix'</span>
-			<span class="hljs-string">'selectedText'</span>: <span class="hljs-string">'enhancer:selected-text'</span>
-			<span class="hljs-string">'confidence'</span>: <span class="hljs-string">'enhancer:confidence'</span>
-			<span class="hljs-string">'relation'</span>:	<span class="hljs-string">'dc:relation'</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-string">'use strict'</span>;</pre></div></div>
             
         </li>
         
@@ -127,18 +107,74 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
-              <pre><code> <span class="hljs-string">'entityLabel'</span>:      <span class="hljs-string">'entity-label'</span>
- <span class="hljs-string">'entityType'</span>:       <span class="hljs-string">'entity-type'</span>
- <span class="hljs-string">'entityReference'</span>:  <span class="hljs-string">'entity-reference'</span>
- <span class="hljs-string">'textAnnotation'</span>:   <span class="hljs-string">'TextAnnotation'</span>
- <span class="hljs-string">'entityAnnotation'</span>: <span class="hljs-string">'EntityAnnotation'</span>
- <span class="hljs-string">'selectionPrefix'</span>:  <span class="hljs-string">'selection-prefix'</span>
- <span class="hljs-string">'selectionSuffix'</span>:  <span class="hljs-string">'selection-suffix'</span>
- <span class="hljs-string">'selectedText'</span>:     <span class="hljs-string">'selected-text'</span>
- <span class="hljs-string">'confidence'</span>:       <span class="hljs-string">'confidence'</span>
- <span class="hljs-string">'relation'</span>:            <span class="hljs-string">'relation'</span>
-</code></pre>
+              <p>Test directives.</p>
+
             </div>
+            
+            <div class="content"><div class='highlight'><pre>describe <span class="hljs-string">'directives'</span>,<span class="hljs-function"> -&gt;</span>
+
+  beforeEach <span class="hljs-built_in">module</span>(<span class="hljs-string">'wordlift.tinymce.plugin.directives'</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>Test the wlEntities directive.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  describe <span class="hljs-string">'wlEntities'</span>,<span class="hljs-function"> -&gt;</span>
+
+    scope = <span class="hljs-literal">undefined</span>
+    element = <span class="hljs-literal">undefined</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>Get the root scope and create a wl-entities element.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    beforeEach inject<span class="hljs-function"><span class="hljs-params">( ($rootScope) -&gt;
+      scope = $rootScope
+      element = angular.element <span class="hljs-string">'&lt;wl-entities&gt;&lt;/wl-entities&gt;'</span>
+    )</span>
+
+</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>Test for the entity to empty.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    it <span class="hljs-string">'should be empty'</span>, inject<span class="hljs-function"><span class="hljs-params">( ($compile) -&gt;
+
+      $compile(element)(scope)
+      scope.$digest()
+
+      expect(element.text()).toEqual <span class="hljs-string">''</span>
+    )</span>
+
+</span></pre></div></div>
             
         </li>
         

@@ -23,7 +23,5 @@ describe 'directives', ->
       $compile(element)(scope)
       scope.$digest()
 
-      dump element
-
       expect(element.text()).toEqual ''
     )
