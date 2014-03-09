@@ -17,6 +17,20 @@ angular.module('wordlift.tinymce.plugin.directives', ['wordlift.tinymce.plugin.c
 # The wlEntities directive provides a UI for disambiguating the entities for a provided text annotation.
 .directive('wlEntities', ->
     restrict: 'E'
-    template: ''
+    template: """
+    <h2>wlEntities wrapper</h2>
+    <ul>
+      <li ng-repeat="(id, entityAnnotation) in textAnnotation.entityAnnotations | orderObjectBy:'confidence':true">
+        <div class="entity {{entityAnnotation.entity.type}}" ng-class="{selected: true==entityAnnotation.selected}" ng-click="onEntityClicked(id, entityAnnotation)" ng-show="entityAnnotation.entity.label">
+          <div class="thumbnail" ng-show="entityAnnotation.entity.thumbnail" title="{{entityAnnotation.entity.id}}" ng-attr-style="background-image: url({{entityAnnotation.entity.thumbnail}})"></div>
+          <div class="thumbnail empty" ng-hide="entityAnnotation.entity.thumbnail" title="{{entityAnnotation.entity.id}}"></div>
+          <div class="confidence" ng-bind="entityAnnotation.confidence"></div>
+          <div class="label" ng-bind="entityAnnotation.entity.label"></div>
+          <div class="type"></div>
+          <div class="source" ng-class="entityAnnotation.entity.source" ng-bind="entityAnnotation.entity.source"></div>
+        </div>
+      </li>
+    </ul>
+    """
   )
 

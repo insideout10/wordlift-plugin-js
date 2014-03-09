@@ -113,7 +113,8 @@
             
             <div class="content"><div class='highlight'><pre>describe <span class="hljs-string">'directives'</span>,<span class="hljs-function"> -&gt;</span>
 
-  beforeEach <span class="hljs-built_in">module</span>(<span class="hljs-string">'wordlift.tinymce.plugin.directives'</span>)</pre></div></div>
+  beforeEach <span class="hljs-built_in">module</span>(<span class="hljs-string">'wordlift.tinymce.plugin.directives'</span>)
+  beforeEach <span class="hljs-built_in">module</span>(<span class="hljs-string">'wordlift.tinymce.plugin.controllers'</span>)</pre></div></div>
             
         </li>
         
@@ -131,7 +132,8 @@
             <div class="content"><div class='highlight'><pre>  describe <span class="hljs-string">'wlEntities'</span>,<span class="hljs-function"> -&gt;</span>
 
     scope = <span class="hljs-literal">undefined</span>
-    element = <span class="hljs-literal">undefined</span></pre></div></div>
+    element = <span class="hljs-literal">undefined</span>
+    EntitiesController = <span class="hljs-literal">undefined</span></pre></div></div>
             
         </li>
         
@@ -151,7 +153,8 @@
       element = angular.element <span class="hljs-string">'&lt;wl-entities&gt;&lt;/wl-entities&gt;'</span>
     )</span>
 
-</span></pre></div></div>
+    <span class="hljs-title">beforeEach</span> <span class="hljs-title">inject</span><span class="hljs-params">(($controller, $rootScope) -&gt;
+</span></span></pre></div></div>
             
         </li>
         
@@ -162,6 +165,53 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
+              <p>Spy on the scopes.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      spyOn($rootScope, <span class="hljs-string">'$broadcast'</span>).<span class="hljs-keyword">and</span>.callThrough()</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>Create a scope and spy on it.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      $scope = $rootScope.$<span class="hljs-keyword">new</span>()
+      spyOn($scope, <span class="hljs-string">'$on'</span>).<span class="hljs-keyword">and</span>.callThrough()</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>Set the EntitiesController.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      EntitiesController = $controller <span class="hljs-string">'EntitiesController'</span>, {<span class="hljs-attribute">$scope</span>: $scope}
+    )</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
               <p>Test for the entity to empty.</p>
 
             </div>
@@ -171,10 +221,52 @@
       $compile(element)(scope)
       scope.$digest()
 
-      expect(element.text()).toEqual <span class="hljs-string">''</span>
+      expect(element.find(<span class="hljs-string">'ul'</span>).length).toEqual <span class="hljs-number">1</span>
+      expect(element.find(<span class="hljs-string">'li'</span>).length).toEqual <span class="hljs-number">0</span>
     )</span>
-
 </span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>Test entity is not empty.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    it <span class="hljs-string">'should not be empty'</span>, inject<span class="hljs-function"><span class="hljs-params">( ($compile, AnalysisService, $httpBackend, $rootScope) -&gt;
+
+      $compile(element)(scope)
+      scope.$digest()
+      
+      AnalysisService.analyze <span class="hljs-string">''</span>
+      $httpBackend.flush()
+</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p>Check that the root scope broadcast method has been called.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      expect($rootScope.$broadcast).toHaveBeenCalledWith(<span class="hljs-string">'analysisReceived'</span>, jasmine.any(Object))
+
+      expect(element.find(<span class="hljs-string">'ul'</span>).length).toEqual <span class="hljs-number">1</span>
+      expect(element.find(<span class="hljs-string">'li'</span>).length).toEqual <span class="hljs-number">0</span>
+
+    )</pre></div></div>
             
         </li>
         
