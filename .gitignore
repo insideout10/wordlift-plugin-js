@@ -4,3 +4,6 @@ node_modules/
 tmp
 .DS_Store
 .idea
+app/js/wordlift-plugin.src.coffee
+app/js/wordlift-plugin.js.map
+app/js/wordlift-plugin.js
