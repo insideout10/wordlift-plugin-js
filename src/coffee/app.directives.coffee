@@ -17,6 +17,7 @@ angular.module('wordlift.tinymce.plugin.directives', ['wordlift.tinymce.plugin.c
 # The wlEntities directive provides a UI for disambiguating the entities for a provided text annotation.
 .directive('wlEntities', ->
     restrict: 'E'
+    link: (scope, element, attrs)->
     template: """
     <h2>wlEntities wrapper</h2>
     <ul>

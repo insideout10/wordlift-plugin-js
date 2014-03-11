@@ -29,6 +29,7 @@
   }).directive('wlEntities', function() {
     return {
       restrict: 'E',
+      link: function(scope, element, attrs) {},
       template: "<h2>wlEntities wrapper</h2>\n<ul>\n  <li ng-repeat=\"(id, entityAnnotation) in textAnnotation.entityAnnotations | orderObjectBy:'confidence':true\">\n    <div class=\"entity {{entityAnnotation.entity.type}}\" ng-class=\"{selected: true==entityAnnotation.selected}\" ng-click=\"onEntityClicked(id, entityAnnotation)\" ng-show=\"entityAnnotation.entity.label\">\n      <div class=\"thumbnail\" ng-show=\"entityAnnotation.entity.thumbnail\" title=\"{{entityAnnotation.entity.id}}\" ng-attr-style=\"background-image: url({{entityAnnotation.entity.thumbnail}})\"></div>\n      <div class=\"thumbnail empty\" ng-hide=\"entityAnnotation.entity.thumbnail\" title=\"{{entityAnnotation.entity.id}}\"></div>\n      <div class=\"confidence\" ng-bind=\"entityAnnotation.confidence\"></div>\n      <div class=\"label\" ng-bind=\"entityAnnotation.entity.label\"></div>\n      <div class=\"type\"></div>\n      <div class=\"source\" ng-class=\"entityAnnotation.entity.source\" ng-bind=\"entityAnnotation.entity.source\"></div>\n    </div>\n  </li>\n</ul>"
     };
   });

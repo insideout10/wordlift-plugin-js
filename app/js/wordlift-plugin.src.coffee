@@ -48,6 +48,7 @@ angular.module('wordlift.tinymce.plugin.directives', ['wordlift.tinymce.plugin.c
 # The wlEntities directive provides a UI for disambiguating the entities for a provided text annotation.
 .directive('wlEntities', ->
     restrict: 'E'
+    link: (scope, element, attrs)->
     template: """
     <h2>wlEntities wrapper</h2>
     <ul>
@@ -622,13 +623,12 @@ angular.module('wordlift.tinymce.plugin.controllers', [ 'wordlift.tinymce.plugin
 
       $scope.$emit 'DisambiguationWidget.entitySelected', entityAnnotation
 
-    # receive the analysis results and store them in the local scope.
+    # Receive the analysis results and store them in the local scope.
     $scope.$on 'analysisReceived', (event, analysis) ->
       $scope.analysis = analysis
 
     # When a text annotation is clicked, open the disambiguation popover.
     $scope.$on 'textAnnotationClicked', (event, id, sourceElement) ->
-
       # Set or reset properly $scope.selectedEntity
       $scope.selectedEntity = undefined
 
