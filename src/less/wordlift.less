@@ -36,8 +36,8 @@
   }
 }
 
-// TinyMCE
-.wp_themeSkin span.mce_wordlift {
+// TinyMCE toolbar
+.mceIcon.mce_wordlift {
   background: data-uri('../img/wordlift-logo-20x20.png');
 
   &.running {
@@ -293,7 +293,7 @@ body#tinymce {
     border-bottom: 2px solid @type !important;
     color: @color;
     background-color: @type;
-    vertical-align:center;
+    vertical-align: center;
   }
 
   .textannotation {
@@ -302,25 +302,32 @@ body#tinymce {
     cursor: hand;
 
     &.place {
-      .textannotation-decoration(@place, @fa-var-map-marker); }
+      .textannotation-decoration(@place, @fa-var-map-marker);
+    }
 
     &.person {
-      .textannotation-decoration(@person, @fa-var-user); }
+      .textannotation-decoration(@person, @fa-var-user);
+    }
 
     &.organization {
-      .textannotation-decoration(@organization, @fa-var-building-o); }
+      .textannotation-decoration(@organization, @fa-var-building-o);
+    }
 
     &.event {
-      .textannotation-decoration(@event, @fa-var-calendar, white); }
+      .textannotation-decoration(@event, @fa-var-calendar, white);
+    }
 
     &.music {
-      .textannotation-decoration(@music, @fa-var-music, white); }
+      .textannotation-decoration(@music, @fa-var-music, white);
+    }
 
     &.thing {
-      .textannotation-decoration(@thing, @fa-var-square-o); }
+      .textannotation-decoration(@thing, @fa-var-square-o);
+    }
 
     &.creativework {
-      .textannotation-decoration(@creativework, @fa-var-square-o, white); }
+      .textannotation-decoration(@creativework, @fa-var-square-o, white);
+    }
 
     .textannotation {
       border: 0;
