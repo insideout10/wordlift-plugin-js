@@ -13,8 +13,13 @@
   "license": "GPL",
   "ignore": [
     "**/.*",
+    "app",
+    "config",
+    "logs",
     "node_modules",
     "bower_components",
+    "scripts",
+    "src",
     "test",
     "tests"
   ]
