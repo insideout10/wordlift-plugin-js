@@ -13,6 +13,7 @@
   "license": "GPL",
   "ignore": [
     "**/.*",
+    ".travis.yml",
     "app",
     "config",
     "logs",
