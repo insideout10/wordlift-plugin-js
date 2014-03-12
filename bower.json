@@ -23,5 +23,8 @@
     "src",
     "test",
     "tests"
-  ]
+  ],
+  "dependencies": {
+    "components-font-awesome": "~4.0.3"
+  }
 }

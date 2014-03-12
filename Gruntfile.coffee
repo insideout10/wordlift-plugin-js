@@ -41,33 +41,27 @@ module.exports = (grunt) ->
     less:
       development:
         files:
-          'src/css/wordlift-admin.css': ['src/less/wordlift-admin.less']
-          'src/css/wordlift-editor.css': ['src/less/wordlift-editor.less']
-      'wordlift-admin.min':
+          'app/css/wordlift.css': ['src/less/wordlift.less']
+      dist:
         options:
           cleancss: true
           sourceMap: true
-          sourceMapFilename: 'src/css/wordlift-admin.min.css.map'
+          sourceMapFilename: 'app/css/wordlift.min.css.map'
         files:
-          'src/css/wordlift-admin.min.css': ['src/less/wordlift-admin.less']
-      'wordlift-editor.min':
-        options:
-          cleancss: true
-          sourceMap: true
-          sourceMapFilename: 'src/css/wordlift-editor.min.css.map'
-        files:
-          'src/css/wordlift-editor.min.css': ['src/less/wordlift-editor.less']
+          'app/css/wordlift.min.css': 'src/less/wordlift.less'
+          'app/css/wordlift.<%= pkg.version %>.min.css': 'src/less/wordlift.less'
 
     copy:
-      main:
+      fonts:
         expand: true
-        cwd: 'src/bower_components/components-font-awesome/fonts/'
+        cwd: 'bower_components/components-font-awesome/fonts/'
         src: '*'
-        dest: 'src/fonts/'
+        dest: 'app/fonts/'
         flatten: true
         filter: 'isFile'
-      # Copy files to dist folder.
-      dist:
+
+      # Copy scripts to the dist folder.
+      'dist-scripts':
         expand: true
         cwd: 'app/js/'
         src: [
@@ -75,8 +69,29 @@ module.exports = (grunt) ->
           'wordlift.min.js',
           'wordlift.<%= pkg.version %>.min.js'
         ]
-        dest: 'dist/'
+        dest: 'dist/js/'
         flatten: true
+
+      # Copy stylesheets to the dist folder.
+      'dist-stylesheets':
+        expand: true
+        cwd: 'app/css/'
+        src: [
+          'wordlift.css',
+          'wordlift.min.css',
+          'wordlift.<%= pkg.version %>.min.css'
+        ]
+        dest: 'dist/css/'
+        flatten: true
+
+      # Copy fonts to the dist folder.
+      'dist-fonts':
+        expand: true
+        cwd: 'app/fonts/'
+        src: '*'
+        dest: 'dist/fonts/'
+        flatten: true
+
 
     docco:
       doc:
