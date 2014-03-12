@@ -1702,54 +1702,54 @@ div.wp-menu-image:before #adminmenu .toplevel_page_wordlift-admin-entities.wp-me
   border-bottom: 10px solid transparent;
   border-right: 10px solid blue;
 }
-.textannotation {
+body#tinymce .textannotation {
   border-bottom: 2px solid #2b2b2b;
   padding: 2px;
   cursor: hand;
 }
-.textannotation.place {
+body#tinymce .textannotation.place {
   border-bottom: 2px solid #ff9a2e !important;
   color: #000000;
   background-color: #ff9a2e;
   vertical-align: center;
 }
-.textannotation.person {
+body#tinymce .textannotation.person {
   border-bottom: 2px solid #f20f62 !important;
   color: #000000;
   background-color: #f20f62;
   vertical-align: center;
 }
-.textannotation.organization {
+body#tinymce .textannotation.organization {
   border-bottom: 2px solid #8fd22a !important;
   color: #000000;
   background-color: #8fd22a;
   vertical-align: center;
 }
-.textannotation.event {
+body#tinymce .textannotation.event {
   border-bottom: 2px solid #642994 !important;
   color: #ffffff;
   background-color: #642994;
   vertical-align: center;
 }
-.textannotation.music {
+body#tinymce .textannotation.music {
   border-bottom: 2px solid #191818 !important;
   color: #ffffff;
   background-color: #191818;
   vertical-align: center;
 }
-.textannotation.thing {
+body#tinymce .textannotation.thing {
   border-bottom: 2px solid #f9f81e !important;
   color: #000000;
   background-color: #f9f81e;
   vertical-align: center;
 }
-.textannotation.creativework {
+body#tinymce .textannotation.creativework {
   border-bottom: 2px solid #000000 !important;
   color: #ffffff;
   background-color: #000000;
   vertical-align: center;
 }
-.textannotation .textannotation {
+body#tinymce .textannotation .textannotation {
   border: 0;
 }
 body#tinymce[contenteditable=false] {
