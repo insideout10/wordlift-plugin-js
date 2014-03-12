@@ -90,7 +90,7 @@ module.exports = (grunt) ->
     watch:
       scripts:
         files: ['src/coffee/**/*.coffee']
-        tasks: ['coffee', 'uglify', 'docco']
+        tasks: ['coffee', 'uglify', 'copy', 'docco']
         options:
           spawn: false
       styles:
