@@ -8,9 +8,9 @@
     "type": "git",
     "url": "https://github.com/insideout10/wordlift-plugin-js"
   },
-  "scripts": {
-    "test": "scripts/test.sh"
-  },
+//  "scripts": {
+//    "test": "scripts/test.sh"
+//  },
   "engines": {
     "node": ">= 0.10.0"
   },
@@ -19,7 +19,7 @@
     "karma": "^0.12.0",
     "karma-junit-reporter": "^0.2.1",
     "karma-jasmine": "^0.2.1",
-    "protractor": "~0.17.0",
+//    "protractor": "~0.17.0",
     "grunt": "^0.4.2",
     "grunt-contrib-copy": "^0.5.0",
     "grunt-contrib-coffee": "^0.10.1",
