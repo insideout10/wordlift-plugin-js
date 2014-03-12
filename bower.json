@@ -1,0 +1,21 @@
+{
+  "name": "wordlift",
+  "version": "3.0.0-SNAPSHOT",
+  "homepage": "http://wordlift.it",
+  "authors": [
+    "David Riccitelli <david@insideout.io>"
+  ],
+  "description": "WordLift Plugin client-side library",
+  "main": "dist/wordlift.min.js",
+  "keywords": [
+    "semantic web"
+  ],
+  "license": "GPL",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
