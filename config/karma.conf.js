@@ -33,7 +33,7 @@ module.exports = function(config){
         'app/lib/jasmine-jquery.js',
         'app/lib/tinymce/jscripts/tiny_mce/tiny_mce.js',
         'app/js/test.init.coffee',
-        'app/js/wordlift-plugin.js',
+        'app/js/wordlift.min.js',
         'test/lib/angular/angular-mocks.js',
         'test/unit/**/*.js',
         'test/unit/**/*.coffee'
