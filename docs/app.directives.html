@@ -130,19 +130,20 @@
     <span class="hljs-attribute">restrict</span>: <span class="hljs-string">'E'</span>
     <span class="hljs-attribute">link</span>: <span class="hljs-function"><span class="hljs-params">(scope, element, attrs)</span>-&gt;</span>
     <span class="hljs-attribute">template</span>: <span class="hljs-string">"""
-    &lt;h2&gt;wlEntities wrapper&lt;/h2&gt;
-    &lt;ul&gt;
-      &lt;li ng-repeat="(id, entityAnnotation) in textAnnotation.entityAnnotations | orderObjectBy:'confidence':true"&gt;
-        &lt;div class="entity {{entityAnnotation.entity.type}}" ng-class="{selected: true==entityAnnotation.selected}" ng-click="onEntityClicked(id, entityAnnotation)" ng-show="entityAnnotation.entity.label"&gt;
-          &lt;div class="thumbnail" ng-show="entityAnnotation.entity.thumbnail" title="{{entityAnnotation.entity.id}}" ng-attr-style="background-image: url({{entityAnnotation.entity.thumbnail}})"&gt;&lt;/div&gt;
-          &lt;div class="thumbnail empty" ng-hide="entityAnnotation.entity.thumbnail" title="{{entityAnnotation.entity.id}}"&gt;&lt;/div&gt;
-          &lt;div class="confidence" ng-bind="entityAnnotation.confidence"&gt;&lt;/div&gt;
-          &lt;div class="label" ng-bind="entityAnnotation.entity.label"&gt;&lt;/div&gt;
-          &lt;div class="type"&gt;&lt;/div&gt;
-          &lt;div class="source" ng-class="entityAnnotation.entity.source" ng-bind="entityAnnotation.entity.source"&gt;&lt;/div&gt;
-        &lt;/div&gt;
-      &lt;/li&gt;
-    &lt;/ul&gt;
+      &lt;div&gt;
+        &lt;ul&gt;
+          &lt;li ng-repeat="(id, entityAnnotation) in textAnnotation.entityAnnotations | orderObjectBy:'confidence':true"&gt;
+            &lt;div class="entity {{entityAnnotation.entity.type}}" ng-class="{selected: true==entityAnnotation.selected}" ng-click="onEntityClicked(id, entityAnnotation)" ng-show="entityAnnotation.entity.label"&gt;
+              &lt;div class="thumbnail" ng-show="entityAnnotation.entity.thumbnail" title="{{entityAnnotation.entity.id}}" ng-attr-style="background-image: url({{entityAnnotation.entity.thumbnail}})"&gt;&lt;/div&gt;
+              &lt;div class="thumbnail empty" ng-hide="entityAnnotation.entity.thumbnail" title="{{entityAnnotation.entity.id}}"&gt;&lt;/div&gt;
+              &lt;div class="confidence" ng-bind="entityAnnotation.confidence"&gt;&lt;/div&gt;
+              &lt;div class="label" ng-bind="entityAnnotation.entity.label"&gt;&lt;/div&gt;
+              &lt;div class="type"&gt;&lt;/div&gt;
+              &lt;div class="source" ng-class="entityAnnotation.entity.source" ng-bind="entityAnnotation.entity.source"&gt;&lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/div&gt;
     """</span>
   )</pre></div></div>
             
