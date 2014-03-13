@@ -147,7 +147,7 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>    beforeEach inject<span class="hljs-function"><span class="hljs-params">(($rootScope, $controller) -&gt;
-      scope = $rootScope.$<span class="hljs-keyword">new</span>()
+
 </span></span></pre></div></div>
             
         </li>
@@ -159,14 +159,13 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
-              <p>The wl-entities</p>
+              <p>Create a new scope, the scope will be shared between the entities controller and the wlEntities directive,
+as in the HTML the textAnnotation is passed using the ‘textAnnotation’ property of the EntitiesController
+scope.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      element = angular.element <span class="hljs-string">'&lt;wl-entities text-annotation="textAnnotation"&gt;&lt;/wl-entities&gt;'</span>
-      EntitiesController = $controller <span class="hljs-string">'EntitiesController'</span>, { <span class="hljs-attribute">$scope</span>: scope }
-
-    )</pre></div></div>
+            <div class="content"><div class='highlight'><pre>      scope = $rootScope.$<span class="hljs-keyword">new</span>()</pre></div></div>
             
         </li>
         
@@ -177,17 +176,11 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
-              <p>Test for the entity to empty.</p>
+              <p>Create the EntitiesController with the new scope.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    it <span class="hljs-string">'should be empty'</span>, inject<span class="hljs-function"><span class="hljs-params">(($compile) -&gt;
-      $compile(element)(scope)
-      scope.$digest()
-      expect(element.find(<span class="hljs-string">'ul'</span>).length).toEqual <span class="hljs-number">1</span>
-      expect(element.find(<span class="hljs-string">'li'</span>).length).toEqual <span class="hljs-number">0</span>
-    )</span>
-</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>      EntitiesController = $controller <span class="hljs-string">'EntitiesController'</span>, { <span class="hljs-attribute">$scope</span>: scope }</pre></div></div>
             
         </li>
         
@@ -198,21 +191,12 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
-              <p>Test entity is not empty.</p>
+              <p>The wlEntities directive gets the annotation from the text-annotation attribute.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    it <span class="hljs-string">'should not be empty'</span>, inject<span class="hljs-function"><span class="hljs-params">(($compile, $rootScope, AnalysisService, $httpBackend) -&gt;
-      $compile(element)(scope)
-      scope.$digest()
-
-      expect(element.find(<span class="hljs-string">'li'</span>).length).toEqual <span class="hljs-number">0</span>
-
-      $.ajax(<span class="hljs-string">'base/app/assets/english.json'</span>,
-        async: <span class="hljs-literal">false</span>
-      ).done (data) -&gt;
-
-</span></span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>      element = angular.element <span class="hljs-string">'&lt;wl-entities text-annotation="textAnnotation"&gt;&lt;/wl-entities&gt;'</span>
+    )</pre></div></div>
             
         </li>
         
@@ -223,11 +207,13 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
-              <p>Catch all the requests to Freebase.</p>
+              <p>Test for the entity to empty.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        $httpBackend.<span class="hljs-keyword">when</span>(<span class="hljs-string">'HEAD'</span>, <span class="hljs-regexp">/rdf.freebase.com/</span>).respond(<span class="hljs-number">200</span>, <span class="hljs-string">''</span>)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    it <span class="hljs-string">'should be empty'</span>, inject<span class="hljs-function"><span class="hljs-params">(($compile) -&gt;
+
+</span></span></pre></div></div>
             
         </li>
         
@@ -238,13 +224,12 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
-              <p>Simulate event broadcasted by AnalysisService</p>
+              <p>Compile the directive.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        $rootScope.$broadcast <span class="hljs-string">'analysisReceived'</span>, AnalysisService.parse data
-
-        textAnnotation = angular.element <span class="hljs-string">'&lt;span id="urn:enhancement-2f293108-0ded-f45a-7945-e7a52640a500" class="textannotation"&gt;David Riccitelli&lt;/span&gt;'</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>      $compile(element)(scope)
+      scope.$digest()</pre></div></div>
             
         </li>
         
@@ -255,15 +240,153 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
+              <p>Check that there’s an empty list.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      expect(element.find(<span class="hljs-string">'ul'</span>).length).toEqual <span class="hljs-number">1</span>
+      expect(element.find(<span class="hljs-string">'li'</span>).length).toEqual <span class="hljs-number">0</span>
+    )</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <p>Test entity is not empty.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    it <span class="hljs-string">'should not be empty'</span>, inject<span class="hljs-function"><span class="hljs-params">(($compile, $rootScope, AnalysisService, $httpBackend) -&gt;
+
+</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p>Compile the directive.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      $compile(element)(scope)
+      scope.$digest()</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <p>Get the mock-up analysis.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      $.ajax(<span class="hljs-string">'base/app/assets/english.json'</span>,
+        <span class="hljs-attribute">async</span>: <span class="hljs-literal">false</span>
+      ).done <span class="hljs-function"><span class="hljs-params">(data)</span> -&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
+              <p>Catch all the requests to Freebase.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        $httpBackend.<span class="hljs-keyword">when</span>(<span class="hljs-string">'HEAD'</span>, <span class="hljs-regexp">/rdf.freebase.com/</span>).respond(<span class="hljs-number">200</span>, <span class="hljs-string">''</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
+              <p>Simulate event broadcasted by AnalysisService</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        $rootScope.$broadcast <span class="hljs-string">'analysisReceived'</span>, AnalysisService.parse data</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <p>Create a fake textAnnotation element (the textAnnotation exists in the mockup data).</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        textAnnotation = angular.element <span class="hljs-string">'&lt;span id="urn:enhancement-2f293108-0ded-f45a-7945-e7a52640a500" class="textannotation"&gt;David Riccitelli&lt;/span&gt;'</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-17">&#182;</a>
+              </div>
               <p>Simulate event broadcasted by EditorService on annotation click</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        $rootScope.$broadcast <span class="hljs-string">'textAnnotationClicked'</span>, textAnnotation.attr(<span class="hljs-string">'id'</span>), { <span class="hljs-attribute">target</span>: textAnnotation }
+            <div class="content"><div class='highlight'><pre>        $rootScope.$broadcast <span class="hljs-string">'textAnnotationClicked'</span>, textAnnotation.attr(<span class="hljs-string">'id'</span>), { <span class="hljs-attribute">target</span>: textAnnotation }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-18">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-18">&#182;</a>
+              </div>
+              <p>Process changes.</p>
 
-        scope.$digest()
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        scope.$digest()</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-19">&#182;</a>
+              </div>
+              <p>Check that there are 2 entities.</p>
 
-        expect(element.find(<span class="hljs-string">'li'</span>).length).toEqual <span class="hljs-number">2</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        expect(element.find(<span class="hljs-string">'li'</span>).length).toEqual <span class="hljs-number">2</span>
 
     )</pre></div></div>
             

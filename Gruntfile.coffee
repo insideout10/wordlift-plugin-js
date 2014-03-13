@@ -29,8 +29,8 @@ module.exports = (grunt) ->
           sourceMap: 'app/js/wordlift.min.js.map'
           sourceMapIn: 'app/js/wordlift.js.map'
           sourceMappingURL: 'wordlift.min.js.map'
-          compress:
-            drop_console: true
+          compress: true
+#            drop_console: true
           dead_code: true
           mangle: true
           beautify: false
