@@ -70,9 +70,7 @@ angular.module('wordlift.tinymce.plugin.controllers', [ 'wordlift.tinymce.plugin
 #      entityAnnotation.selected = !entityAnnotation.selected
 
     $scope.onEntitySelected = (textAnnotation, entityAnnotation) ->
-      console.log "onEntitySelected [ textAnnotation :: #{textAnnotation} ][ entityAnnotation :: #{entityAnnotation} ]"
 
-      # TODO: bring back the entity description/images
       # Select (or unselect) the specified entity annotation.
 #      if entityAnnotation.selected
 #        EntityService.select entityAnnotation

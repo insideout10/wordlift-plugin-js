@@ -646,9 +646,7 @@ angular.module('wordlift.tinymce.plugin.controllers', [ 'wordlift.tinymce.plugin
 #      entityAnnotation.selected = !entityAnnotation.selected
 
     $scope.onEntitySelected = (textAnnotation, entityAnnotation) ->
-      console.log "onEntitySelected [ textAnnotation :: #{textAnnotation} ][ entityAnnotation :: #{entityAnnotation} ]"
 
-      # TODO: bring back the entity description/images
       # Select (or unselect) the specified entity annotation.
 #      if entityAnnotation.selected
 #        EntityService.select entityAnnotation
@@ -715,15 +713,13 @@ $(
 
           <div ng-repeat="textAnnotation in analysis.textAnnotations">
             <div ng-repeat="entityAnnotation in textAnnotation.entityAnnotations | filterObjectBy:'selected':true">
-              <div ng-bind="entityAnnotation.entity.label"></div>
 
               <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][uri]' value='{{entityAnnotation.entity.id}}'>
               <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][label]' value='{{entityAnnotation.entity.label}}'>
               <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][description]' value='{{entityAnnotation.entity.description}}'>
               <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][type]' value='{{entityAnnotation.entity.type}}'>
 
-
-              <input ng-repeat="image in entityAnnotation.entity.images" type='text'
+              <input ng-repeat="image in entityAnnotation.entity.thumbnails" type='text'
                 name='wl_entities[{{entityAnnotation.entity.id}}][image]' value='{{image}}'>
 
             </div>

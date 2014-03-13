@@ -147,15 +147,13 @@
 
           &lt;div ng-repeat="textAnnotation in analysis.textAnnotations"&gt;
             &lt;div ng-repeat="entityAnnotation in textAnnotation.entityAnnotations | filterObjectBy:'selected':true"&gt;
-              &lt;div ng-bind="entityAnnotation.entity.label"&gt;&lt;/div&gt;
 
               &lt;input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][uri]' value='{{entityAnnotation.entity.id}}'&gt;
               &lt;input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][label]' value='{{entityAnnotation.entity.label}}'&gt;
               &lt;input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][description]' value='{{entityAnnotation.entity.description}}'&gt;
               &lt;input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][type]' value='{{entityAnnotation.entity.type}}'&gt;
 
-
-              &lt;input ng-repeat="image in entityAnnotation.entity.images" type='text'
+              &lt;input ng-repeat="image in entityAnnotation.entity.thumbnails" type='text'
                 name='wl_entities[{{entityAnnotation.entity.id}}][image]' value='{{image}}'&gt;
 
             &lt;/div&gt;
