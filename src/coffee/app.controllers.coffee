@@ -56,13 +56,6 @@ angular.module('wordlift.tinymce.plugin.controllers', [ 'wordlift.tinymce.plugin
     $(window).scroll(scroll)
     $('#content_ifr').contents().scroll(scroll)
 
-#    DEPRECATED: the stylesheet is now applied using in the template. The selection is done using the selected attribute.
-#    $scope.currentCssClass = (entityIndex, entityAnnotation) ->
-#      currentItemId = $scope.textAnnotationSpan.attr("itemid")
-#      return "#{entityAnnotation.entity.type} selected" if entityAnnotation.entity.id == currentItemId
-#      return "#{entityAnnotation.entity.type} selected" if entityIndex == $scope.selectedEntity
-#      return "#{entityAnnotation.entity.type}"
-
     # This event is raised when an entity is selected from the entities popover.
     $scope.onEntityClicked = (entityIndex, entityAnnotation) ->
       $scope.selectedEntity = entityIndex

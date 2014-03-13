@@ -30,30 +30,33 @@
     return {
       restrict: 'E',
       scope: {
-        textAnnotation: '='
+        textAnnotation: '=',
+        onSelect: '&'
       },
       link: function(scope, element, attrs) {
         return scope.select = function(item) {
-          var entityAnnotation, id, _ref, _results;
+          var entityAnnotation, id, _ref;
           _ref = scope.textAnnotation.entityAnnotations;
-          _results = [];
           for (id in _ref) {
             entityAnnotation = _ref[id];
-            _results.push(entityAnnotation.selected = item.id === entityAnnotation.id && !entityAnnotation.selected);
+            entityAnnotation.selected = item.id === entityAnnotation.id && !entityAnnotation.selected;
           }
-          return _results;
+          return scope.onSelect({
+            textAnnotation: scope.textAnnotation,
+            entityAnnotation: item.selected ? item : null
+          });
         };
       },
-      template: "<div>\n  <ul>\n    <li ng-repeat=\"entityAnnotation in textAnnotation.entityAnnotations | orderObjectBy:'confidence':true\">\n      <wl-entity select=\"select(entityAnnotation)\" entity-annotation=\"entityAnnotation\"></wl-entity>\n    </li>\n  </ul>\n</div>"
+      template: "<div>\n  <ul>\n    <li ng-repeat=\"entityAnnotation in textAnnotation.entityAnnotations | orderObjectBy:'confidence':true\">\n      <wl-entity on-select=\"select(entityAnnotation)\" entity-annotation=\"entityAnnotation\"></wl-entity>\n    </li>\n  </ul>\n</div>"
     };
   }).directive('wlEntity', function() {
     return {
       restrict: 'E',
       scope: {
         entityAnnotation: '=',
-        select: '&'
+        onSelect: '&'
       },
-      template: "<div class=\"entity {{entityAnnotation.entity.type}}\" ng-class=\"{selected: true==entityAnnotation.selected}\" ng-click=\"select()\" ng-show=\"entityAnnotation.entity.label\">\n  <div class=\"thumbnail\" ng-show=\"entityAnnotation.entity.thumbnail\" title=\"{{entityAnnotation.entity.id}}\" ng-attr-style=\"background-image: url({{entityAnnotation.entity.thumbnail}})\"></div>\n  <div class=\"thumbnail empty\" ng-hide=\"entityAnnotation.entity.thumbnail\" title=\"{{entityAnnotation.entity.id}}\"></div>\n  <div class=\"confidence\" ng-bind=\"entityAnnotation.confidence\"></div>\n  <div class=\"label\" ng-bind=\"entityAnnotation.entity.label\"></div>\n  <div class=\"type\"></div>\n  <div class=\"source\" ng-class=\"entityAnnotation.entity.source\" ng-bind=\"entityAnnotation.entity.source\"></div>\n</div>"
+      template: "<div class=\"entity {{entityAnnotation.entity.type}}\" ng-class=\"{selected: true==entityAnnotation.selected}\" ng-click=\"onSelect()\" ng-show=\"entityAnnotation.entity.label\">\n  <div class=\"thumbnail\" ng-show=\"entityAnnotation.entity.thumbnail\" title=\"{{entityAnnotation.entity.id}}\" ng-attr-style=\"background-image: url({{entityAnnotation.entity.thumbnail}})\"></div>\n  <div class=\"thumbnail empty\" ng-hide=\"entityAnnotation.entity.thumbnail\" title=\"{{entityAnnotation.entity.id}}\"></div>\n  <div class=\"confidence\" ng-bind=\"entityAnnotation.confidence\"></div>\n  <div class=\"label\" ng-bind=\"entityAnnotation.entity.label\"></div>\n  <div class=\"type\"></div>\n  <div class=\"source\" ng-class=\"entityAnnotation.entity.source\" ng-bind=\"entityAnnotation.entity.source\"></div>\n</div>"
     };
   });
 
@@ -588,7 +591,7 @@
 
   angular.module('wordlift.tinymce.plugin', ['wordlift.tinymce.plugin.controllers', 'wordlift.tinymce.plugin.directives']);
 
-  $(container = $('<div id="wordlift-disambiguation-popover" class="metabox-holder">\n  <div class="postbox">\n    <div class="handlediv" title="Click to toggle"><br></div>\n    <h3 class="hndle"><span>Semantic Web</span></h3>\n    <div class="inside">\n      <form role="form">\n        <div class="form-group">\n          <div class="ui-widget">\n            <input type="text" class="form-control" id="search" placeholder="search or create">\n          </div>\n        </div>\n\n        <wl-entities text-annotation="textAnnotation"></wl-entities>\n\n      </form>\n    </div>\n  </div>\n</div>').appendTo('body').css({
+  $(container = $('<div id="wordlift-disambiguation-popover" class="metabox-holder">\n  <div class="postbox">\n    <div class="handlediv" title="Click to toggle"><br></div>\n    <h3 class="hndle"><span>Semantic Web</span></h3>\n    <div class="inside">\n      <form role="form">\n        <div class="form-group">\n          <div class="ui-widget">\n            <input type="text" class="form-control" id="search" placeholder="search or create">\n          </div>\n        </div>\n\n        <wl-entities text-annotation="textAnnotation"></wl-entities>\n\n      </form>\n    </div>\n  </div>\n</div>').appendTo('form[name=post]').css({
     display: 'none',
     height: $('body').height() - $('#wpadminbar').height() + 32,
     top: $('#wpadminbar').height() - 1,

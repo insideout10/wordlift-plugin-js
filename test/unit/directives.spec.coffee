@@ -16,7 +16,7 @@ describe 'directives', ->
       scope = $rootScope.$new()
 
       # The wlEntities directive gets the annotation from the text-annotation attribute.
-      element = angular.element '<wl-entity select="select(entityAnnotation)" entity-annotation="entityAnnotation"></wl-entities>'
+      element = angular.element '<wl-entity on-select="select(entityAnnotation)" entity-annotation="entityAnnotation"></wl-entities>'
     )
 
     it 'fires the select method with the entityAnnotation', inject(($compile) ->
@@ -56,7 +56,7 @@ describe 'directives', ->
       EntitiesController = $controller 'EntitiesController', { $scope: scope }
 
       # The wlEntities directive gets the annotation from the text-annotation attribute.
-      element = angular.element '<wl-entities text-annotation="textAnnotation"></wl-entities>'
+      element = angular.element '<wl-entities on-select="select(textAnnotation, entityAnnotation)" text-annotation="textAnnotation"></wl-entities>'
     )
 
     # Test for the entity to empty.
@@ -73,6 +73,9 @@ describe 'directives', ->
 
     # Test entity is not empty.
     it 'should not be empty', inject(($compile, $rootScope, AnalysisService, $httpBackend) ->
+      # Create a mock select method.
+      scope.select = (ta, ea) -> # Do nothing
+      spyOn scope, 'select'
 
       # Compile the directive.
       $compile(element)(scope)
@@ -110,15 +113,21 @@ describe 'directives', ->
         entitiesElems[0].click()
         expect(scope.textAnnotation.entityAnnotations[id1].selected).toBe true
         expect(scope.textAnnotation.entityAnnotations[id2].selected).toBe false
+        # Check that the select event has been called.
+        expect(scope.select).toHaveBeenCalledWith(scope.textAnnotation, scope.textAnnotation.entityAnnotations[id1])
 
         # Click on the second entity.
         entitiesElems[1].click()
         expect(scope.textAnnotation.entityAnnotations[id1].selected).toBe false
         expect(scope.textAnnotation.entityAnnotations[id2].selected).toBe true
+        # Check that the select event has been called.
+        expect(scope.select).toHaveBeenCalledWith(scope.textAnnotation, scope.textAnnotation.entityAnnotations[id2])
 
         # Click again on the second entity.
         entitiesElems[1].click()
         expect(scope.textAnnotation.entityAnnotations[id1].selected).toBe false
         expect(scope.textAnnotation.entityAnnotations[id2].selected).toBe false
+        # Check that the select event has been called.
+        expect(scope.select).toHaveBeenCalledWith(scope.textAnnotation, null)
 
     ) 

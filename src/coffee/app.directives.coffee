@@ -22,6 +22,7 @@ angular.module('wordlift.tinymce.plugin.directives', ['wordlift.tinymce.plugin.c
     scope:
     # Get the text annotation from the text-annotation attribute.
       textAnnotation: '='
+      onSelect: '&'
     # Create the link function in order to bind to children elements events.
     link: (scope, element, attrs) ->
       scope.select = (item) ->
@@ -32,11 +33,16 @@ angular.module('wordlift.tinymce.plugin.directives', ['wordlift.tinymce.plugin.c
           # For the selected one is set to true only if the entity is not selected already, otherwise it is deselected.
           entityAnnotation.selected = item.id is entityAnnotation.id && !entityAnnotation.selected
 
+        # Call the select function with the textAnnotation and the selected entityAnnotation or null.
+        scope.onSelect
+          textAnnotation: scope.textAnnotation
+          entityAnnotation: if item.selected then item else null
+
     template: """
       <div>
         <ul>
           <li ng-repeat="entityAnnotation in textAnnotation.entityAnnotations | orderObjectBy:'confidence':true">
-            <wl-entity select="select(entityAnnotation)" entity-annotation="entityAnnotation"></wl-entity>
+            <wl-entity on-select="select(entityAnnotation)" entity-annotation="entityAnnotation"></wl-entity>
           </li>
         </ul>
       </div>
@@ -48,9 +54,9 @@ angular.module('wordlift.tinymce.plugin.directives', ['wordlift.tinymce.plugin.c
     restrict: 'E'
     scope:
       entityAnnotation: '='
-      select: '&'
+      onSelect: '&'
     template: """
-      <div class="entity {{entityAnnotation.entity.type}}" ng-class="{selected: true==entityAnnotation.selected}" ng-click="select()" ng-show="entityAnnotation.entity.label">
+      <div class="entity {{entityAnnotation.entity.type}}" ng-class="{selected: true==entityAnnotation.selected}" ng-click="onSelect()" ng-show="entityAnnotation.entity.label">
         <div class="thumbnail" ng-show="entityAnnotation.entity.thumbnail" title="{{entityAnnotation.entity.id}}" ng-attr-style="background-image: url({{entityAnnotation.entity.thumbnail}})"></div>
         <div class="thumbnail empty" ng-hide="entityAnnotation.entity.thumbnail" title="{{entityAnnotation.entity.id}}"></div>
         <div class="confidence" ng-bind="entityAnnotation.confidence"></div>

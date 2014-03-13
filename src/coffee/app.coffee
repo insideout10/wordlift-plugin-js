@@ -26,7 +26,7 @@ $(
       </div>
     </div>
     ''')
-  .appendTo('body')
+  .appendTo('form[name=post]')
   .css(
       display: 'none'
       height: $('body').height() - $('#wpadminbar').height() + 32

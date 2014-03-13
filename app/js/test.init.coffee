@@ -3,7 +3,7 @@
 __karma__.loaded = ->
 
 
-document.body.innerHTML = '<textarea id="content"></textarea><div id="content_ifr"></div>'
+document.body.innerHTML = '<form name="post"><textarea id="content"></textarea><div id="content_ifr"></div></form>'
 
 editor  = undefined
 # Set the AJAX URL to the mock up response.
