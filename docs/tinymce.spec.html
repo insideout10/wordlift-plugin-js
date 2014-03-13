@@ -423,6 +423,7 @@
       $httpBackend.expectPOST(<span class="hljs-string">'/base/app/assets/english.json?action=wordlift_analyze'</span>)
         .respond <span class="hljs-number">200</span>, data
 
+
       $httpBackend.expect(<span class="hljs-string">'HEAD'</span>, <span class="hljs-string">'http://upload.wikimedia.org/wikipedia/commons/a/a6/Flag_of_Rome.svg'</span>)
         .respond <span class="hljs-number">200</span>, <span class="hljs-string">''</span>
       $httpBackend.expect(<span class="hljs-string">'HEAD'</span>, <span class="hljs-string">'http://upload.wikimedia.org/wikipedia/commons/5/5c/Street_Scene,_Rome,_ME.jpg'</span>)

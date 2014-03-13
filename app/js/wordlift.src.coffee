@@ -206,8 +206,6 @@ angular.module( 'AnalysisService', [] )
           thumbnails  : thumbnails
           type        : getKnownType(types)
           types       : types
-          description : getLanguage('rdfs:comment', item, language)
-          descriptions: get('rdfs:comment', item)
           label       : getLanguage('rdfs:label', item, language)
           labels      : get('rdfs:label', item)
           source      : if id.match('^http://rdf.freebase.com/.*$')
@@ -217,6 +215,14 @@ angular.module( 'AnalysisService', [] )
                         else
                           'wordlift'
           _item       : item
+
+        # Get the description
+        if entity.source is 'freebase'
+          entity.description = getLanguage('http://rdf.freebase.com/ns/common.topic.description', item, language)
+          entity.descriptions = get('http://rdf.freebase.com/ns/common.topic.description', item)
+        else
+          entity.description = getLanguage('rdfs:comment', item, language)
+          entity.descriptions = get('rdfs:comment', item)
 
         # Check if thumbnails exists.
         if thumbnails? and angular.isArray thumbnails

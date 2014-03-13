@@ -193,13 +193,18 @@
               thumbnails: thumbnails,
               type: getKnownType(types),
               types: types,
-              description: getLanguage('rdfs:comment', item, language),
-              descriptions: get('rdfs:comment', item),
               label: getLanguage('rdfs:label', item, language),
               labels: get('rdfs:label', item),
               source: id.match('^http://rdf.freebase.com/.*$') ? 'freebase' : id.match('^http://dbpedia.org/.*$') ? 'dbpedia' : 'wordlift',
               _item: item
             };
+            if (entity.source === 'freebase') {
+              entity.description = getLanguage('http://rdf.freebase.com/ns/common.topic.description', item, language);
+              entity.descriptions = get('http://rdf.freebase.com/ns/common.topic.description', item);
+            } else {
+              entity.description = getLanguage('rdfs:comment', item, language);
+              entity.descriptions = get('rdfs:comment', item);
+            }
             if ((thumbnails != null) && angular.isArray(thumbnails)) {
               $q.all((function() {
                 var _i, _len, _results;
