@@ -47,8 +47,13 @@ angular.module('wordlift.tinymce.plugin.directives', ['wordlift.tinymce.plugin.c
   )
 # The wlEntities directive provides a UI for disambiguating the entities for a provided text annotation.
 .directive('wlEntities', ->
+    # Restrict the directive to elements only (<wl-entities text-annotation="..."></wl-entities>)
     restrict: 'E'
-    link: (scope, element, attrs)->
+    # Create a separate scope
+    scope:
+      # Get the text annotation from the text-annotation attribute.
+      textAnnotation: '='
+#    link: (scope, element, attrs)->
     template: """
       <div>
         <ul>
@@ -676,7 +681,7 @@ $(
               </div>
             </div>
 
-            <wl-entities></wl-entities>
+            <wl-entities annotation="textAnnotation"></wl-entities>
 
           </form>
         </div>

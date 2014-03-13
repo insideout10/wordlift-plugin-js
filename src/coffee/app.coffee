@@ -19,7 +19,7 @@ $(
               </div>
             </div>
 
-            <wl-entities></wl-entities>
+            <wl-entities annotation="textAnnotation"></wl-entities>
 
           </form>
         </div>
