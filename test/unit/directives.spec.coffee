@@ -31,7 +31,7 @@ describe 'directives', ->
       scope.$digest()
 
       # Simulate the click on the element.
-      element.children('div')[0].click()
+      element.children()[0].click()
 
       # Check that the select event has been called.
       expect(scope.select).toHaveBeenCalledWith(scope.entityAnnotation)
@@ -98,7 +98,27 @@ describe 'directives', ->
         # Process changes.
         scope.$digest()
 
-        # Check that there are 2 entities.
-        expect(element.find('li').length).toEqual 2
+        # Check that there are 2 entity tiles.
+        entitiesElems = element.find('wl-entity > div')
+        expect(entitiesElems.length).toEqual 2
+
+        # Set the ID of the entity annotations (from the mock file).
+        id1 = 'urn:enhancement-bf74ebad-e1bf-88fb-e88e-edd0aebaf401'
+        id2 = 'urn:enhancement-9fbb26dd-21f1-53d4-d9f0-d69b83867b03'
+
+        # Click the first entity.
+        entitiesElems[0].click()
+        expect(scope.textAnnotation.entityAnnotations[id1].selected).toBe true
+        expect(scope.textAnnotation.entityAnnotations[id2].selected).toBe false
+
+        # Click on the second entity.
+        entitiesElems[1].click()
+        expect(scope.textAnnotation.entityAnnotations[id1].selected).toBe false
+        expect(scope.textAnnotation.entityAnnotations[id2].selected).toBe true
+
+        # Click again on the second entity.
+        entitiesElems[1].click()
+        expect(scope.textAnnotation.entityAnnotations[id1].selected).toBe false
+        expect(scope.textAnnotation.entityAnnotations[id2].selected).toBe false
 
     ) 

@@ -26,9 +26,9 @@ module.exports = function(config){
         // Serve TXT files
         {pattern: 'app/**/*.txt', watched: false, served: true, included: false },
 
+        'app/lib/jquery/jquery-1.10.2.min.js',
         'app/lib/angular/angular.js',
         'app/lib/angular/angular-*.js',
-        'app/lib/jquery/jquery-1.10.2.min.js',
         'app/lib/jquery-ui-1.10.3/ui/jquery-ui.js',
         'app/lib/jasmine-jquery.js',
         'app/lib/tinymce/jscripts/tiny_mce/tiny_mce.js',
