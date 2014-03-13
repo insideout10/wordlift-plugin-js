@@ -86,9 +86,16 @@ angular.module( 'AnalysisService', [] )
         id         = get('@id', item)
         types      = get('@type', item)
         thumbnails = get('foaf:depiction', item)
-        freebaseThumbnails = get('http://rdf.freebase.com/ns/common.topic.image', item)
-        freebaseThumbnails = if angular.isArray freebaseThumbnails then freebaseThumbnails else [ freebaseThumbnails ]
-        freebaseThumbnails = ("admin-ajax.php?action=wordlift_freebase_image&url=#{escape(thumbnail)}" for thumbnail in freebaseThumbnails)
+        thumbnails = if angular.isArray thumbnails then thumbnails else [ thumbnails ]
+        freebase = get('http://rdf.freebase.com/ns/common.topic.image', item)
+        freebase = if angular.isArray freebase then freebase else [ freebase ]
+        freebaseThumbnails = []
+#        freebaseThumbnails = ("admin-ajax.php?action=wordlift_freebase_image&url=#{escape(thumbnail)}" for thumbnail in freebaseThumbnails)
+        freebaseThumbnails = (
+          for thumbnail in freebase
+            match = /m\.(.*)$/i.exec thumbnail
+            "https://usercontent.googleapis.com/freebase/v1/image/m/#{match[1]}?maxwidth=4096&maxheight=4096"
+        )
         thumbnails = thumbnails.concat freebaseThumbnails
 
         # create the entity model.

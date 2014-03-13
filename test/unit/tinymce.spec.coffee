@@ -82,27 +82,35 @@ describe "TinyMCE tests", ->
       $httpBackend.expectPOST('/base/app/assets/english.json?action=wordlift_analyze')
         .respond 200, data
 
-      $httpBackend.expect('HEAD', 'admin-ajax.php?action=wordlift_freebase_image&url=http%3A//rdf.freebase.com/ns/m.04js6kc')
-        .respond 200, ''
-      $httpBackend.expect('HEAD', 'admin-ajax.php?action=wordlift_freebase_image&url=http%3A//rdf.freebase.com/ns/m.04js6kq')
-        .respond 200, ''
-      $httpBackend.expect('HEAD', 'admin-ajax.php?action=wordlift_freebase_image&url=http%3A//rdf.freebase.com/ns/m.04mn0b4')
-        .respond 200, ''
-      $httpBackend.expect('HEAD', 'admin-ajax.php?action=wordlift_freebase_image&url=http%3A//rdf.freebase.com/ns/m.04mn0bt')
-        .respond 200, ''
-      $httpBackend.expect('HEAD', 'admin-ajax.php?action=wordlift_freebase_image&url=http%3A//rdf.freebase.com/ns/m.0djtw4k')
-        .respond 200, ''
-      $httpBackend.expect('HEAD', 'admin-ajax.php?action=wordlift_freebase_image&url=http%3A//rdf.freebase.com/ns/m.0p7qbkp')
-        .respond 200, ''
-      $httpBackend.expect('HEAD', 'admin-ajax.php?action=wordlift_freebase_image&url=http%3A//rdf.freebase.com/ns/m.0kybkyc')
-        .respond 200, ''
-      $httpBackend.expect('HEAD', 'admin-ajax.php?action=wordlift_freebase_image&url=http%3A//rdf.freebase.com/ns/m.0kybl3w')
-        .respond 200, ''
-      $httpBackend.expect('HEAD', 'admin-ajax.php?action=wordlift_freebase_image&url=http%3A//rdf.freebase.com/ns/m.0kyblb5')
-        .respond 200, ''
-      $httpBackend.expect('HEAD', 'admin-ajax.php?action=wordlift_freebase_image&url=http%3A//rdf.freebase.com/ns/m.0kyblkj')
-        .respond 200, ''
 
+      $httpBackend.expect('HEAD', 'http://upload.wikimedia.org/wikipedia/commons/a/a6/Flag_of_Rome.svg')
+        .respond 200, ''
+      $httpBackend.expect('HEAD', 'http://upload.wikimedia.org/wikipedia/commons/5/5c/Street_Scene,_Rome,_ME.jpg')
+        .respond 200, ''
+      $httpBackend.expect('HEAD', 'http://upload.wikimedia.org/wikipedia/commons/a/a4/Sw-horz-w3c.png')
+        .respond 200, ''
+      $httpBackend.expect('HEAD', 'http://upload.wikimedia.org/wikipedia/commons/2/20/WordPress_logo.svg')
+        .respond 200, ''
+      $httpBackend.expect('HEAD', 'https://usercontent.googleapis.com/freebase/v1/image/m/04js6kc?maxwidth=4096&maxheight=4096')
+        .respond 200, ''
+      $httpBackend.expect('HEAD', 'https://usercontent.googleapis.com/freebase/v1/image/m/04js6kq?maxwidth=4096&maxheight=4096')
+        .respond 200, ''
+      $httpBackend.expect('HEAD', 'https://usercontent.googleapis.com/freebase/v1/image/m/04mn0b4?maxwidth=4096&maxheight=4096')
+        .respond 200, ''
+      $httpBackend.expect('HEAD', 'https://usercontent.googleapis.com/freebase/v1/image/m/04mn0bt?maxwidth=4096&maxheight=4096')
+        .respond 200, ''
+      $httpBackend.expect('HEAD', 'https://usercontent.googleapis.com/freebase/v1/image/m/0djtw4k?maxwidth=4096&maxheight=4096')
+        .respond 200, ''
+      $httpBackend.expect('HEAD', 'https://usercontent.googleapis.com/freebase/v1/image/m/0p7qbkp?maxwidth=4096&maxheight=4096')
+        .respond 200, ''
+      $httpBackend.expect('HEAD', 'https://usercontent.googleapis.com/freebase/v1/image/m/0kybkyc?maxwidth=4096&maxheight=4096')
+        .respond 200, ''
+      $httpBackend.expect('HEAD', 'https://usercontent.googleapis.com/freebase/v1/image/m/0kybl3w?maxwidth=4096&maxheight=4096')
+        .respond 200, ''
+      $httpBackend.expect('HEAD', 'https://usercontent.googleapis.com/freebase/v1/image/m/0kyblb5?maxwidth=4096&maxheight=4096')
+        .respond 200, ''
+      $httpBackend.expect('HEAD', 'https://usercontent.googleapis.com/freebase/v1/image/m/0kyblkj?maxwidth=4096&maxheight=4096')
+        .respond 200, ''
 
       # Call the analyze method of the editor.
       EditorService.analyze ed.getContent { format: 'text' }

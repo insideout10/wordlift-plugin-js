@@ -25,36 +25,7 @@ describe "EditorController tests", ->
       $httpBackend.expectPOST('/base/app/assets/english.json?action=wordlift_analyze')
       .respond 200, data
 
-      $httpBackend.expect('HEAD',
-        'admin-ajax.php?action=wordlift_freebase_image&url=http%3A//rdf.freebase.com/ns/m.04js6kc')
-      .respond 200, ''
-      $httpBackend.expect('HEAD',
-        'admin-ajax.php?action=wordlift_freebase_image&url=http%3A//rdf.freebase.com/ns/m.04js6kq')
-      .respond 200, ''
-      $httpBackend.expect('HEAD',
-        'admin-ajax.php?action=wordlift_freebase_image&url=http%3A//rdf.freebase.com/ns/m.04mn0b4')
-      .respond 200, ''
-      $httpBackend.expect('HEAD',
-        'admin-ajax.php?action=wordlift_freebase_image&url=http%3A//rdf.freebase.com/ns/m.04mn0bt')
-      .respond 200, ''
-      $httpBackend.expect('HEAD',
-        'admin-ajax.php?action=wordlift_freebase_image&url=http%3A//rdf.freebase.com/ns/m.0djtw4k')
-      .respond 200, ''
-      $httpBackend.expect('HEAD',
-        'admin-ajax.php?action=wordlift_freebase_image&url=http%3A//rdf.freebase.com/ns/m.0p7qbkp')
-      .respond 200, ''
-      $httpBackend.expect('HEAD',
-        'admin-ajax.php?action=wordlift_freebase_image&url=http%3A//rdf.freebase.com/ns/m.0kybkyc')
-      .respond 200, ''
-      $httpBackend.expect('HEAD',
-        'admin-ajax.php?action=wordlift_freebase_image&url=http%3A//rdf.freebase.com/ns/m.0kybl3w')
-      .respond 200, ''
-      $httpBackend.expect('HEAD',
-        'admin-ajax.php?action=wordlift_freebase_image&url=http%3A//rdf.freebase.com/ns/m.0kyblb5')
-      .respond 200, ''
-      $httpBackend.expect('HEAD',
-        'admin-ajax.php?action=wordlift_freebase_image&url=http%3A//rdf.freebase.com/ns/m.0kyblkj')
-      .respond 200, ''
+      $httpBackend.when('HEAD', /.*/).respond(200, '')
 
       AnalysisService.analyze ''
 

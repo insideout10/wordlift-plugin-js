@@ -87,7 +87,7 @@ describe 'directives', ->
       ).done (data) ->
 
         # Catch all the requests to Freebase.
-        $httpBackend.when('HEAD', /rdf.freebase.com/).respond(200, '')
+        $httpBackend.when('HEAD', /.*/).respond(200, '')
 
         # Simulate event broadcasted by AnalysisService
         $rootScope.$broadcast 'analysisReceived', AnalysisService.parse data

@@ -168,18 +168,21 @@
             return 'thing';
           };
           createEntity = function(item, language) {
-            var entity, freebaseThumbnails, id, thumbnail, thumbnails, types;
+            var entity, freebase, freebaseThumbnails, id, match, thumbnail, thumbnails, types;
             id = get('@id', item);
             types = get('@type', item);
             thumbnails = get('foaf:depiction', item);
-            freebaseThumbnails = get('http://rdf.freebase.com/ns/common.topic.image', item);
-            freebaseThumbnails = angular.isArray(freebaseThumbnails) ? freebaseThumbnails : [freebaseThumbnails];
+            thumbnails = angular.isArray(thumbnails) ? thumbnails : [thumbnails];
+            freebase = get('http://rdf.freebase.com/ns/common.topic.image', item);
+            freebase = angular.isArray(freebase) ? freebase : [freebase];
+            freebaseThumbnails = [];
             freebaseThumbnails = (function() {
               var _i, _len, _results;
               _results = [];
-              for (_i = 0, _len = freebaseThumbnails.length; _i < _len; _i++) {
-                thumbnail = freebaseThumbnails[_i];
-                _results.push("admin-ajax.php?action=wordlift_freebase_image&url=" + (escape(thumbnail)));
+              for (_i = 0, _len = freebase.length; _i < _len; _i++) {
+                thumbnail = freebase[_i];
+                match = /m\.(.*)$/i.exec(thumbnail);
+                _results.push("https://usercontent.googleapis.com/freebase/v1/image/m/" + match[1] + "?maxwidth=4096&maxheight=4096");
               }
               return _results;
             })();

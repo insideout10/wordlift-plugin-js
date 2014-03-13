@@ -423,25 +423,33 @@
       $httpBackend.expectPOST(<span class="hljs-string">'/base/app/assets/english.json?action=wordlift_analyze'</span>)
         .respond <span class="hljs-number">200</span>, data
 
-      $httpBackend.expect(<span class="hljs-string">'HEAD'</span>, <span class="hljs-string">'admin-ajax.php?action=wordlift_freebase_image&amp;url=http%3A//rdf.freebase.com/ns/m.04js6kc'</span>)
+      $httpBackend.expect(<span class="hljs-string">'HEAD'</span>, <span class="hljs-string">'http://upload.wikimedia.org/wikipedia/commons/a/a6/Flag_of_Rome.svg'</span>)
         .respond <span class="hljs-number">200</span>, <span class="hljs-string">''</span>
-      $httpBackend.expect(<span class="hljs-string">'HEAD'</span>, <span class="hljs-string">'admin-ajax.php?action=wordlift_freebase_image&amp;url=http%3A//rdf.freebase.com/ns/m.04js6kq'</span>)
+      $httpBackend.expect(<span class="hljs-string">'HEAD'</span>, <span class="hljs-string">'http://upload.wikimedia.org/wikipedia/commons/5/5c/Street_Scene,_Rome,_ME.jpg'</span>)
         .respond <span class="hljs-number">200</span>, <span class="hljs-string">''</span>
-      $httpBackend.expect(<span class="hljs-string">'HEAD'</span>, <span class="hljs-string">'admin-ajax.php?action=wordlift_freebase_image&amp;url=http%3A//rdf.freebase.com/ns/m.04mn0b4'</span>)
+      $httpBackend.expect(<span class="hljs-string">'HEAD'</span>, <span class="hljs-string">'http://upload.wikimedia.org/wikipedia/commons/a/a4/Sw-horz-w3c.png'</span>)
         .respond <span class="hljs-number">200</span>, <span class="hljs-string">''</span>
-      $httpBackend.expect(<span class="hljs-string">'HEAD'</span>, <span class="hljs-string">'admin-ajax.php?action=wordlift_freebase_image&amp;url=http%3A//rdf.freebase.com/ns/m.04mn0bt'</span>)
+      $httpBackend.expect(<span class="hljs-string">'HEAD'</span>, <span class="hljs-string">'http://upload.wikimedia.org/wikipedia/commons/2/20/WordPress_logo.svg'</span>)
         .respond <span class="hljs-number">200</span>, <span class="hljs-string">''</span>
-      $httpBackend.expect(<span class="hljs-string">'HEAD'</span>, <span class="hljs-string">'admin-ajax.php?action=wordlift_freebase_image&amp;url=http%3A//rdf.freebase.com/ns/m.0djtw4k'</span>)
+      $httpBackend.expect(<span class="hljs-string">'HEAD'</span>, <span class="hljs-string">'https://usercontent.googleapis.com/freebase/v1/image/m/04js6kc?maxwidth=4096&amp;maxheight=4096'</span>)
         .respond <span class="hljs-number">200</span>, <span class="hljs-string">''</span>
-      $httpBackend.expect(<span class="hljs-string">'HEAD'</span>, <span class="hljs-string">'admin-ajax.php?action=wordlift_freebase_image&amp;url=http%3A//rdf.freebase.com/ns/m.0p7qbkp'</span>)
+      $httpBackend.expect(<span class="hljs-string">'HEAD'</span>, <span class="hljs-string">'https://usercontent.googleapis.com/freebase/v1/image/m/04js6kq?maxwidth=4096&amp;maxheight=4096'</span>)
         .respond <span class="hljs-number">200</span>, <span class="hljs-string">''</span>
-      $httpBackend.expect(<span class="hljs-string">'HEAD'</span>, <span class="hljs-string">'admin-ajax.php?action=wordlift_freebase_image&amp;url=http%3A//rdf.freebase.com/ns/m.0kybkyc'</span>)
+      $httpBackend.expect(<span class="hljs-string">'HEAD'</span>, <span class="hljs-string">'https://usercontent.googleapis.com/freebase/v1/image/m/04mn0b4?maxwidth=4096&amp;maxheight=4096'</span>)
         .respond <span class="hljs-number">200</span>, <span class="hljs-string">''</span>
-      $httpBackend.expect(<span class="hljs-string">'HEAD'</span>, <span class="hljs-string">'admin-ajax.php?action=wordlift_freebase_image&amp;url=http%3A//rdf.freebase.com/ns/m.0kybl3w'</span>)
+      $httpBackend.expect(<span class="hljs-string">'HEAD'</span>, <span class="hljs-string">'https://usercontent.googleapis.com/freebase/v1/image/m/04mn0bt?maxwidth=4096&amp;maxheight=4096'</span>)
         .respond <span class="hljs-number">200</span>, <span class="hljs-string">''</span>
-      $httpBackend.expect(<span class="hljs-string">'HEAD'</span>, <span class="hljs-string">'admin-ajax.php?action=wordlift_freebase_image&amp;url=http%3A//rdf.freebase.com/ns/m.0kyblb5'</span>)
+      $httpBackend.expect(<span class="hljs-string">'HEAD'</span>, <span class="hljs-string">'https://usercontent.googleapis.com/freebase/v1/image/m/0djtw4k?maxwidth=4096&amp;maxheight=4096'</span>)
         .respond <span class="hljs-number">200</span>, <span class="hljs-string">''</span>
-      $httpBackend.expect(<span class="hljs-string">'HEAD'</span>, <span class="hljs-string">'admin-ajax.php?action=wordlift_freebase_image&amp;url=http%3A//rdf.freebase.com/ns/m.0kyblkj'</span>)
+      $httpBackend.expect(<span class="hljs-string">'HEAD'</span>, <span class="hljs-string">'https://usercontent.googleapis.com/freebase/v1/image/m/0p7qbkp?maxwidth=4096&amp;maxheight=4096'</span>)
+        .respond <span class="hljs-number">200</span>, <span class="hljs-string">''</span>
+      $httpBackend.expect(<span class="hljs-string">'HEAD'</span>, <span class="hljs-string">'https://usercontent.googleapis.com/freebase/v1/image/m/0kybkyc?maxwidth=4096&amp;maxheight=4096'</span>)
+        .respond <span class="hljs-number">200</span>, <span class="hljs-string">''</span>
+      $httpBackend.expect(<span class="hljs-string">'HEAD'</span>, <span class="hljs-string">'https://usercontent.googleapis.com/freebase/v1/image/m/0kybl3w?maxwidth=4096&amp;maxheight=4096'</span>)
+        .respond <span class="hljs-number">200</span>, <span class="hljs-string">''</span>
+      $httpBackend.expect(<span class="hljs-string">'HEAD'</span>, <span class="hljs-string">'https://usercontent.googleapis.com/freebase/v1/image/m/0kyblb5?maxwidth=4096&amp;maxheight=4096'</span>)
+        .respond <span class="hljs-number">200</span>, <span class="hljs-string">''</span>
+      $httpBackend.expect(<span class="hljs-string">'HEAD'</span>, <span class="hljs-string">'https://usercontent.googleapis.com/freebase/v1/image/m/0kyblkj?maxwidth=4096&amp;maxheight=4096'</span>)
         .respond <span class="hljs-number">200</span>, <span class="hljs-string">''</span></pre></div></div>
             
         </li>
