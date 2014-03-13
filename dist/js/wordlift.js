@@ -518,25 +518,23 @@
       }
       return filtered;
     };
+  }).filter('filterObjectBy', function() {
+    return function(items, field, value) {
+      var filtered;
+      filtered = [];
+      angular.forEach(items, function(item) {
+        if (item[field] === value) {
+          return filtered.push(item);
+        }
+      });
+      return filtered;
+    };
   }).controller('EntitiesController', [
     'EditorService', 'EntityService', '$log', '$scope', 'Configuration', function(EditorService, EntityService, $log, $scope, Configuration) {
       var el, scroll, setArrowTop;
       $scope.analysis = null;
       $scope.textAnnotation = null;
       $scope.textAnnotationSpan = null;
-      $scope.annotations = [];
-      $scope.selectedEntity = void 0;
-      $scope.selectedEntitiesMapping = {};
-      $scope.getSelectedEntities = function() {
-        var entities, key, value, _ref;
-        entities = [];
-        _ref = $scope.selectedEntitiesMapping;
-        for (key in _ref) {
-          value = _ref[key];
-          entities.push(value);
-        }
-        return entities;
-      };
       $scope.sortByConfidence = function(entity) {
         return entity[Configuration.entityLabels.confidence];
       };
@@ -557,15 +555,8 @@
       };
       $(window).scroll(scroll);
       $('#content_ifr').contents().scroll(scroll);
-      $scope.onEntityClicked = function(entityIndex, entityAnnotation) {
-        $scope.selectedEntity = entityIndex;
-        $scope.selectedEntitiesMapping[entityAnnotation.relation.id] = entityAnnotation.entity;
-        entityAnnotation.selected = !entityAnnotation.selected;
-        if (entityAnnotation.selected) {
-          EntityService.select(entityAnnotation);
-        } else {
-          EntityService.deselect(entityAnnotation);
-        }
+      $scope.onEntitySelected = function(textAnnotation, entityAnnotation) {
+        console.log("onEntitySelected [ textAnnotation :: " + textAnnotation + " ][ entityAnnotation :: " + entityAnnotation + " ]");
         return $scope.$emit('DisambiguationWidget.entitySelected', entityAnnotation);
       };
       $scope.$on('analysisReceived', function(event, analysis) {
@@ -573,7 +564,6 @@
       });
       return $scope.$on('textAnnotationClicked', function(event, id, sourceElement) {
         var pos, _ref, _ref1;
-        $scope.selectedEntity = void 0;
         $scope.textAnnotationSpan = angular.element(sourceElement.target);
         $scope.textAnnotation = $scope.analysis.textAnnotations[id];
         if (0 === ((_ref = $scope.textAnnotation) != null ? (_ref1 = _ref.entityAnnotations) != null ? _ref1.length : void 0 : void 0)) {
@@ -591,7 +581,7 @@
 
   angular.module('wordlift.tinymce.plugin', ['wordlift.tinymce.plugin.controllers', 'wordlift.tinymce.plugin.directives']);
 
-  $(container = $('<div id="wordlift-disambiguation-popover" class="metabox-holder">\n  <div class="postbox">\n    <div class="handlediv" title="Click to toggle"><br></div>\n    <h3 class="hndle"><span>Semantic Web</span></h3>\n    <div class="inside">\n      <form role="form">\n        <div class="form-group">\n          <div class="ui-widget">\n            <input type="text" class="form-control" id="search" placeholder="search or create">\n          </div>\n        </div>\n\n        <wl-entities text-annotation="textAnnotation"></wl-entities>\n\n      </form>\n    </div>\n  </div>\n</div>').appendTo('form[name=post]').css({
+  $(container = $('<div id="wordlift-disambiguation-popover" class="metabox-holder">\n  <div class="postbox">\n    <div class="handlediv" title="Click to toggle"><br></div>\n    <h3 class="hndle"><span>Semantic Web</span></h3>\n    <div class="inside">\n      <form role="form">\n        <div class="form-group">\n          <div class="ui-widget">\n            <input type="text" class="form-control" id="search" placeholder="search or create">\n          </div>\n        </div>\n\n        <wl-entities on-select="onEntitySelected(textAnnotation, entityAnnotation)" text-annotation="textAnnotation"></wl-entities>\n\n      </form>\n\n      <div ng-repeat="textAnnotation in analysis.textAnnotations">\n        <div ng-repeat="entityAnnotation in textAnnotation.entityAnnotations | filterObjectBy:\'selected\':true">\n          <div ng-bind="entityAnnotation.entity.label"></div>\n\n          <input type=\'text\' name=\'wl_entities[{{entityAnnotation.entity.id}}][uri]\' value=\'{{entityAnnotation.entity.id}}\'>\n          <input type=\'text\' name=\'wl_entities[{{entityAnnotation.entity.id}}][label]\' value=\'{{entityAnnotation.entity.label}}\'>\n          <input type=\'text\' name=\'wl_entities[{{entityAnnotation.entity.id}}][description]\' value=\'{{entityAnnotation.entity.description}}\'>\n          <input type=\'text\' name=\'wl_entities[{{entityAnnotation.entity.id}}][type]\' value=\'{{entityAnnotation.entity.type}}\'>\n\n\n          <input ng-repeat="image in entityAnnotation.entity.images" type=\'text\'\n            name=\'wl_entities[{{entityAnnotation.entity.id}}][image]\' value=\'{{image}}\'>\n\n        </div>\n      </div>\n    </div>\n  </div>\n</div>').appendTo('form[name=post]').css({
     display: 'none',
     height: $('body').height() - $('#wpadminbar').height() + 32,
     top: $('#wpadminbar').height() - 1,

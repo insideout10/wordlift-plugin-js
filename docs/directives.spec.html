@@ -410,7 +410,8 @@ scope.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      scope.<span class="hljs-function"><span class="hljs-title">select</span> = <span class="hljs-params">(ta, ea)</span> -&gt;</span> <span class="hljs-built_in">console</span>.log <span class="hljs-string">"you selected sth [ ta :: <span class="hljs-subst">#{ta}</span> ][ ea :: <span class="hljs-subst">#{ea}</span> ]"</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>      scope.<span class="hljs-function"><span class="hljs-title">select</span> = <span class="hljs-params">(ta, ea)</span> -&gt;</span> <span class="hljs-comment"># Do nothing</span>
+      spyOn scope, <span class="hljs-string">'select'</span></pre></div></div>
             
         </li>
         
@@ -420,19 +421,6 @@ scope.</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-21">&#182;</a>
-              </div>
-              <pre><code> spyOn scope, <span class="hljs-string">'select'</span>
-</code></pre>
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-22">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
               <p>Compile the directive.</p>
 
@@ -444,11 +432,11 @@ scope.</p>
         </li>
         
         
-        <li id="section-23">
+        <li id="section-22">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-23">&#182;</a>
+                <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
               <p>Get the mock-up analysis.</p>
 
@@ -461,11 +449,11 @@ scope.</p>
         </li>
         
         
-        <li id="section-24">
+        <li id="section-23">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-24">&#182;</a>
+                <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
               <p>Catch all the requests to Freebase.</p>
 
@@ -476,11 +464,11 @@ scope.</p>
         </li>
         
         
-        <li id="section-25">
+        <li id="section-24">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-25">&#182;</a>
+                <a class="pilcrow" href="#section-24">&#182;</a>
               </div>
               <p>Simulate event broadcasted by AnalysisService</p>
 
@@ -491,11 +479,11 @@ scope.</p>
         </li>
         
         
-        <li id="section-26">
+        <li id="section-25">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-26">&#182;</a>
+                <a class="pilcrow" href="#section-25">&#182;</a>
               </div>
               <p>Create a fake textAnnotation element (the textAnnotation exists in the mockup data).</p>
 
@@ -506,11 +494,11 @@ scope.</p>
         </li>
         
         
-        <li id="section-27">
+        <li id="section-26">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-27">&#182;</a>
+                <a class="pilcrow" href="#section-26">&#182;</a>
               </div>
               <p>Simulate event broadcasted by EditorService on annotation click</p>
 
@@ -521,11 +509,11 @@ scope.</p>
         </li>
         
         
-        <li id="section-28">
+        <li id="section-27">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-28">&#182;</a>
+                <a class="pilcrow" href="#section-27">&#182;</a>
               </div>
               <p>Process changes.</p>
 
@@ -536,11 +524,11 @@ scope.</p>
         </li>
         
         
-        <li id="section-29">
+        <li id="section-28">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-29">&#182;</a>
+                <a class="pilcrow" href="#section-28">&#182;</a>
               </div>
               <p>Check that there are 2 entity tiles.</p>
 
@@ -552,11 +540,11 @@ scope.</p>
         </li>
         
         
-        <li id="section-30">
+        <li id="section-29">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-30">&#182;</a>
+                <a class="pilcrow" href="#section-29">&#182;</a>
               </div>
               <p>Set the ID of the entity annotations (from the mock file).</p>
 
@@ -568,11 +556,11 @@ scope.</p>
         </li>
         
         
-        <li id="section-31">
+        <li id="section-30">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-31">&#182;</a>
+                <a class="pilcrow" href="#section-30">&#182;</a>
               </div>
               <p>Click the first entity.</p>
 
@@ -581,6 +569,21 @@ scope.</p>
             <div class="content"><div class='highlight'><pre>        entitiesElems[<span class="hljs-number">0</span>].click()
         expect(scope.textAnnotation.entityAnnotations[id1].selected).toBe <span class="hljs-literal">true</span>
         expect(scope.textAnnotation.entityAnnotations[id2].selected).toBe <span class="hljs-literal">false</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-31">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-31">&#182;</a>
+              </div>
+              <p>Check that the select event has been called.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        expect(scope.select).toHaveBeenCalledWith(scope.textAnnotation, scope.textAnnotation.entityAnnotations[id1])</pre></div></div>
             
         </li>
         
@@ -608,13 +611,43 @@ scope.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-33">&#182;</a>
               </div>
+              <p>Check that the select event has been called.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        expect(scope.select).toHaveBeenCalledWith(scope.textAnnotation, scope.textAnnotation.entityAnnotations[id2])</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-34">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-34">&#182;</a>
+              </div>
               <p>Click again on the second entity.</p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre>        entitiesElems[<span class="hljs-number">1</span>].click()
         expect(scope.textAnnotation.entityAnnotations[id1].selected).toBe <span class="hljs-literal">false</span>
-        expect(scope.textAnnotation.entityAnnotations[id2].selected).toBe <span class="hljs-literal">false</span>
+        expect(scope.textAnnotation.entityAnnotations[id2].selected).toBe <span class="hljs-literal">false</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-35">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-35">&#182;</a>
+              </div>
+              <p>Check that the select event has been called.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        expect(scope.select).toHaveBeenCalledWith(scope.textAnnotation, <span class="hljs-literal">null</span>)
 
     )</pre></div></div>
             

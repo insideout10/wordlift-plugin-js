@@ -11,6 +11,14 @@ angular.module('wordlift.tinymce.plugin.controllers', [ 'wordlift.tinymce.plugin
 
       filtered
   )
+  .filter('filterObjectBy', ->
+    (items, field, value) ->
+      filtered = []
+
+      angular.forEach items, (item) -> filtered.push(item) if item[field] is value
+
+      filtered
+  )
   .controller('EntitiesController', ['EditorService', 'EntityService', '$log', '$scope', 'Configuration', (EditorService, EntityService, $log, $scope, Configuration) ->
 
     # holds a reference to the current analysis results.
@@ -21,18 +29,15 @@ angular.module('wordlift.tinymce.plugin.controllers', [ 'wordlift.tinymce.plugin
     # holds a reference to the selected text annotation span.
     $scope.textAnnotationSpan = null
 
+#    $scope.annotations = []
+#    $scope.selectedEntity = undefined
+#    $scope.selectedEntitiesMapping = {}
 
-    $scope.annotations = []
-    $scope.selectedEntity = undefined
-    
-    $scope.selectedEntitiesMapping = {}
-
-
-    $scope.getSelectedEntities = () ->
-      entities = []
-      for key, value of $scope.selectedEntitiesMapping
-        entities.push value
-      entities
+#    $scope.getSelectedEntities = () ->
+#      entities = []
+#      for key, value of $scope.selectedEntitiesMapping
+#        entities.push value
+#      entities
 
     $scope.sortByConfidence = (entity) ->
     	entity[Configuration.entityLabels.confidence]
@@ -57,18 +62,22 @@ angular.module('wordlift.tinymce.plugin.controllers', [ 'wordlift.tinymce.plugin
     $('#content_ifr').contents().scroll(scroll)
 
     # This event is raised when an entity is selected from the entities popover.
-    $scope.onEntityClicked = (entityIndex, entityAnnotation) ->
-      $scope.selectedEntity = entityIndex
-      $scope.selectedEntitiesMapping[entityAnnotation.relation.id] = entityAnnotation.entity
+#    $scope.onEntityClicked = (entityIndex, entityAnnotation) ->
+#      $scope.selectedEntity = entityIndex
+#      $scope.selectedEntitiesMapping[entityAnnotation.relation.id] = entityAnnotation.entity
 
       # Set the annotation selected/unselected.
-      entityAnnotation.selected = !entityAnnotation.selected
+#      entityAnnotation.selected = !entityAnnotation.selected
 
+    $scope.onEntitySelected = (textAnnotation, entityAnnotation) ->
+      console.log "onEntitySelected [ textAnnotation :: #{textAnnotation} ][ entityAnnotation :: #{entityAnnotation} ]"
+
+      # TODO: bring back the entity description/images
       # Select (or unselect) the specified entity annotation.
-      if entityAnnotation.selected
-        EntityService.select entityAnnotation
-      else
-        EntityService.deselect entityAnnotation
+#      if entityAnnotation.selected
+#        EntityService.select entityAnnotation
+#      else
+#        EntityService.deselect entityAnnotation
 
       $scope.$emit 'DisambiguationWidget.entitySelected', entityAnnotation
 
@@ -79,7 +88,7 @@ angular.module('wordlift.tinymce.plugin.controllers', [ 'wordlift.tinymce.plugin
     # When a text annotation is clicked, open the disambiguation popover.
     $scope.$on 'textAnnotationClicked', (event, id, sourceElement) ->
       # Set or reset properly $scope.selectedEntity
-      $scope.selectedEntity = undefined
+#      $scope.selectedEntity = undefined
 
       # Get the text annotation with the provided id.
       $scope.textAnnotationSpan = angular.element sourceElement.target
