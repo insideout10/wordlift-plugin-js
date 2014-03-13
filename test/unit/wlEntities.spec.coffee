@@ -5,6 +5,39 @@ describe 'directives', ->
   beforeEach module('wordlift.tinymce.plugin.directives')
   beforeEach module('AnalysisService')
 
+  # Test the wlEntity directive.
+  describe 'wlEntity', ->
+    scope = undefined
+    element = undefined
+
+    # Get the root scope and create a wl-entities element.
+    beforeEach inject(($rootScope) ->
+
+      scope = $rootScope.$new()
+
+      # The wlEntities directive gets the annotation from the text-annotation attribute.
+      element = angular.element '<wl-entity select="select(entityAnnotation)" entity-annotation="entityAnnotation"></wl-entities>'
+    )
+
+    it 'fires the select method with the entityAnnotation', inject(($compile) ->
+      # Create a mock entity annotation
+      scope.entityAnnotation = {}
+      # Create a mock select method.
+      scope.select = (item) -> # Do nothing
+      spyOn scope, 'select'
+
+      # Compile the directive.
+      $compile(element)(scope)
+      scope.$digest()
+
+      # Simulate the click on the element.
+      element.children('div')[0].click()
+
+      # Check that the select event has been called.
+      expect(scope.select).toHaveBeenCalledWith(scope.entityAnnotation)
+    )
+
+
   # Test the wlEntities directive.
   describe 'wlEntities', ->
     scope = undefined
