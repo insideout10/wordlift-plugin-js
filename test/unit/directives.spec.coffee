@@ -93,7 +93,7 @@ describe 'directives', ->
         $rootScope.$broadcast 'analysisReceived', AnalysisService.parse data
 
         # Create a fake textAnnotation element (the textAnnotation exists in the mockup data).
-        textAnnotation = angular.element '<span id="urn:enhancement-2f293108-0ded-f45a-7945-e7a52640a500" class="textannotation">David Riccitelli</span>'
+        textAnnotation = angular.element '<span id="urn:enhancement-233fd158-870d-6ca4-b7ce-30313e4a7015" class="textannotation">David Riccitelli</span>'
 
         # Simulate event broadcasted by EditorService on annotation click
         $rootScope.$broadcast 'textAnnotationClicked', textAnnotation.attr('id'), { target: textAnnotation }
@@ -103,28 +103,28 @@ describe 'directives', ->
 
         # Check that there are 2 entity tiles.
         entitiesElems = element.find('wl-entity > div')
-        expect(entitiesElems.length).toEqual 2
+        expect(entitiesElems.length).toEqual 3
 
         # Set the ID of the entity annotations (from the mock file).
-        id1 = 'urn:enhancement-bf74ebad-e1bf-88fb-e88e-edd0aebaf401'
-        id2 = 'urn:enhancement-9fbb26dd-21f1-53d4-d9f0-d69b83867b03'
+        id1 = 'urn:enhancement-3a64853f-2f48-c749-0073-c5787acf3b0e'
+        id2 = 'urn:enhancement-26a923a4-fbb8-b39d-53ad-e2922474b7fc'
 
         # Click the first entity.
-        entitiesElems[0].click()
+        entitiesElems[1].click()
         expect(scope.textAnnotation.entityAnnotations[id1].selected).toBe true
         expect(scope.textAnnotation.entityAnnotations[id2].selected).toBe false
         # Check that the select event has been called.
         expect(scope.select).toHaveBeenCalledWith(scope.textAnnotation, scope.textAnnotation.entityAnnotations[id1])
 
         # Click on the second entity.
-        entitiesElems[1].click()
+        entitiesElems[2].click()
         expect(scope.textAnnotation.entityAnnotations[id1].selected).toBe false
         expect(scope.textAnnotation.entityAnnotations[id2].selected).toBe true
         # Check that the select event has been called.
         expect(scope.select).toHaveBeenCalledWith(scope.textAnnotation, scope.textAnnotation.entityAnnotations[id2])
 
         # Click again on the second entity.
-        entitiesElems[1].click()
+        entitiesElems[2].click()
         expect(scope.textAnnotation.entityAnnotations[id1].selected).toBe false
         expect(scope.textAnnotation.entityAnnotations[id2].selected).toBe false
         # Check that the select event has been called.
@@ -153,7 +153,7 @@ describe 'directives', ->
     )
 
     # Test for the entity to empty.
-    it 'should be empty', inject((AnalysisService, $compile, $httpBackend, $rootScope) ->
+    it 'creates input boxes and textareas with entity data', inject((AnalysisService, $compile, $httpBackend, $rootScope) ->
 
       # Compile the directive.
       $compile(element)(scope)
@@ -171,19 +171,19 @@ describe 'directives', ->
         $rootScope.$broadcast 'analysisReceived', AnalysisService.parse data
 
         # Check that the analysis is set.
-        expect(scope.analysis).not.toBe null
-        expect(scope.analysis.textAnnotations).not.toBe null
+        expect(scope.analysis).not.toBe undefined
+        expect(scope.analysis.textAnnotations).not.toBe undefined
 
         # Check that there are no input boxes (no entities selected).
         expect(element.find('input').length).toEqual 0
         expect(element.find('textarea').length).toEqual 0
 
         # Select a text annotation.
-        textAnnotation1 = scope.analysis.textAnnotations['urn:enhancement-2f293108-0ded-f45a-7945-e7a52640a500']
+        textAnnotation1 = scope.analysis.textAnnotations['urn:enhancement-1a452dcd-b97f-6d9c-8de5-b4cec57ec020']
         expect(textAnnotation1).not.toBe undefined
 
         # Select an entity annotation in the first text annotation.
-        entityAnnotation1 = textAnnotation1.entityAnnotations['urn:enhancement-bf74ebad-e1bf-88fb-e88e-edd0aebaf401']
+        entityAnnotation1 = textAnnotation1.entityAnnotations['urn:enhancement-ec266952-de23-ef06-896f-02f9434e99b0']
         expect(entityAnnotation1).not.toBe undefined
 
         # Select one entity.
@@ -192,14 +192,20 @@ describe 'directives', ->
 
         # Check that there are no input boxes (no entities selected).
         fieldName1 = "wl_entities\\[#{entityAnnotation1.entity.id}\\]"
-        expect(element.find('input').length).toEqual 4
+        expect(element.find('input').length).toEqual 7
         expect(element.find('textarea').length).toEqual 1
 
         expect(element.find("input[name='#{fieldName1}\\[uri\\]']")[0].value).toEqual entityAnnotation1.entity.id
         expect(element.find("input[name='#{fieldName1}\\[label\\]']")[0].value).toEqual entityAnnotation1.entity.label
-        expect(element.find("textarea[name='#{fieldName1}\\[description\\]']")[0].innerHTML).toEqual entityAnnotation1.entity.description
         expect(element.find("input[name='#{fieldName1}\\[type\\]']")[0].value).toEqual entityAnnotation1.entity.type
         expect(element.find("input[name='#{fieldName1}\\[image\\]']")[0].value).toEqual entityAnnotation1.entity.thumbnails[0]
+        expect(element.find("input[name='#{fieldName1}\\[image\\]']")[1].value).toEqual entityAnnotation1.entity.thumbnails[1]
+        expect(element.find("input[name='#{fieldName1}\\[image\\]']")[2].value).toEqual entityAnnotation1.entity.thumbnails[2]
+        expect(element.find("input[name='#{fieldName1}\\[image\\]']")[3].value).toEqual entityAnnotation1.entity.thumbnails[3]
+
+        # Get the decoded description and check it against the entity.
+        description = $(element.find("textarea[name='#{fieldName1}\\[description\\]']")[0]).text()
+        expect(description).toEqual entityAnnotation1.entity.description
 
         # Deselect the entity.
         entityAnnotation1.selected = false
@@ -214,11 +220,11 @@ describe 'directives', ->
         scope.$digest()
 
         # Select a text annotation.
-        textAnnotation2 = scope.analysis.textAnnotations['urn:enhancement-0bb607cd-b1e8-33fd-5d34-e1a6da9d447a']
+        textAnnotation2 = scope.analysis.textAnnotations['urn:enhancement-233fd158-870d-6ca4-b7ce-30313e4a7015']
         expect(textAnnotation2).not.toBe undefined
 
         # Select an entity annotation in the first text annotation.
-        entityAnnotation2 = textAnnotation2.entityAnnotations['urn:enhancement-c0b100cf-d83e-8756-32f3-e3898df69525']
+        entityAnnotation2 = textAnnotation2.entityAnnotations['urn:enhancement-26a923a4-fbb8-b39d-53ad-e2922474b7fc']
         expect(entityAnnotation2).not.toBe undefined
 
         # Select another entity in the same text annotation.
@@ -237,8 +243,5 @@ describe 'directives', ->
         expect(element.find("textarea[name='#{fieldName2}\\[description\\]']")[0].innerHTML).toEqual entityAnnotation2.entity.description
         expect(element.find("input[name='#{fieldName2}\\[type\\]']")[0].value).toEqual entityAnnotation2.entity.type
         expect(element.find("input[name='#{fieldName2}\\[image\\]']")[0].value).toEqual entityAnnotation2.entity.thumbnails[0]
-        expect(element.find("input[name='#{fieldName2}\\[image\\]']")[1].value).toEqual entityAnnotation2.entity.thumbnails[1]
-        expect(element.find("input[name='#{fieldName2}\\[image\\]']")[2].value).toEqual entityAnnotation2.entity.thumbnails[2]
-        expect(element.find("input[name='#{fieldName2}\\[image\\]']")[3].value).toEqual entityAnnotation2.entity.thumbnails[3]
 
     )

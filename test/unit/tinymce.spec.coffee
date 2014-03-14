@@ -81,15 +81,17 @@ describe "TinyMCE tests", ->
 
       $httpBackend.expectPOST('/base/app/assets/english.json?action=wordlift_analyze')
         .respond 200, data
-
-
       $httpBackend.expect('HEAD', 'http://upload.wikimedia.org/wikipedia/commons/a/a6/Flag_of_Rome.svg')
         .respond 200, ''
-      $httpBackend.expect('HEAD', 'http://upload.wikimedia.org/wikipedia/commons/5/5c/Street_Scene,_Rome,_ME.jpg')
+      $httpBackend.expect('HEAD', 'http://upload.wikimedia.org/wikipedia/commons/a/a3/Rome_Georgia_from_Myrtle_Hill_Cemetery.jpg')
+        .respond 200, ''
+      $httpBackend.expect('HEAD', 'http://upload.wikimedia.org/wikipedia/commons/6/6a/OneidaCoCourthouse-Beale.jpg')
         .respond 200, ''
       $httpBackend.expect('HEAD', 'http://upload.wikimedia.org/wikipedia/commons/a/a4/Sw-horz-w3c.png')
         .respond 200, ''
       $httpBackend.expect('HEAD', 'http://upload.wikimedia.org/wikipedia/commons/2/20/WordPress_logo.svg')
+        .respond 200, ''
+      $httpBackend.expect('HEAD', 'https://usercontent.googleapis.com/freebase/v1/image/m/05thd8b?maxwidth=4096&maxheight=4096')
         .respond 200, ''
       $httpBackend.expect('HEAD', 'https://usercontent.googleapis.com/freebase/v1/image/m/04js6kc?maxwidth=4096&maxheight=4096')
         .respond 200, ''
@@ -141,8 +143,8 @@ describe "TinyMCE tests", ->
       expect(analysis.languages).not.toBe undefined
 
       expect(analysis.language).toEqual 'en'
-      expect(Object.keys(analysis.entities).length).toEqual 25
-      expect(Object.keys(analysis.entityAnnotations).length).toEqual 27
+      expect(Object.keys(analysis.entities).length).toEqual 28
+      expect(Object.keys(analysis.entityAnnotations).length).toEqual 30
       expect(Object.keys(analysis.textAnnotations).length).toEqual 10
       expect(Object.keys(analysis.languages).length).toEqual 1
 
