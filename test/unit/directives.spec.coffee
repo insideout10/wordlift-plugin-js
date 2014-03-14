@@ -198,10 +198,10 @@ describe 'directives', ->
         expect(element.find("input[name='#{fieldName1}\\[uri\\]']")[0].value).toEqual entityAnnotation1.entity.id
         expect(element.find("input[name='#{fieldName1}\\[label\\]']")[0].value).toEqual entityAnnotation1.entity.label
         expect(element.find("input[name='#{fieldName1}\\[type\\]']")[0].value).toEqual entityAnnotation1.entity.type
-        expect(element.find("input[name='#{fieldName1}\\[image\\]']")[0].value).toEqual entityAnnotation1.entity.thumbnails[0]
-        expect(element.find("input[name='#{fieldName1}\\[image\\]']")[1].value).toEqual entityAnnotation1.entity.thumbnails[1]
-        expect(element.find("input[name='#{fieldName1}\\[image\\]']")[2].value).toEqual entityAnnotation1.entity.thumbnails[2]
-        expect(element.find("input[name='#{fieldName1}\\[image\\]']")[3].value).toEqual entityAnnotation1.entity.thumbnails[3]
+        expect(element.find("input[name='#{fieldName1}\\[image\\]\\[\\]']")[0].value).toEqual entityAnnotation1.entity.thumbnails[0]
+        expect(element.find("input[name='#{fieldName1}\\[image\\]\\[\\]']")[1].value).toEqual entityAnnotation1.entity.thumbnails[1]
+        expect(element.find("input[name='#{fieldName1}\\[image\\]\\[\\]']")[2].value).toEqual entityAnnotation1.entity.thumbnails[2]
+        expect(element.find("input[name='#{fieldName1}\\[image\\]\\[\\]']")[3].value).toEqual entityAnnotation1.entity.thumbnails[3]
 
         # Get the decoded description and check it against the entity.
         description = $(element.find("textarea[name='#{fieldName1}\\[description\\]']")[0]).text()
@@ -242,7 +242,7 @@ describe 'directives', ->
         expect(element.find("input[name='#{fieldName2}\\[label\\]']")[0].value).toEqual entityAnnotation2.entity.label
         expect(element.find("textarea[name='#{fieldName2}\\[description\\]']")[0].innerHTML).toEqual entityAnnotation2.entity.description
         expect(element.find("input[name='#{fieldName2}\\[type\\]']")[0].value).toEqual entityAnnotation2.entity.type
-        expect(element.find("input[name='#{fieldName2}\\[image\\]']")[0].value).toEqual entityAnnotation2.entity.thumbnails[0]
+        expect(element.find("input[name='#{fieldName2}\\[image\\]\\[\\]']")[0].value).toEqual entityAnnotation2.entity.thumbnails[0]
 
     )
 
@@ -294,10 +294,10 @@ describe 'directives', ->
         expect(element.find("input[name='#{fieldName1}\\[type\\]']")[0].value).toEqual entityAnnotation1.entity.type
 
         for i in [0...entityAnnotation1.entity.thumbnails.length]
-          expect(element.find("input[name='#{fieldName1}\\[image\\]']")[i].value).toEqual entityAnnotation1.entity.thumbnails[i]
+          expect(element.find("input[name='#{fieldName1}\\[image\\]\\[\\]']")[i].value).toEqual entityAnnotation1.entity.thumbnails[i]
 
         for i in [0...entityAnnotation1.entity.sameAs.length]
-          expect(element.find("input[name='#{fieldName1}\\[sameas\\]']")[i].value).toEqual entityAnnotation1.entity.sameAs[i]
+          expect(element.find("input[name='#{fieldName1}\\[sameas\\]\\[\\]']")[i].value).toEqual entityAnnotation1.entity.sameAs[i]
 
         # Get the decoded description and check it against the entity.
         description = $(element.find("textarea[name='#{fieldName1}\\[description\\]']")[0]).text()
@@ -339,6 +339,6 @@ describe 'directives', ->
         expect(element.find("input[name='#{fieldName2}\\[label\\]']")[0].value).toEqual entityAnnotation2.entity.label
         expect(element.find("textarea[name='#{fieldName2}\\[description\\]']")[0].innerHTML).toEqual entityAnnotation2.entity.description
         expect(element.find("input[name='#{fieldName2}\\[type\\]']")[0].value).toEqual entityAnnotation2.entity.type
-        expect(element.find("input[name='#{fieldName2}\\[image\\]']")[0].value).toEqual entityAnnotation2.entity.thumbnails[0]
+        expect(element.find("input[name='#{fieldName2}\\[image\\]\\[\\]']")[0].value).toEqual entityAnnotation2.entity.thumbnails[0]
 
     )
