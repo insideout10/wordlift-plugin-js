@@ -128,38 +128,44 @@ angular.module( 'AnalysisService', [] )
           entity.description = getLanguage('rdfs:comment', item, language)
           entity.descriptions = get('rdfs:comment', item)
 
-        # Check if thumbnails exists.
-        if thumbnails? and angular.isArray thumbnails
-          $q.all(($http.head thumbnail for thumbnail in thumbnails))
-            .then (results) ->
-              # Populate the thumbnails array only with existing images (those that return *status code* 200).
-              entity.thumbnails = (result.config.url for result in results when 200 is result.status)
-              # Set the main thumbnail as the first.
-              # TODO: use the lightest image as first.
-              entity.thumbnail  = entity.thumbnails[0] if 0 < entity.thumbnails.length
+        # Avoid null in entity description.
+        entity.description = '' if not entity.description?
 
+        # Check if thumbnails exists.
+#        if thumbnails? and angular.isArray thumbnails
+#          $q.all(($http.head thumbnail for thumbnail in thumbnails))
+#            .then (results) ->
+#              # Populate the thumbnails array only with existing images (those that return *status code* 200).
+#              entity.thumbnails = (result.config.url for result in results when 200 is result.status)
+#              # Set the main thumbnail as the first.
+#              # TODO: use the lightest image as first.
+#              entity.thumbnail  = entity.thumbnails[0] if 0 < entity.thumbnails.length'
 
         # return the entity.
         entity
 
       createEntityAnnotation = (item) ->
+        entity = entities[get('enhancer:entity-reference', item)]
+        # If the referenced entity is not found, return null
+        return null if not entity?
+
         # get the related text annotation.
         textAnnotation = textAnnotations[get('dc:relation', item)]
 
-        entity = {
+        entityAnnotation = {
           id        : get('@id', item),
           label     : get('enhancer:entity-label', item),
           confidence: get('enhancer:confidence', item),
-          entity    : entities[get('enhancer:entity-reference', item)],
+          entity    : entity,
           relation  : textAnnotations[get('dc:relation', item)],
           _item     : item
         }
 
         # create a binding from the textannotation to the entity.
-        textAnnotation.entityAnnotations[entity.id] = entity if textAnnotation?
+        textAnnotation.entityAnnotations[entityAnnotation.id] = entityAnnotation if textAnnotation?
 
         # return the entity.
-        entity
+        entityAnnotation
 
 
       createTextAnnotation = (item) ->
@@ -220,6 +226,11 @@ angular.module( 'AnalysisService', [] )
             entity.sameAs = entity.sameAs.concat(existing.sameAs)
             entity.thumbnails = entity.thumbnails.concat(existing.thumbnails)
             entity.source += ", #{existing.source}"
+            # Prefer the DBpedia description.
+            # TODO: have a user-set priority.
+            entity.description = existing.description if 'dbpedia' is existing.source
+
+            # Delete the sameAs entity from the index.
             delete entities[sameAs]
             mergeEntities(entity, entities)
         entity
@@ -299,10 +310,13 @@ angular.module( 'AnalysisService', [] )
       textAnnotations[id] = createTextAnnotation(item) for id, item of textAnnotations
 
       # Create entity annotations instances.
-      entityAnnotations[id] = createEntityAnnotation(item) for id, item of entityAnnotations
-
-      # Remove entity annotations that refer to unavailable entities (maybe because of entity merges).
-      delete entityAnnotations[id] for id, entityAnnotation of entityAnnotations when entityAnnotation.entity is undefined
+      for id, item of entityAnnotations
+        entityAnnotation = createEntityAnnotation(item)
+        # Add the entity annotation if it's not null, otherwise delete the EntityAnnotation from the index.
+        if entityAnnotation?
+          entityAnnotations[id] = entityAnnotation
+        else
+          delete entityAnnotations[id]
 
       # return the analysis result.
       {

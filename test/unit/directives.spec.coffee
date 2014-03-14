@@ -153,7 +153,7 @@ describe 'directives', ->
     )
 
     # Test for the entity to empty.
-    it 'creates input boxes and textareas with entity data', inject((AnalysisService, $compile, $httpBackend, $rootScope) ->
+    it 'creates input boxes and textareas with entity data (non-merged)', inject((AnalysisService, $compile, $httpBackend, $rootScope) ->
 
       # Compile the directive.
       $compile(element)(scope)
@@ -233,6 +233,103 @@ describe 'directives', ->
 
         # Check that the number of inputs matches.
         expect(element.find('input').length).toEqual 11
+        expect(element.find('textarea').length).toEqual 2
+
+        # Check that there are no input boxes (no entities selected).
+        fieldName2 = "wl_entities\\[#{entityAnnotation2.entity.id}\\]"
+
+        expect(element.find("input[name='#{fieldName2}\\[uri\\]']")[0].value).toEqual entityAnnotation2.entity.id
+        expect(element.find("input[name='#{fieldName2}\\[label\\]']")[0].value).toEqual entityAnnotation2.entity.label
+        expect(element.find("textarea[name='#{fieldName2}\\[description\\]']")[0].innerHTML).toEqual entityAnnotation2.entity.description
+        expect(element.find("input[name='#{fieldName2}\\[type\\]']")[0].value).toEqual entityAnnotation2.entity.type
+        expect(element.find("input[name='#{fieldName2}\\[image\\]']")[0].value).toEqual entityAnnotation2.entity.thumbnails[0]
+
+    )
+
+    # Test for the entity to empty.
+    it 'creates input boxes and textareas with entity data (merged)', inject((AnalysisService, $compile, $httpBackend, $rootScope) ->
+
+      # Compile the directive.
+      $compile(element)(scope)
+      scope.$digest()
+
+      # Get the mock-up analysis.
+      $.ajax('base/app/assets/english.json',
+        async: false
+      ).done (data) ->
+
+        # Catch all the requests to Freebase.
+        $httpBackend.when('HEAD', /.*/).respond(200, '')
+
+        # Simulate event broadcasted by AnalysisService
+        $rootScope.$broadcast 'analysisReceived', AnalysisService.parse data, true
+
+        # Check that the analysis is set.
+        expect(scope.analysis).not.toBe undefined
+        expect(scope.analysis.textAnnotations).not.toBe undefined
+
+        # Check that there are no input boxes (no entities selected).
+        expect(element.find('input').length).toEqual 0
+        expect(element.find('textarea').length).toEqual 0
+
+        # Select a text annotation.
+        textAnnotation1 = scope.analysis.textAnnotations['urn:enhancement-1a452dcd-b97f-6d9c-8de5-b4cec57ec020']
+        expect(textAnnotation1).not.toBe undefined
+
+        # Select an entity annotation in the first text annotation.
+        entityAnnotation1 = textAnnotation1.entityAnnotations['urn:enhancement-90a5f78d-7f4d-04fa-70df-fbb0e9aa212d']
+        expect(entityAnnotation1).not.toBe undefined
+
+        # Select one entity.
+        entityAnnotation1.selected = true
+        scope.$digest()
+
+        # Check that there are no input boxes (no entities selected).
+        fieldName1 = "wl_entities\\[#{entityAnnotation1.entity.id}\\]"
+        expect(element.find('input').length).toEqual 7
+        expect(element.find('textarea').length).toEqual 1
+
+        expect(element.find("input[name='#{fieldName1}\\[uri\\]']")[0].value).toEqual entityAnnotation1.entity.id
+        expect(element.find("input[name='#{fieldName1}\\[label\\]']")[0].value).toEqual entityAnnotation1.entity.label
+        expect(element.find("input[name='#{fieldName1}\\[type\\]']")[0].value).toEqual entityAnnotation1.entity.type
+
+        for i in [0...entityAnnotation1.entity.thumbnails.length]
+          expect(element.find("input[name='#{fieldName1}\\[image\\]']")[i].value).toEqual entityAnnotation1.entity.thumbnails[i]
+
+        for i in [0...entityAnnotation1.entity.sameAs.length]
+          expect(element.find("input[name='#{fieldName1}\\[same_as\\]']")[i].value).toEqual entityAnnotation1.entity.sameAs[i]
+
+        # Get the decoded description and check it against the entity.
+        description = $(element.find("textarea[name='#{fieldName1}\\[description\\]']")[0]).text()
+        expect(description).toEqual entityAnnotation1.entity.description
+
+        # Deselect the entity.
+        entityAnnotation1.selected = false
+        scope.$digest()
+
+        # Check that no inputs are selected.
+        expect(element.find('input').length).toEqual 0
+        expect(element.find('textarea').length).toEqual 0
+
+        # Reselect the entity.
+        entityAnnotation1.selected = true
+        scope.$digest()
+
+        # Select a text annotation.
+        textAnnotation2 = scope.analysis.textAnnotations['urn:enhancement-233fd158-870d-6ca4-b7ce-30313e4a7015']
+        expect(textAnnotation2).not.toBe undefined
+
+        # Select an entity annotation in the first text annotation.
+        entityAnnotation2 = textAnnotation2.entityAnnotations['urn:enhancement-53bd49a5-4609-627c-be3f-468d30a35bdc']
+        expect(entityAnnotation2).not.toBe undefined
+        expect(entityAnnotation2.entity).not.toBe undefined
+
+        # Select another entity in the same text annotation.
+        entityAnnotation2.selected = true
+        scope.$digest()
+
+        # Check that the number of inputs matches.
+        expect(element.find('input').length).toEqual 12
         expect(element.find('textarea').length).toEqual 2
 
         # Check that there are no input boxes (no entities selected).

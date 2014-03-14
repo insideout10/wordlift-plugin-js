@@ -93,6 +93,7 @@ describe 'services', ->
         # Set a reference to the entity annotation.
         entityAnnotation = textAnnotation.entityAnnotations[entityAnnotationId]
         expect(entityAnnotation).not.toBe undefined
+        expect(entityAnnotation.entity).not.toBe undefined
         expect(entityAnnotation.entity.sameAs).not.toBe undefined
 
         # Set a reference to the entity.
@@ -106,5 +107,11 @@ describe 'services', ->
 
         # Check that the sameAs are not present.
         expect(analysis.entities[sameAs]).toBe undefined for sameAs in entity.sameAs
+
+        expect(entityAnnotation.entity).not.toBe undefined for id, entityAnnotation of analysis.entityAnnotations
+
+        for id, textAnnotation of analysis.textAnnotations
+          for id, entityAnnotation of textAnnotation.entityAnnotations
+            expect(entityAnnotation.entity).not.toBe undefined
 
     )

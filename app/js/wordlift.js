@@ -64,7 +64,7 @@
       scope: {
         textAnnotations: '='
       },
-      template: "<div class=\"wl-entity-input-boxes\" ng-repeat=\"textAnnotation in textAnnotations\">\n  <div ng-repeat=\"entityAnnotation in textAnnotation.entityAnnotations | filterObjectBy:'selected':true\">\n\n    <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][uri]' value='{{entityAnnotation.entity.id}}'>\n    <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][label]' value='{{entityAnnotation.entity.label}}'>\n    <textarea name='wl_entities[{{entityAnnotation.entity.id}}][description]'>{{entityAnnotation.entity.description}}</textarea>\n    <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][type]' value='{{entityAnnotation.entity.type}}'>\n\n    <input ng-repeat=\"image in entityAnnotation.entity.thumbnails\" type='text'\n      name='wl_entities[{{entityAnnotation.entity.id}}][image]' value='{{image}}'>\n    <input ng-repeat=\"sameAs in entityAnnotation.entity.sameAs\" type='text'\n      name='wl_entities[{{entityAnnotation.entity.id}}][sameAs]' value='{{sameAs}}'>\n\n  </div>\n</div>"
+      template: "<div class=\"wl-entity-input-boxes\" ng-repeat=\"textAnnotation in textAnnotations\">\n  <div ng-repeat=\"entityAnnotation in textAnnotation.entityAnnotations | filterObjectBy:'selected':true\">\n\n    <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][uri]' value='{{entityAnnotation.entity.id}}'>\n    <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][label]' value='{{entityAnnotation.entity.label}}'>\n    <textarea name='wl_entities[{{entityAnnotation.entity.id}}][description]'>{{entityAnnotation.entity.description}}</textarea>\n    <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][type]' value='{{entityAnnotation.entity.type}}'>\n\n    <input ng-repeat=\"image in entityAnnotation.entity.thumbnails\" type='text'\n      name='wl_entities[{{entityAnnotation.entity.id}}][image]' value='{{image}}'>\n    <input ng-repeat=\"sameAs in entityAnnotation.entity.sameAs\" type='text'\n      name='wl_entities[{{entityAnnotation.entity.id}}][same_as]' value='{{sameAs}}'>\n\n  </div>\n</div>"
     };
   });
 
@@ -222,50 +222,30 @@
               entity.description = getLanguage('rdfs:comment', item, language);
               entity.descriptions = get('rdfs:comment', item);
             }
-            if ((thumbnails != null) && angular.isArray(thumbnails)) {
-              $q.all((function() {
-                var _i, _len, _results;
-                _results = [];
-                for (_i = 0, _len = thumbnails.length; _i < _len; _i++) {
-                  thumbnail = thumbnails[_i];
-                  _results.push($http.head(thumbnail));
-                }
-                return _results;
-              })()).then(function(results) {
-                var result;
-                entity.thumbnails = (function() {
-                  var _i, _len, _results;
-                  _results = [];
-                  for (_i = 0, _len = results.length; _i < _len; _i++) {
-                    result = results[_i];
-                    if (200 === result.status) {
-                      _results.push(result.config.url);
-                    }
-                  }
-                  return _results;
-                })();
-                if (0 < entity.thumbnails.length) {
-                  return entity.thumbnail = entity.thumbnails[0];
-                }
-              });
+            if (entity.description == null) {
+              entity.description = '';
             }
             return entity;
           };
           createEntityAnnotation = function(item) {
-            var entity, textAnnotation;
+            var entity, entityAnnotation, textAnnotation;
+            entity = entities[get('enhancer:entity-reference', item)];
+            if (entity == null) {
+              return null;
+            }
             textAnnotation = textAnnotations[get('dc:relation', item)];
-            entity = {
+            entityAnnotation = {
               id: get('@id', item),
               label: get('enhancer:entity-label', item),
               confidence: get('enhancer:confidence', item),
-              entity: entities[get('enhancer:entity-reference', item)],
+              entity: entity,
               relation: textAnnotations[get('dc:relation', item)],
               _item: item
             };
             if (textAnnotation != null) {
-              textAnnotation.entityAnnotations[entity.id] = entity;
+              textAnnotation.entityAnnotations[entityAnnotation.id] = entityAnnotation;
             }
-            return entity;
+            return entityAnnotation;
           };
           createTextAnnotation = function(item) {
             return {
@@ -335,6 +315,9 @@
                 entity.sameAs = entity.sameAs.concat(existing.sameAs);
                 entity.thumbnails = entity.thumbnails.concat(existing.thumbnails);
                 entity.source += ", " + existing.source;
+                if ('dbpedia' === existing.source) {
+                  entity.description = existing.description;
+                }
                 delete entities[sameAs];
                 mergeEntities(entity, entities);
               }
@@ -401,11 +384,10 @@
           }
           for (id in entityAnnotations) {
             item = entityAnnotations[id];
-            entityAnnotations[id] = createEntityAnnotation(item);
-          }
-          for (id in entityAnnotations) {
-            entityAnnotation = entityAnnotations[id];
-            if (entityAnnotation.entity === void 0) {
+            entityAnnotation = createEntityAnnotation(item);
+            if (entityAnnotation != null) {
+              entityAnnotations[id] = entityAnnotation;
+            } else {
               delete entityAnnotations[id];
             }
           }
