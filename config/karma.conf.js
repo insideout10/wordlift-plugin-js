@@ -51,8 +51,8 @@ module.exports = function(config){
 
     browsers : [
         'Chrome'
-//        'Firefox',
-//        'Safari'
+        ,'Firefox'
+        ,'Safari'
     ],
 
 //    logLevel : 'DEBUG',
