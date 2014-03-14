@@ -1750,7 +1750,7 @@ scope.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    it <span class="hljs-string">'creates input boxes and textareas with entity data (merged) 2'</span>, inject<span class="hljs-function"><span class="hljs-params">((AnalysisService, $compile, $httpBackend, $rootScope) -&gt;
+            <div class="content"><div class='highlight'><pre>    it <span class="hljs-string">'creates input boxes and textareas with entity data (merged) with many sameAs'</span>, inject<span class="hljs-function"><span class="hljs-params">((AnalysisService, $compile, $httpBackend, $rootScope) -&gt;
 
 </span></span></pre></div></div>
             
@@ -1927,8 +1927,18 @@ scope.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>        fieldName = <span class="hljs-string">"wl_entities\\[<span class="hljs-subst">#{entityAnnotation.entity.id}</span>\\]"</span>
-        expect(element.find(<span class="hljs-string">'input'</span>).length).toEqual <span class="hljs-number">7</span>
-        expect(element.find(<span class="hljs-string">'textarea'</span>).length).toEqual <span class="hljs-number">1</span></pre></div></div>
+        expect(element.find(<span class="hljs-string">'input'</span>).length).toEqual <span class="hljs-number">17</span>
+        expect(element.find(<span class="hljs-string">'textarea'</span>).length).toEqual <span class="hljs-number">1</span>
+
+        expect(element.find(<span class="hljs-string">"input[name='<span class="hljs-subst">#{fieldName}</span>\\[uri\\]']"</span>)[<span class="hljs-number">0</span>].value).toEqual entityAnnotation.entity.id
+        expect(element.find(<span class="hljs-string">"input[name='<span class="hljs-subst">#{fieldName}</span>\\[label\\]']"</span>)[<span class="hljs-number">0</span>].value).toEqual entityAnnotation.entity.label
+        expect(element.find(<span class="hljs-string">"input[name='<span class="hljs-subst">#{fieldName}</span>\\[type\\]']"</span>)[<span class="hljs-number">0</span>].value).toEqual entityAnnotation.entity.type
+
+        <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">0.</span>..entityAnnotation.entity.thumbnails.length]
+          expect(element.find(<span class="hljs-string">"input[name='<span class="hljs-subst">#{fieldName}</span>\\[image\\]\\[\\]']"</span>)[i].value).toEqual entityAnnotation.entity.thumbnails[i]
+
+        <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">0.</span>..entityAnnotation.entity.sameAs.length]
+          expect(element.find(<span class="hljs-string">"input[name='<span class="hljs-subst">#{fieldName}</span>\\[sameas\\]\\[\\]']"</span>)[i].value).toEqual entityAnnotation.entity.sameAs[i]</pre></div></div>
             
         </li>
         
@@ -1939,61 +1949,13 @@ scope.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-112">&#182;</a>
               </div>
-              <pre><code>   expect(element.find(<span class="hljs-string">"input[name='<span class="hljs-subst">#{fieldName1}</span>\\[uri\\]']"</span>)[<span class="hljs-number">0</span>].value).toEqual entityAnnotation1.entity.id
-   expect(element.find(<span class="hljs-string">"input[name='<span class="hljs-subst">#{fieldName1}</span>\\[label\\]']"</span>)[<span class="hljs-number">0</span>].value).toEqual entityAnnotation1.entity.label
-   expect(element.find(<span class="hljs-string">"input[name='<span class="hljs-subst">#{fieldName1}</span>\\[type\\]']"</span>)[<span class="hljs-number">0</span>].value).toEqual entityAnnotation1.entity.type
+              <p>Get the decoded description and check it against the entity.</p>
 
-   <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">0.</span>..entityAnnotation1.entity.thumbnails.length]
-     expect(element.find(<span class="hljs-string">"input[name='<span class="hljs-subst">#{fieldName1}</span>\\[image\\]\\[\\]']"</span>)[i].value).toEqual entityAnnotation1.entity.thumbnails[i]
-
-   <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">0.</span>..entityAnnotation1.entity.sameAs.length]
-     expect(element.find(<span class="hljs-string">"input[name='<span class="hljs-subst">#{fieldName1}</span>\\[sameas\\]\\[\\]']"</span>)[i].value).toEqual entityAnnotation1.entity.sameAs[i]
-
-   <span class="hljs-comment"># Get the decoded description and check it against the entity.</span>
-   description = $(element.find(<span class="hljs-string">"textarea[name='<span class="hljs-subst">#{fieldName1}</span>\\[description\\]']"</span>)[<span class="hljs-number">0</span>]).text()
-   expect(description).toEqual entityAnnotation1.entity.description
-
-   <span class="hljs-comment"># Deselect the entity.</span>
-   entityAnnotation1.selected = <span class="hljs-literal">false</span>
-   scope.$digest()
-
-   <span class="hljs-comment"># Check that no inputs are selected.</span>
-   expect(element.find(<span class="hljs-string">'input'</span>).length).toEqual <span class="hljs-number">0</span>
-   expect(element.find(<span class="hljs-string">'textarea'</span>).length).toEqual <span class="hljs-number">0</span>
-
-   <span class="hljs-comment"># Reselect the entity.</span>
-   entityAnnotation1.selected = <span class="hljs-literal">true</span>
-   scope.$digest()
-
-   <span class="hljs-comment"># Select a text annotation.</span>
-   textAnnotation2 = scope.analysis.textAnnotations[<span class="hljs-string">'urn:enhancement-233fd158-870d-6ca4-b7ce-30313e4a7015'</span>]
-   expect(textAnnotation2).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
-
-   <span class="hljs-comment"># Select an entity annotation in the first text annotation.</span>
-   entityAnnotation2 = textAnnotation2.entityAnnotations[<span class="hljs-string">'urn:enhancement-53bd49a5-4609-627c-be3f-468d30a35bdc'</span>]
-   expect(entityAnnotation2).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
-   expect(entityAnnotation2.entity).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
-
-   <span class="hljs-comment"># Select another entity in the same text annotation.</span>
-   entityAnnotation2.selected = <span class="hljs-literal">true</span>
-   scope.$digest()
-
-   <span class="hljs-comment"># Check that the number of inputs matches.</span>
-   expect(element.find(<span class="hljs-string">'input'</span>).length).toEqual <span class="hljs-number">12</span>
-   expect(element.find(<span class="hljs-string">'textarea'</span>).length).toEqual <span class="hljs-number">2</span>
-
-   <span class="hljs-comment"># Check that there are no input boxes (no entities selected).</span>
-   fieldName2 = <span class="hljs-string">"wl_entities\\[<span class="hljs-subst">#{entityAnnotation2.entity.id}</span>\\]"</span>
-
-   expect(element.find(<span class="hljs-string">"input[name='<span class="hljs-subst">#{fieldName2}</span>\\[uri\\]']"</span>)[<span class="hljs-number">0</span>].value).toEqual entityAnnotation2.entity.id
-   expect(element.find(<span class="hljs-string">"input[name='<span class="hljs-subst">#{fieldName2}</span>\\[label\\]']"</span>)[<span class="hljs-number">0</span>].value).toEqual entityAnnotation2.entity.label
-   expect(element.find(<span class="hljs-string">"textarea[name='<span class="hljs-subst">#{fieldName2}</span>\\[description\\]']"</span>)[<span class="hljs-number">0</span>].innerHTML).toEqual entityAnnotation2.entity.description
-   expect(element.find(<span class="hljs-string">"input[name='<span class="hljs-subst">#{fieldName2}</span>\\[type\\]']"</span>)[<span class="hljs-number">0</span>].value).toEqual entityAnnotation2.entity.type
-   expect(element.find(<span class="hljs-string">"input[name='<span class="hljs-subst">#{fieldName2}</span>\\[image\\]\\[\\]']"</span>)[<span class="hljs-number">0</span>].value).toEqual entityAnnotation2.entity.thumbnails[<span class="hljs-number">0</span>]
-</code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>
+            <div class="content"><div class='highlight'><pre>        description = $(element.find(<span class="hljs-string">"textarea[name='<span class="hljs-subst">#{fieldName}</span>\\[description\\]']"</span>)[<span class="hljs-number">0</span>]).text()
+        expect(description).toEqual entityAnnotation.entity.description
+
     )</pre></div></div>
             
         </li>

@@ -430,7 +430,7 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
             
             <div class="content"><div class='highlight'><pre>        entity =
           id          : id
-          thumbnail   : <span class="hljs-literal">null</span>
+          thumbnail   : <span class="hljs-keyword">if</span> <span class="hljs-number">0</span> &lt; thumbnails.length <span class="hljs-keyword">then</span> thumbnails[<span class="hljs-number">0</span>] <span class="hljs-keyword">else</span> <span class="hljs-literal">null</span>
           thumbnails  : thumbnails
           type        : getKnownType(types)
           types       : types

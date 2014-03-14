@@ -110,7 +110,7 @@ angular.module( 'AnalysisService', [] )
         # create the entity model.
         entity =
           id          : id
-          thumbnail   : null
+          thumbnail   : if 0 < thumbnails.length then thumbnails[0] else null
           thumbnails  : thumbnails
           type        : getKnownType(types)
           types       : types

@@ -209,7 +209,7 @@
             mergeUnique(thumbnails, schemaImages);
             entity = {
               id: id,
-              thumbnail: null,
+              thumbnail: 0 < thumbnails.length ? thumbnails[0] : null,
               thumbnails: thumbnails,
               type: getKnownType(types),
               types: types,
