@@ -91,6 +91,10 @@ angular.module( 'AnalysisService', [] )
         sameAs     = if angular.isArray sameAs then sameAs else [ sameAs ]
         thumbnails = get('foaf:depiction', item)
         thumbnails = if angular.isArray thumbnails then thumbnails else [ thumbnails ]
+
+        schemaImages = get('schema:image', item)
+        schemaImages = if angular.isArray schemaImages then schemaImages else [ schemaImages ]
+
         freebase = get('http://rdf.freebase.com/ns/common.topic.image', item)
         freebase = if angular.isArray freebase then freebase else [ freebase ]
         freebaseThumbnails = []
@@ -100,7 +104,8 @@ angular.module( 'AnalysisService', [] )
             match = /m\.(.*)$/i.exec thumbnail
             "https://usercontent.googleapis.com/freebase/v1/image/m/#{match[1]}?maxwidth=4096&maxheight=4096"
         )
-        thumbnails = thumbnails.concat freebaseThumbnails
+        mergeUnique(thumbnails, freebaseThumbnails)
+        mergeUnique(thumbnails, schemaImages)
 
         # create the entity model.
         entity =
@@ -218,13 +223,16 @@ angular.module( 'AnalysisService', [] )
         # otherwise false.
         false
 
+      mergeUnique = (array1, array2) ->
+        array1.push item for item in array2 when item not in array1
+
       mergeEntities = (entity, entities) ->
         for sameAs in entity.sameAs
           if entities[sameAs]?
             existing = entities[sameAs]
             # TODO: make concats unique.
-            entity.sameAs = entity.sameAs.concat(existing.sameAs)
-            entity.thumbnails = entity.thumbnails.concat(existing.thumbnails)
+            mergeUnique(entity.sameAs, existing.sameAs)
+            mergeUnique(entity.thumbnails, existing.thumbnails)
             entity.source += ", #{existing.source}"
             # Prefer the DBpedia description.
             # TODO: have a user-set priority.

@@ -115,3 +115,60 @@ describe 'services', ->
             expect(entityAnnotation.entity).not.toBe undefined
 
     )
+
+    it 'merges data while keeping sameAs', inject((AnalysisService, $httpBackend, $rootScope) ->
+
+      # Get the mock-up analysis.
+      $.ajax('base/app/assets/english.002.json',
+        async: false
+      ).done (data) ->
+
+        # Catch all the requests to Freebase.
+        $httpBackend.when('HEAD', /.*/).respond(200, '')
+
+        # Simulate event broadcasted by AnalysisService
+        analysis = AnalysisService.parse data, true
+
+        # Check that the analysis results conform.
+        expect(analysis).toEqual jasmine.any(Object)
+        expect(analysis.language).not.toBe undefined
+        expect(analysis.entities).not.toBe undefined
+        expect(analysis.entityAnnotations).not.toBe undefined
+        expect(analysis.textAnnotations).not.toBe undefined
+        expect(analysis.languages).not.toBe undefined
+        expect(analysis.language).toEqual 'en'
+        expect(Object.keys(analysis.entities).length).toEqual 14
+        expect(Object.keys(analysis.entityAnnotations).length).toEqual 15
+        expect(Object.keys(analysis.textAnnotations).length).toEqual 10
+        expect(Object.keys(analysis.languages).length).toEqual 1
+
+        # Get a Text Annotation and three entities that related to that Text Annotation.
+        textAnnotationId = 'urn:enhancement-a6bb446e-6e95-d6be-e91c-32833aa58b32'
+        entityAnnotationId = 'urn:enhancement-8a04d086-c636-7c64-d31c-19a8d3bde030'
+
+        # Set a reference to the text annotation.
+        textAnnotation = analysis.textAnnotations[textAnnotationId]
+        expect(textAnnotation).not.toBe undefined
+
+        # Set a reference to the entity annotation.
+        entityAnnotation = textAnnotation.entityAnnotations[entityAnnotationId]
+        expect(entityAnnotation).not.toBe undefined
+        expect(entityAnnotation.entity).not.toBe undefined
+        expect(entityAnnotation.entity.sameAs).not.toBe undefined
+
+        # Set a reference to the entity.
+        entity = entityAnnotation.entity
+        expect(entity.thumbnails.length).toEqual 9
+        for i in [0...entity.thumbnails.length]
+          expect(entity.thumbnails[i]).toEqual entity.thumbnails[i]
+
+        # Check that the sameAs are not present.
+        expect(analysis.entities[sameAs]).toBe undefined for sameAs in entity.sameAs
+
+        expect(entityAnnotation.entity).not.toBe undefined for id, entityAnnotation of analysis.entityAnnotations
+
+        for id, textAnnotation of analysis.textAnnotations
+          for id, entityAnnotation of textAnnotation.entityAnnotations
+            expect(entityAnnotation.entity).not.toBe undefined
+
+    )

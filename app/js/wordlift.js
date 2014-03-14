@@ -1,5 +1,6 @@
 (function() {
-  var $, container, injector;
+  var $, container, injector,
+    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   angular.module('wordlift.tinymce.plugin.config', []).constant('Configuration', {
     supportedTypes: ['schema:Place', 'schema:Event', 'schema:CreativeWork', 'schema:Product', 'schema:Person', 'schema:Organization'],
@@ -93,7 +94,7 @@
           });
         },
         parse: function(data, merge) {
-          var containsOrEquals, context, createEntity, createEntityAnnotation, createLanguage, createTextAnnotation, dctype, entities, entity, entityAnnotation, entityAnnotations, expand, get, getKnownType, getLanguage, graph, id, item, key, language, languages, mergeEntities, prefixes, textAnnotations, types, value, _i, _len;
+          var containsOrEquals, context, createEntity, createEntityAnnotation, createLanguage, createTextAnnotation, dctype, entities, entity, entityAnnotation, entityAnnotations, expand, get, getKnownType, getLanguage, graph, id, item, key, language, languages, mergeEntities, mergeUnique, prefixes, textAnnotations, types, value, _i, _len;
           if (merge == null) {
             merge = false;
           }
@@ -182,13 +183,15 @@
             return 'thing';
           };
           createEntity = function(item, language) {
-            var entity, freebase, freebaseThumbnails, id, match, sameAs, thumbnail, thumbnails, types;
+            var entity, freebase, freebaseThumbnails, id, match, sameAs, schemaImages, thumbnail, thumbnails, types;
             id = get('@id', item);
             types = get('@type', item);
             sameAs = get('owl:sameAs', item);
             sameAs = angular.isArray(sameAs) ? sameAs : [sameAs];
             thumbnails = get('foaf:depiction', item);
             thumbnails = angular.isArray(thumbnails) ? thumbnails : [thumbnails];
+            schemaImages = get('schema:image', item);
+            schemaImages = angular.isArray(schemaImages) ? schemaImages : [schemaImages];
             freebase = get('http://rdf.freebase.com/ns/common.topic.image', item);
             freebase = angular.isArray(freebase) ? freebase : [freebase];
             freebaseThumbnails = [];
@@ -202,7 +205,8 @@
               }
               return _results;
             })();
-            thumbnails = thumbnails.concat(freebaseThumbnails);
+            mergeUnique(thumbnails, freebaseThumbnails);
+            mergeUnique(thumbnails, schemaImages);
             entity = {
               id: id,
               thumbnail: null,
@@ -305,6 +309,17 @@
             }
             return false;
           };
+          mergeUnique = function(array1, array2) {
+            var item, _i, _len, _results;
+            _results = [];
+            for (_i = 0, _len = array2.length; _i < _len; _i++) {
+              item = array2[_i];
+              if (__indexOf.call(array1, item) < 0) {
+                _results.push(array1.push(item));
+              }
+            }
+            return _results;
+          };
           mergeEntities = function(entity, entities) {
             var existing, sameAs, _i, _len, _ref;
             _ref = entity.sameAs;
@@ -312,8 +327,8 @@
               sameAs = _ref[_i];
               if (entities[sameAs] != null) {
                 existing = entities[sameAs];
-                entity.sameAs = entity.sameAs.concat(existing.sameAs);
-                entity.thumbnails = entity.thumbnails.concat(existing.thumbnails);
+                mergeUnique(entity.sameAs, existing.sameAs);
+                mergeUnique(entity.thumbnails, existing.thumbnails);
                 entity.source += ", " + existing.source;
                 if ('dbpedia' === existing.source) {
                   entity.description = existing.description;

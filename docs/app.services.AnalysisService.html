@@ -386,6 +386,10 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         sameAs     = <span class="hljs-keyword">if</span> angular.isArray sameAs <span class="hljs-keyword">then</span> sameAs <span class="hljs-keyword">else</span> [ sameAs ]
         thumbnails = get(<span class="hljs-string">'foaf:depiction'</span>, item)
         thumbnails = <span class="hljs-keyword">if</span> angular.isArray thumbnails <span class="hljs-keyword">then</span> thumbnails <span class="hljs-keyword">else</span> [ thumbnails ]
+
+        schemaImages = get(<span class="hljs-string">'schema:image'</span>, item)
+        schemaImages = <span class="hljs-keyword">if</span> angular.isArray schemaImages <span class="hljs-keyword">then</span> schemaImages <span class="hljs-keyword">else</span> [ schemaImages ]
+
         freebase = get(<span class="hljs-string">'http://rdf.freebase.com/ns/common.topic.image'</span>, item)
         freebase = <span class="hljs-keyword">if</span> angular.isArray freebase <span class="hljs-keyword">then</span> freebase <span class="hljs-keyword">else</span> [ freebase ]
         freebaseThumbnails = []</pre></div></div>
@@ -408,7 +412,8 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
             match = <span class="hljs-regexp">/m\.(.*)$/i</span>.exec thumbnail
             <span class="hljs-string">"https://usercontent.googleapis.com/freebase/v1/image/m/<span class="hljs-subst">#{match[<span class="hljs-number">1</span>]}</span>?maxwidth=4096&amp;maxheight=4096"</span>
         )
-        thumbnails = thumbnails.concat freebaseThumbnails</pre></div></div>
+        mergeUnique(thumbnails, freebaseThumbnails)
+        mergeUnique(thumbnails, schemaImages)</pre></div></div>
             
         </li>
         
@@ -801,6 +806,9 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
             
             <div class="content"><div class='highlight'><pre>        <span class="hljs-literal">false</span>
 
+      <span class="hljs-function"><span class="hljs-title">mergeUnique</span> = <span class="hljs-params">(array1, array2)</span> -&gt;</span>
+        array1.push item <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> array2 <span class="hljs-keyword">when</span> item <span class="hljs-keyword">not</span> <span class="hljs-keyword">in</span> array1
+
       <span class="hljs-function"><span class="hljs-title">mergeEntities</span> = <span class="hljs-params">(entity, entities)</span> -&gt;</span>
         <span class="hljs-keyword">for</span> sameAs <span class="hljs-keyword">in</span> entity.sameAs
           <span class="hljs-keyword">if</span> entities[sameAs]?
@@ -819,8 +827,8 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            entity.sameAs = entity.sameAs.concat(existing.sameAs)
-            entity.thumbnails = entity.thumbnails.concat(existing.thumbnails)
+            <div class="content"><div class='highlight'><pre>            mergeUnique(entity.sameAs, existing.sameAs)
+            mergeUnique(entity.thumbnails, existing.thumbnails)
             entity.source += <span class="hljs-string">", <span class="hljs-subst">#{existing.source}</span>"</span></pre></div></div>
             
         </li>
