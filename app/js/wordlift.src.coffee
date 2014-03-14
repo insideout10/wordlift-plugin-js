@@ -113,6 +113,8 @@ angular.module('wordlift.tinymce.plugin.directives', ['wordlift.tinymce.plugin.c
 
           <input ng-repeat="image in entityAnnotation.entity.thumbnails" type='text'
             name='wl_entities[{{entityAnnotation.entity.id}}][image]' value='{{image}}'>
+          <input ng-repeat="sameAs in entityAnnotation.entity.sameAs" type='text'
+            name='wl_entities[{{entityAnnotation.entity.id}}][sameAs]' value='{{sameAs}}'>
 
         </div>
       </div>
@@ -424,7 +426,7 @@ angular.module( 'AnalysisService', [] )
       entityAnnotations[id] = createEntityAnnotation(item) for id, item of entityAnnotations
 
       # Remove entity annotations that refer to unavailable entities (maybe because of entity merges).
-      delete entityAnnotations[id] for id, entityAnnotation of entityAnnotations when not entityAnnotation.entity?
+      delete entityAnnotations[id] for id, entityAnnotation of entityAnnotations when entityAnnotation.entity is undefined
 
       # return the analysis result.
       {

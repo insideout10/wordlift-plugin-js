@@ -144,8 +144,8 @@ describe "TinyMCE tests", ->
       expect(analysis.textAnnotations).not.toBe undefined
       expect(analysis.languages).not.toBe undefined
       expect(analysis.language).toEqual 'en'
-      expect(Object.keys(analysis.entities).length).toEqual 21
-      expect(Object.keys(analysis.entityAnnotations).length).toEqual 22
+      expect(Object.keys(analysis.entities).length).toEqual 20
+      expect(Object.keys(analysis.entityAnnotations).length).toEqual 21
       expect(Object.keys(analysis.textAnnotations).length).toEqual 10
       expect(Object.keys(analysis.languages).length).toEqual 1
 

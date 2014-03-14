@@ -302,7 +302,7 @@ angular.module( 'AnalysisService', [] )
       entityAnnotations[id] = createEntityAnnotation(item) for id, item of entityAnnotations
 
       # Remove entity annotations that refer to unavailable entities (maybe because of entity merges).
-      delete entityAnnotations[id] for id, entityAnnotation of entityAnnotations when not entityAnnotation.entity?
+      delete entityAnnotations[id] for id, entityAnnotation of entityAnnotations when entityAnnotation.entity is undefined
 
       # return the analysis result.
       {

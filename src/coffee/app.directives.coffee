@@ -82,6 +82,8 @@ angular.module('wordlift.tinymce.plugin.directives', ['wordlift.tinymce.plugin.c
 
           <input ng-repeat="image in entityAnnotation.entity.thumbnails" type='text'
             name='wl_entities[{{entityAnnotation.entity.id}}][image]' value='{{image}}'>
+          <input ng-repeat="sameAs in entityAnnotation.entity.sameAs" type='text'
+            name='wl_entities[{{entityAnnotation.entity.id}}][sameAs]' value='{{sameAs}}'>
 
         </div>
       </div>

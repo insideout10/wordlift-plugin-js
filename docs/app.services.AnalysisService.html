@@ -1194,7 +1194,7 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">delete</span> entityAnnotations[id] <span class="hljs-keyword">for</span> id, entityAnnotation <span class="hljs-keyword">of</span> entityAnnotations <span class="hljs-keyword">when</span> <span class="hljs-keyword">not</span> entityAnnotation.entity?</pre></div></div>
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">delete</span> entityAnnotations[id] <span class="hljs-keyword">for</span> id, entityAnnotation <span class="hljs-keyword">of</span> entityAnnotations <span class="hljs-keyword">when</span> entityAnnotation.entity <span class="hljs-keyword">is</span> <span class="hljs-literal">undefined</span></pre></div></div>
             
         </li>
         

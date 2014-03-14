@@ -77,14 +77,14 @@ describe 'services', ->
         expect(analysis.textAnnotations).not.toBe undefined
         expect(analysis.languages).not.toBe undefined
         expect(analysis.language).toEqual 'en'
-        expect(Object.keys(analysis.entities).length).toEqual 21
-        expect(Object.keys(analysis.entityAnnotations).length).toEqual 22
+        expect(Object.keys(analysis.entities).length).toEqual 20
+        expect(Object.keys(analysis.entityAnnotations).length).toEqual 21
         expect(Object.keys(analysis.textAnnotations).length).toEqual 10
         expect(Object.keys(analysis.languages).length).toEqual 1
 
         # Get a Text Annotation and three entities that related to that Text Annotation.
         textAnnotationId = 'urn:enhancement-1a452dcd-b97f-6d9c-8de5-b4cec57ec020'
-        entityAnnotationId = 'urn:enhancement-509b6609-e7d6-4c08-e627-afcfd637c42f'
+        entityAnnotationId = 'urn:enhancement-3366ede4-c449-f43b-e3cf-297fb41a619d'
 
         # Set a reference to the text annotation.
         textAnnotation = analysis.textAnnotations[textAnnotationId]
