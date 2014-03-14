@@ -20,7 +20,8 @@ angular.module( 'AnalysisService', [] )
 
     # <a name="analyze"></a>
     # Analyze the provided content. Only one analysis at a time is run.
-    analyze: (content) ->
+    # The merge parameter is passed to the parse call and merges together entities related via sameAs.
+    analyze: (content, merge = false) ->
       # Exit if an analysis is already running.
       return if @isRunning
       # Set that an analysis is running.
@@ -38,7 +39,7 @@ angular.module( 'AnalysisService', [] )
       )
       # If successful, broadcast an *analysisReceived* event.
       .success (data, status, headers, config) ->
-        $rootScope.$broadcast 'analysisReceived', that.parse data
+        $rootScope.$broadcast 'analysisReceived', that.parse(data, merge)
         # Set that the analysis is complete.
         that.isRunning = false
       # In case of error, we don't do anything (for now).
@@ -49,7 +50,8 @@ angular.module( 'AnalysisService', [] )
         that.isRunning = false
 
     # Parse the response data from the analysis request (Redlink).
-    parse: (data) ->
+    # If *merge* is set to true, entity annotations and entities with matching sameAs will be merged.
+    parse: (data, merge = false) ->
 
       languages         = []
       textAnnotations   = {}
@@ -85,6 +87,8 @@ angular.module( 'AnalysisService', [] )
       createEntity = (item, language) ->
         id         = get('@id', item)
         types      = get('@type', item)
+        sameAs     = get('owl:sameAs', item)
+        sameAs     = if angular.isArray sameAs then sameAs else [ sameAs ]
         thumbnails = get('foaf:depiction', item)
         thumbnails = if angular.isArray thumbnails then thumbnails else [ thumbnails ]
         freebase = get('http://rdf.freebase.com/ns/common.topic.image', item)
@@ -107,6 +111,7 @@ angular.module( 'AnalysisService', [] )
           types       : types
           label       : getLanguage('rdfs:label', item, language)
           labels      : get('rdfs:label', item)
+          sameAs      : sameAs
           source      : if id.match('^http://rdf.freebase.com/.*$')
                           'freebase'
                         else if id.match('^http://dbpedia.org/.*$')
@@ -207,6 +212,18 @@ angular.module( 'AnalysisService', [] )
         # otherwise false.
         false
 
+      mergeEntities = (entity, entities) ->
+        for sameAs in entity.sameAs
+          if entities[sameAs]?
+            existing = entities[sameAs]
+            # TODO: make concats unique.
+            entity.sameAs = entity.sameAs.concat(existing.sameAs)
+            entity.thumbnails = entity.thumbnails.concat(existing.thumbnails)
+            entity.source += ", #{existing.source}"
+            delete entities[sameAs]
+            mergeEntities(entity, entities)
+        entity
+
       # expand a string to a full path if it contains a prefix.
       expand = (content) ->
         # if there's no prefix, return the original string.
@@ -272,16 +289,20 @@ angular.module( 'AnalysisService', [] )
       # create a reference to the default language.
       language = languages[0].code
 
-      # create entities instances in the entities array.
-      for id, item of entities
-        entity       = createEntity(item, language)
-        entities[id] = entity
+      # Create entities instances in the entities array.
+      entities[id] = createEntity(item, language) for id, item of entities
 
-      # create entities instances in the entities array.
+      # Cycle in every entity.
+      mergeEntities(entity, entities) for id, entity of entities if merge
+
+      # Create text annotation instances.
       textAnnotations[id] = createTextAnnotation(item) for id, item of textAnnotations
 
-      # create entities instances in the entities array.
+      # Create entity annotations instances.
       entityAnnotations[id] = createEntityAnnotation(item) for id, item of entityAnnotations
+
+      # Remove entity annotations that refer to unavailable entities (maybe because of entity merges).
+      delete entityAnnotations[id] for id, entityAnnotation of entityAnnotations when not entityAnnotation.entity?
 
       # return the analysis result.
       {

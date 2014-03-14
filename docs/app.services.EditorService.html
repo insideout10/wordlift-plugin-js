@@ -69,6 +69,11 @@
               </a>
             
               
+              <a class="source" href="services.spec.html">
+                services.spec.coffee
+              </a>
+            
+              
               <a class="source" href="tinymce.spec.html">
                 tinymce.spec.coffee
               </a>
@@ -320,11 +325,11 @@ Send the provided content for analysis using the <a href="app.services.AnalysisS
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
-              <p>Call the <a href="AnalysisService.html">AnalysisService</a> to analyze the provided content.</p>
+              <p>Call the <a href="AnalysisService.html">AnalysisService</a> to analyze the provided content, asking to merge sameAs related entities.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        AnalysisService.analyze content</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        AnalysisService.analyze content, <span class="hljs-literal">true</span></pre></div></div>
             
         </li>
         
@@ -465,8 +470,6 @@ When an analysis is completed, remove the <em>running</em> class from the WordLi
             </div>
             
             <div class="content"><div class='highlight'><pre>    $rootScope.$<span class="hljs-literal">on</span> <span class="hljs-string">'analysisReceived'</span>, <span class="hljs-function"><span class="hljs-params">(event, analysis)</span> -&gt;</span>
-
-      $log.info <span class="hljs-string">'analysisReceived [ analysis :: '</span> + analysis + <span class="hljs-string">' ]'</span>
 
       service.embedAnalysis analysis</pre></div></div>
             

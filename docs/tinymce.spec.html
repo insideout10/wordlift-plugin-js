@@ -69,6 +69,11 @@
               </a>
             
               
+              <a class="source" href="services.spec.html">
+                services.spec.coffee
+              </a>
+            
+              
               <a class="source" href="tinymce.spec.html">
                 tinymce.spec.coffee
               </a>
@@ -422,15 +427,17 @@
 
       $httpBackend.expectPOST(<span class="hljs-string">'/base/app/assets/english.json?action=wordlift_analyze'</span>)
         .respond <span class="hljs-number">200</span>, data
-
-
       $httpBackend.expect(<span class="hljs-string">'HEAD'</span>, <span class="hljs-string">'http://upload.wikimedia.org/wikipedia/commons/a/a6/Flag_of_Rome.svg'</span>)
         .respond <span class="hljs-number">200</span>, <span class="hljs-string">''</span>
-      $httpBackend.expect(<span class="hljs-string">'HEAD'</span>, <span class="hljs-string">'http://upload.wikimedia.org/wikipedia/commons/5/5c/Street_Scene,_Rome,_ME.jpg'</span>)
+      $httpBackend.expect(<span class="hljs-string">'HEAD'</span>, <span class="hljs-string">'http://upload.wikimedia.org/wikipedia/commons/a/a3/Rome_Georgia_from_Myrtle_Hill_Cemetery.jpg'</span>)
+        .respond <span class="hljs-number">200</span>, <span class="hljs-string">''</span>
+      $httpBackend.expect(<span class="hljs-string">'HEAD'</span>, <span class="hljs-string">'http://upload.wikimedia.org/wikipedia/commons/6/6a/OneidaCoCourthouse-Beale.jpg'</span>)
         .respond <span class="hljs-number">200</span>, <span class="hljs-string">''</span>
       $httpBackend.expect(<span class="hljs-string">'HEAD'</span>, <span class="hljs-string">'http://upload.wikimedia.org/wikipedia/commons/a/a4/Sw-horz-w3c.png'</span>)
         .respond <span class="hljs-number">200</span>, <span class="hljs-string">''</span>
       $httpBackend.expect(<span class="hljs-string">'HEAD'</span>, <span class="hljs-string">'http://upload.wikimedia.org/wikipedia/commons/2/20/WordPress_logo.svg'</span>)
+        .respond <span class="hljs-number">200</span>, <span class="hljs-string">''</span>
+      $httpBackend.expect(<span class="hljs-string">'HEAD'</span>, <span class="hljs-string">'https://usercontent.googleapis.com/freebase/v1/image/m/05thd8b?maxwidth=4096&amp;maxheight=4096'</span>)
         .respond <span class="hljs-number">200</span>, <span class="hljs-string">''</span>
       $httpBackend.expect(<span class="hljs-string">'HEAD'</span>, <span class="hljs-string">'https://usercontent.googleapis.com/freebase/v1/image/m/04js6kc?maxwidth=4096&amp;maxheight=4096'</span>)
         .respond <span class="hljs-number">200</span>, <span class="hljs-string">''</span>
@@ -477,11 +484,11 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
-              <p>The analysis service shouldn’t have been called</p>
+              <p>The analysis service shouldn’t have been called with the merge parameter set to true.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      expect(AnalysisService.analyze).toHaveBeenCalledWith(jasmine.any(String))
+            <div class="content"><div class='highlight'><pre>      expect(AnalysisService.analyze).toHaveBeenCalledWith(jasmine.any(String), <span class="hljs-literal">true</span>)
 
       $httpBackend.flush()
 
@@ -548,15 +555,15 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      expect(analysis.language).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
+            <div class="content"><div class='highlight'><pre>      expect(analysis).toEqual jasmine.any(Object)
+      expect(analysis.language).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
       expect(analysis.entities).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
       expect(analysis.entityAnnotations).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
       expect(analysis.textAnnotations).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
       expect(analysis.languages).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
-
       expect(analysis.language).toEqual <span class="hljs-string">'en'</span>
-      expect(Object.keys(analysis.entities).length).toEqual <span class="hljs-number">25</span>
-      expect(Object.keys(analysis.entityAnnotations).length).toEqual <span class="hljs-number">27</span>
+      expect(Object.keys(analysis.entities).length).toEqual <span class="hljs-number">19</span>
+      expect(Object.keys(analysis.entityAnnotations).length).toEqual <span class="hljs-number">20</span>
       expect(Object.keys(analysis.textAnnotations).length).toEqual <span class="hljs-number">10</span>
       expect(Object.keys(analysis.languages).length).toEqual <span class="hljs-number">1</span></pre></div></div>
             

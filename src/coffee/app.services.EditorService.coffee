@@ -59,8 +59,8 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
         $('.mce_wordlift').addClass 'running'
         # Make the editor read-obly.
         tinyMCE.get('content').getBody().setAttribute 'contenteditable', false
-        # Call the [AnalysisService](AnalysisService.html) to analyze the provided content.
-        AnalysisService.analyze content
+        # Call the [AnalysisService](AnalysisService.html) to analyze the provided content, asking to merge sameAs related entities.
+        AnalysisService.analyze content, true
 
       # set some predefined variables.
       getEditor : -> tinyMCE.get('content')
@@ -104,8 +104,6 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
     # When an analysis is completed, remove the *running* class from the WordLift toolbar button.
     # (The button is set to running when [an analysis is called](#analyze).
     $rootScope.$on 'analysisReceived', (event, analysis) ->
-
-      $log.info 'analysisReceived [ analysis :: ' + analysis + ' ]'
 
       service.embedAnalysis analysis
 

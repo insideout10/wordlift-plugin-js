@@ -117,8 +117,8 @@ describe "TinyMCE tests", ->
       # Call the analyze method of the editor.
       EditorService.analyze ed.getContent { format: 'text' }
 
-      # The analysis service shouldn't have been called
-      expect(AnalysisService.analyze).toHaveBeenCalledWith(jasmine.any(String))
+      # The analysis service shouldn't have been called with the merge parameter set to true.
+      expect(AnalysisService.analyze).toHaveBeenCalledWith(jasmine.any(String), true)
 
       $httpBackend.flush()
 
@@ -132,22 +132,22 @@ describe "TinyMCE tests", ->
 
       # Get a reference to the argument passed with the event.
       args     = $rootScope.$broadcast.calls.argsFor 0
+
       # Get a reference to the analysis structure.
       analysis = args[1]
 
       # Check that the analysis results conform.
+      expect(analysis).toEqual jasmine.any(Object)
       expect(analysis.language).not.toBe undefined
       expect(analysis.entities).not.toBe undefined
       expect(analysis.entityAnnotations).not.toBe undefined
       expect(analysis.textAnnotations).not.toBe undefined
       expect(analysis.languages).not.toBe undefined
-
       expect(analysis.language).toEqual 'en'
-      expect(Object.keys(analysis.entities).length).toEqual 28
-      expect(Object.keys(analysis.entityAnnotations).length).toEqual 30
+      expect(Object.keys(analysis.entities).length).toEqual 21
+      expect(Object.keys(analysis.entityAnnotations).length).toEqual 22
       expect(Object.keys(analysis.textAnnotations).length).toEqual 10
       expect(Object.keys(analysis.languages).length).toEqual 1
-
 
     # Check that the text annotations have been embedded in the content.
     it "embeds the analysis results in the editor contents", inject (EditorService, $rootScope) ->

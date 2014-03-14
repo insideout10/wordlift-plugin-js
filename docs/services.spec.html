@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>services.spec.coffee</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page">
+            
+              
+              <a class="source" href="app.html">
+                app.coffee
+              </a>
+            
+              
+              <a class="source" href="app.config.html">
+                app.config.coffee
+              </a>
+            
+              
+              <a class="source" href="app.controllers.html">
+                app.controllers.coffee
+              </a>
+            
+              
+              <a class="source" href="app.directives.html">
+                app.directives.coffee
+              </a>
+            
+              
+              <a class="source" href="app.services.AnalysisService.html">
+                app.services.AnalysisService.coffee
+              </a>
+            
+              
+              <a class="source" href="app.services.EditorService.html">
+                app.services.EditorService.coffee
+              </a>
+            
+              
+              <a class="source" href="app.services.EntityService.html">
+                app.services.EntityService.coffee
+              </a>
+            
+              
+              <a class="source" href="app.services.html">
+                app.services.coffee
+              </a>
+            
+              
+              <a class="source" href="EntitiesController.spec.html">
+                EntitiesController.spec.coffee
+              </a>
+            
+              
+              <a class="source" href="directives.spec.html">
+                directives.spec.coffee
+              </a>
+            
+              
+              <a class="source" href="services.spec.html">
+                services.spec.coffee
+              </a>
+            
+              
+              <a class="source" href="tinymce.spec.html">
+                tinymce.spec.coffee
+              </a>
+            
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>services.spec.coffee</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-string">'use strict'</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>Test services.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>describe <span class="hljs-string">'services'</span>,<span class="hljs-function"> -&gt;</span>
+  beforeEach <span class="hljs-built_in">module</span>(<span class="hljs-string">'wordlift.tinymce.plugin.services'</span>)
+  beforeEach <span class="hljs-built_in">module</span>(<span class="hljs-string">'AnalysisService'</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>Test the wlEntity directive.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  describe <span class="hljs-string">'AnalysisService'</span>,<span class="hljs-function"> -&gt;</span>
+
+    it <span class="hljs-string">'parses analysis data'</span>, inject<span class="hljs-function"><span class="hljs-params">((AnalysisService, $httpBackend, $rootScope) -&gt;
+
+</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>Get the mock-up analysis.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      $.ajax(<span class="hljs-string">'base/app/assets/english.json'</span>,
+        <span class="hljs-attribute">async</span>: <span class="hljs-literal">false</span>
+      ).done <span class="hljs-function"><span class="hljs-params">(data)</span> -&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>Catch all the requests to Freebase.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        $httpBackend.<span class="hljs-keyword">when</span>(<span class="hljs-string">'HEAD'</span>, <span class="hljs-regexp">/.*/</span>).respond(<span class="hljs-number">200</span>, <span class="hljs-string">''</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>Simulate event broadcasted by AnalysisService</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        analysis = AnalysisService.parse data</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>Check that the analysis results conform.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        expect(analysis).toEqual jasmine.any(Object)
+        expect(analysis.language).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
+        expect(analysis.entities).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
+        expect(analysis.entityAnnotations).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
+        expect(analysis.textAnnotations).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
+        expect(analysis.languages).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
+        expect(analysis.language).toEqual <span class="hljs-string">'en'</span>
+        expect(Object.keys(analysis.entities).length).toEqual <span class="hljs-number">28</span>
+        expect(Object.keys(analysis.entityAnnotations).length).toEqual <span class="hljs-number">30</span>
+        expect(Object.keys(analysis.textAnnotations).length).toEqual <span class="hljs-number">10</span>
+        expect(Object.keys(analysis.languages).length).toEqual <span class="hljs-number">1</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p>Get a Text Annotation and three entities that related to that Text Annotation.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        textAnnotationId = <span class="hljs-string">'urn:enhancement-1a452dcd-b97f-6d9c-8de5-b4cec57ec020'</span>
+        entityAnnotation1Id = <span class="hljs-string">'urn:enhancement-509b6609-e7d6-4c08-e627-afcfd637c42f'</span>
+        entityAnnotation2Id = <span class="hljs-string">'urn:enhancement-ec266952-de23-ef06-896f-02f9434e99b0'</span>
+        entityAnnotation3Id = <span class="hljs-string">'urn:enhancement-3366ede4-c449-f43b-e3cf-297fb41a619d'</span>
+
+        textAnnotation = analysis.textAnnotations[textAnnotationId]
+        expect(textAnnotation).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
+
+        entityAnnotation1 = textAnnotation.entityAnnotations[entityAnnotation1Id]
+        expect(entityAnnotation1).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
+        expect(entityAnnotation1.entity.sameAs).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
+
+        entityAnnotation2 = textAnnotation.entityAnnotations[entityAnnotation2Id]
+        expect(entityAnnotation2).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
+        expect(entityAnnotation2.entity.sameAs).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
+
+        entityAnnotation3 = textAnnotation.entityAnnotations[entityAnnotation3Id]
+        expect(entityAnnotation3).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
+        expect(angular.isArray(entityAnnotation3.entity.sameAs)).toBe <span class="hljs-literal">true</span>
+    )
+
+    it <span class="hljs-string">'parses and merges analysis data'</span>, inject<span class="hljs-function"><span class="hljs-params">((AnalysisService, $httpBackend, $rootScope) -&gt;
+
+</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>Get the mock-up analysis.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      $.ajax(<span class="hljs-string">'base/app/assets/english.json'</span>,
+        <span class="hljs-attribute">async</span>: <span class="hljs-literal">false</span>
+      ).done <span class="hljs-function"><span class="hljs-params">(data)</span> -&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p>Catch all the requests to Freebase.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        $httpBackend.<span class="hljs-keyword">when</span>(<span class="hljs-string">'HEAD'</span>, <span class="hljs-regexp">/.*/</span>).respond(<span class="hljs-number">200</span>, <span class="hljs-string">''</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <p>Simulate event broadcasted by AnalysisService</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        analysis = AnalysisService.parse data, <span class="hljs-literal">true</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p>Check that the analysis results conform.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        expect(analysis).toEqual jasmine.any(Object)
+        expect(analysis.language).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
+        expect(analysis.entities).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
+        expect(analysis.entityAnnotations).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
+        expect(analysis.textAnnotations).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
+        expect(analysis.languages).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
+        expect(analysis.language).toEqual <span class="hljs-string">'en'</span>
+        expect(Object.keys(analysis.entities).length).toEqual <span class="hljs-number">19</span>
+        expect(Object.keys(analysis.entityAnnotations).length).toEqual <span class="hljs-number">20</span>
+        expect(Object.keys(analysis.textAnnotations).length).toEqual <span class="hljs-number">10</span>
+        expect(Object.keys(analysis.languages).length).toEqual <span class="hljs-number">1</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <p>Get a Text Annotation and three entities that related to that Text Annotation.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        textAnnotationId = <span class="hljs-string">'urn:enhancement-1a452dcd-b97f-6d9c-8de5-b4cec57ec020'</span>
+        entityAnnotationId = <span class="hljs-string">'urn:enhancement-509b6609-e7d6-4c08-e627-afcfd637c42f'</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
+              <p>Set a reference to the text annotation.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        textAnnotation = analysis.textAnnotations[textAnnotationId]
+        expect(textAnnotation).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
+              <p>Set a reference to the entity annotation.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        entityAnnotation = textAnnotation.entityAnnotations[entityAnnotationId]
+        expect(entityAnnotation).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
+        expect(entityAnnotation.entity.sameAs).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <p>Set a reference to the entity.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        entity = entityAnnotation.entity
+        expect(entity.thumbnails.length).toEqual <span class="hljs-number">5</span>
+        expect(entity.thumbnails[<span class="hljs-number">0</span>]).toEqual <span class="hljs-string">'http://upload.wikimedia.org/wikipedia/commons/a/a6/Flag_of_Rome.svg'</span>
+        expect(entity.thumbnails[<span class="hljs-number">1</span>]).toEqual <span class="hljs-string">'https://usercontent.googleapis.com/freebase/v1/image/m/04js6kc?maxwidth=4096&amp;maxheight=4096'</span>
+        expect(entity.thumbnails[<span class="hljs-number">2</span>]).toEqual <span class="hljs-string">'https://usercontent.googleapis.com/freebase/v1/image/m/04js6kq?maxwidth=4096&amp;maxheight=4096'</span>
+        expect(entity.thumbnails[<span class="hljs-number">3</span>]).toEqual <span class="hljs-string">'https://usercontent.googleapis.com/freebase/v1/image/m/04mn0b4?maxwidth=4096&amp;maxheight=4096'</span>
+        expect(entity.thumbnails[<span class="hljs-number">4</span>]).toEqual <span class="hljs-string">'https://usercontent.googleapis.com/freebase/v1/image/m/04mn0bt?maxwidth=4096&amp;maxheight=4096'</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-17">&#182;</a>
+              </div>
+              <p>Check that the sameAs are not present.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        expect(analysis.entities[sameAs]).toBe <span class="hljs-literal">undefined</span> <span class="hljs-keyword">for</span> sameAs <span class="hljs-keyword">in</span> entity.sameAs
+
+    )</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

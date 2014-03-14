@@ -159,7 +159,7 @@
         {
             "@id": "http://data.redlink.io/353/wordlift/entity/Rome",
             "@type": "schema:Thing",
-            "owl:sameAs": "http://data.redlink.io/353/wordlift/post/60",
+            "owl:sameAs": "http://dbpedia.org/resource/Rome",
             "rdfs:label": {
                 "@language": "en",
                 "@value": "Rome"

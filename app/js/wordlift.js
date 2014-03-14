@@ -72,8 +72,11 @@
     '$http', '$q', '$rootScope', '$log', function($http, $q, $rootScope, $log) {
       return {
         isRunning: false,
-        analyze: function(content) {
+        analyze: function(content, merge) {
           var that;
+          if (merge == null) {
+            merge = false;
+          }
           if (this.isRunning) {
             return;
           }
@@ -82,15 +85,18 @@
           return $http.post(ajaxurl + '?action=wordlift_analyze', {
             data: content
           }).success(function(data, status, headers, config) {
-            $rootScope.$broadcast('analysisReceived', that.parse(data));
+            $rootScope.$broadcast('analysisReceived', that.parse(data, merge));
             return that.isRunning = false;
           }).error(function(data, status, headers, config) {
             console.log('error received');
             return that.isRunning = false;
           });
         },
-        parse: function(data) {
-          var containsOrEquals, context, createEntity, createEntityAnnotation, createLanguage, createTextAnnotation, dctype, entities, entity, entityAnnotations, expand, get, getKnownType, getLanguage, graph, id, item, key, language, languages, prefixes, textAnnotations, types, value, _i, _len;
+        parse: function(data, merge) {
+          var containsOrEquals, context, createEntity, createEntityAnnotation, createLanguage, createTextAnnotation, dctype, entities, entity, entityAnnotation, entityAnnotations, expand, get, getKnownType, getLanguage, graph, id, item, key, language, languages, mergeEntities, prefixes, textAnnotations, types, value, _i, _len;
+          if (merge == null) {
+            merge = false;
+          }
           languages = [];
           textAnnotations = {};
           entityAnnotations = {};
@@ -176,9 +182,11 @@
             return 'thing';
           };
           createEntity = function(item, language) {
-            var entity, freebase, freebaseThumbnails, id, match, thumbnail, thumbnails, types;
+            var entity, freebase, freebaseThumbnails, id, match, sameAs, thumbnail, thumbnails, types;
             id = get('@id', item);
             types = get('@type', item);
+            sameAs = get('owl:sameAs', item);
+            sameAs = angular.isArray(sameAs) ? sameAs : [sameAs];
             thumbnails = get('foaf:depiction', item);
             thumbnails = angular.isArray(thumbnails) ? thumbnails : [thumbnails];
             freebase = get('http://rdf.freebase.com/ns/common.topic.image', item);
@@ -203,6 +211,7 @@
               types: types,
               label: getLanguage('rdfs:label', item, language),
               labels: get('rdfs:label', item),
+              sameAs: sameAs,
               source: id.match('^http://rdf.freebase.com/.*$') ? 'freebase' : id.match('^http://dbpedia.org/.*$') ? 'dbpedia' : 'wordlift',
               _item: item
             };
@@ -316,6 +325,22 @@
             }
             return false;
           };
+          mergeEntities = function(entity, entities) {
+            var existing, sameAs, _i, _len, _ref;
+            _ref = entity.sameAs;
+            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+              sameAs = _ref[_i];
+              if (entities[sameAs] != null) {
+                existing = entities[sameAs];
+                entity.sameAs = entity.sameAs.concat(existing.sameAs);
+                entity.thumbnails = entity.thumbnails.concat(existing.thumbnails);
+                entity.source += ", " + existing.source;
+                delete entities[sameAs];
+                mergeEntities(entity, entities);
+              }
+            }
+            return entity;
+          };
           expand = function(content) {
             var matches, path, prefix, prepend;
             if (null === (matches = content.match(/([\w|\d]+):(.*)/))) {
@@ -362,8 +387,13 @@
           language = languages[0].code;
           for (id in entities) {
             item = entities[id];
-            entity = createEntity(item, language);
-            entities[id] = entity;
+            entities[id] = createEntity(item, language);
+          }
+          if (merge) {
+            for (id in entities) {
+              entity = entities[id];
+              mergeEntities(entity, entities);
+            }
           }
           for (id in textAnnotations) {
             item = textAnnotations[id];
@@ -372,6 +402,12 @@
           for (id in entityAnnotations) {
             item = entityAnnotations[id];
             entityAnnotations[id] = createEntityAnnotation(item);
+          }
+          for (id in entityAnnotations) {
+            entityAnnotation = entityAnnotations[id];
+            if (entityAnnotation.entity == null) {
+              delete entityAnnotations[id];
+            }
           }
           return {
             language: language,
@@ -435,7 +471,7 @@
           }
           $('.mce_wordlift').addClass('running');
           tinyMCE.get('content').getBody().setAttribute('contenteditable', false);
-          return AnalysisService.analyze(content);
+          return AnalysisService.analyze(content, true);
         },
         getEditor: function() {
           return tinyMCE.get('content');
@@ -470,7 +506,6 @@
         return dom.setAttrib(id, 'itemid', obj.entity.id);
       });
       $rootScope.$on('analysisReceived', function(event, analysis) {
-        $log.info('analysisReceived [ analysis :: ' + analysis + ' ]');
         service.embedAnalysis(analysis);
         $('.mce_wordlift').removeClass('running');
         return tinyMCE.get('content').getBody().setAttribute('contenteditable', true);
