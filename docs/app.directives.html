@@ -278,13 +278,27 @@ in the select attribute is called.</p>
         &lt;div class="source" ng-class="entityAnnotation.entity.source" ng-bind="entityAnnotation.entity.source"&gt;&lt;/div&gt;
       &lt;/div&gt;
     """</span>
-  )
-.directive(<span class="hljs-string">'wlEntityInputBoxes'</span>,<span class="hljs-function"> -&gt;</span>
+  )</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <p>The wlEntityInputBoxes prints the inputs and textareas with entities data.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>.directive(<span class="hljs-string">'wlEntityInputBoxes'</span>,<span class="hljs-function"> -&gt;</span>
     <span class="hljs-attribute">restrict</span>: <span class="hljs-string">'E'</span>
     <span class="hljs-attribute">scope</span>:
       <span class="hljs-attribute">textAnnotations</span>: <span class="hljs-string">'='</span>
     <span class="hljs-attribute">template</span>: <span class="hljs-string">"""
-      &lt;div ng-repeat="textAnnotation in textAnnotations"&gt;
+      &lt;div class="wl-entity-input-boxes" ng-repeat="textAnnotation in textAnnotations"&gt;
         &lt;div ng-repeat="entityAnnotation in textAnnotation.entityAnnotations | filterObjectBy:'selected':true"&gt;
 
           &lt;input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][uri]' value='{{entityAnnotation.entity.id}}'&gt;

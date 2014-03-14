@@ -176,6 +176,7 @@ describe 'directives', ->
 
         # Check that there are no input boxes (no entities selected).
         expect(element.find('input').length).toEqual 0
+        expect(element.find('textarea').length).toEqual 0
 
         # Select a text annotation.
         textAnnotation1 = scope.analysis.textAnnotations['urn:enhancement-2f293108-0ded-f45a-7945-e7a52640a500']
@@ -192,9 +193,11 @@ describe 'directives', ->
         # Check that there are no input boxes (no entities selected).
         fieldName1 = "wl_entities\\[#{entityAnnotation1.entity.id}\\]"
         expect(element.find('input').length).toEqual 4
+        expect(element.find('textarea').length).toEqual 1
+
         expect(element.find("input[name='#{fieldName1}\\[uri\\]']")[0].value).toEqual entityAnnotation1.entity.id
         expect(element.find("input[name='#{fieldName1}\\[label\\]']")[0].value).toEqual entityAnnotation1.entity.label
-#        expect(element.find("input[name='#{fieldName1}\\[description\\]']")[0].value).toEqual entityAnnotation1.entity.description
+        expect(element.find("textarea[name='#{fieldName1}\\[description\\]']")[0].innerText).toEqual entityAnnotation1.entity.description
         expect(element.find("input[name='#{fieldName1}\\[type\\]']")[0].value).toEqual entityAnnotation1.entity.type
         expect(element.find("input[name='#{fieldName1}\\[image\\]']")[0].value).toEqual entityAnnotation1.entity.thumbnails[0]
 
@@ -204,6 +207,7 @@ describe 'directives', ->
 
         # Check that no inputs are selected.
         expect(element.find('input').length).toEqual 0
+        expect(element.find('textarea').length).toEqual 0
 
         # Reselect the entity.
         entityAnnotation1.selected = true
@@ -223,18 +227,14 @@ describe 'directives', ->
 
         # Check that the number of inputs matches.
         expect(element.find('input').length).toEqual 11
-
+        expect(element.find('textarea').length).toEqual 2
 
         # Check that there are no input boxes (no entities selected).
         fieldName2 = "wl_entities\\[#{entityAnnotation2.entity.id}\\]"
 
-#        dump element.find("input[name='#{fieldName2}\\[description\\]']")[0].value
-
-#        dump entityAnnotation2.entity.description
-
         expect(element.find("input[name='#{fieldName2}\\[uri\\]']")[0].value).toEqual entityAnnotation2.entity.id
         expect(element.find("input[name='#{fieldName2}\\[label\\]']")[0].value).toEqual entityAnnotation2.entity.label
-#        expect(element.find("input[name='#{fieldName2}\\[description\\]']")[0].value).toEqual entityAnnotation2.entity.description
+        expect(element.find("textarea[name='#{fieldName2}\\[description\\]']")[0].innerText).toEqual entityAnnotation2.entity.description
         expect(element.find("input[name='#{fieldName2}\\[type\\]']")[0].value).toEqual entityAnnotation2.entity.type
         expect(element.find("input[name='#{fieldName2}\\[image\\]']")[0].value).toEqual entityAnnotation2.entity.thumbnails[0]
         expect(element.find("input[name='#{fieldName2}\\[image\\]']")[1].value).toEqual entityAnnotation2.entity.thumbnails[1]
