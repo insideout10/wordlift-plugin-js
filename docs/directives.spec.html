@@ -649,6 +649,409 @@ scope.</p>
             
             <div class="content"><div class='highlight'><pre>        expect(scope.select).toHaveBeenCalledWith(scope.textAnnotation, <span class="hljs-literal">null</span>)
 
+    ) 
+
+  describe <span class="hljs-string">'wlEntityInputBoxes'</span>,<span class="hljs-function"> -&gt;</span>
+    scope = <span class="hljs-literal">undefined</span>
+    element = <span class="hljs-literal">undefined</span>
+    EntitiesController = <span class="hljs-literal">undefined</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-36">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-36">&#182;</a>
+              </div>
+              <p>Get the root scope and create a wl-entities element.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    beforeEach inject<span class="hljs-function"><span class="hljs-params">(($rootScope, $controller) -&gt;
+
+</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-37">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-37">&#182;</a>
+              </div>
+              <p>Create a new scope, the scope will be shared between the entities controller and the wlEntities directive,
+as in the HTML the textAnnotation is passed using the ‘textAnnotation’ property of the EntitiesController
+scope.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      scope = $rootScope.$<span class="hljs-keyword">new</span>()</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-38">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-38">&#182;</a>
+              </div>
+              <p>Create the EntitiesController with the new scope.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      EntitiesController = $controller <span class="hljs-string">'EntitiesController'</span>, { <span class="hljs-attribute">$scope</span>: scope }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-39">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-39">&#182;</a>
+              </div>
+              <p>The wlEntities directive gets the annotation from the text-annotation attribute.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      element = angular.element <span class="hljs-string">'&lt;wl-entity-input-boxes text-annotations="analysis.textAnnotations"&gt;&lt;/wl-entity-input-boxes&gt;'</span>
+    )</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-40">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-40">&#182;</a>
+              </div>
+              <p>Test for the entity to empty.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    it <span class="hljs-string">'should be empty'</span>, inject<span class="hljs-function"><span class="hljs-params">((AnalysisService, $compile, $httpBackend, $rootScope) -&gt;
+
+</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-41">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-41">&#182;</a>
+              </div>
+              <p>Compile the directive.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      $compile(element)(scope)
+      scope.$digest()</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-42">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-42">&#182;</a>
+              </div>
+              <p>Get the mock-up analysis.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      $.ajax(<span class="hljs-string">'base/app/assets/english.json'</span>,
+        <span class="hljs-attribute">async</span>: <span class="hljs-literal">false</span>
+      ).done <span class="hljs-function"><span class="hljs-params">(data)</span> -&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-43">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-43">&#182;</a>
+              </div>
+              <p>Catch all the requests to Freebase.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        $httpBackend.<span class="hljs-keyword">when</span>(<span class="hljs-string">'HEAD'</span>, <span class="hljs-regexp">/.*/</span>).respond(<span class="hljs-number">200</span>, <span class="hljs-string">''</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-44">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-44">&#182;</a>
+              </div>
+              <p>Simulate event broadcasted by AnalysisService</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        $rootScope.$broadcast <span class="hljs-string">'analysisReceived'</span>, AnalysisService.parse data</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-45">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-45">&#182;</a>
+              </div>
+              <p>Check that the analysis is set.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        expect(scope.analysis).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">null</span>
+        expect(scope.analysis.textAnnotations).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">null</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-46">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-46">&#182;</a>
+              </div>
+              <p>Check that there are no input boxes (no entities selected).</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        expect(element.find(<span class="hljs-string">'input'</span>).length).toEqual <span class="hljs-number">0</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-47">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-47">&#182;</a>
+              </div>
+              <p>Select a text annotation.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        textAnnotation1 = scope.analysis.textAnnotations[<span class="hljs-string">'urn:enhancement-2f293108-0ded-f45a-7945-e7a52640a500'</span>]
+        expect(textAnnotation1).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-48">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-48">&#182;</a>
+              </div>
+              <p>Select an entity annotation in the first text annotation.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        entityAnnotation1 = textAnnotation1.entityAnnotations[<span class="hljs-string">'urn:enhancement-bf74ebad-e1bf-88fb-e88e-edd0aebaf401'</span>]
+        expect(entityAnnotation1).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-49">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-49">&#182;</a>
+              </div>
+              <p>Select one entity.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        entityAnnotation1.selected = <span class="hljs-literal">true</span>
+        scope.$digest()</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-50">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-50">&#182;</a>
+              </div>
+              <p>Check that there are no input boxes (no entities selected).</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        fieldName1 = <span class="hljs-string">"wl_entities\\[<span class="hljs-subst">#{entityAnnotation1.entity.id}</span>\\]"</span>
+        expect(element.find(<span class="hljs-string">'input'</span>).length).toEqual <span class="hljs-number">5</span>
+        expect(element.find(<span class="hljs-string">"input[name='<span class="hljs-subst">#{fieldName1}</span>\\[uri\\]']"</span>)[<span class="hljs-number">0</span>].value).toEqual entityAnnotation1.entity.id
+        expect(element.find(<span class="hljs-string">"input[name='<span class="hljs-subst">#{fieldName1}</span>\\[label\\]']"</span>)[<span class="hljs-number">0</span>].value).toEqual entityAnnotation1.entity.label
+        expect(element.find(<span class="hljs-string">"input[name='<span class="hljs-subst">#{fieldName1}</span>\\[description\\]']"</span>)[<span class="hljs-number">0</span>].value).toEqual entityAnnotation1.entity.description
+        expect(element.find(<span class="hljs-string">"input[name='<span class="hljs-subst">#{fieldName1}</span>\\[type\\]']"</span>)[<span class="hljs-number">0</span>].value).toEqual entityAnnotation1.entity.type
+        expect(element.find(<span class="hljs-string">"input[name='<span class="hljs-subst">#{fieldName1}</span>\\[image\\]']"</span>)[<span class="hljs-number">0</span>].value).toEqual entityAnnotation1.entity.thumbnails[<span class="hljs-number">0</span>]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-51">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-51">&#182;</a>
+              </div>
+              <p>Deselect the entity.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        entityAnnotation1.selected = <span class="hljs-literal">false</span>
+        scope.$digest()</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-52">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-52">&#182;</a>
+              </div>
+              <p>Check that no inputs are selected.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        expect(element.find(<span class="hljs-string">'input'</span>).length).toEqual <span class="hljs-number">0</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-53">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-53">&#182;</a>
+              </div>
+              <p>Reselect the entity.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        entityAnnotation1.selected = <span class="hljs-literal">true</span>
+        scope.$digest()</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-54">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-54">&#182;</a>
+              </div>
+              <p>Select a text annotation.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        textAnnotation2 = scope.analysis.textAnnotations[<span class="hljs-string">'urn:enhancement-0bb607cd-b1e8-33fd-5d34-e1a6da9d447a'</span>]
+        expect(textAnnotation2).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-55">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-55">&#182;</a>
+              </div>
+              <p>Select an entity annotation in the first text annotation.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        entityAnnotation2 = textAnnotation2.entityAnnotations[<span class="hljs-string">'urn:enhancement-c0b100cf-d83e-8756-32f3-e3898df69525'</span>]
+        expect(entityAnnotation2).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-56">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-56">&#182;</a>
+              </div>
+              <p>Select another entity in the same text annotation.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        entityAnnotation2.selected = <span class="hljs-literal">true</span>
+        scope.$digest()</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-57">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-57">&#182;</a>
+              </div>
+              <p>Check that the number of inputs matches.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        expect(element.find(<span class="hljs-string">'input'</span>).length).toEqual <span class="hljs-number">13</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-58">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-58">&#182;</a>
+              </div>
+              <p>Check that there are no input boxes (no entities selected).</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        fieldName2 = <span class="hljs-string">"wl_entities\\[<span class="hljs-subst">#{entityAnnotation2.entity.id}</span>\\]"</span>
+
+        dump element.find(<span class="hljs-string">"input[name='<span class="hljs-subst">#{fieldName2}</span>\\[description\\]']"</span>)[<span class="hljs-number">0</span>].value
+
+        dump entityAnnotation2.entity.description
+
+        expect(element.find(<span class="hljs-string">"input[name='<span class="hljs-subst">#{fieldName2}</span>\\[uri\\]']"</span>)[<span class="hljs-number">0</span>].value).toEqual entityAnnotation2.entity.id
+        expect(element.find(<span class="hljs-string">"input[name='<span class="hljs-subst">#{fieldName2}</span>\\[label\\]']"</span>)[<span class="hljs-number">0</span>].value).toEqual entityAnnotation2.entity.label</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-59">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-59">&#182;</a>
+              </div>
+              <pre><code>   expect(element.find(<span class="hljs-string">"input[name='<span class="hljs-subst">#{fieldName2}</span>\\[description\\]']"</span>)[<span class="hljs-number">0</span>].value).toEqual entityAnnotation2.entity.description
+</code></pre>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        expect(element.find(<span class="hljs-string">"input[name='<span class="hljs-subst">#{fieldName2}</span>\\[type\\]']"</span>)[<span class="hljs-number">0</span>].value).toEqual entityAnnotation2.entity.type
+        expect(element.find(<span class="hljs-string">"input[name='<span class="hljs-subst">#{fieldName2}</span>\\[image\\]']"</span>)[<span class="hljs-number">0</span>].value).toEqual entityAnnotation2.entity.thumbnails[<span class="hljs-number">0</span>]
+        expect(element.find(<span class="hljs-string">"input[name='<span class="hljs-subst">#{fieldName2}</span>\\[image\\]']"</span>)[<span class="hljs-number">1</span>].value).toEqual entityAnnotation2.entity.thumbnails[<span class="hljs-number">1</span>]
+        expect(element.find(<span class="hljs-string">"input[name='<span class="hljs-subst">#{fieldName2}</span>\\[image\\]']"</span>)[<span class="hljs-number">2</span>].value).toEqual entityAnnotation2.entity.thumbnails[<span class="hljs-number">2</span>]
+        expect(element.find(<span class="hljs-string">"input[name='<span class="hljs-subst">#{fieldName2}</span>\\[image\\]']"</span>)[<span class="hljs-number">3</span>].value).toEqual entityAnnotation2.entity.thumbnails[<span class="hljs-number">3</span>]
+
     )</pre></div></div>
             
         </li>

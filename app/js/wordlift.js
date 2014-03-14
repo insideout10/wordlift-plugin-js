@@ -58,6 +58,14 @@
       },
       template: "<div class=\"entity {{entityAnnotation.entity.type}}\" ng-class=\"{selected: true==entityAnnotation.selected}\" ng-click=\"onSelect()\" ng-show=\"entityAnnotation.entity.label\">\n  <div class=\"thumbnail\" ng-show=\"entityAnnotation.entity.thumbnail\" title=\"{{entityAnnotation.entity.id}}\" ng-attr-style=\"background-image: url({{entityAnnotation.entity.thumbnail}})\"></div>\n  <div class=\"thumbnail empty\" ng-hide=\"entityAnnotation.entity.thumbnail\" title=\"{{entityAnnotation.entity.id}}\"></div>\n  <div class=\"confidence\" ng-bind=\"entityAnnotation.confidence\"></div>\n  <div class=\"label\" ng-bind=\"entityAnnotation.entity.label\"></div>\n  <div class=\"type\"></div>\n  <div class=\"source\" ng-class=\"entityAnnotation.entity.source\" ng-bind=\"entityAnnotation.entity.source\"></div>\n</div>"
     };
+  }).directive('wlEntityInputBoxes', function() {
+    return {
+      restrict: 'E',
+      scope: {
+        textAnnotations: '='
+      },
+      template: "<div ng-repeat=\"textAnnotation in textAnnotations\">\n  <div ng-repeat=\"entityAnnotation in textAnnotation.entityAnnotations | filterObjectBy:'selected':true\">\n\n    <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][uri]' value='{{entityAnnotation.entity.id}}'>\n    <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][label]' value='{{entityAnnotation.entity.label}}'>\n    <textarea name='wl_entities[{{entityAnnotation.entity.id}}][description]'>{{entityAnnotation.entity.description}}</textarea>\n    <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][type]' value='{{entityAnnotation.entity.type}}'>\n\n    <input ng-repeat=\"image in entityAnnotation.entity.thumbnails\" type='text'\n      name='wl_entities[{{entityAnnotation.entity.id}}][image]' value='{{image}}'>\n\n  </div>\n</div>"
+    };
   });
 
   angular.module('AnalysisService', []).service('AnalysisService', [
@@ -588,7 +596,7 @@
 
   angular.module('wordlift.tinymce.plugin', ['wordlift.tinymce.plugin.controllers', 'wordlift.tinymce.plugin.directives']);
 
-  $(container = $('<div id="wordlift-disambiguation-popover" class="metabox-holder">\n  <div class="postbox">\n    <div class="handlediv" title="Click to toggle"><br></div>\n    <h3 class="hndle"><span>Semantic Web</span></h3>\n    <div class="inside">\n      <form role="form">\n        <div class="form-group">\n          <div class="ui-widget">\n            <input type="text" class="form-control" id="search" placeholder="search or create">\n          </div>\n        </div>\n\n        <wl-entities on-select="onEntitySelected(textAnnotation, entityAnnotation)" text-annotation="textAnnotation"></wl-entities>\n\n      </form>\n\n      <div ng-repeat="textAnnotation in analysis.textAnnotations">\n        <div ng-repeat="entityAnnotation in textAnnotation.entityAnnotations | filterObjectBy:\'selected\':true">\n\n          <input type=\'text\' name=\'wl_entities[{{entityAnnotation.entity.id}}][uri]\' value=\'{{entityAnnotation.entity.id}}\'>\n          <input type=\'text\' name=\'wl_entities[{{entityAnnotation.entity.id}}][label]\' value=\'{{entityAnnotation.entity.label}}\'>\n          <input type=\'text\' name=\'wl_entities[{{entityAnnotation.entity.id}}][description]\' value=\'{{entityAnnotation.entity.description}}\'>\n          <input type=\'text\' name=\'wl_entities[{{entityAnnotation.entity.id}}][type]\' value=\'{{entityAnnotation.entity.type}}\'>\n\n          <input ng-repeat="image in entityAnnotation.entity.thumbnails" type=\'text\'\n            name=\'wl_entities[{{entityAnnotation.entity.id}}][image]\' value=\'{{image}}\'>\n\n        </div>\n      </div>\n    </div>\n  </div>\n</div>').appendTo('form[name=post]').css({
+  $(container = $('<div id="wordlift-disambiguation-popover" class="metabox-holder">\n  <div class="postbox">\n    <div class="handlediv" title="Click to toggle"><br></div>\n    <h3 class="hndle"><span>Semantic Web</span></h3>\n    <div class="inside">\n      <form role="form">\n        <div class="form-group">\n          <div class="ui-widget">\n            <input type="text" class="form-control" id="search" placeholder="search or create">\n          </div>\n        </div>\n\n        <wl-entities on-select="onEntitySelected(textAnnotation, entityAnnotation)" text-annotation="textAnnotation"></wl-entities>\n\n      </form>\n\n      <wl-entity-input-boxes text-annotations="analysis.textAnnotations"></wl-entity-input-boxes>\n    </div>\n  </div>\n</div>').appendTo('form[name=post]').css({
     display: 'none',
     height: $('body').height() - $('#wpadminbar').height() + 32,
     top: $('#wpadminbar').height() - 1,

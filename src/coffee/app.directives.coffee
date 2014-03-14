@@ -66,4 +66,24 @@ angular.module('wordlift.tinymce.plugin.directives', ['wordlift.tinymce.plugin.c
       </div>
     """
   )
+.directive('wlEntityInputBoxes', ->
+    restrict: 'E'
+    scope:
+      textAnnotations: '='
+    template: """
+      <div ng-repeat="textAnnotation in textAnnotations">
+        <div ng-repeat="entityAnnotation in textAnnotation.entityAnnotations | filterObjectBy:'selected':true">
+
+          <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][uri]' value='{{entityAnnotation.entity.id}}'>
+          <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][label]' value='{{entityAnnotation.entity.label}}'>
+          <textarea name='wl_entities[{{entityAnnotation.entity.id}}][description]'>{{entityAnnotation.entity.description}}</textarea>
+          <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][type]' value='{{entityAnnotation.entity.type}}'>
+
+          <input ng-repeat="image in entityAnnotation.entity.thumbnails" type='text'
+            name='wl_entities[{{entityAnnotation.entity.id}}][image]' value='{{image}}'>
+
+        </div>
+      </div>
+    """
+  )
 
