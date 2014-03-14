@@ -297,7 +297,7 @@ describe 'directives', ->
           expect(element.find("input[name='#{fieldName1}\\[image\\]']")[i].value).toEqual entityAnnotation1.entity.thumbnails[i]
 
         for i in [0...entityAnnotation1.entity.sameAs.length]
-          expect(element.find("input[name='#{fieldName1}\\[same_as\\]']")[i].value).toEqual entityAnnotation1.entity.sameAs[i]
+          expect(element.find("input[name='#{fieldName1}\\[sameas\\]']")[i].value).toEqual entityAnnotation1.entity.sameAs[i]
 
         # Get the decoded description and check it against the entity.
         description = $(element.find("textarea[name='#{fieldName1}\\[description\\]']")[0]).text()
