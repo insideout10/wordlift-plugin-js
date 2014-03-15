@@ -221,6 +221,7 @@ angular.module( 'AnalysisService', [] )
         # expand the what key.
         whatExp = expand(what)
         # return the value bound to the specified key.
+#        console.log "[ what exp :: #{whatExp} ][ key :: #{expand key} ][ value :: #{value} ][ match :: #{whatExp is expand(key)} ]" for key, value of container
         return filter(value) for key, value of container when whatExp is expand(key)
         []
 
@@ -237,14 +238,19 @@ angular.module( 'AnalysisService', [] )
         null
 
       containsOrEquals = (what, where) ->
+#        dump "containsOrEquals [ what :: #{what} ][ where :: #{where} ]"
         # if where is not defined return false.
         return false if not where?
         # ensure the where argument is an array.
         whereArray = if angular.isArray where then where else [ where ]
         # expand the what string.
         whatExp    = expand(what)
-        # return true if the string is found.
-        return true for item in whereArray when whatExp is expand(item)
+        if '@' is what.charAt(0)
+          # return true if the string is found.
+          return true for item in whereArray when whatExp is expand(item)
+        else
+          # return true if the string is found.
+          return true for item in whereArray when whatExp is expand(item)
         # otherwise false.
         false
 
@@ -272,14 +278,18 @@ angular.module( 'AnalysisService', [] )
       expand = (content) ->
         # if there's no prefix, return the original string.
         if null is matches = content.match(/([\w|\d]+):(.*)/)
-          return content
-
-        # get the prefix and the path.
-        prefix  = matches[1]
-        path    = matches[2]
+          prefix = content
+          path = ''
+        else
+          # get the prefix and the path.
+          prefix  = matches[1]
+          path    = matches[2]
 
         # if the prefix is unknown, leave it.
-        prepend = if prefixes[prefix]? then prefixes[prefix] else "#{prefix}:"
+        if context[prefix]?
+          prepend = if angular.isString context[prefix] then context[prefix] else context[prefix]['@id']
+        else
+          prepend = prefix + ':'
 
         # return the full path.
         prepend + path
@@ -288,23 +298,32 @@ angular.module( 'AnalysisService', [] )
       context  = if data['@context']? then data['@context'] else {}
       graph    = if data['@graph']? then data['@graph'] else {}
 
-      # get the prefixes.
-      prefixes = []
+#      # get the prefixes.
+#      prefixes = {}
+#
+#      dump context
+#
+#      # cycle in the context definitions and extract the prefixes.
+#      prefixes[key] = value for key, value of context when not ':' in key and angular.isString value
+##        dump "[ contains colons :: #{':' in key} ][ key :: #{key} ][ value :: #{value} ][ value is String :: #{angular.isString(value)} ]"
+##        # consider a prefix only keys w/o ':' and the value is string.
+##         if
+#
+#      dump prefixes
 
-      # cycle in the context definitions and extract the prefixes.
-      for key, value of context
-        # consider a prefix only keys w/o ':' and the value is string.
-        if -1 is key.indexOf(':') and angular.isString(value)
-          # add the prefix.
-          prefixes[key] = value
 
       for item in graph
         id     = item['@id']
+#        console.log "[ id :: #{id} ]"
+
         types  = item['@type']
         dctype = get('http://purl.org/dc/terms/type', item)
 
+#        console.log "[ id :: #{id} ][ dc:type :: #{dctype} ]"
+
         # TextAnnotation/LinguisticSystem
         if containsOrEquals('http://fise.iks-project.eu/ontology/TextAnnotation', types) and containsOrEquals('http://purl.org/dc/terms/LinguisticSystem', dctype)
+#          dump "language [ id :: #{id} ][ dc:type :: #{dctype} ]"
           languages.push createLanguage(item)
 
         # TextAnnotation

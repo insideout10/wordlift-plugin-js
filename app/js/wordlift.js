@@ -94,7 +94,7 @@
           });
         },
         parse: function(data, merge) {
-          var containsOrEquals, context, createEntity, createEntityAnnotation, createLanguage, createTextAnnotation, dctype, entities, entity, entityAnnotation, entityAnnotations, expand, get, getA, getKnownType, getLanguage, graph, id, item, key, language, languages, mergeEntities, mergeUnique, prefixes, textAnnotations, types, value, _i, _len;
+          var containsOrEquals, context, createEntity, createEntityAnnotation, createLanguage, createTextAnnotation, dctype, entities, entity, entityAnnotation, entityAnnotations, expand, get, getA, getKnownType, getLanguage, graph, id, item, language, languages, mergeEntities, mergeUnique, textAnnotations, types, _i, _len;
           if (merge == null) {
             merge = false;
           }
@@ -305,16 +305,25 @@
             return null;
           };
           containsOrEquals = function(what, where) {
-            var item, whatExp, whereArray, _i, _len;
+            var item, whatExp, whereArray, _i, _j, _len, _len1;
             if (where == null) {
               return false;
             }
             whereArray = angular.isArray(where) ? where : [where];
             whatExp = expand(what);
-            for (_i = 0, _len = whereArray.length; _i < _len; _i++) {
-              item = whereArray[_i];
-              if (whatExp === expand(item)) {
-                return true;
+            if ('@' === what.charAt(0)) {
+              for (_i = 0, _len = whereArray.length; _i < _len; _i++) {
+                item = whereArray[_i];
+                if (whatExp === expand(item)) {
+                  return true;
+                }
+              }
+            } else {
+              for (_j = 0, _len1 = whereArray.length; _j < _len1; _j++) {
+                item = whereArray[_j];
+                if (whatExp === expand(item)) {
+                  return true;
+                }
               }
             }
             return false;
@@ -352,22 +361,21 @@
           expand = function(content) {
             var matches, path, prefix, prepend;
             if (null === (matches = content.match(/([\w|\d]+):(.*)/))) {
-              return content;
+              prefix = content;
+              path = '';
+            } else {
+              prefix = matches[1];
+              path = matches[2];
             }
-            prefix = matches[1];
-            path = matches[2];
-            prepend = prefixes[prefix] != null ? prefixes[prefix] : "" + prefix + ":";
+            if (context[prefix] != null) {
+              prepend = angular.isString(context[prefix]) ? context[prefix] : context[prefix]['@id'];
+            } else {
+              prepend = prefix + ':';
+            }
             return prepend + path;
           };
           context = data['@context'] != null ? data['@context'] : {};
           graph = data['@graph'] != null ? data['@graph'] : {};
-          prefixes = [];
-          for (key in context) {
-            value = context[key];
-            if (-1 === key.indexOf(':') && angular.isString(value)) {
-              prefixes[key] = value;
-            }
-          }
           for (_i = 0, _len = graph.length; _i < _len; _i++) {
             item = graph[_i];
             id = item['@id'];

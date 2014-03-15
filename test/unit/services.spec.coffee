@@ -172,3 +172,30 @@ describe 'services', ->
             expect(entityAnnotation.entity).not.toBe undefined
 
     )
+
+    it 'parses correctly analysis result without prefixes', inject((AnalysisService, $httpBackend, $rootScope) ->
+
+      # Get the mock-up analysis.
+      $.ajax('base/app/assets/tim_berners-lee.json',
+        async: false
+      ).done (data) ->
+
+        # Catch all the requests to Freebase.
+        $httpBackend.when('HEAD', /.*/).respond(200, '')
+
+        # Simulate event broadcasted by AnalysisService
+        analysis = AnalysisService.parse data, true
+
+        # Check that the analysis results conform.
+        expect(analysis).toEqual jasmine.any(Object)
+        expect(analysis.language).not.toBe undefined
+        expect(analysis.entities).not.toBe undefined
+        expect(analysis.entityAnnotations).not.toBe undefined
+        expect(analysis.textAnnotations).not.toBe undefined
+        expect(analysis.languages).not.toBe undefined
+        expect(analysis.language).toEqual 'en'
+        expect(Object.keys(analysis.entities).length).toEqual 7
+        expect(Object.keys(analysis.entityAnnotations).length).toEqual 7
+        expect(Object.keys(analysis.textAnnotations).length).toEqual 3
+        expect(Object.keys(analysis.languages).length).toEqual 1
+    )
