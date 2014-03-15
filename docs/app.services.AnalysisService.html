@@ -382,7 +382,7 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
             <div class="content"><div class='highlight'><pre>      <span class="hljs-function"><span class="hljs-title">createEntity</span> = <span class="hljs-params">(item, language)</span> -&gt;</span>
         id         = get(<span class="hljs-string">'@id'</span>, item)
         types      = get(<span class="hljs-string">'@type'</span>, item)
-        sameAs     = get(<span class="hljs-string">'owl:sameAs'</span>, item)
+        sameAs     = get(<span class="hljs-string">'http://www.w3.org/2002/07/owl#sameAs'</span>, item)
         sameAs     = <span class="hljs-keyword">if</span> angular.isArray sameAs <span class="hljs-keyword">then</span> sameAs <span class="hljs-keyword">else</span> [ sameAs ]</pre></div></div>
             
         </li>
@@ -399,7 +399,7 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
             </div>
             
             <div class="content"><div class='highlight'><pre>        thumbnails = get(
-          [<span class="hljs-string">'foaf:depiction'</span>, <span class="hljs-string">'http://rdf.freebase.com/ns/common.topic.image'</span>, <span class="hljs-string">'schema:image'</span>],
+          [<span class="hljs-string">'http://xmlns.com/foaf/0.1/depiction'</span>, <span class="hljs-string">'http://rdf.freebase.com/ns/common.topic.image'</span>, <span class="hljs-string">'http://schema.org/image'</span>],
           item,
           <span class="hljs-function"><span class="hljs-params">(values)</span> -&gt;</span>
             values = <span class="hljs-keyword">if</span> angular.isArray values <span class="hljs-keyword">then</span> values <span class="hljs-keyword">else</span> [ values ]
@@ -444,8 +444,8 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
           thumbnails  : thumbnails
           type        : getKnownType(types)
           types       : types
-          label       : getLanguage(<span class="hljs-string">'rdfs:label'</span>, item, language)
-          labels      : get(<span class="hljs-string">'rdfs:label'</span>, item)
+          label       : getLanguage(<span class="hljs-string">'http://www.w3.org/2000/01/rdf-schema#label'</span>, item, language)
+          labels      : get(<span class="hljs-string">'http://www.w3.org/2000/01/rdf-schema#label'</span>, item)
           sameAs      : sameAs
           source      : <span class="hljs-keyword">if</span> id.match(<span class="hljs-string">'^http://rdf.freebase.com/.*$'</span>)
                           <span class="hljs-string">'freebase'</span>
@@ -457,16 +457,16 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
 
         entity.description = getLanguage(
           [
-            <span class="hljs-string">'rdfs:comment'</span>,
+            <span class="hljs-string">'http://www.w3.org/2000/01/rdf-schema#comment'</span>,
             <span class="hljs-string">'http://rdf.freebase.com/ns/common.topic.description'</span>,
-            <span class="hljs-string">'schema:description'</span>
+            <span class="hljs-string">'http://schema.org/description'</span>
           ], item, language
         )
         entity.descriptions = get(
           [
-            <span class="hljs-string">'rdfs:comment'</span>,
+            <span class="hljs-string">'http://www.w3.org/2000/01/rdf-schema#comment'</span>,
             <span class="hljs-string">'http://rdf.freebase.com/ns/common.topic.description'</span>,
-            <span class="hljs-string">'schema:description'</span>
+            <span class="hljs-string">'http://schema.org/description'</span>
           ],
           item
         )</pre></div></div>
@@ -523,7 +523,7 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
             <div class="content"><div class='highlight'><pre>        entity
 
       <span class="hljs-function"><span class="hljs-title">createEntityAnnotation</span> = <span class="hljs-params">(item)</span> -&gt;</span>
-        entity = entities[get(<span class="hljs-string">'enhancer:entity-reference'</span>, item)]</pre></div></div>
+        entity = entities[get(<span class="hljs-string">'http://fise.iks-project.eu/ontology/entity-reference'</span>, item)]</pre></div></div>
             
         </li>
         
@@ -553,14 +553,14 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        textAnnotation = textAnnotations[get(<span class="hljs-string">'dc:relation'</span>, item)]
+            <div class="content"><div class='highlight'><pre>        textAnnotation = textAnnotations[get(<span class="hljs-string">'http://purl.org/dc/terms/relation'</span>, item)]
 
         entityAnnotation = {
           id        : get(<span class="hljs-string">'@id'</span>, item),
-          label     : get(<span class="hljs-string">'enhancer:entity-label'</span>, item),
-          <span class="hljs-attribute">confidence</span>: get(<span class="hljs-string">'enhancer:confidence'</span>, item),
+          label     : get(<span class="hljs-string">'http://fise.iks-project.eu/ontology/entity-label'</span>, item),
+          <span class="hljs-attribute">confidence</span>: get(<span class="hljs-string">'http://fise.iks-project.eu/ontology/confidence'</span>, item),
           entity    : entity,
-          relation  : textAnnotations[get(<span class="hljs-string">'dc:relation'</span>, item)],
+          relation  : textAnnotations[get(<span class="hljs-string">'http://purl.org/dc/terms/relation'</span>, item)],
           _item     : item
         }</pre></div></div>
             
@@ -598,18 +598,18 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
       <span class="hljs-function"><span class="hljs-title">createTextAnnotation</span> = <span class="hljs-params">(item)</span> -&gt;</span>
         {
           id               : get(<span class="hljs-string">'@id'</span>, item),
-          selectedText     : get(<span class="hljs-string">'enhancer:selected-text'</span>, item)[<span class="hljs-string">'@value'</span>],
-          selectionPrefix  : get(<span class="hljs-string">'enhancer:selection-prefix'</span>, item)[<span class="hljs-string">'@value'</span>],
-          selectionSuffix  : get(<span class="hljs-string">'enhancer:selection-suffix'</span>, item)[<span class="hljs-string">'@value'</span>],
-          confidence       : get(<span class="hljs-string">'enhancer:confidence'</span>, item),
+          selectedText     : get(<span class="hljs-string">'http://fise.iks-project.eu/ontology/selected-text'</span>, item)[<span class="hljs-string">'@value'</span>],
+          selectionPrefix  : get(<span class="hljs-string">'http://fise.iks-project.eu/ontology/selection-prefix'</span>, item)[<span class="hljs-string">'@value'</span>],
+          selectionSuffix  : get(<span class="hljs-string">'http://fise.iks-project.eu/ontology/selection-suffix'</span>, item)[<span class="hljs-string">'@value'</span>],
+          confidence       : get(<span class="hljs-string">'http://fise.iks-project.eu/ontology/confidence'</span>, item),
           <span class="hljs-attribute">entityAnnotations</span>: {},
           _item            : item
         }
 
       <span class="hljs-function"><span class="hljs-title">createLanguage</span> = <span class="hljs-params">(item)</span> -&gt;</span>
         {
-          code      : get(<span class="hljs-string">'dc:language'</span>, item),
-          <span class="hljs-attribute">confidence</span>: get(<span class="hljs-string">'enhancer:confidence'</span>, item)
+          code      : get(<span class="hljs-string">'http://purl.org/dc/terms/language'</span>, item),
+          <span class="hljs-attribute">confidence</span>: get(<span class="hljs-string">'http://fise.iks-project.eu/ontology/confidence'</span>, item)
           _item     : item
         }</pre></div></div>
             
@@ -1132,7 +1132,7 @@ TODO: have a user-set priority.</p>
       <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> graph
         id     = item[<span class="hljs-string">'@id'</span>]
         types  = item[<span class="hljs-string">'@type'</span>]
-        dctype = get(<span class="hljs-string">'dc:type'</span>, item)</pre></div></div>
+        dctype = get(<span class="hljs-string">'http://purl.org/dc/terms/type'</span>, item)</pre></div></div>
             
         </li>
         
@@ -1147,7 +1147,7 @@ TODO: have a user-set priority.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> containsOrEquals(<span class="hljs-string">'enhancer:TextAnnotation'</span>, types) <span class="hljs-keyword">and</span> containsOrEquals(<span class="hljs-string">'dc:LinguisticSystem'</span>, dctype)
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> containsOrEquals(<span class="hljs-string">'http://fise.iks-project.eu/ontology/TextAnnotation'</span>, types) <span class="hljs-keyword">and</span> containsOrEquals(<span class="hljs-string">'http://purl.org/dc/terms/LinguisticSystem'</span>, dctype)
           languages.push createLanguage(item)</pre></div></div>
             
         </li>
@@ -1163,7 +1163,7 @@ TODO: have a user-set priority.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> containsOrEquals(<span class="hljs-string">'enhancer:TextAnnotation'</span>, types)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> containsOrEquals(<span class="hljs-string">'http://fise.iks-project.eu/ontology/TextAnnotation'</span>, types)</pre></div></div>
             
         </li>
         
@@ -1193,7 +1193,7 @@ TODO: have a user-set priority.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> containsOrEquals(<span class="hljs-string">'enhancer:EntityAnnotation'</span>, types)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> containsOrEquals(<span class="hljs-string">'http://fise.iks-project.eu/ontology/EntityAnnotation'</span>, types)</pre></div></div>
             
         </li>
         

@@ -211,12 +211,12 @@ angular.module( 'AnalysisService', [] )
       createEntity = (item, language) ->
         id         = get('@id', item)
         types      = get('@type', item)
-        sameAs     = get('owl:sameAs', item)
+        sameAs     = get('http://www.w3.org/2002/07/owl#sameAs', item)
         sameAs     = if angular.isArray sameAs then sameAs else [ sameAs ]
 
         # Get all the thumbnails; for each thumbnail execute the provided function.
         thumbnails = get(
-          ['foaf:depiction', 'http://rdf.freebase.com/ns/common.topic.image', 'schema:image'],
+          ['http://xmlns.com/foaf/0.1/depiction', 'http://rdf.freebase.com/ns/common.topic.image', 'http://schema.org/image'],
           item,
           (values) ->
             values = if angular.isArray values then values else [ values ]
@@ -236,8 +236,8 @@ angular.module( 'AnalysisService', [] )
           thumbnails  : thumbnails
           type        : getKnownType(types)
           types       : types
-          label       : getLanguage('rdfs:label', item, language)
-          labels      : get('rdfs:label', item)
+          label       : getLanguage('http://www.w3.org/2000/01/rdf-schema#label', item, language)
+          labels      : get('http://www.w3.org/2000/01/rdf-schema#label', item)
           sameAs      : sameAs
           source      : if id.match('^http://rdf.freebase.com/.*$')
                           'freebase'
@@ -249,16 +249,16 @@ angular.module( 'AnalysisService', [] )
 
         entity.description = getLanguage(
           [
-            'rdfs:comment',
+            'http://www.w3.org/2000/01/rdf-schema#comment',
             'http://rdf.freebase.com/ns/common.topic.description',
-            'schema:description'
+            'http://schema.org/description'
           ], item, language
         )
         entity.descriptions = get(
           [
-            'rdfs:comment',
+            'http://www.w3.org/2000/01/rdf-schema#comment',
             'http://rdf.freebase.com/ns/common.topic.description',
-            'schema:description'
+            'http://schema.org/description'
           ],
           item
         )
@@ -280,19 +280,19 @@ angular.module( 'AnalysisService', [] )
         entity
 
       createEntityAnnotation = (item) ->
-        entity = entities[get('enhancer:entity-reference', item)]
+        entity = entities[get('http://fise.iks-project.eu/ontology/entity-reference', item)]
         # If the referenced entity is not found, return null
         return null if not entity?
 
         # get the related text annotation.
-        textAnnotation = textAnnotations[get('dc:relation', item)]
+        textAnnotation = textAnnotations[get('http://purl.org/dc/terms/relation', item)]
 
         entityAnnotation = {
           id        : get('@id', item),
-          label     : get('enhancer:entity-label', item),
-          confidence: get('enhancer:confidence', item),
+          label     : get('http://fise.iks-project.eu/ontology/entity-label', item),
+          confidence: get('http://fise.iks-project.eu/ontology/confidence', item),
           entity    : entity,
-          relation  : textAnnotations[get('dc:relation', item)],
+          relation  : textAnnotations[get('http://purl.org/dc/terms/relation', item)],
           _item     : item
         }
 
@@ -306,18 +306,18 @@ angular.module( 'AnalysisService', [] )
       createTextAnnotation = (item) ->
         {
           id               : get('@id', item),
-          selectedText     : get('enhancer:selected-text', item)['@value'],
-          selectionPrefix  : get('enhancer:selection-prefix', item)['@value'],
-          selectionSuffix  : get('enhancer:selection-suffix', item)['@value'],
-          confidence       : get('enhancer:confidence', item),
+          selectedText     : get('http://fise.iks-project.eu/ontology/selected-text', item)['@value'],
+          selectionPrefix  : get('http://fise.iks-project.eu/ontology/selection-prefix', item)['@value'],
+          selectionSuffix  : get('http://fise.iks-project.eu/ontology/selection-suffix', item)['@value'],
+          confidence       : get('http://fise.iks-project.eu/ontology/confidence', item),
           entityAnnotations: {},
           _item            : item
         }
 
       createLanguage = (item) ->
         {
-          code      : get('dc:language', item),
-          confidence: get('enhancer:confidence', item)
+          code      : get('http://purl.org/dc/terms/language', item),
+          confidence: get('http://fise.iks-project.eu/ontology/confidence', item)
           _item     : item
         }
 
@@ -425,19 +425,19 @@ angular.module( 'AnalysisService', [] )
       for item in graph
         id     = item['@id']
         types  = item['@type']
-        dctype = get('dc:type', item)
+        dctype = get('http://purl.org/dc/terms/type', item)
 
         # TextAnnotation/LinguisticSystem
-        if containsOrEquals('enhancer:TextAnnotation', types) and containsOrEquals('dc:LinguisticSystem', dctype)
+        if containsOrEquals('http://fise.iks-project.eu/ontology/TextAnnotation', types) and containsOrEquals('http://purl.org/dc/terms/LinguisticSystem', dctype)
           languages.push createLanguage(item)
 
         # TextAnnotation
-        else if containsOrEquals('enhancer:TextAnnotation', types)
+        else if containsOrEquals('http://fise.iks-project.eu/ontology/TextAnnotation', types)
 #          $log.debug "TextAnnotation [ @id :: #{id} ][ types :: #{types} ]"
           textAnnotations[id] = item
 
         # EntityAnnotation
-        else if containsOrEquals('enhancer:EntityAnnotation', types)
+        else if containsOrEquals('http://fise.iks-project.eu/ontology/EntityAnnotation', types)
 #          $log.debug "EntityAnnotation [ @id :: #{id} ][ types :: #{types} ]"
           entityAnnotations[id] = item
 
