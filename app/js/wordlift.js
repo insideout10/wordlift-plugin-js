@@ -183,27 +183,26 @@
             return 'thing';
           };
           createEntity = function(item, language) {
-            var entity, freebase, freebaseThumbnails, id, match, sameAs, thumbnail, thumbnails, types;
+            var entity, id, sameAs, thumbnails, types;
             id = get('@id', item);
             types = get('@type', item);
             sameAs = get('owl:sameAs', item);
             sameAs = angular.isArray(sameAs) ? sameAs : [sameAs];
-            thumbnails = get(['foaf:depiction', 'schema:image'], item);
-            thumbnails = angular.isArray(thumbnails) ? thumbnails : [thumbnails];
-            freebase = get('http://rdf.freebase.com/ns/common.topic.image', item);
-            freebase = angular.isArray(freebase) ? freebase : [freebase];
-            freebaseThumbnails = [];
-            freebaseThumbnails = (function() {
-              var _i, _len, _results;
+            thumbnails = get(['foaf:depiction', 'http://rdf.freebase.com/ns/common.topic.image', 'schema:image'], item, function(values) {
+              var match, value, _i, _len, _results;
+              values = angular.isArray(values) ? values : [values];
               _results = [];
-              for (_i = 0, _len = freebase.length; _i < _len; _i++) {
-                thumbnail = freebase[_i];
-                match = /m\.(.*)$/i.exec(thumbnail);
-                _results.push("https://usercontent.googleapis.com/freebase/v1/image/m/" + match[1] + "?maxwidth=4096&maxheight=4096");
+              for (_i = 0, _len = values.length; _i < _len; _i++) {
+                value = values[_i];
+                match = /m\.(.*)$/i.exec(value);
+                if (null === match) {
+                  _results.push(value);
+                } else {
+                  _results.push("https://usercontent.googleapis.com/freebase/v1/image/m/" + match[1] + "?maxwidth=4096&maxheight=4096");
+                }
               }
               return _results;
-            })();
-            mergeUnique(thumbnails, freebaseThumbnails);
+            });
             entity = {
               id: id,
               thumbnail: 0 < thumbnails.length ? thumbnails[0] : null,
@@ -261,27 +260,32 @@
               _item: item
             };
           };
-          get = function(what, container) {
+          get = function(what, container, filter) {
             var add, key, values, _i, _len;
             if (!angular.isArray(what)) {
-              return getA(what, container);
+              return getA(what, container, filter);
             }
             values = [];
             for (_i = 0, _len = what.length; _i < _len; _i++) {
               key = what[_i];
-              add = getA(key, container);
+              add = getA(key, container, filter);
               add = angular.isArray(add) ? add : [add];
               mergeUnique(values, add);
             }
             return values;
           };
-          getA = function(what, container) {
+          getA = function(what, container, filter) {
             var key, value, whatExp;
+            if (filter == null) {
+              filter = function(a) {
+                return a;
+              };
+            }
             whatExp = expand(what);
             for (key in container) {
               value = container[key];
               if (whatExp === expand(key)) {
-                return value;
+                return filter(value);
               }
             }
             return [];

@@ -90,19 +90,20 @@ angular.module( 'AnalysisService', [] )
         sameAs     = get('owl:sameAs', item)
         sameAs     = if angular.isArray sameAs then sameAs else [ sameAs ]
 
-        thumbnails = get(['foaf:depiction', 'schema:image'], item)
-        thumbnails = if angular.isArray thumbnails then thumbnails else [ thumbnails ]
-
-        freebase = get('http://rdf.freebase.com/ns/common.topic.image', item)
-        freebase = if angular.isArray freebase then freebase else [ freebase ]
-        freebaseThumbnails = []
-#        freebaseThumbnails = ("admin-ajax.php?action=wordlift_freebase_image&url=#{escape(thumbnail)}" for thumbnail in freebaseThumbnails)
-        freebaseThumbnails = (
-          for thumbnail in freebase
-            match = /m\.(.*)$/i.exec thumbnail
-            "https://usercontent.googleapis.com/freebase/v1/image/m/#{match[1]}?maxwidth=4096&maxheight=4096"
+        # Get all the thumbnails; for each thumbnail execute the provided function.
+        thumbnails = get(
+          ['foaf:depiction', 'http://rdf.freebase.com/ns/common.topic.image', 'schema:image'],
+          item,
+          (values) ->
+            values = if angular.isArray values then values else [ values ]
+            for value in values
+              match = /m\.(.*)$/i.exec value
+              if null is match
+                value
+              else
+                # If it's a Freebase URL normalize the link to the image.
+                "https://usercontent.googleapis.com/freebase/v1/image/m/#{match[1]}?maxwidth=4096&maxheight=4096"
         )
-        mergeUnique(thumbnails, freebaseThumbnails)
 
         # create the entity model.
         entity =
@@ -137,14 +138,6 @@ angular.module( 'AnalysisService', [] )
           ],
           item
         )
-
-        # Get the description
-#        if entity.source is 'freebase'
-#          entity.description = getLanguage('http://rdf.freebase.com/ns/common.topic.description', item, language)
-#          entity.descriptions = get('http://rdf.freebase.com/ns/common.topic.description', item)
-#        else
-#          entity.description = getLanguage('rdfs:comment', item, language)
-#          entity.descriptions = get('rdfs:comment', item)
 
         # Avoid null in entity description.
         entity.description = '' if not entity.description?
@@ -205,16 +198,16 @@ angular.module( 'AnalysisService', [] )
         }
 
       # Get the values associated with the specified key(s). Keys are expanded.
-      get = (what, container) ->
+      get = (what, container, filter) ->
         # If it's a single key, call getA
-        return getA(what, container) if not angular.isArray what
+        return getA(what, container, filter) if not angular.isArray what
 
         # Prepare the return array.
         values = []
 
         # For each key, add the result.
         for key in what
-          add = getA(key, container)
+          add = getA(key, container, filter)
           # Ensure the result is an array.
           add = if angular.isArray add then add else [ add ]
           # Merge unique the results.
@@ -224,11 +217,11 @@ angular.module( 'AnalysisService', [] )
         values
 
       # Get the values associated with the specified key. Keys are expanded.
-      getA = (what, container) ->
+      getA = (what, container, filter = (a) -> a ) ->
         # expand the what key.
         whatExp = expand(what)
         # return the value bound to the specified key.
-        return value for key, value of container when whatExp is expand(key)
+        return filter(value) for key, value of container when whatExp is expand(key)
         []
 
       # get the value for specified property (what) in the provided container in the specified language.
@@ -345,6 +338,9 @@ angular.module( 'AnalysisService', [] )
 
       # Cycle in every entity.
       mergeEntities(entity, entities) for id, entity of entities if merge
+
+#      for id, entity of entities
+#        console.log "[ id :: #{entity.id} ][ thumbnails :: #{entity.thumbnails} ]"
 
       # Create text annotation instances.
       textAnnotations[id] = createTextAnnotation(item) for id, item of textAnnotations

@@ -383,14 +383,7 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         id         = get(<span class="hljs-string">'@id'</span>, item)
         types      = get(<span class="hljs-string">'@type'</span>, item)
         sameAs     = get(<span class="hljs-string">'owl:sameAs'</span>, item)
-        sameAs     = <span class="hljs-keyword">if</span> angular.isArray sameAs <span class="hljs-keyword">then</span> sameAs <span class="hljs-keyword">else</span> [ sameAs ]
-
-        thumbnails = get([<span class="hljs-string">'foaf:depiction'</span>, <span class="hljs-string">'schema:image'</span>], item)
-        thumbnails = <span class="hljs-keyword">if</span> angular.isArray thumbnails <span class="hljs-keyword">then</span> thumbnails <span class="hljs-keyword">else</span> [ thumbnails ]
-
-        freebase = get(<span class="hljs-string">'http://rdf.freebase.com/ns/common.topic.image'</span>, item)
-        freebase = <span class="hljs-keyword">if</span> angular.isArray freebase <span class="hljs-keyword">then</span> freebase <span class="hljs-keyword">else</span> [ freebase ]
-        freebaseThumbnails = []</pre></div></div>
+        sameAs     = <span class="hljs-keyword">if</span> angular.isArray sameAs <span class="hljs-keyword">then</span> sameAs <span class="hljs-keyword">else</span> [ sameAs ]</pre></div></div>
             
         </li>
         
@@ -401,16 +394,20 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
-              <pre><code>   freebaseThumbnails = (<span class="hljs-string">"admin-ajax.php?action=wordlift_freebase_image&amp;url=<span class="hljs-subst">#{escape(thumbnail)}</span>"</span> <span class="hljs-keyword">for</span> thumbnail <span class="hljs-keyword">in</span> freebaseThumbnails)
-</code></pre>
+              <p>Get all the thumbnails; for each thumbnail execute the provided function.</p>
+
             </div>
             
-            <div class="content"><div class='highlight'><pre>        freebaseThumbnails = (
-          <span class="hljs-keyword">for</span> thumbnail <span class="hljs-keyword">in</span> freebase
-            match = <span class="hljs-regexp">/m\.(.*)$/i</span>.exec thumbnail
-            <span class="hljs-string">"https://usercontent.googleapis.com/freebase/v1/image/m/<span class="hljs-subst">#{match[<span class="hljs-number">1</span>]}</span>?maxwidth=4096&amp;maxheight=4096"</span>
-        )
-        mergeUnique(thumbnails, freebaseThumbnails)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        thumbnails = get(
+          [<span class="hljs-string">'foaf:depiction'</span>, <span class="hljs-string">'http://rdf.freebase.com/ns/common.topic.image'</span>, <span class="hljs-string">'schema:image'</span>],
+          item,
+          <span class="hljs-function"><span class="hljs-params">(values)</span> -&gt;</span>
+            values = <span class="hljs-keyword">if</span> angular.isArray values <span class="hljs-keyword">then</span> values <span class="hljs-keyword">else</span> [ values ]
+            <span class="hljs-keyword">for</span> value <span class="hljs-keyword">in</span> values
+              match = <span class="hljs-regexp">/m\.(.*)$/i</span>.exec value
+              <span class="hljs-keyword">if</span> <span class="hljs-literal">null</span> <span class="hljs-keyword">is</span> match
+                value
+              <span class="hljs-keyword">else</span></pre></div></div>
             
         </li>
         
@@ -420,6 +417,22 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-18">&#182;</a>
+              </div>
+              <p>If it’s a Freebase URL normalize the link to the image.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                <span class="hljs-string">"https://usercontent.googleapis.com/freebase/v1/image/m/<span class="hljs-subst">#{match[<span class="hljs-number">1</span>]}</span>?maxwidth=4096&amp;maxheight=4096"</span>
+        )</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
               <p>create the entity model.</p>
 
@@ -457,25 +470,6 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
           ],
           item
         )</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-19">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-19">&#182;</a>
-              </div>
-              <p>Get the description
-       if entity.source is ‘freebase’
-         entity.description = getLanguage(‘<a href="http://rdf.freebase.com/ns/common.topic.description">http://rdf.freebase.com/ns/common.topic.description</a>‘, item, language)
-         entity.descriptions = get(‘<a href="http://rdf.freebase.com/ns/common.topic.description">http://rdf.freebase.com/ns/common.topic.description</a>‘, item)
-       else
-         entity.description = getLanguage(‘rdfs:comment’, item, language)
-         entity.descriptions = get(‘rdfs:comment’, item)</p>
-
-            </div>
             
         </li>
         
@@ -632,7 +626,7 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      <span class="hljs-function"><span class="hljs-title">get</span> = <span class="hljs-params">(what, container)</span> -&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-function"><span class="hljs-title">get</span> = <span class="hljs-params">(what, container, filter)</span> -&gt;</span></pre></div></div>
             
         </li>
         
@@ -647,7 +641,7 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">return</span> getA(what, container) <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> angular.isArray what</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">return</span> getA(what, container, filter) <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> angular.isArray what</pre></div></div>
             
         </li>
         
@@ -678,7 +672,7 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
             </div>
             
             <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">for</span> key <span class="hljs-keyword">in</span> what
-          add = getA(key, container)</pre></div></div>
+          add = getA(key, container, filter)</pre></div></div>
             
         </li>
         
@@ -738,7 +732,7 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      <span class="hljs-function"><span class="hljs-title">getA</span> = <span class="hljs-params">(what, container)</span> -&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-function"><span class="hljs-title">getA</span> = <span class="hljs-params">(what, container, filter = (a) -&gt; a )</span> -&gt;</span></pre></div></div>
             
         </li>
         
@@ -768,7 +762,7 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">return</span> value <span class="hljs-keyword">for</span> key, value <span class="hljs-keyword">of</span> container <span class="hljs-keyword">when</span> whatExp <span class="hljs-keyword">is</span> expand(key)
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">return</span> filter(value) <span class="hljs-keyword">for</span> key, value <span class="hljs-keyword">of</span> container <span class="hljs-keyword">when</span> whatExp <span class="hljs-keyword">is</span> expand(key)
         []</pre></div></div>
             
         </li>
@@ -1320,11 +1314,10 @@ TODO: have a user-set priority.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-71">&#182;</a>
               </div>
-              <p>Create text annotation instances.</p>
-
+              <pre><code> <span class="hljs-keyword">for</span> id, entity <span class="hljs-keyword">of</span> entities
+   <span class="hljs-built_in">console</span>.log <span class="hljs-string">"[ id :: <span class="hljs-subst">#{entity.id}</span> ][ thumbnails :: <span class="hljs-subst">#{entity.thumbnails}</span> ]"</span>
+</code></pre>
             </div>
-            
-            <div class="content"><div class='highlight'><pre>      textAnnotations[id] = createTextAnnotation(item) <span class="hljs-keyword">for</span> id, item <span class="hljs-keyword">of</span> textAnnotations</pre></div></div>
             
         </li>
         
@@ -1334,6 +1327,21 @@ TODO: have a user-set priority.</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-72">&#182;</a>
+              </div>
+              <p>Create text annotation instances.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      textAnnotations[id] = createTextAnnotation(item) <span class="hljs-keyword">for</span> id, item <span class="hljs-keyword">of</span> textAnnotations</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-73">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-73">&#182;</a>
               </div>
               <p>Create entity annotations instances.</p>
 
@@ -1345,11 +1353,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-73">
+        <li id="section-74">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-73">&#182;</a>
+                <a class="pilcrow" href="#section-74">&#182;</a>
               </div>
               <p>Add the entity annotation if it’s not null, otherwise delete the EntityAnnotation from the index.</p>
 
@@ -1363,11 +1371,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-74">
+        <li id="section-75">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-74">&#182;</a>
+                <a class="pilcrow" href="#section-75">&#182;</a>
               </div>
               <p>return the analysis result.</p>
 
