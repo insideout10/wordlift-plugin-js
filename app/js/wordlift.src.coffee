@@ -213,11 +213,9 @@ angular.module( 'AnalysisService', [] )
         types      = get('@type', item)
         sameAs     = get('owl:sameAs', item)
         sameAs     = if angular.isArray sameAs then sameAs else [ sameAs ]
-        thumbnails = get('foaf:depiction', item)
-        thumbnails = if angular.isArray thumbnails then thumbnails else [ thumbnails ]
 
-        schemaImages = get('schema:image', item)
-        schemaImages = if angular.isArray schemaImages then schemaImages else [ schemaImages ]
+        thumbnails = get(['foaf:depiction', 'schema:image'], item)
+        thumbnails = if angular.isArray thumbnails then thumbnails else [ thumbnails ]
 
         freebase = get('http://rdf.freebase.com/ns/common.topic.image', item)
         freebase = if angular.isArray freebase then freebase else [ freebase ]
@@ -229,7 +227,6 @@ angular.module( 'AnalysisService', [] )
             "https://usercontent.googleapis.com/freebase/v1/image/m/#{match[1]}?maxwidth=4096&maxheight=4096"
         )
         mergeUnique(thumbnails, freebaseThumbnails)
-        mergeUnique(thumbnails, schemaImages)
 
         # create the entity model.
         entity =
@@ -249,13 +246,29 @@ angular.module( 'AnalysisService', [] )
                           'wordlift'
           _item       : item
 
+        entity.description = getLanguage(
+          [
+            'rdfs:comment',
+            'http://rdf.freebase.com/ns/common.topic.description',
+            'schema:description'
+          ], item, language
+        )
+        entity.descriptions = get(
+          [
+            'rdfs:comment',
+            'http://rdf.freebase.com/ns/common.topic.description',
+            'schema:description'
+          ],
+          item
+        )
+
         # Get the description
-        if entity.source is 'freebase'
-          entity.description = getLanguage('http://rdf.freebase.com/ns/common.topic.description', item, language)
-          entity.descriptions = get('http://rdf.freebase.com/ns/common.topic.description', item)
-        else
-          entity.description = getLanguage('rdfs:comment', item, language)
-          entity.descriptions = get('rdfs:comment', item)
+#        if entity.source is 'freebase'
+#          entity.description = getLanguage('http://rdf.freebase.com/ns/common.topic.description', item, language)
+#          entity.descriptions = get('http://rdf.freebase.com/ns/common.topic.description', item)
+#        else
+#          entity.description = getLanguage('rdfs:comment', item, language)
+#          entity.descriptions = get('rdfs:comment', item)
 
         # Avoid null in entity description.
         entity.description = '' if not entity.description?
@@ -315,8 +328,27 @@ angular.module( 'AnalysisService', [] )
           _item     : item
         }
 
-      # get the provided key from the container, expanding the keys when necessary.
+      # Get the values associated with the specified key(s). Keys are expanded.
       get = (what, container) ->
+        # If it's a single key, call getA
+        return getA(what, container) if not angular.isArray what
+
+        # Prepare the return array.
+        values = []
+
+        # For each key, add the result.
+        for key in what
+          add = getA(key, container)
+          # Ensure the result is an array.
+          add = if angular.isArray add then add else [ add ]
+          # Merge unique the results.
+          mergeUnique values, add
+
+        # Return the result array.
+        values
+
+      # Get the values associated with the specified key. Keys are expanded.
+      getA = (what, container) ->
         # expand the what key.
         whatExp = expand(what)
         # return the value bound to the specified key.
