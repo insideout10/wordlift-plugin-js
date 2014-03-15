@@ -26,17 +26,16 @@ module.exports = (grunt) ->
     uglify:
       wordlift:
         options:
-          sourceMap: 'app/js/wordlift.min.js.map'
+          sourceMap: true
           sourceMapIn: 'app/js/wordlift.js.map'
-          sourceMappingURL: 'wordlift.min.js.map'
           compress: true
 #            drop_console: true
           dead_code: true
           mangle: true
           beautify: false
         files:
-          'app/js/wordlift.min.js': ['app/js/wordlift.js']
-          'app/js/wordlift.<%= pkg.version %>.min.js': ['app/js/wordlift.js']
+          'app/js/wordlift.min.js': 'app/js/wordlift.js'
+          'app/js/wordlift.<%= pkg.version %>.min.js': 'app/js/wordlift.js'
 
     less:
       development:
@@ -67,7 +66,10 @@ module.exports = (grunt) ->
         src: [
           'wordlift.js',
           'wordlift.min.js',
-          'wordlift.<%= pkg.version %>.min.js'
+          'wordlift.<%= pkg.version %>.min.js',
+          'wordlift.js.map',
+          'wordlift.min.map',
+          'wordlift.<%= pkg.version %>.min.map'
         ]
         dest: 'dist/js/'
         flatten: true
@@ -79,7 +81,8 @@ module.exports = (grunt) ->
         src: [
           'wordlift.css',
           'wordlift.min.css',
-          'wordlift.<%= pkg.version %>.min.css'
+          'wordlift.<%= pkg.version %>.min.css',
+          'wordlift.min.css.map'
         ]
         dest: 'dist/css/'
         flatten: true
