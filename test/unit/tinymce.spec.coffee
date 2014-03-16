@@ -7,13 +7,13 @@ describe "TinyMCE tests", ->
     # Set a reference to the editor.
     ed = tinyMCE.get('content')
 
-    #
     module 'wordlift.tinymce.plugin.services'
 
   afterEach inject ($httpBackend) ->
     $httpBackend.verifyNoOutstandingExpectation()
     $httpBackend.verifyNoOutstandingRequest()
-
+    # Clean up editor after each test
+    ed.setContent ''
 
   it "loads the editor and the WordLift plugin", ->
 
@@ -37,6 +37,54 @@ describe "TinyMCE tests", ->
       # Check for the editor content not to be empty.
       expect(ed.getContent().length).toBeGreaterThan 0
 
+  it "perform analysis on analyzed content", inject (AnalysisService, EditorService, $httpBackend) ->
+    # Check that the editor content is empty.
+    expect(ed.getContent().length).toEqual 0
+
+    # Load the sample text in the editor.
+    $.ajax('base/app/assets/english_analyzed.txt',
+      async: false
+    ).done (source) ->
+      # Set the editor content
+      ed.setContent source
+      # Check editor content is set properly
+      expect(ed.getContent({format: 'raw'})).toEqual(source)
+    
+      # Load the sample response.
+      $.ajax('base/app/assets/english.json',
+        async: false
+      ).done (data) ->
+        analysis = AnalysisService.parse data
+        # Catch all the requests to Freebase.
+        $httpBackend.when('HEAD', /.*/).respond(200, '')
+        EditorService.embedAnalysis analysis
+        # Check that text annotation spans clean up works properly
+        expect(ed.getContent({format: 'raw'})).toEqual(source)
+
+  it "perform analysis on analyzed content with a dismabiguated item", inject (AnalysisService, EditorService, $httpBackend) ->
+    # Check that the editor content is empty.
+    expect(ed.getContent().length).toEqual 0
+
+    # Load the sample text in the editor.
+    $.ajax('base/app/assets/english_disambiguated.txt',
+      async: false
+    ).done (source) ->
+      # Set the editor content
+      ed.setContent source
+      # Check editor content is set properly
+      expect(ed.getContent({format: 'raw'})).toEqual(source)
+    
+      # Load the sample response.
+      $.ajax('base/app/assets/english.json',
+        async: false
+      ).done (data) ->
+        analysis = AnalysisService.parse data
+        # Catch all the requests to Freebase.
+        $httpBackend.when('HEAD', /.*/).respond(200, '')
+        EditorService.embedAnalysis analysis
+        # Check that text annotation spans clean up works properly
+        # and disambiguated item is preserved
+        expect(ed.getContent({format: 'raw'})).toEqual(source)
 
   it "doesn't run an analysis when an analysis is already running", inject (AnalysisService, EditorService) ->
 

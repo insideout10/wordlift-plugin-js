@@ -51,7 +51,7 @@ module.exports = function(config){
 
     browsers : [
         'Chrome'
-        ,'Firefox'
+//        ,'Firefox'
 //        ,'Safari'
     ],
 

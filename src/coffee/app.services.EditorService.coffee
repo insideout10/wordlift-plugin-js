@@ -15,11 +15,13 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
         currentHtmlContent = tinyMCE.get('content').getContent({format : 'raw'})
 
         # Remove the existing text annotation spans.
-        spanre = /<span class="textannotation"[^>]*>([^<]*)<\/span>/gi
+        spanre = new RegExp("<span[^>]+class=\"textannotation\"[^>]*>([^<]*)</span>","gi")
         while spanre.test currentHtmlContent
           currentHtmlContent = currentHtmlContent.replace spanre, '$1'
-
+ 
         for id, textAnnotation of analysis.textAnnotations
+
+          #console.log textAnnotation.id
           # get the selection prefix and suffix for the regexp.
           selPrefix = cleanUp(textAnnotation.selectionPrefix.substr(-1))
           selPrefix = '^|\\W' if '' is selPrefix
@@ -31,11 +33,18 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
           # the new regular expression, may not match everything.
           # TODO: enhance the matching.
           r = new RegExp("(#{selPrefix}(?:<[^>]+>){0,})(#{selText})((?:<[^>]+>){0,}#{selSuffix})(?![^<]*\"[^<]*>)")
+          r2 = new RegExp("id=\"(urn:enhancement.[a-z,0-9,-]+)\"")
 
-          replace = "$1<span class=\"textannotation\" id=\"#{id}\" typeof=\"http://fise.iks-project.eu/ontology/TextAnnotation\">$2</span>$3"
-
-          currentHtmlContent = currentHtmlContent.replace( r, replace )
-
+          # If there are disambiguated entities 
+          # the span is not added while the existing span id is replaced
+          if matchResult = currentHtmlContent.match r
+            replace = "#{matchResult[1]}<span class=\"textannotation\" id=\"#{id}\" typeof=\"http://fise.iks-project.eu/ontology/TextAnnotation\">#{matchResult[2]}</span>#{matchResult[3]}" 
+            if r2.test matchResult[1]
+              m = matchResult[1].replace r2,"id=\"#{id}\""
+              replace = "#{m}#{matchResult[2]}#{matchResult[3]}" 
+          
+            currentHtmlContent = currentHtmlContent.replace( r, replace )
+          
         isDirty = tinyMCE.get('content').isDirty()
         tinyMCE.get('content').setContent currentHtmlContent
         tinyMCE.get('content').isNotDirty = 1 if not isDirty
