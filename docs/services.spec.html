@@ -659,9 +659,7 @@
         expect(Object.keys(analysis.languages).length).toEqual <span class="hljs-number">1</span>
     )
 
-  describe <span class="hljs-string">'EditorService'</span>,<span class="hljs-function"> -&gt;</span>
-
-    it <span class="hljs-string">"embeds analysis results also when there are parentheses in the selected text"</span>, inject<span class="hljs-function"><span class="hljs-params">( (AnalysisService, EditorService, $httpBackend) -&gt;
+    it <span class="hljs-string">'finds entities for all the text annotations'</span>, inject<span class="hljs-function"><span class="hljs-params">((AnalysisService, $httpBackend, $rootScope) -&gt;
 
 </span></span></pre></div></div>
             
@@ -678,7 +676,7 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      $.ajax(<span class="hljs-string">'base/app/assets/tim_berners-lee_2.json'</span>,
+            <div class="content"><div class='highlight'><pre>      $.ajax(<span class="hljs-string">'base/app/assets/eight_players_joined.json'</span>,
         <span class="hljs-attribute">async</span>: <span class="hljs-literal">false</span>
       ).done <span class="hljs-function"><span class="hljs-params">(data)</span> -&gt;</span></pre></div></div>
             
@@ -720,6 +718,102 @@
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-34">&#182;</a>
+              </div>
+              <p>Check that the analysis results conform.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        expect(analysis).toEqual jasmine.any(Object)
+        expect(analysis.language).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
+        expect(analysis.entities).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
+        expect(analysis.entityAnnotations).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
+        expect(analysis.textAnnotations).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
+        expect(analysis.languages).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
+        expect(analysis.language).toEqual <span class="hljs-string">'en'</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-35">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-35">&#182;</a>
+              </div>
+              <pre><code>   expect(Object.keys(analysis.entities).length).toEqual <span class="hljs-number">34</span>
+   expect(Object.keys(analysis.entityAnnotations).length).toEqual <span class="hljs-number">34</span>
+   expect(Object.keys(analysis.textAnnotations).length).toEqual <span class="hljs-number">18</span>
+   expect(Object.keys(analysis.languages).length).toEqual <span class="hljs-number">1</span>
+</code></pre>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+        <span class="hljs-keyword">for</span> id, textAnnotation <span class="hljs-keyword">of</span> analysis.textAnnotations
+          dump textAnnotation.id
+          expect(Object.keys(textAnnotation.entityAnnotations).length).toBeGreaterThan <span class="hljs-number">0</span>
+    )
+
+  describe <span class="hljs-string">'EditorService'</span>,<span class="hljs-function"> -&gt;</span>
+
+    it <span class="hljs-string">"embeds analysis results also when there are parentheses in the selected text"</span>, inject<span class="hljs-function"><span class="hljs-params">( (AnalysisService, EditorService, $httpBackend) -&gt;
+
+</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-36">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-36">&#182;</a>
+              </div>
+              <p>Get the mock-up analysis.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      $.ajax(<span class="hljs-string">'base/app/assets/tim_berners-lee_2.json'</span>,
+        <span class="hljs-attribute">async</span>: <span class="hljs-literal">false</span>
+      ).done <span class="hljs-function"><span class="hljs-params">(data)</span> -&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-37">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-37">&#182;</a>
+              </div>
+              <p>Catch all the requests to Freebase.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        $httpBackend.<span class="hljs-keyword">when</span>(<span class="hljs-string">'HEAD'</span>, <span class="hljs-regexp">/.*/</span>).respond(<span class="hljs-number">200</span>, <span class="hljs-string">''</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-38">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-38">&#182;</a>
+              </div>
+              <p>Simulate event broadcasted by AnalysisService</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        analysis = AnalysisService.parse data, <span class="hljs-literal">true</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-39">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-39">&#182;</a>
               </div>
               <p>Check that the analysis results conform.</p>
 

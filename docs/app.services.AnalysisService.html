@@ -534,7 +534,8 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
-              <p>If the referenced entity is not found, return null</p>
+              <pre><code>   <span class="hljs-built_in">console</span>.log <span class="hljs-string">"createEntityAnnotation [ entity :: <span class="hljs-subst">#{entity}</span> ]"</span>
+</code></pre><p>If the referenced entity is not found, return null</p>
 
             </div>
             
@@ -942,7 +943,7 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
 
       <span class="hljs-function"><span class="hljs-title">mergeEntities</span> = <span class="hljs-params">(entity, entities)</span> -&gt;</span>
         <span class="hljs-keyword">for</span> sameAs <span class="hljs-keyword">in</span> entity.sameAs
-          <span class="hljs-keyword">if</span> entities[sameAs]?
+          <span class="hljs-keyword">if</span> entities[sameAs]? <span class="hljs-keyword">and</span> entities[sameAs] <span class="hljs-keyword">isnt</span> entity
             existing = entities[sameAs]</pre></div></div>
             
         </li>
@@ -991,7 +992,7 @@ TODO: have a user-set priority.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">delete</span> entities[sameAs]
+            <div class="content"><div class='highlight'><pre>            entities[sameAs] = entity
             mergeEntities(entity, entities)
         entity</pre></div></div>
             
@@ -1091,7 +1092,10 @@ TODO: have a user-set priority.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>      context  = <span class="hljs-keyword">if</span> data[<span class="hljs-string">'@context'</span>]? <span class="hljs-keyword">then</span> data[<span class="hljs-string">'@context'</span>] <span class="hljs-keyword">else</span> {}
-      graph    = <span class="hljs-keyword">if</span> data[<span class="hljs-string">'@graph'</span>]? <span class="hljs-keyword">then</span> data[<span class="hljs-string">'@graph'</span>] <span class="hljs-keyword">else</span> {}</pre></div></div>
+      graph    = <span class="hljs-keyword">if</span> data[<span class="hljs-string">'@graph'</span>]? <span class="hljs-keyword">then</span> data[<span class="hljs-string">'@graph'</span>] <span class="hljs-keyword">else</span> {}
+
+      <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> graph
+        id     = item[<span class="hljs-string">'@id'</span>]</pre></div></div>
             
         </li>
         
@@ -1101,34 +1105,6 @@ TODO: have a user-set priority.</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-57">&#182;</a>
-              </div>
-              <pre><code> <span class="hljs-comment"># get the prefixes.</span>
- prefixes = {}
-
- dump context
-
- <span class="hljs-comment"># cycle in the context definitions and extract the prefixes.</span>
- prefixes[key] = value <span class="hljs-keyword">for</span> key, value <span class="hljs-keyword">of</span> context <span class="hljs-keyword">when</span> <span class="hljs-keyword">not</span> <span class="hljs-string">':'</span> <span class="hljs-keyword">in</span> key <span class="hljs-keyword">and</span> angular.isString value
-</code></pre><h1 id="dump-contains-colons-in-key-key-key-value-value-value-is-string-angular-isstring-value-">dump “[ contains colons :: #{‘:’ in key} ][ key :: #{key} ][ value :: #{value} ][ value is String :: #{angular.isString(value)} ]”</h1>
-<h1 id="-consider-a-prefix-only-keys-w-o-and-the-value-is-string-"># consider a prefix only keys w/o ‘:’ and the value is string.</h1>
-<h1 id="if">if</h1>
-<pre><code> dump prefixes
-</code></pre>
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>
-
-      <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> graph
-        id     = item[<span class="hljs-string">'@id'</span>]</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-58">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-58">&#182;</a>
               </div>
               <pre><code>   <span class="hljs-built_in">console</span>.log <span class="hljs-string">"[ id :: <span class="hljs-subst">#{id}</span> ]"</span>
 </code></pre>
@@ -1141,11 +1117,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-59">
+        <li id="section-58">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-59">&#182;</a>
+                <a class="pilcrow" href="#section-58">&#182;</a>
               </div>
               <pre><code>   <span class="hljs-built_in">console</span>.log <span class="hljs-string">"[ id :: <span class="hljs-subst">#{id}</span> ][ dc:type :: <span class="hljs-subst">#{dctype}</span> ]"</span>
 </code></pre>
@@ -1154,11 +1130,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-60">
+        <li id="section-59">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-60">&#182;</a>
+                <a class="pilcrow" href="#section-59">&#182;</a>
               </div>
               <p>TextAnnotation/LinguisticSystem</p>
 
@@ -1169,11 +1145,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-61">
+        <li id="section-60">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-61">&#182;</a>
+                <a class="pilcrow" href="#section-60">&#182;</a>
               </div>
               <pre><code>     dump <span class="hljs-string">"language [ id :: <span class="hljs-subst">#{id}</span> ][ dc:type :: <span class="hljs-subst">#{dctype}</span> ]"</span>
 </code></pre>
@@ -1184,11 +1160,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-62">
+        <li id="section-61">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-62">&#182;</a>
+                <a class="pilcrow" href="#section-61">&#182;</a>
               </div>
               <p>TextAnnotation</p>
 
@@ -1199,11 +1175,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-63">
+        <li id="section-62">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-63">&#182;</a>
+                <a class="pilcrow" href="#section-62">&#182;</a>
               </div>
               <pre><code>     $log.debug <span class="hljs-string">"TextAnnotation [ @id :: <span class="hljs-subst">#{id}</span> ][ types :: <span class="hljs-subst">#{types}</span> ]"</span>
 </code></pre>
@@ -1214,11 +1190,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-64">
+        <li id="section-63">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-64">&#182;</a>
+                <a class="pilcrow" href="#section-63">&#182;</a>
               </div>
               <p>EntityAnnotation</p>
 
@@ -1229,11 +1205,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-65">
+        <li id="section-64">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-65">&#182;</a>
+                <a class="pilcrow" href="#section-64">&#182;</a>
               </div>
               <pre><code>     $log.debug <span class="hljs-string">"EntityAnnotation [ @id :: <span class="hljs-subst">#{id}</span> ][ types :: <span class="hljs-subst">#{types}</span> ]"</span>
 </code></pre>
@@ -1244,11 +1220,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-66">
+        <li id="section-65">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-66">&#182;</a>
+                <a class="pilcrow" href="#section-65">&#182;</a>
               </div>
               <p>Entity</p>
 
@@ -1259,11 +1235,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-67">
+        <li id="section-66">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-67">&#182;</a>
+                <a class="pilcrow" href="#section-66">&#182;</a>
               </div>
               <pre><code>     $log.debug <span class="hljs-string">"Entity [ @id :: <span class="hljs-subst">#{id}</span> ][ types :: <span class="hljs-subst">#{types}</span> ]"</span>
 </code></pre>
@@ -1274,11 +1250,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-68">
+        <li id="section-67">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-68">&#182;</a>
+                <a class="pilcrow" href="#section-67">&#182;</a>
               </div>
               <p>sort the languages by confidence.</p>
 
@@ -1294,11 +1270,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-69">
+        <li id="section-68">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-69">&#182;</a>
+                <a class="pilcrow" href="#section-68">&#182;</a>
               </div>
               <p>create a reference to the default language.</p>
 
@@ -1309,11 +1285,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-70">
+        <li id="section-69">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-70">&#182;</a>
+                <a class="pilcrow" href="#section-69">&#182;</a>
               </div>
               <p>Create entities instances in the entities array.</p>
 
@@ -1324,11 +1300,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-71">
+        <li id="section-70">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-71">&#182;</a>
+                <a class="pilcrow" href="#section-70">&#182;</a>
               </div>
               <p>Cycle in every entity.</p>
 
@@ -1339,25 +1315,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-72">
+        <li id="section-71">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-72">&#182;</a>
-              </div>
-              <pre><code> <span class="hljs-keyword">for</span> id, entity <span class="hljs-keyword">of</span> entities
-   <span class="hljs-built_in">console</span>.log <span class="hljs-string">"[ id :: <span class="hljs-subst">#{entity.id}</span> ][ thumbnails :: <span class="hljs-subst">#{entity.thumbnails}</span> ]"</span>
-</code></pre>
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-73">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-73">&#182;</a>
+                <a class="pilcrow" href="#section-71">&#182;</a>
               </div>
               <p>Create text annotation instances.</p>
 
@@ -1368,18 +1330,47 @@ TODO: have a user-set priority.</p>
         </li>
         
         
+        <li id="section-72">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-72">&#182;</a>
+              </div>
+              <p>Create entity annotations instances.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      entityAnnotations[id] = createEntityAnnotation(item) <span class="hljs-keyword">for</span> id, item <span class="hljs-keyword">of</span> entityAnnotations</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-73">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-73">&#182;</a>
+              </div>
+              <p>For every text annotation delete entity annotations that refer to the same entity (after merging).</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> merge</pre></div></div>
+            
+        </li>
+        
+        
         <li id="section-74">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-74">&#182;</a>
               </div>
-              <p>Create entity annotations instances.</p>
+              <p>Cycle in text annotations.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">for</span> id, item <span class="hljs-keyword">of</span> entityAnnotations
-        entityAnnotation = createEntityAnnotation(item)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">for</span> id, textAnnotation <span class="hljs-keyword">of</span> textAnnotations</pre></div></div>
             
         </li>
         
@@ -1390,14 +1381,11 @@ TODO: have a user-set priority.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-75">&#182;</a>
               </div>
-              <p>Add the entity annotation if it’s not null, otherwise delete the EntityAnnotation from the index.</p>
+              <p>Cycle in entity annotations.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> entityAnnotation?
-          entityAnnotations[id] = entityAnnotation
-        <span class="hljs-keyword">else</span>
-          <span class="hljs-keyword">delete</span> entityAnnotations[id]</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">for</span> id, entityAnnotation <span class="hljs-keyword">of</span> textAnnotation.entityAnnotations</pre></div></div>
             
         </li>
         
@@ -1407,6 +1395,22 @@ TODO: have a user-set priority.</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-76">&#182;</a>
+              </div>
+              <p>Check if there are entity annotations referring to the same entity, and if so, delete it.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">for</span> anotherId, anotherEntityAnnotation <span class="hljs-keyword">of</span> textAnnotation.entityAnnotations <span class="hljs-keyword">when</span> id <span class="hljs-keyword">isnt</span> anotherId <span class="hljs-keyword">and</span> entityAnnotation.entity <span class="hljs-keyword">is</span> anotherEntityAnnotation.entity
+              <span class="hljs-keyword">delete</span> textAnnotation.entityAnnotations[anotherId]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-77">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-77">&#182;</a>
               </div>
               <p>return the analysis result.</p>
 

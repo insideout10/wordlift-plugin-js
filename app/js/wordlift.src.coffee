@@ -281,6 +281,7 @@ angular.module( 'AnalysisService', [] )
 
       createEntityAnnotation = (item) ->
         entity = entities[get('http://fise.iks-project.eu/ontology/entity-reference', item)]
+#        console.log "createEntityAnnotation [ entity :: #{entity} ]"
         # If the referenced entity is not found, return null
         return null if not entity?
 
@@ -383,7 +384,7 @@ angular.module( 'AnalysisService', [] )
 
       mergeEntities = (entity, entities) ->
         for sameAs in entity.sameAs
-          if entities[sameAs]?
+          if entities[sameAs]? and entities[sameAs] isnt entity
             existing = entities[sameAs]
             # TODO: make concats unique.
             mergeUnique(entity.sameAs, existing.sameAs)
@@ -394,7 +395,7 @@ angular.module( 'AnalysisService', [] )
             entity.description = existing.description if 'dbpedia' is existing.source
 
             # Delete the sameAs entity from the index.
-            delete entities[sameAs]
+            entities[sameAs] = entity
             mergeEntities(entity, entities)
         entity
 
@@ -421,20 +422,6 @@ angular.module( 'AnalysisService', [] )
       # data is split in a context and a graph.
       context  = if data['@context']? then data['@context'] else {}
       graph    = if data['@graph']? then data['@graph'] else {}
-
-#      # get the prefixes.
-#      prefixes = {}
-#
-#      dump context
-#
-#      # cycle in the context definitions and extract the prefixes.
-#      prefixes[key] = value for key, value of context when not ':' in key and angular.isString value
-##        dump "[ contains colons :: #{':' in key} ][ key :: #{key} ][ value :: #{value} ][ value is String :: #{angular.isString(value)} ]"
-##        # consider a prefix only keys w/o ':' and the value is string.
-##         if
-#
-#      dump prefixes
-
 
       for item in graph
         id     = item['@id']
@@ -482,20 +469,21 @@ angular.module( 'AnalysisService', [] )
       # Cycle in every entity.
       mergeEntities(entity, entities) for id, entity of entities if merge
 
-#      for id, entity of entities
-#        console.log "[ id :: #{entity.id} ][ thumbnails :: #{entity.thumbnails} ]"
-
       # Create text annotation instances.
       textAnnotations[id] = createTextAnnotation(item) for id, item of textAnnotations
 
       # Create entity annotations instances.
-      for id, item of entityAnnotations
-        entityAnnotation = createEntityAnnotation(item)
-        # Add the entity annotation if it's not null, otherwise delete the EntityAnnotation from the index.
-        if entityAnnotation?
-          entityAnnotations[id] = entityAnnotation
-        else
-          delete entityAnnotations[id]
+      entityAnnotations[id] = createEntityAnnotation(item) for id, item of entityAnnotations
+
+      # For every text annotation delete entity annotations that refer to the same entity (after merging).
+      if merge
+        # Cycle in text annotations.
+        for id, textAnnotation of textAnnotations
+          # Cycle in entity annotations.
+          for id, entityAnnotation of textAnnotation.entityAnnotations
+            # Check if there are entity annotations referring to the same entity, and if so, delete it.
+            for anotherId, anotherEntityAnnotation of textAnnotation.entityAnnotations when id isnt anotherId and entityAnnotation.entity is anotherEntityAnnotation.entity
+              delete textAnnotation.entityAnnotations[anotherId]
 
       # return the analysis result.
       {

@@ -319,8 +319,10 @@ describe 'directives', ->
         textAnnotation2 = scope.analysis.textAnnotations['urn:enhancement-233fd158-870d-6ca4-b7ce-30313e4a7015']
         expect(textAnnotation2).not.toBe undefined
 
+#        dump "[ id :: #{id} ][ entity id :: #{entityAnnotation.entity.id} ]" for id, entityAnnotation of textAnnotation2.entityAnnotations
+
         # Select an entity annotation in the first text annotation.
-        entityAnnotation2 = textAnnotation2.entityAnnotations['urn:enhancement-53bd49a5-4609-627c-be3f-468d30a35bdc']
+        entityAnnotation2 = textAnnotation2.entityAnnotations['urn:enhancement-26a923a4-fbb8-b39d-53ad-e2922474b7fc']
         expect(entityAnnotation2).not.toBe undefined
         expect(entityAnnotation2.entity).not.toBe undefined
 
@@ -465,11 +467,13 @@ describe 'directives', ->
 
         # Get a Text Annotation and three entities that related to that Text Annotation.
         textAnnotationId = 'urn:enhancement-a6bb446e-6e95-d6be-e91c-32833aa58b32'
-        entityAnnotationId = 'urn:enhancement-8a04d086-c636-7c64-d31c-19a8d3bde030'
+        entityAnnotationId = 'urn:enhancement-663e0cfd-c482-f695-674e-cae98e42dd18'
 
         # Select a text annotation.
         textAnnotation = scope.analysis.textAnnotations[textAnnotationId]
         expect(textAnnotation).not.toBe undefined
+
+#        dump "[ id :: #{id} ][ entity id :: #{entityAnnotation.entity.id} ]" for id, entityAnnotation of textAnnotation.entityAnnotations
 
         # Select an entity annotation in the first text annotation.
         entityAnnotation = textAnnotation.entityAnnotations[entityAnnotationId]
