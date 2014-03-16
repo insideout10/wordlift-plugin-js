@@ -94,7 +94,7 @@
           });
         },
         parse: function(data, merge) {
-          var anotherEntityAnnotation, anotherId, containsOrEquals, context, createEntity, createEntityAnnotation, createLanguage, createTextAnnotation, dctype, entities, entity, entityAnnotation, entityAnnotations, expand, get, getA, getKnownType, getLanguage, graph, id, item, language, languages, mergeEntities, mergeUnique, textAnnotation, textAnnotations, types, _i, _len, _ref, _ref1;
+          var anotherEntityAnnotation, anotherId, containsOrEquals, context, createEntity, createEntityAnnotation, createLanguage, createTextAnnotation, dctype, entities, entity, entityAnnotation, entityAnnotations, expand, get, getA, getKnownType, getLanguage, graph, id, item, language, languages, mergeEntities, mergeUnique, textAnnotation, textAnnotationId, textAnnotations, types, _i, _len, _ref, _ref1;
           if (merge == null) {
             merge = false;
           }
@@ -105,7 +105,7 @@
           getKnownType = function(types) {
             var type, typesArray, _i, _j, _k, _l, _len, _len1, _len10, _len11, _len2, _len3, _len4, _len5, _len6, _len7, _len8, _len9, _m, _n, _o, _p, _q, _r, _s, _t;
             if (types == null) {
-              return null;
+              return 'thing';
             }
             typesArray = angular.isArray(types) ? types : [types];
             for (_i = 0, _len = typesArray.length; _i < _len; _i++) {
@@ -223,22 +223,29 @@
             return entity;
           };
           createEntityAnnotation = function(item) {
-            var entity, entityAnnotation, textAnnotation;
-            entity = entities[get('http://fise.iks-project.eu/ontology/entity-reference', item)];
+            var entity, entityAnnotation, id, reference, relation, relations, textAnnotation, _i, _len;
+            reference = get('http://fise.iks-project.eu/ontology/entity-reference', item);
+            entity = entities[reference];
             if (entity == null) {
               return null;
             }
-            textAnnotation = textAnnotations[get('http://purl.org/dc/terms/relation', item)];
+            id = get('@id', item);
+            relations = get('http://purl.org/dc/terms/relation', item);
+            relations = angular.isArray(relations) ? relations : [relations];
             entityAnnotation = {
-              id: get('@id', item),
+              id: id,
               label: get('http://fise.iks-project.eu/ontology/entity-label', item),
               confidence: get('http://fise.iks-project.eu/ontology/confidence', item),
               entity: entity,
-              relation: textAnnotations[get('http://purl.org/dc/terms/relation', item)],
+              relation: null,
               _item: item
             };
-            if (textAnnotation != null) {
-              textAnnotation.entityAnnotations[entityAnnotation.id] = entityAnnotation;
+            for (_i = 0, _len = relations.length; _i < _len; _i++) {
+              relation = relations[_i];
+              textAnnotation = textAnnotations[relation];
+              if (textAnnotation != null) {
+                textAnnotation.entityAnnotations[entityAnnotation.id] = entityAnnotation;
+              }
             }
             return entityAnnotation;
           };
@@ -420,8 +427,8 @@
             entityAnnotations[id] = createEntityAnnotation(item);
           }
           if (merge) {
-            for (id in textAnnotations) {
-              textAnnotation = textAnnotations[id];
+            for (textAnnotationId in textAnnotations) {
+              textAnnotation = textAnnotations[textAnnotationId];
               _ref = textAnnotation.entityAnnotations;
               for (id in _ref) {
                 entityAnnotation = _ref[id];

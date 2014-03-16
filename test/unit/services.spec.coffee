@@ -169,82 +169,115 @@ describe 'services', ->
             expect(entityAnnotation.entity).not.toBe undefined
 
     )
-#
-#    it 'parses correctly analysis result without prefixes', inject((AnalysisService, $httpBackend, $rootScope) ->
-#
-#      # Get the mock-up analysis.
-#      $.ajax('base/app/assets/tim_berners-lee.json',
-#        async: false
-#      ).done (data) ->
-#
-#        # Catch all the requests to Freebase.
-#        $httpBackend.when('HEAD', /.*/).respond(200, '')
-#
-#        # Simulate event broadcasted by AnalysisService
-#        analysis = AnalysisService.parse data, true
-#
-#        # Check that the analysis results conform.
-#        expect(analysis).toEqual jasmine.any(Object)
-#        expect(analysis.language).not.toBe undefined
-#        expect(analysis.entities).not.toBe undefined
-#        expect(analysis.entityAnnotations).not.toBe undefined
-#        expect(analysis.textAnnotations).not.toBe undefined
-#        expect(analysis.languages).not.toBe undefined
-#        expect(analysis.language).toEqual 'en'
-#        expect(Object.keys(analysis.entities).length).toEqual 9
-#        expect(Object.keys(analysis.entityAnnotations).length).toEqual 9
-#        expect(Object.keys(analysis.textAnnotations).length).toEqual 3
+
+    it 'parses correctly analysis result without prefixes', inject((AnalysisService, $httpBackend, $rootScope) ->
+
+      # Get the mock-up analysis.
+      $.ajax('base/app/assets/tim_berners-lee.json',
+        async: false
+      ).done (data) ->
+
+        # Catch all the requests to Freebase.
+        $httpBackend.when('HEAD', /.*/).respond(200, '')
+
+        # Simulate event broadcasted by AnalysisService
+        analysis = AnalysisService.parse data, true
+
+        # Check that the analysis results conform.
+        expect(analysis).toEqual jasmine.any(Object)
+        expect(analysis.language).not.toBe undefined
+        expect(analysis.entities).not.toBe undefined
+        expect(analysis.entityAnnotations).not.toBe undefined
+        expect(analysis.textAnnotations).not.toBe undefined
+        expect(analysis.languages).not.toBe undefined
+        expect(analysis.language).toEqual 'en'
+        expect(Object.keys(analysis.entities).length).toEqual 9
+        expect(Object.keys(analysis.entityAnnotations).length).toEqual 9
+        expect(Object.keys(analysis.textAnnotations).length).toEqual 3
+        expect(Object.keys(analysis.languages).length).toEqual 1
+    )
+
+    it 'finds entities for all the text annotations', inject((AnalysisService, $httpBackend, $rootScope) ->
+
+      # Get the mock-up analysis.
+      $.ajax('base/app/assets/eight_players_joined.json',
+        async: false
+      ).done (data) ->
+
+        # Catch all the requests to Freebase.
+        $httpBackend.when('HEAD', /.*/).respond(200, '')
+
+        # Simulate event broadcasted by AnalysisService
+        analysis = AnalysisService.parse data, true
+
+        # Check that the analysis results conform.
+        expect(analysis).toEqual jasmine.any(Object)
+        expect(analysis.language).not.toBe undefined
+        expect(analysis.entities).not.toBe undefined
+        expect(analysis.entityAnnotations).not.toBe undefined
+        expect(analysis.textAnnotations).not.toBe undefined
+        expect(analysis.languages).not.toBe undefined
+        expect(analysis.language).toEqual 'en'
+        expect(Object.keys(analysis.entities).length).toEqual 44
+        expect(Object.keys(analysis.entityAnnotations).length).toEqual 46
+        expect(Object.keys(analysis.textAnnotations).length).toEqual 18
+        expect(Object.keys(analysis.languages).length).toEqual 1
+
+        for id, textAnnotation of analysis.textAnnotations
+          expect(Object.keys(textAnnotation.entityAnnotations).length).toBeGreaterThan 0
+    )
+
+    it 'parses correctly entity annotations that are related to more than one text annotation', inject((AnalysisService, $httpBackend, $rootScope) ->
+
+      # Get the mock-up analysis.
+      $.ajax('base/app/assets/sparql.json',
+        async: false
+      ).done (data) ->
+
+        # Catch all the requests to Freebase.
+        $httpBackend.when('HEAD', /.*/).respond(200, '')
+
+        # Simulate event broadcasted by AnalysisService
+        analysis = AnalysisService.parse data, true
+
+        # Check that the analysis results conform.
+        expect(analysis).toEqual jasmine.any(Object)
+        expect(analysis.language).not.toBe undefined
+        expect(analysis.entities).not.toBe undefined
+        expect(analysis.entityAnnotations).not.toBe undefined
+        expect(analysis.textAnnotations).not.toBe undefined
+        expect(analysis.languages).not.toBe undefined
+        expect(analysis.language).toEqual 'en'
+#        expect(Object.keys(analysis.entities).length).toEqual 44
+        expect(Object.keys(analysis.entityAnnotations).length).toEqual 21
+        expect(Object.keys(analysis.textAnnotations).length).toEqual 12
 #        expect(Object.keys(analysis.languages).length).toEqual 1
-#    )
-#
-#    it 'finds entities for all the text annotations', inject((AnalysisService, $httpBackend, $rootScope) ->
-#
-#      # Get the mock-up analysis.
-#      $.ajax('base/app/assets/eight_players_joined.json',
-#        async: false
-#      ).done (data) ->
-#
-#        # Catch all the requests to Freebase.
-#        $httpBackend.when('HEAD', /.*/).respond(200, '')
-#
-#        # Simulate event broadcasted by AnalysisService
-#        analysis = AnalysisService.parse data, true
-#
-#        # Check that the analysis results conform.
-#        expect(analysis).toEqual jasmine.any(Object)
-#        expect(analysis.language).not.toBe undefined
-#        expect(analysis.entities).not.toBe undefined
-#        expect(analysis.entityAnnotations).not.toBe undefined
-#        expect(analysis.textAnnotations).not.toBe undefined
-#        expect(analysis.languages).not.toBe undefined
-#        expect(analysis.language).toEqual 'en'
-##        expect(Object.keys(analysis.entities).length).toEqual 34
-##        expect(Object.keys(analysis.entityAnnotations).length).toEqual 34
-##        expect(Object.keys(analysis.textAnnotations).length).toEqual 18
-##        expect(Object.keys(analysis.languages).length).toEqual 1
-#
-#        for id, textAnnotation of analysis.textAnnotations
-#          dump textAnnotation.id
-#          expect(Object.keys(textAnnotation.entityAnnotations).length).toBeGreaterThan 0
-#    )
-#
-#  describe 'EditorService', ->
-#
-#    it "embeds analysis results also when there are parentheses in the selected text", inject( (AnalysisService, EditorService, $httpBackend) ->
-#
-#      # Get the mock-up analysis.
-#      $.ajax('base/app/assets/tim_berners-lee_2.json',
-#        async: false
-#      ).done (data) ->
-#
-#        # Catch all the requests to Freebase.
-#        $httpBackend.when('HEAD', /.*/).respond(200, '')
-#
-#        # Simulate event broadcasted by AnalysisService
-#        analysis = AnalysisService.parse data, true
-#        # Check that the analysis results conform.
-#        expect(analysis).toEqual jasmine.any(Object)
-#
-#        EditorService.embedAnalysis analysis
-#
-#    )
+
+        for textAnnotationId, textAnnotation of analysis.textAnnotations
+#          dump "[ text-annotation id :: #{textAnnotationId} ][ selected text :: #{textAnnotation.selectedText} ][ entity annotations count :: #{Object.keys(textAnnotation.entityAnnotations).length} ]"
+          expect(Object.keys(textAnnotation.entityAnnotations).length).toBeGreaterThan 0
+#          for entityAnnotationId, entityAnnotation of textAnnotation.entityAnnotations
+#            dump "[ entity-annotation id :: #{entityAnnotationId} ]"
+
+    )
+
+  describe 'EditorService', ->
+
+    it "embeds analysis results also when there are parentheses in the selected text", inject( (AnalysisService, EditorService, $httpBackend) ->
+
+      # Get the mock-up analysis.
+      $.ajax('base/app/assets/tim_berners-lee_2.json',
+        async: false
+      ).done (data) ->
+
+        # Catch all the requests to Freebase.
+        $httpBackend.when('HEAD', /.*/).respond(200, '')
+
+        # Simulate event broadcasted by AnalysisService
+        analysis = AnalysisService.parse data, true
+        # Check that the analysis results conform.
+        expect(analysis).toEqual jasmine.any(Object)
+
+        EditorService.embedAnalysis analysis
+
+    )

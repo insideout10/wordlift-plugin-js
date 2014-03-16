@@ -65,7 +65,8 @@ angular.module( 'AnalysisService', [] )
       #  * organization
       #  * place
       getKnownType = (types) ->
-        return null if not types?
+        return 'thing' if not types?
+
         typesArray = if angular.isArray types then types else [ types ]
         return 'person'       for type in typesArray when 'http://schema.org/Person' is expand(type)
         return 'person'       for type in typesArray when 'http://rdf.freebase.com/ns/people.person' is expand(type)
@@ -89,6 +90,8 @@ angular.module( 'AnalysisService', [] )
         types      = get('@type', item)
         sameAs     = get('http://www.w3.org/2002/07/owl#sameAs', item)
         sameAs     = if angular.isArray sameAs then sameAs else [ sameAs ]
+
+#        console.log "createEntity [ id :: #{id} ][ language :: #{language} ][ types :: #{types} ][ sameAs :: #{sameAs} ]"
 
         # Get all the thumbnails; for each thumbnail execute the provided function.
         thumbnails = get(
@@ -153,30 +156,44 @@ angular.module( 'AnalysisService', [] )
 #              entity.thumbnail  = entity.thumbnails[0] if 0 < entity.thumbnails.length'
 
         # return the entity.
+#        console.log "createEntity [ entity id :: #{entity.id} ][ language :: #{language} ][ types :: #{types} ][ sameAs :: #{sameAs} ]"
         entity
 
       createEntityAnnotation = (item) ->
-        entity = entities[get('http://fise.iks-project.eu/ontology/entity-reference', item)]
-#        console.log "createEntityAnnotation [ entity :: #{entity} ]"
+        reference = get('http://fise.iks-project.eu/ontology/entity-reference', item)
+        entity = entities[reference]
+
+#        console.log "[ reference :: #{reference} ][ entity :: #{entity} ]"
         # If the referenced entity is not found, return null
         return null if not entity?
 
-        # get the related text annotation.
-        textAnnotation = textAnnotations[get('http://purl.org/dc/terms/relation', item)]
+        # Get the text annotation id.
+        id = get('@id', item)
 
+        # get the related text annotation.
+        relations = get('http://purl.org/dc/terms/relation', item)
+        # Ensure we're dealing with an array.
+        relations = if angular.isArray relations then relations else [ relations ]
+
+        # Create an entity annotation.
         entityAnnotation = {
-          id        : get('@id', item),
-          label     : get('http://fise.iks-project.eu/ontology/entity-label', item),
-          confidence: get('http://fise.iks-project.eu/ontology/confidence', item),
-          entity    : entity,
-          relation  : textAnnotations[get('http://purl.org/dc/terms/relation', item)],
+          id        : id
+          label     : get('http://fise.iks-project.eu/ontology/entity-label', item)
+          confidence: get('http://fise.iks-project.eu/ontology/confidence', item)
+          entity    : entity
+          relation  : null
           _item     : item
         }
 
-        # create a binding from the textannotation to the entity.
-        textAnnotation.entityAnnotations[entityAnnotation.id] = entityAnnotation if textAnnotation?
+        # For each text annotation bound to this entity annotation, create an entity annotation and add it to the text annotation.
+        for relation in relations
+          textAnnotation = textAnnotations[relation]
+#          console.log "[ id :: #{id} ][ relation :: #{relation} ][ entity id :: #{entity.id} ][ text annotation :: #{textAnnotation} ]"
 
-        # return the entity.
+          # Create a binding from the textannotation to the entity annotation.
+          textAnnotation.entityAnnotations[entityAnnotation.id] = entityAnnotation if textAnnotation?
+
+        # Return the annotations.
         entityAnnotation
 
 
@@ -349,16 +366,20 @@ angular.module( 'AnalysisService', [] )
       textAnnotations[id] = createTextAnnotation(item) for id, item of textAnnotations
 
       # Create entity annotations instances.
-      entityAnnotations[id] = createEntityAnnotation(item) for id, item of entityAnnotations
+      for id, item of entityAnnotations
+#        console.log "[ id :: #{id} ]"
+        entityAnnotations[id] = createEntityAnnotation(item)
 
       # For every text annotation delete entity annotations that refer to the same entity (after merging).
       if merge
         # Cycle in text annotations.
-        for id, textAnnotation of textAnnotations
+        for textAnnotationId, textAnnotation of textAnnotations
           # Cycle in entity annotations.
           for id, entityAnnotation of textAnnotation.entityAnnotations
+#            console.log "[ text-annotation id :: #{textAnnotationId} ][ entity-annotation id :: #{entityAnnotation.id} ]"
             # Check if there are entity annotations referring to the same entity, and if so, delete it.
             for anotherId, anotherEntityAnnotation of textAnnotation.entityAnnotations when id isnt anotherId and entityAnnotation.entity is anotherEntityAnnotation.entity
+#              console.log "[ id :: #{id} ][ another id :: #{anotherId} ]"
               delete textAnnotation.entityAnnotations[anotherId]
 
       # return the analysis result.
