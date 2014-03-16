@@ -223,31 +223,33 @@
             return entity;
           };
           createEntityAnnotation = function(item) {
-            var entity, entityAnnotation, id, reference, relation, relations, textAnnotation, _i, _len;
+            var annotations, entity, entityAnnotation, id, reference, relation, relations, textAnnotation, _i, _len;
             reference = get('http://fise.iks-project.eu/ontology/entity-reference', item);
             entity = entities[reference];
             if (entity == null) {
               return null;
             }
+            annotations = [];
             id = get('@id', item);
             relations = get('http://purl.org/dc/terms/relation', item);
             relations = angular.isArray(relations) ? relations : [relations];
-            entityAnnotation = {
-              id: id,
-              label: get('http://fise.iks-project.eu/ontology/entity-label', item),
-              confidence: get('http://fise.iks-project.eu/ontology/confidence', item),
-              entity: entity,
-              relation: null,
-              _item: item
-            };
             for (_i = 0, _len = relations.length; _i < _len; _i++) {
               relation = relations[_i];
               textAnnotation = textAnnotations[relation];
+              entityAnnotation = {
+                id: id,
+                label: get('http://fise.iks-project.eu/ontology/entity-label', item),
+                confidence: get('http://fise.iks-project.eu/ontology/confidence', item),
+                entity: entity,
+                relation: textAnnotation,
+                _item: item
+              };
               if (textAnnotation != null) {
                 textAnnotation.entityAnnotations[entityAnnotation.id] = entityAnnotation;
               }
+              annotations.push(entityAnnotation);
             }
-            return entityAnnotation;
+            return annotations[0];
           };
           createTextAnnotation = function(item) {
             return {

@@ -555,7 +555,9 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span> <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> entity?</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span> <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> entity?
+
+        annotations = []</pre></div></div>
             
         </li>
         
@@ -611,18 +613,12 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-28">&#182;</a>
               </div>
-              <p>Create an entity annotation.</p>
+              <p>For each text annotation bound to this entity annotation, create an entity annotation and add it to the text annotation.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        entityAnnotation = {
-          id        : id
-          label     : get(<span class="hljs-string">'http://fise.iks-project.eu/ontology/entity-label'</span>, item)
-          <span class="hljs-attribute">confidence</span>: get(<span class="hljs-string">'http://fise.iks-project.eu/ontology/confidence'</span>, item)
-          entity    : entity
-          relation  : <span class="hljs-literal">null</span>
-          _item     : item
-        }</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">for</span> relation <span class="hljs-keyword">in</span> relations
+          textAnnotation = textAnnotations[relation]</pre></div></div>
             
         </li>
         
@@ -633,12 +629,18 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-29">&#182;</a>
               </div>
-              <p>For each text annotation bound to this entity annotation, create an entity annotation and add it to the text annotation.</p>
+              <p>Create an entity annotation.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">for</span> relation <span class="hljs-keyword">in</span> relations
-          textAnnotation = textAnnotations[relation]</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          entityAnnotation = {
+            id        : id
+            label     : get(<span class="hljs-string">'http://fise.iks-project.eu/ontology/entity-label'</span>, item)
+            <span class="hljs-attribute">confidence</span>: get(<span class="hljs-string">'http://fise.iks-project.eu/ontology/confidence'</span>, item)
+            entity    : entity
+            relation  : textAnnotation
+            _item     : item
+          }</pre></div></div>
             
         </li>
         
@@ -666,7 +668,9 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          textAnnotation.entityAnnotations[entityAnnotation.id] = entityAnnotation <span class="hljs-keyword">if</span> textAnnotation?</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          textAnnotation.entityAnnotations[entityAnnotation.id] = entityAnnotation <span class="hljs-keyword">if</span> textAnnotation?
+
+          annotations.push entityAnnotation</pre></div></div>
             
         </li>
         
@@ -681,7 +685,7 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        entityAnnotation
+            <div class="content"><div class='highlight'><pre>        annotations[<span class="hljs-number">0</span>]
 
 
       <span class="hljs-function"><span class="hljs-title">createTextAnnotation</span> = <span class="hljs-params">(item)</span> -&gt;</span>

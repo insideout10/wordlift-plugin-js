@@ -167,6 +167,8 @@ angular.module( 'AnalysisService', [] )
         # If the referenced entity is not found, return null
         return null if not entity?
 
+        annotations = []
+
         # Get the text annotation id.
         id = get('@id', item)
 
@@ -175,26 +177,29 @@ angular.module( 'AnalysisService', [] )
         # Ensure we're dealing with an array.
         relations = if angular.isArray relations then relations else [ relations ]
 
-        # Create an entity annotation.
-        entityAnnotation = {
-          id        : id
-          label     : get('http://fise.iks-project.eu/ontology/entity-label', item)
-          confidence: get('http://fise.iks-project.eu/ontology/confidence', item)
-          entity    : entity
-          relation  : null
-          _item     : item
-        }
-
         # For each text annotation bound to this entity annotation, create an entity annotation and add it to the text annotation.
         for relation in relations
           textAnnotation = textAnnotations[relation]
+
+            # Create an entity annotation.
+          entityAnnotation = {
+            id        : id
+            label     : get('http://fise.iks-project.eu/ontology/entity-label', item)
+            confidence: get('http://fise.iks-project.eu/ontology/confidence', item)
+            entity    : entity
+            relation  : textAnnotation
+            _item     : item
+          }
+
 #          console.log "[ id :: #{id} ][ relation :: #{relation} ][ entity id :: #{entity.id} ][ text annotation :: #{textAnnotation} ]"
 
           # Create a binding from the textannotation to the entity annotation.
           textAnnotation.entityAnnotations[entityAnnotation.id] = entityAnnotation if textAnnotation?
 
+          annotations.push entityAnnotation
+
         # Return the annotations.
-        entityAnnotation
+        annotations[0]
 
 
       createTextAnnotation = (item) ->
