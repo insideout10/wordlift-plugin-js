@@ -25,7 +25,8 @@ tinymce.init
     theme_advanced_toolbar_align : "left"
     theme_advanced_statusbar_location : "bottom"
     theme_advanced_resizing : true
-
+    # Add custom attributes for spane
+    extended_valid_elements : "span[id|class|itemscope|itemtype|itemid]"
     # Skin options
     skin : "o2k7"
     skin_variant : "silver"

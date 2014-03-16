@@ -441,16 +441,16 @@
       var service;
       service = {
         embedAnalysis: function(analysis) {
-          var cleanUp, content, id, isDirty, selPrefix, selSuffix, selText, spanre, textAnnotation, _ref;
+          var cleanUp, currentHtmlContent, id, isDirty, m, matchResult, r, r2, replace, selPrefix, selSuffix, selText, spanre, textAnnotation, _ref;
           cleanUp = function(text) {
             return text.replace('\\', '\\\\').replace('\(', '\\(').replace('\)', '\\)').replace('\n', '\\n?').replace('-', '\\-').replace('\x20', '\\s').replace('\xa0', '&nbsp;');
           };
-          content = tinyMCE.get('content').getContent({
+          currentHtmlContent = tinyMCE.get('content').getContent({
             format: 'raw'
           });
-          spanre = /<span class="textannotation"[^>]*>([^<]*)<\/span>/gi;
-          while (spanre.test(content)) {
-            content = content.replace(spanre, '$1');
+          spanre = new RegExp("<span[^>]+class=\"textannotation\"[^>]*>([^<]*)</span>", "gi");
+          while (spanre.test(currentHtmlContent)) {
+            currentHtmlContent = currentHtmlContent.replace(spanre, '$1');
           }
           _ref = analysis.textAnnotations;
           for (id in _ref) {
@@ -463,11 +463,20 @@
             if ('' === selSuffix) {
               selSuffix = '$|\\W';
             }
-            selText = textAnnotation.selectedText.replace('(', '\\(').replace(')', '\\)');
-            content = content.replace(new RegExp("(" + selPrefix + "(?:<[^>]+>){0,})(" + selText + ")((?:<[^>]+>){0,}" + selSuffix + ")(?![^<]*\"[^<]*>)"), "$1<span class=\"textannotation\" id=\"" + id + "\" typeof=\"http://fise.iks-project.eu/ontology/TextAnnotation\">$2</span>$3");
+            selText = textAnnotation.selectedText;
+            r = new RegExp("(" + selPrefix + "(?:<[^>]+>){0,})(" + selText + ")((?:<[^>]+>){0,}" + selSuffix + ")(?![^<]*\"[^<]*>)");
+            r2 = new RegExp("id=\"(urn:enhancement.[a-z,0-9,-]+)\"");
+            if (matchResult = currentHtmlContent.match(r)) {
+              replace = "" + matchResult[1] + "<span class=\"textannotation\" id=\"" + id + "\" typeof=\"http://fise.iks-project.eu/ontology/TextAnnotation\">" + matchResult[2] + "</span>" + matchResult[3];
+              if (r2.test(matchResult[1])) {
+                m = matchResult[1].replace(r2, "id=\"" + id + "\"");
+                replace = "" + m + matchResult[2] + matchResult[3];
+              }
+              currentHtmlContent = currentHtmlContent.replace(r, replace);
+            }
           }
           isDirty = tinyMCE.get('content').isDirty();
-          tinyMCE.get('content').setContent(content);
+          tinyMCE.get('content').setContent(currentHtmlContent);
           if (!isDirty) {
             tinyMCE.get('content').isNotDirty = 1;
           }

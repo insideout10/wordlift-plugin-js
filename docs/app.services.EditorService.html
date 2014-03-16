@@ -102,7 +102,7 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>angular.<span class="hljs-built_in">module</span>(<span class="hljs-string">'wordlift.tinymce.plugin.services.EditorService'</span>, [<span class="hljs-string">'wordlift.tinymce.plugin.config'</span>, <span class="hljs-string">'AnalysisService'</span>])
-  .service<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'EditorService'</span>, [<span class="hljs-string">'AnalysisService'</span>, <span class="hljs-string">'$rootScope'</span>, <span class="hljs-string">'$log'</span>, <span class="hljs-string">'Configuration'</span>, (AnalysisService, $rootScope, $log, Configuration) -&gt;
+.service<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'EditorService'</span>, [<span class="hljs-string">'AnalysisService'</span>, <span class="hljs-string">'$rootScope'</span>, <span class="hljs-string">'$log'</span>, <span class="hljs-string">'Configuration'</span>, (AnalysisService, $rootScope, $log, Configuration) -&gt;
 
 </span></span></pre></div></div>
             
@@ -151,8 +151,11 @@
             
             <div class="content"><div class='highlight'><pre>        <span class="hljs-function"><span class="hljs-title">cleanUp</span> = <span class="hljs-params">(text)</span> -&gt;</span>
           text
-            .replace(<span class="hljs-string">'\\'</span>, <span class="hljs-string">'\\\\'</span>).replace( <span class="hljs-string">'\('</span>, <span class="hljs-string">'\\('</span> ).replace( <span class="hljs-string">'\)'</span>, <span class="hljs-string">'\\)'</span>).replace(<span class="hljs-string">'\n'</span>, <span class="hljs-string">'\\n?'</span>)
-            .replace(<span class="hljs-string">'-'</span>, <span class="hljs-string">'\\-'</span>).replace(<span class="hljs-string">'\x20'</span>, <span class="hljs-string">'\\s'</span>).replace(<span class="hljs-string">'\xa0'</span>, <span class="hljs-string">'&amp;nbsp;'</span>)</pre></div></div>
+          .replace(<span class="hljs-string">'\\'</span>, <span class="hljs-string">'\\\\'</span>).replace( <span class="hljs-string">'\('</span>, <span class="hljs-string">'\\('</span> ).replace( <span class="hljs-string">'\)'</span>, <span class="hljs-string">'\\)'</span>).replace(<span class="hljs-string">'\n'</span>, <span class="hljs-string">'\\n?'</span>)
+          .replace(<span class="hljs-string">'-'</span>, <span class="hljs-string">'\\-'</span>).replace(<span class="hljs-string">'\x20'</span>, <span class="hljs-string">'\\s'</span>).replace(<span class="hljs-string">'\xa0'</span>, <span class="hljs-string">'&amp;nbsp;'</span>)
+
+
+        currentHtmlContent = tinyMCE.get(<span class="hljs-string">'content'</span>).getContent({format : <span class="hljs-string">'raw'</span>})</pre></div></div>
             
         </li>
         
@@ -163,11 +166,15 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
-              <p>Get the content in the TinyMCE editor.</p>
+              <p>Remove the existing text annotation spans.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        content = tinyMCE.get(<span class="hljs-string">'content'</span>).getContent({format : <span class="hljs-string">'raw'</span>})</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        spanre = <span class="hljs-keyword">new</span> RegExp(<span class="hljs-string">"&lt;span[^&gt;]+class=\"textannotation\"[^&gt;]*&gt;([^&lt;]*)&lt;/span&gt;"</span>,<span class="hljs-string">"gi"</span>)
+        <span class="hljs-keyword">while</span> spanre.test currentHtmlContent
+          currentHtmlContent = currentHtmlContent.replace spanre, <span class="hljs-string">'$1'</span>
+
+        <span class="hljs-keyword">for</span> id, textAnnotation <span class="hljs-keyword">of</span> analysis.textAnnotations</pre></div></div>
             
         </li>
         
@@ -178,15 +185,17 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
-              <p>Remove the existing text annotation spans.</p>
+              <p>console.log textAnnotation.id
+get the selection prefix and suffix for the regexp.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        spanre = <span class="hljs-regexp">/&lt;span class="textannotation"[^&gt;]*&gt;([^&lt;]*)&lt;\/span&gt;/gi</span>
-        <span class="hljs-keyword">while</span> spanre.test content
-          content = content.replace spanre, <span class="hljs-string">'$1'</span>
+            <div class="content"><div class='highlight'><pre>          selPrefix = cleanUp(textAnnotation.selectionPrefix.substr(-<span class="hljs-number">1</span>))
+          selPrefix = <span class="hljs-string">'^|\\W'</span> <span class="hljs-keyword">if</span> <span class="hljs-string">''</span> <span class="hljs-keyword">is</span> selPrefix
+          selSuffix = cleanUp(textAnnotation.selectionSuffix.substr(<span class="hljs-number">0</span>, <span class="hljs-number">1</span>))
+          selSuffix = <span class="hljs-string">'$|\\W'</span> <span class="hljs-keyword">if</span> <span class="hljs-string">''</span> <span class="hljs-keyword">is</span> selSuffix
 
-        <span class="hljs-keyword">for</span> id, textAnnotation <span class="hljs-keyword">of</span> analysis.textAnnotations</pre></div></div>
+          selText   = textAnnotation.selectedText</pre></div></div>
             
         </li>
         
@@ -197,16 +206,13 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
-              <p>get the selection prefix and suffix for the regexp.</p>
+              <p>the new regular expression, may not match everything.
+TODO: enhance the matching.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          selPrefix = cleanUp(textAnnotation.selectionPrefix.substr(-<span class="hljs-number">1</span>))
-          selPrefix = <span class="hljs-string">'^|\\W'</span> <span class="hljs-keyword">if</span> <span class="hljs-string">''</span> <span class="hljs-keyword">is</span> selPrefix
-          selSuffix = cleanUp(textAnnotation.selectionSuffix.substr(<span class="hljs-number">0</span>, <span class="hljs-number">1</span>))
-          selSuffix = <span class="hljs-string">'$|\\W'</span> <span class="hljs-keyword">if</span> <span class="hljs-string">''</span> <span class="hljs-keyword">is</span> selSuffix
-
-          selText   = textAnnotation.selectedText.replace(<span class="hljs-string">'('</span>, <span class="hljs-string">'\\('</span>).replace(<span class="hljs-string">')'</span>, <span class="hljs-string">'\\)'</span>)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          r = <span class="hljs-keyword">new</span> RegExp(<span class="hljs-string">"(<span class="hljs-subst">#{selPrefix}</span>(?:&lt;[^&gt;]+&gt;){0,})(<span class="hljs-subst">#{selText}</span>)((?:&lt;[^&gt;]+&gt;){0,}<span class="hljs-subst">#{selSuffix}</span>)(?![^&lt;]*\"[^&lt;]*&gt;)"</span>)
+          r2 = <span class="hljs-keyword">new</span> RegExp(<span class="hljs-string">"id=\"(urn:enhancement.[a-z,0-9,-]+)\""</span>)</pre></div></div>
             
         </li>
         
@@ -217,17 +223,21 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
-              <p>TODO: enhance the matching.</p>
+              <p>If there are disambiguated entities
+the span is not added while the existing span id is replaced</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          content = content.replace(
-            <span class="hljs-keyword">new</span> RegExp(<span class="hljs-string">"(<span class="hljs-subst">#{selPrefix}</span>(?:&lt;[^&gt;]+&gt;){0,})(<span class="hljs-subst">#{selText}</span>)((?:&lt;[^&gt;]+&gt;){0,}<span class="hljs-subst">#{selSuffix}</span>)(?![^&lt;]*\"[^&lt;]*&gt;)"</span>),
-            <span class="hljs-string">"$1&lt;span class=\"textannotation\" id=\"<span class="hljs-subst">#{id}</span>\" typeof=\"http://fise.iks-project.eu/ontology/TextAnnotation\"&gt;$2&lt;/span&gt;$3"</span>
-          )
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">if</span> matchResult = currentHtmlContent.match r
+            replace = <span class="hljs-string">"<span class="hljs-subst">#{matchResult[<span class="hljs-number">1</span>]}</span>&lt;span class=\"textannotation\" id=\"<span class="hljs-subst">#{id}</span>\" typeof=\"http://fise.iks-project.eu/ontology/TextAnnotation\"&gt;<span class="hljs-subst">#{matchResult[<span class="hljs-number">2</span>]}</span>&lt;/span&gt;<span class="hljs-subst">#{matchResult[<span class="hljs-number">3</span>]}</span>"</span>
+            <span class="hljs-keyword">if</span> r2.test matchResult[<span class="hljs-number">1</span>]
+              m = matchResult[<span class="hljs-number">1</span>].replace r2,<span class="hljs-string">"id=\"<span class="hljs-subst">#{id}</span>\""</span>
+              replace = <span class="hljs-string">"<span class="hljs-subst">#{m}</span><span class="hljs-subst">#{matchResult[<span class="hljs-number">2</span>]}</span><span class="hljs-subst">#{matchResult[<span class="hljs-number">3</span>]}</span>"</span>
+
+            currentHtmlContent = currentHtmlContent.replace( r, replace )
 
         isDirty = tinyMCE.get(<span class="hljs-string">'content'</span>).isDirty()
-        tinyMCE.get(<span class="hljs-string">'content'</span>).setContent content
+        tinyMCE.get(<span class="hljs-string">'content'</span>).setContent currentHtmlContent
         tinyMCE.get(<span class="hljs-string">'content'</span>).isNotDirty = <span class="hljs-number">1</span> <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> isDirty</pre></div></div>
             
         </li>
@@ -391,10 +401,10 @@ Send the provided content for analysis using the <a href="app.services.AnalysisS
         el   = elem.target
 
         top  = $(<span class="hljs-string">'#content_ifr'</span>).offset().top - $(<span class="hljs-string">'body'</span>).scrollTop() +
-               el.offsetTop - $(ed.getBody()).scrollTop()
+        el.offsetTop - $(ed.getBody()).scrollTop()
 
         left = $(<span class="hljs-string">'#content_ifr'</span>).offset().left - $(<span class="hljs-string">'body'</span>).scrollLeft() +
-               el.offsetLeft - $(ed.getBody()).scrollLeft()</pre></div></div>
+        el.offsetLeft - $(ed.getBody()).scrollLeft()</pre></div></div>
             
         </li>
         
