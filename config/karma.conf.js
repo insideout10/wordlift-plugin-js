@@ -35,7 +35,6 @@ module.exports = function(config){
         'app/js/test.init.coffee',
         'app/js/wordlift.min.js',
         'test/lib/angular/angular-mocks.js',
-        'test/unit/**/*.js',
         'test/unit/**/*.coffee'
     ],
 

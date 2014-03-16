@@ -94,7 +94,7 @@
           });
         },
         parse: function(data, merge) {
-          var containsOrEquals, context, createEntity, createEntityAnnotation, createLanguage, createTextAnnotation, dctype, entities, entity, entityAnnotation, entityAnnotations, expand, get, getA, getKnownType, getLanguage, graph, id, item, key, language, languages, mergeEntities, mergeUnique, prefixes, textAnnotations, types, value, _i, _len;
+          var containsOrEquals, context, createEntity, createEntityAnnotation, createLanguage, createTextAnnotation, dctype, entities, entity, entityAnnotation, entityAnnotations, expand, get, getA, getKnownType, getLanguage, graph, id, item, language, languages, mergeEntities, mergeUnique, textAnnotations, types, _i, _len;
           if (merge == null) {
             merge = false;
           }
@@ -186,9 +186,9 @@
             var entity, id, sameAs, thumbnails, types;
             id = get('@id', item);
             types = get('@type', item);
-            sameAs = get('owl:sameAs', item);
+            sameAs = get('http://www.w3.org/2002/07/owl#sameAs', item);
             sameAs = angular.isArray(sameAs) ? sameAs : [sameAs];
-            thumbnails = get(['foaf:depiction', 'http://rdf.freebase.com/ns/common.topic.image', 'schema:image'], item, function(values) {
+            thumbnails = get(['http://xmlns.com/foaf/0.1/depiction', 'http://rdf.freebase.com/ns/common.topic.image', 'http://schema.org/image'], item, function(values) {
               var match, value, _i, _len, _results;
               values = angular.isArray(values) ? values : [values];
               _results = [];
@@ -209,14 +209,14 @@
               thumbnails: thumbnails,
               type: getKnownType(types),
               types: types,
-              label: getLanguage('rdfs:label', item, language),
-              labels: get('rdfs:label', item),
+              label: getLanguage('http://www.w3.org/2000/01/rdf-schema#label', item, language),
+              labels: get('http://www.w3.org/2000/01/rdf-schema#label', item),
               sameAs: sameAs,
               source: id.match('^http://rdf.freebase.com/.*$') ? 'freebase' : id.match('^http://dbpedia.org/.*$') ? 'dbpedia' : 'wordlift',
               _item: item
             };
-            entity.description = getLanguage(['rdfs:comment', 'http://rdf.freebase.com/ns/common.topic.description', 'schema:description'], item, language);
-            entity.descriptions = get(['rdfs:comment', 'http://rdf.freebase.com/ns/common.topic.description', 'schema:description'], item);
+            entity.description = getLanguage(['http://www.w3.org/2000/01/rdf-schema#comment', 'http://rdf.freebase.com/ns/common.topic.description', 'http://schema.org/description'], item, language);
+            entity.descriptions = get(['http://www.w3.org/2000/01/rdf-schema#comment', 'http://rdf.freebase.com/ns/common.topic.description', 'http://schema.org/description'], item);
             if (entity.description == null) {
               entity.description = '';
             }
@@ -224,17 +224,17 @@
           };
           createEntityAnnotation = function(item) {
             var entity, entityAnnotation, textAnnotation;
-            entity = entities[get('enhancer:entity-reference', item)];
+            entity = entities[get('http://fise.iks-project.eu/ontology/entity-reference', item)];
             if (entity == null) {
               return null;
             }
-            textAnnotation = textAnnotations[get('dc:relation', item)];
+            textAnnotation = textAnnotations[get('http://purl.org/dc/terms/relation', item)];
             entityAnnotation = {
               id: get('@id', item),
-              label: get('enhancer:entity-label', item),
-              confidence: get('enhancer:confidence', item),
+              label: get('http://fise.iks-project.eu/ontology/entity-label', item),
+              confidence: get('http://fise.iks-project.eu/ontology/confidence', item),
               entity: entity,
-              relation: textAnnotations[get('dc:relation', item)],
+              relation: textAnnotations[get('http://purl.org/dc/terms/relation', item)],
               _item: item
             };
             if (textAnnotation != null) {
@@ -245,18 +245,18 @@
           createTextAnnotation = function(item) {
             return {
               id: get('@id', item),
-              selectedText: get('enhancer:selected-text', item)['@value'],
-              selectionPrefix: get('enhancer:selection-prefix', item)['@value'],
-              selectionSuffix: get('enhancer:selection-suffix', item)['@value'],
-              confidence: get('enhancer:confidence', item),
+              selectedText: get('http://fise.iks-project.eu/ontology/selected-text', item)['@value'],
+              selectionPrefix: get('http://fise.iks-project.eu/ontology/selection-prefix', item)['@value'],
+              selectionSuffix: get('http://fise.iks-project.eu/ontology/selection-suffix', item)['@value'],
+              confidence: get('http://fise.iks-project.eu/ontology/confidence', item),
               entityAnnotations: {},
               _item: item
             };
           };
           createLanguage = function(item) {
             return {
-              code: get('dc:language', item),
-              confidence: get('enhancer:confidence', item),
+              code: get('http://purl.org/dc/terms/language', item),
+              confidence: get('http://fise.iks-project.eu/ontology/confidence', item),
               _item: item
             };
           };
@@ -305,16 +305,25 @@
             return null;
           };
           containsOrEquals = function(what, where) {
-            var item, whatExp, whereArray, _i, _len;
+            var item, whatExp, whereArray, _i, _j, _len, _len1;
             if (where == null) {
               return false;
             }
             whereArray = angular.isArray(where) ? where : [where];
             whatExp = expand(what);
-            for (_i = 0, _len = whereArray.length; _i < _len; _i++) {
-              item = whereArray[_i];
-              if (whatExp === expand(item)) {
-                return true;
+            if ('@' === what.charAt(0)) {
+              for (_i = 0, _len = whereArray.length; _i < _len; _i++) {
+                item = whereArray[_i];
+                if (whatExp === expand(item)) {
+                  return true;
+                }
+              }
+            } else {
+              for (_j = 0, _len1 = whereArray.length; _j < _len1; _j++) {
+                item = whereArray[_j];
+                if (whatExp === expand(item)) {
+                  return true;
+                }
               }
             }
             return false;
@@ -352,32 +361,31 @@
           expand = function(content) {
             var matches, path, prefix, prepend;
             if (null === (matches = content.match(/([\w|\d]+):(.*)/))) {
-              return content;
+              prefix = content;
+              path = '';
+            } else {
+              prefix = matches[1];
+              path = matches[2];
             }
-            prefix = matches[1];
-            path = matches[2];
-            prepend = prefixes[prefix] != null ? prefixes[prefix] : "" + prefix + ":";
+            if (context[prefix] != null) {
+              prepend = angular.isString(context[prefix]) ? context[prefix] : context[prefix]['@id'];
+            } else {
+              prepend = prefix + ':';
+            }
             return prepend + path;
           };
           context = data['@context'] != null ? data['@context'] : {};
           graph = data['@graph'] != null ? data['@graph'] : {};
-          prefixes = [];
-          for (key in context) {
-            value = context[key];
-            if (-1 === key.indexOf(':') && angular.isString(value)) {
-              prefixes[key] = value;
-            }
-          }
           for (_i = 0, _len = graph.length; _i < _len; _i++) {
             item = graph[_i];
             id = item['@id'];
             types = item['@type'];
-            dctype = get('dc:type', item);
-            if (containsOrEquals('enhancer:TextAnnotation', types) && containsOrEquals('dc:LinguisticSystem', dctype)) {
+            dctype = get('http://purl.org/dc/terms/type', item);
+            if (containsOrEquals('http://fise.iks-project.eu/ontology/TextAnnotation', types) && containsOrEquals('http://purl.org/dc/terms/LinguisticSystem', dctype)) {
               languages.push(createLanguage(item));
-            } else if (containsOrEquals('enhancer:TextAnnotation', types)) {
+            } else if (containsOrEquals('http://fise.iks-project.eu/ontology/TextAnnotation', types)) {
               textAnnotations[id] = item;
-            } else if (containsOrEquals('enhancer:EntityAnnotation', types)) {
+            } else if (containsOrEquals('http://fise.iks-project.eu/ontology/EntityAnnotation', types)) {
               entityAnnotations[id] = item;
             } else {
               entities[id] = item;
