@@ -254,10 +254,10 @@ describe 'services', ->
 #        expect(Object.keys(analysis.languages).length).toEqual 1
 
         for textAnnotationId, textAnnotation of analysis.textAnnotations
-          dump "[ text-annotation id :: #{textAnnotationId} ][ selected text :: #{textAnnotation.selectedText} ][ entity annotations count :: #{Object.keys(textAnnotation.entityAnnotations).length} ]"
+#          dump "[ text-annotation id :: #{textAnnotationId} ][ selected text :: #{textAnnotation.selectedText} ][ entity annotations count :: #{Object.keys(textAnnotation.entityAnnotations).length} ]"
           expect(Object.keys(textAnnotation.entityAnnotations).length).toBeGreaterThan 0
-          for entityAnnotationId, entityAnnotation of textAnnotation.entityAnnotations
-            dump "[ entity-annotation id :: #{entityAnnotationId} ][ entity id :: #{entityAnnotation.entity.id} ][ confidence :: #{entityAnnotation.confidence} ]"
+#          for entityAnnotationId, entityAnnotation of textAnnotation.entityAnnotations
+#            dump "[ entity-annotation id :: #{entityAnnotationId} ][ entity id :: #{entityAnnotation.entity.id} ][ confidence :: #{entityAnnotation.confidence} ]"
 
         entityAnnotation1 = analysis.textAnnotations['urn:enhancement-9de365a0-3312-4927-0cbd-8735d460901d']
           .entityAnnotations['urn:enhancement-1c03bb72-6cfe-3dfc-ad7f-3082a5ce086b']
