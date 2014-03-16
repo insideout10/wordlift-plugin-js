@@ -11,13 +11,13 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
           .replace('\\', '\\\\').replace( '\(', '\\(' ).replace( '\)', '\\)').replace('\n', '\\n?')
           .replace('-', '\\-').replace('\x20', '\\s').replace('\xa0', '&nbsp;')
 
-
-        currentHtmlContent = tinyMCE.get('content').getContent({format : 'raw'})
+        # Get the TinyMCE editor content.
+        content = tinyMCE.get('content').getContent({format : 'raw'})
 
         # Remove the existing text annotation spans.
         spanre = new RegExp("<span[^>]+class=\"textannotation\"[^>]*>([^<]*)</span>","gi")
-        while spanre.test currentHtmlContent
-          currentHtmlContent = currentHtmlContent.replace spanre, '$1'
+        while spanre.test content
+          content = content.replace spanre, '$1'
 
         for id, textAnnotation of analysis.textAnnotations
 
@@ -28,7 +28,7 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
           selSuffix = cleanUp(textAnnotation.selectionSuffix.substr(0, 1))
           selSuffix = '$|\\W' if '' is selSuffix
 
-          selText   = textAnnotation.selectedText
+          selText   = textAnnotation.selectedText.replace('(', '\\(').replace(')', '\\)')
 
           # the new regular expression, may not match everything.
           # TODO: enhance the matching.
@@ -37,16 +37,16 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
 
           # If there are disambiguated entities
           # the span is not added while the existing span id is replaced
-          if matchResult = currentHtmlContent.match r
+          if matchResult = content.match r
             replace = "#{matchResult[1]}<span class=\"textannotation\" id=\"#{id}\" typeof=\"http://fise.iks-project.eu/ontology/TextAnnotation\">#{matchResult[2]}</span>#{matchResult[3]}"
             if r2.test matchResult[1]
               m = matchResult[1].replace r2,"id=\"#{id}\""
               replace = "#{m}#{matchResult[2]}#{matchResult[3]}"
 
-            currentHtmlContent = currentHtmlContent.replace( r, replace )
+            content = content.replace( r, replace )
 
         isDirty = tinyMCE.get('content').isDirty()
-        tinyMCE.get('content').setContent currentHtmlContent
+        tinyMCE.get('content').setContent content
         tinyMCE.get('content').isNotDirty = 1 if not isDirty
 
         # this event is raised when a textannotation is selected in the TinyMCE editor.
@@ -57,8 +57,6 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
             # send a message about the currently clicked annotation.
             $rootScope.$broadcast 'textAnnotationClicked', e.target.id, e
           )
-
-      ping: (message)    -> $log.debug message
 
     # <a name="analyze"></a>
     # Send the provided content for analysis using the [AnalysisService.analyze](app.services.AnalysisService.html#analyze) method.
