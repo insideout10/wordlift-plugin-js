@@ -242,7 +242,8 @@
                 confidence: get('http://fise.iks-project.eu/ontology/confidence', item),
                 entity: entity,
                 relation: textAnnotation,
-                _item: item
+                _item: item,
+                selected: false
               };
               if (textAnnotation != null) {
                 textAnnotation.entityAnnotations[entityAnnotation.id] = entityAnnotation;

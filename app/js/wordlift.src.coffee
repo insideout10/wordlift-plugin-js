@@ -313,6 +313,7 @@ angular.module( 'AnalysisService', [] )
             entity    : entity
             relation  : textAnnotation
             _item     : item
+            selected  : false
           }
 
 #          console.log "[ id :: #{id} ][ relation :: #{relation} ][ entity id :: #{entity.id} ][ text annotation :: #{textAnnotation} ]"

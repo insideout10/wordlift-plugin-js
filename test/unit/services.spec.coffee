@@ -254,11 +254,26 @@ describe 'services', ->
 #        expect(Object.keys(analysis.languages).length).toEqual 1
 
         for textAnnotationId, textAnnotation of analysis.textAnnotations
-#          dump "[ text-annotation id :: #{textAnnotationId} ][ selected text :: #{textAnnotation.selectedText} ][ entity annotations count :: #{Object.keys(textAnnotation.entityAnnotations).length} ]"
+          dump "[ text-annotation id :: #{textAnnotationId} ][ selected text :: #{textAnnotation.selectedText} ][ entity annotations count :: #{Object.keys(textAnnotation.entityAnnotations).length} ]"
           expect(Object.keys(textAnnotation.entityAnnotations).length).toBeGreaterThan 0
-#          for entityAnnotationId, entityAnnotation of textAnnotation.entityAnnotations
-#            dump "[ entity-annotation id :: #{entityAnnotationId} ]"
+          for entityAnnotationId, entityAnnotation of textAnnotation.entityAnnotations
+            dump "[ entity-annotation id :: #{entityAnnotationId} ][ entity id :: #{entityAnnotation.entity.id} ][ confidence :: #{entityAnnotation.confidence} ]"
 
+        entityAnnotation1 = analysis.textAnnotations['urn:enhancement-9de365a0-3312-4927-0cbd-8735d460901d']
+          .entityAnnotations['urn:enhancement-1c03bb72-6cfe-3dfc-ad7f-3082a5ce086b']
+        entityAnnotation2 = analysis.textAnnotations['urn:enhancement-d791d926-23e9-61f9-7b67-6414586bc49e']
+          .entityAnnotations['urn:enhancement-1c03bb72-6cfe-3dfc-ad7f-3082a5ce086b']
+
+        expect(entityAnnotation1).not.toBe undefined
+        expect(entityAnnotation2).not.toBe undefined
+
+        expect(entityAnnotation1).not.toBe entityAnnotation2
+        expect(entityAnnotation1.selected).toBe false
+        expect(entityAnnotation2.selected).toBe false
+
+        entityAnnotation1.selected = true
+        expect(entityAnnotation1.selected).toBe true
+        expect(entityAnnotation2.selected).toBe false
     )
 
   describe 'EditorService', ->

@@ -130,7 +130,114 @@ describe 'directives', ->
         # Check that the select event has been called.
         expect(scope.select).toHaveBeenCalledWith(scope.textAnnotation, null)
 
-    ) 
+    )
+
+    # Test entity is not empty.
+    it 'works well with entity annotations that relate to one or more text annotation', inject(($compile, $rootScope, AnalysisService, $httpBackend) ->
+      # Create a mock select method.
+      scope.select = (ta, ea) -> # Do nothing
+      spyOn scope, 'select'
+
+      # Compile the directive.
+      $compile(element)(scope)
+      scope.$digest()
+
+      # Get the mock-up analysis.
+      $.ajax('base/app/assets/sparql.json',
+        async: false
+      ).done (data) ->
+
+        # Catch all the requests to Freebase.
+        $httpBackend.when('HEAD', /.*/).respond(200, '')
+
+        # Simulate event broadcasted by AnalysisService
+        $rootScope.$broadcast 'analysisReceived', AnalysisService.parse data, true
+
+        # Create a fake textAnnotation element (the textAnnotation exists in the mockup data).
+        elements = []
+        elements[0] = angular.element '<span id="urn:enhancement-d791d926-23e9-61f9-7b67-6414586bc49e" class="textannotation">Lorem Ipsum</span>'
+        elements[1] = angular.element '<span id="urn:enhancement-9de365a0-3312-4927-0cbd-8735d460901d" class="textannotation">Lorem Ipsum</span>'
+        elements[2] = angular.element '<span id="urn:enhancement-aaf7f73e-910a-3516-1f58-d5c41c42ab0b" class="textannotation">Lorem Ipsum</span>'
+
+        entityAnnotations = []
+        entityAnnotations[0] = 'urn:enhancement-ee057616-a5b7-e0c1-1111-24d2304417ff'
+        entityAnnotations[1] = 'urn:enhancement-1c03bb72-6cfe-3dfc-ad7f-3082a5ce086b'
+
+
+        dump elements
+
+        # Simulate event broadcasted by EditorService on annotation click
+        $rootScope.$broadcast 'textAnnotationClicked', elements[0].attr('id'), { target: elements[0] }
+        scope.$digest()
+
+        entities = element.find('wl-entity > div')
+        expect(entities.length).toEqual 2
+
+        entities[0].click()
+
+        # Simulate event broadcasted by EditorService on annotation click
+        $rootScope.$broadcast 'textAnnotationClicked', elements[1].attr('id'), { target: elements[1] }
+        scope.$digest()
+
+        entities = element.find('wl-entity > div')
+        expect(entities.length).toEqual 1
+
+        entities[0].click()
+
+        # Simulate event broadcasted by EditorService on annotation click
+        $rootScope.$broadcast 'textAnnotationClicked', elements[2].attr('id'), { target: elements[2] }
+        scope.$digest()
+
+        entities = element.find('wl-entity > div')
+        expect(entities.length).toEqual 3
+
+        for id, entityAnnotation of scope.textAnnotation.entityAnnotations
+          expect(entityAnnotation.selected).toBe false
+
+
+      #        entityAnnotation1 = analysis.textAnnotations['urn:enhancement-9de365a0-3312-4927-0cbd-8735d460901d']
+#        .entityAnnotations['urn:enhancement-1c03bb72-6cfe-3dfc-ad7f-3082a5ce086b']
+#        entityAnnotation2 = analysis.textAnnotations['urn:enhancement-d791d926-23e9-61f9-7b67-6414586bc49e']
+#        .entityAnnotations['urn:enhancement-1c03bb72-6cfe-3dfc-ad7f-3082a5ce086b']
+
+#        DUMP: '[ text-annotation id :: urn:enhancement-d791d926-23e9-61f9-7b67-6414586bc49e ][ selected text :: RDF query language ][ entity annotations count :: 2 ]'
+#      DUMP: '[ entity-annotation id :: urn:enhancement-1c03bb72-6cfe-3dfc-ad7f-3082a5ce086b ][ entity id :: http://dbpedia.org/resource/RDF_query_language ][ confidence :: 0.30222222 ]'
+#      DUMP: '[ entity-annotation id :: urn:enhancement-ee057616-a5b7-e0c1-1111-24d2304417ff ][ entity id :: http://dbpedia.org/resource/SPARQL ][ confidence :: 1 ]'
+#
+#      DUMP: '[ text-annotation id :: urn:enhancement-aaf7f73e-910a-3516-1f58-d5c41c42ab0b ][ selected text :: query language ][ entity annotations count :: 3 ]'
+#      DUMP: '[ entity-annotation id :: urn:enhancement-7aa0d159-7539-5b8f-a056-633710f8ef4f ][ entity id :: http://dbpedia.org/resource/RDF_query_language ][ confidence :: 0.34 ]'
+#      DUMP: '[ entity-annotation id :: urn:enhancement-d20e08d7-87fa-0ced-0dd2-216daa10b911 ][ entity id :: http://dbpedia.org/resource/Query_language ][ confidence :: 0.3157143 ]'
+#      DUMP: '[ entity-annotation id :: urn:enhancement-ee057616-a5b7-e0c1-1111-24d2304417ff ][ entity id :: http://dbpedia.org/resource/SPARQL ][ confidence :: 1 ]'
+#
+#      DUMP: '[ text-annotation id :: urn:enhancement-9de365a0-3312-4927-0cbd-8735d460901d ][ selected text :: RDF Query Language ][ entity annotations count :: 1 ]'
+#      DUMP: '[ entity-annotation id :: urn:enhancement-1c03bb72-6cfe-3dfc-ad7f-3082a5ce086b ][ entity id :: http://dbpedia.org/resource/RDF_query_language ][ confidence :: 0.30222222 ]'
+#
+#        # Set the ID of the entity annotations (from the mock file).
+#        id1 = 'urn:enhancement-1c03bb72-6cfe-3dfc-ad7f-3082a5ce086b'
+#        id2 = 'urn:enhancement-26a923a4-fbb8-b39d-53ad-e2922474b7fc'
+#
+#        # Click the first entity.
+#        entitiesElems[1].click()
+#        expect(scope.textAnnotation.entityAnnotations[id1].selected).toBe true
+#        expect(scope.textAnnotation.entityAnnotations[id2].selected).toBe false
+#        # Check that the select event has been called.
+#        expect(scope.select).toHaveBeenCalledWith(scope.textAnnotation, scope.textAnnotation.entityAnnotations[id1])
+#
+#        # Click on the second entity.
+#        entitiesElems[2].click()
+#        expect(scope.textAnnotation.entityAnnotations[id1].selected).toBe false
+#        expect(scope.textAnnotation.entityAnnotations[id2].selected).toBe true
+#        # Check that the select event has been called.
+#        expect(scope.select).toHaveBeenCalledWith(scope.textAnnotation, scope.textAnnotation.entityAnnotations[id2])
+#
+#        # Click again on the second entity.
+#        entitiesElems[2].click()
+#        expect(scope.textAnnotation.entityAnnotations[id1].selected).toBe false
+#        expect(scope.textAnnotation.entityAnnotations[id2].selected).toBe false
+#        # Check that the select event has been called.
+#        expect(scope.select).toHaveBeenCalledWith(scope.textAnnotation, null)
+
+    )
 
   describe 'wlEntityInputBoxes', ->
     scope = undefined
