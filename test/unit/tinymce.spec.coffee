@@ -81,38 +81,6 @@ describe "TinyMCE tests", ->
 
       $httpBackend.expectPOST('/base/app/assets/english.json?action=wordlift_analyze')
         .respond 200, data
-#      $httpBackend.expect('HEAD', 'http://upload.wikimedia.org/wikipedia/commons/a/a6/Flag_of_Rome.svg')
-#        .respond 200, ''
-#      $httpBackend.expect('HEAD', 'http://upload.wikimedia.org/wikipedia/commons/a/a3/Rome_Georgia_from_Myrtle_Hill_Cemetery.jpg')
-#        .respond 200, ''
-#      $httpBackend.expect('HEAD', 'http://upload.wikimedia.org/wikipedia/commons/6/6a/OneidaCoCourthouse-Beale.jpg')
-#        .respond 200, ''
-#      $httpBackend.expect('HEAD', 'http://upload.wikimedia.org/wikipedia/commons/a/a4/Sw-horz-w3c.png')
-#        .respond 200, ''
-#      $httpBackend.expect('HEAD', 'http://upload.wikimedia.org/wikipedia/commons/2/20/WordPress_logo.svg')
-#        .respond 200, ''
-#      $httpBackend.expect('HEAD', 'https://usercontent.googleapis.com/freebase/v1/image/m/05thd8b?maxwidth=4096&maxheight=4096')
-#        .respond 200, ''
-#      $httpBackend.expect('HEAD', 'https://usercontent.googleapis.com/freebase/v1/image/m/04js6kc?maxwidth=4096&maxheight=4096')
-#        .respond 200, ''
-#      $httpBackend.expect('HEAD', 'https://usercontent.googleapis.com/freebase/v1/image/m/04js6kq?maxwidth=4096&maxheight=4096')
-#        .respond 200, ''
-#      $httpBackend.expect('HEAD', 'https://usercontent.googleapis.com/freebase/v1/image/m/04mn0b4?maxwidth=4096&maxheight=4096')
-#        .respond 200, ''
-#      $httpBackend.expect('HEAD', 'https://usercontent.googleapis.com/freebase/v1/image/m/04mn0bt?maxwidth=4096&maxheight=4096')
-#        .respond 200, ''
-#      $httpBackend.expect('HEAD', 'https://usercontent.googleapis.com/freebase/v1/image/m/0djtw4k?maxwidth=4096&maxheight=4096')
-#        .respond 200, ''
-#      $httpBackend.expect('HEAD', 'https://usercontent.googleapis.com/freebase/v1/image/m/0p7qbkp?maxwidth=4096&maxheight=4096')
-#        .respond 200, ''
-#      $httpBackend.expect('HEAD', 'https://usercontent.googleapis.com/freebase/v1/image/m/0kybkyc?maxwidth=4096&maxheight=4096')
-#        .respond 200, ''
-#      $httpBackend.expect('HEAD', 'https://usercontent.googleapis.com/freebase/v1/image/m/0kybl3w?maxwidth=4096&maxheight=4096')
-#        .respond 200, ''
-#      $httpBackend.expect('HEAD', 'https://usercontent.googleapis.com/freebase/v1/image/m/0kyblb5?maxwidth=4096&maxheight=4096')
-#        .respond 200, ''
-#      $httpBackend.expect('HEAD', 'https://usercontent.googleapis.com/freebase/v1/image/m/0kyblkj?maxwidth=4096&maxheight=4096')
-#        .respond 200, ''
 
       # Call the analyze method of the editor.
       EditorService.analyze ed.getContent { format: 'text' }
@@ -172,5 +140,3 @@ describe "TinyMCE tests", ->
         text = match[2]
         expect(textAnnotations[id]).not.toBe null
         expect(textAnnotations[id].selectedText).toEqual text
-
-

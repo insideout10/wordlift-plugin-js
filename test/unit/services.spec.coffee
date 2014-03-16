@@ -199,3 +199,24 @@ describe 'services', ->
         expect(Object.keys(analysis.textAnnotations).length).toEqual 3
         expect(Object.keys(analysis.languages).length).toEqual 1
     )
+
+  describe 'EditorService', ->
+
+    it "embeds analysis results also when there are parentheses in the selected text", inject( (AnalysisService, EditorService, $httpBackend) ->
+
+      # Get the mock-up analysis.
+      $.ajax('base/app/assets/tim_berners-lee_2.json',
+        async: false
+      ).done (data) ->
+
+        # Catch all the requests to Freebase.
+        $httpBackend.when('HEAD', /.*/).respond(200, '')
+
+        # Simulate event broadcasted by AnalysisService
+        analysis = AnalysisService.parse data, true
+        # Check that the analysis results conform.
+        expect(analysis).toEqual jasmine.any(Object)
+
+        EditorService.embedAnalysis analysis
+
+    )

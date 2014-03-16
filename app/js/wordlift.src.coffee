@@ -522,12 +522,13 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
             .replace('-', '\\-').replace('\x20', '\\s').replace('\xa0', '&nbsp;')
 
 
-        currentHtmlContent = tinyMCE.get('content').getContent({format : 'raw'})
+        # Get the content in the TinyMCE editor.
+        content = tinyMCE.get('content').getContent({format : 'raw'})
 
         # Remove the existing text annotation spans.
         spanre = /<span class="textannotation"[^>]*>([^<]*)<\/span>/gi
-        while spanre.test currentHtmlContent
-          currentHtmlContent = currentHtmlContent.replace spanre, '$1'
+        while spanre.test content
+          content = content.replace spanre, '$1'
 
         for id, textAnnotation of analysis.textAnnotations
           # get the selection prefix and suffix for the regexp.
@@ -536,18 +537,16 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
           selSuffix = cleanUp(textAnnotation.selectionSuffix.substr(0, 1))
           selSuffix = '$|\\W' if '' is selSuffix
 
-          selText   = textAnnotation.selectedText
+          selText   = textAnnotation.selectedText.replace('(', '\\(').replace(')', '\\)')
 
-          # the new regular expression, may not match everything.
           # TODO: enhance the matching.
-          r = new RegExp("(#{selPrefix}(?:<[^>]+>){0,})(#{selText})((?:<[^>]+>){0,}#{selSuffix})(?![^<]*\"[^<]*>)")
-
-          replace = "$1<span class=\"textannotation\" id=\"#{id}\" typeof=\"http://fise.iks-project.eu/ontology/TextAnnotation\">$2</span>$3"
-
-          currentHtmlContent = currentHtmlContent.replace( r, replace )
+          content = content.replace(
+            new RegExp("(#{selPrefix}(?:<[^>]+>){0,})(#{selText})((?:<[^>]+>){0,}#{selSuffix})(?![^<]*\"[^<]*>)"),
+            "$1<span class=\"textannotation\" id=\"#{id}\" typeof=\"http://fise.iks-project.eu/ontology/TextAnnotation\">$2</span>$3"
+          )
 
         isDirty = tinyMCE.get('content').isDirty()
-        tinyMCE.get('content').setContent currentHtmlContent
+        tinyMCE.get('content').setContent content
         tinyMCE.get('content').isNotDirty = 1 if not isDirty
 
         # this event is raised when a textannotation is selected in the TinyMCE editor.

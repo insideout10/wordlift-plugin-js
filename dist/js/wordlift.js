@@ -441,16 +441,16 @@
       var service;
       service = {
         embedAnalysis: function(analysis) {
-          var cleanUp, currentHtmlContent, id, isDirty, r, replace, selPrefix, selSuffix, selText, spanre, textAnnotation, _ref;
+          var cleanUp, content, id, isDirty, selPrefix, selSuffix, selText, spanre, textAnnotation, _ref;
           cleanUp = function(text) {
             return text.replace('\\', '\\\\').replace('\(', '\\(').replace('\)', '\\)').replace('\n', '\\n?').replace('-', '\\-').replace('\x20', '\\s').replace('\xa0', '&nbsp;');
           };
-          currentHtmlContent = tinyMCE.get('content').getContent({
+          content = tinyMCE.get('content').getContent({
             format: 'raw'
           });
           spanre = /<span class="textannotation"[^>]*>([^<]*)<\/span>/gi;
-          while (spanre.test(currentHtmlContent)) {
-            currentHtmlContent = currentHtmlContent.replace(spanre, '$1');
+          while (spanre.test(content)) {
+            content = content.replace(spanre, '$1');
           }
           _ref = analysis.textAnnotations;
           for (id in _ref) {
@@ -463,13 +463,11 @@
             if ('' === selSuffix) {
               selSuffix = '$|\\W';
             }
-            selText = textAnnotation.selectedText;
-            r = new RegExp("(" + selPrefix + "(?:<[^>]+>){0,})(" + selText + ")((?:<[^>]+>){0,}" + selSuffix + ")(?![^<]*\"[^<]*>)");
-            replace = "$1<span class=\"textannotation\" id=\"" + id + "\" typeof=\"http://fise.iks-project.eu/ontology/TextAnnotation\">$2</span>$3";
-            currentHtmlContent = currentHtmlContent.replace(r, replace);
+            selText = textAnnotation.selectedText.replace('(', '\\(').replace(')', '\\)');
+            content = content.replace(new RegExp("(" + selPrefix + "(?:<[^>]+>){0,})(" + selText + ")((?:<[^>]+>){0,}" + selSuffix + ")(?![^<]*\"[^<]*>)"), "$1<span class=\"textannotation\" id=\"" + id + "\" typeof=\"http://fise.iks-project.eu/ontology/TextAnnotation\">$2</span>$3");
           }
           isDirty = tinyMCE.get('content').isDirty();
-          tinyMCE.get('content').setContent(currentHtmlContent);
+          tinyMCE.get('content').setContent(content);
           if (!isDirty) {
             tinyMCE.get('content').isNotDirty = 1;
           }
