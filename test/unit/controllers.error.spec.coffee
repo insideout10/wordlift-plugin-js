@@ -8,11 +8,16 @@ describe "Controllers: ErrorController", ->
     # Create the scope for the controller.
     scope = $rootScope.$new()
 
+    element = angular.element.find '#wl-error-controller'
+
     # Set-up the spy on the event receiver.
     spyOn(scope, '$on').and.callThrough()
 
     # Set-up the ErrorController.
-    controller = $controller 'ErrorController', {$scope: scope}
+    controller = $controller 'ErrorController', {
+      $scope: scope
+      $element: element
+    }
 
   )
 
@@ -27,9 +32,16 @@ describe "Controllers: ErrorController", ->
 
       $httpBackend.when('HEAD', /.*/).respond(200, '')
 
+      # Check for the dialog box not to be visible.
+      expect($('#wl-error-controller')).not.toBeVisible()
+
       # Parse and merge the data.
       AnalysisService.parse data, true
 
       # Check that the error event has been called.
       expect(scope.$on).toHaveBeenCalledWith('error', jasmine.any(Function))
+      scope.$digest()
+
+      # Check that the dialog box is now visible.
+      expect($('#wl-error-controller')).toBeVisible()
   )

@@ -8,7 +8,9 @@ angular.module('wordlift.tinymce.plugin', ['wordlift.tinymce.plugin.controllers'
 $(
   container = $('''
     <div id="wl-app" class="wl-app">
-      <div id="wl-error-controller" class="wl-error-controller" ng-controller="ErrorController"></div>
+      <div id="wl-error-controller" class="wl-error-controller" ng-controller="ErrorController">
+        <p ng-bind="message"></p>
+      </div>
       <div id="wordlift-disambiguation-popover" class="metabox-holder" ng-controller="EntitiesController">
         <div class="postbox">
           <div class="handlediv" title="Click to toggle"><br></div>

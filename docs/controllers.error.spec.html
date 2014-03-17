@@ -140,7 +140,9 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    scope = $rootScope.$<span class="hljs-keyword">new</span>()</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    scope = $rootScope.$<span class="hljs-keyword">new</span>()
+
+    element = angular.element <span class="hljs-string">'&lt;div&gt;&lt;/div&gt;'</span></pre></div></div>
             
         </li>
         
@@ -170,7 +172,10 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    controller = $controller <span class="hljs-string">'ErrorController'</span>, {<span class="hljs-attribute">$scope</span>: scope}
+            <div class="content"><div class='highlight'><pre>    controller = $controller <span class="hljs-string">'ErrorController'</span>, {
+      <span class="hljs-attribute">$scope</span>: scope
+      <span class="hljs-attribute">$element</span>: element
+    }
 
   )
 
@@ -197,7 +202,9 @@
       $httpBackend.expectPOST(<span class="hljs-string">'/base/app/assets/english.json?action=wordlift_analyze'</span>)
       .respond <span class="hljs-number">200</span>, data
 
-      $httpBackend.<span class="hljs-keyword">when</span>(<span class="hljs-string">'HEAD'</span>, <span class="hljs-regexp">/.*/</span>).respond(<span class="hljs-number">200</span>, <span class="hljs-string">''</span>)</pre></div></div>
+      $httpBackend.<span class="hljs-keyword">when</span>(<span class="hljs-string">'HEAD'</span>, <span class="hljs-regexp">/.*/</span>).respond(<span class="hljs-number">200</span>, <span class="hljs-string">''</span>)
+
+      expect($(<span class="hljs-string">'#wl-error-controller'</span>)).<span class="hljs-keyword">not</span>.toBeVisible()</pre></div></div>
             
         </li>
         
@@ -228,6 +235,9 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>      expect(scope.$<span class="hljs-literal">on</span>).toHaveBeenCalledWith(<span class="hljs-string">'error'</span>, jasmine.any(Function))
+      scope.$digest()
+
+      expect($(<span class="hljs-string">'#wl-error-controller'</span>)).toBeVisible()
   )</pre></div></div>
             
         </li>

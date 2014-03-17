@@ -140,7 +140,9 @@
             <div class="content"><div class='highlight'><pre>$(
   container = $(<span class="hljs-string">'''
     &lt;div id="wl-app" class="wl-app"&gt;
-      &lt;div id="wl-error-controller" class="wl-error-controller" ng-controller="ErrorController"&gt;&lt;/div&gt;
+      &lt;div id="wl-error-controller" class="wl-error-controller" ng-controller="ErrorController"&gt;
+        &lt;p ng-bind="message"&gt;&lt;/p&gt;
+      &lt;/div&gt;
       &lt;div id="wordlift-disambiguation-popover" class="metabox-holder" ng-controller="EntitiesController"&gt;
         &lt;div class="postbox"&gt;
           &lt;div class="handlediv" title="Click to toggle"&gt;&lt;br&gt;&lt;/div&gt;

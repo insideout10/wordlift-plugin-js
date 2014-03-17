@@ -16,6 +16,7 @@ module.exports = function(config){
         {pattern: 'app/lib/tinymce/jscripts/tiny_mce/themes/**/*.gif', watched: false, served: true, included: false },
         {pattern: 'app/lib/tinymce/jscripts/tiny_mce/themes/**/*.png', watched: false, served: true, included: false },
         {pattern: 'app/lib/tinymce/jscripts/tiny_mce/langs/**/*.js', watched: false, served: true, included: false },
+        {pattern: 'app/lib/jquery-ui-1.10.3/themes/base/images/*.png', watched: false, served: true, included: false },
 
         // Serve HTML files.
         {pattern: 'app/**/*.html', watched: false, served: true, included: false },
@@ -30,12 +31,14 @@ module.exports = function(config){
         'app/lib/angular/angular.js',
         'app/lib/angular/angular-*.js',
         'app/lib/jquery-ui-1.10.3/ui/jquery-ui.js',
+        'app/lib/jquery-ui-1.10.3/ui/jquery.ui.dialog.js',
         'app/lib/jasmine-jquery.js',
         'app/lib/tinymce/jscripts/tiny_mce/tiny_mce.js',
         'app/js/test.init.coffee',
         'app/js/wordlift.min.js',
         'test/lib/angular/angular-mocks.js',
-        'test/unit/**/*.coffee'
+        'test/unit/**/*.coffee',
+        'app/lib/jquery-ui-1.10.3/themes/base/*.css'
     ],
 
     exclude : [

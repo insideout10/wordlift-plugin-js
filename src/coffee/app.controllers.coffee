@@ -87,7 +87,21 @@ angular.module('wordlift.tinymce.plugin.controllers',
           $('#wordlift-disambiguation-popover').show()
 
   ])
-.controller('ErrorController', ['$scope', '$log', ($scope, $log) ->
+.controller('ErrorController', ['$element', '$scope', '$log', ($element, $scope, $log) ->
 
-    $scope.$on 'error', (message) -> $log.info "ErrorController [ message :: #{message} ]"
+    # Set the element as a jQuery UI Dialog.
+    element = $($element).dialog
+      title: 'WordLift'
+      dialogClass: 'wp-dialog'
+      modal: true
+      autoOpen: false
+      closeOnEscape: true
+      buttons:
+        Ok: -> $(this).dialog 'close'
+
+    # Show the dialog box when an error is raised.
+    $scope.$on 'error', (event, message) ->
+      $scope.message = message
+      element.dialog 'open'
+
   ])

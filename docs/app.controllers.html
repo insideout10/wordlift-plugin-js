@@ -392,12 +392,50 @@
             <div class="content"><div class='highlight'><pre>          $(<span class="hljs-string">'#wordlift-disambiguation-popover'</span>).show()
 
   ])
-.controller<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'ErrorController'</span>, [<span class="hljs-string">'$scope'</span>, <span class="hljs-string">'$log'</span>, ($scope, $log) -&gt;
+.controller<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'ErrorController'</span>, [<span class="hljs-string">'$element'</span>, <span class="hljs-string">'$scope'</span>, <span class="hljs-string">'$log'</span>, ($element, $scope, $log) -&gt;
 
-    $scope.$<span class="hljs-literal">on</span> <span class="hljs-string">'error'</span>, (message) -&gt; $log.info <span class="hljs-string">"ErrorController [ message :: <span class="hljs-subst">#{message}</span> ]"</span>
-  ])</span>
+</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-18">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-18">&#182;</a>
+              </div>
+              <p>Set the element as a jQuery UI Dialog.</p>
 
-</span></pre></div></div>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    element = $($element).dialog
+      <span class="hljs-attribute">title</span>: <span class="hljs-string">'WordLift'</span>
+      <span class="hljs-attribute">dialogClass</span>: <span class="hljs-string">'wp-dialog'</span>
+      <span class="hljs-attribute">modal</span>: <span class="hljs-literal">true</span>
+      <span class="hljs-attribute">autoOpen</span>: <span class="hljs-literal">false</span>
+      <span class="hljs-attribute">closeOnEscape</span>: <span class="hljs-literal">true</span>
+      <span class="hljs-attribute">buttons</span>:
+        <span class="hljs-attribute">Ok</span>:<span class="hljs-function"> -&gt;</span> $(<span class="hljs-keyword">this</span>).dialog <span class="hljs-string">'close'</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-19">&#182;</a>
+              </div>
+              <p>Show the dialog box when an error is raised.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    $scope.$<span class="hljs-literal">on</span> <span class="hljs-string">'error'</span>, <span class="hljs-function"><span class="hljs-params">(event, message)</span> -&gt;</span>
+      $scope.message = message
+      element.dialog <span class="hljs-string">'open'</span>
+
+  ])</pre></div></div>
             
         </li>
         
