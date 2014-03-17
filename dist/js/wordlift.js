@@ -1,5 +1,5 @@
 (function() {
-  var $, container, injector,
+  var $, CONTEXT, GRAPH, container, injector,
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   angular.module('wordlift.tinymce.plugin.config', []).constant('Configuration', {
@@ -68,6 +68,10 @@
       template: "<div class=\"wl-entity-input-boxes\" ng-repeat=\"textAnnotation in textAnnotations\">\n  <div ng-repeat=\"entityAnnotation in textAnnotation.entityAnnotations | filterObjectBy:'selected':true\">\n\n    <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][uri]' value='{{entityAnnotation.entity.id}}'>\n    <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][label]' value='{{entityAnnotation.entity.label}}'>\n    <textarea name='wl_entities[{{entityAnnotation.entity.id}}][description]'>{{entityAnnotation.entity.description}}</textarea>\n    <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][type]' value='{{entityAnnotation.entity.type}}'>\n\n    <input ng-repeat=\"image in entityAnnotation.entity.thumbnails\" type='text'\n      name='wl_entities[{{entityAnnotation.entity.id}}][image][]' value='{{image}}'>\n    <input ng-repeat=\"sameAs in entityAnnotation.entity.sameAs\" type='text'\n      name='wl_entities[{{entityAnnotation.entity.id}}][sameas][]' value='{{sameAs}}'>\n\n  </div>\n</div>"
     };
   });
+
+  CONTEXT = '@context';
+
+  GRAPH = '@graph';
 
   angular.module('AnalysisService', []).service('AnalysisService', [
     '$http', '$q', '$rootScope', '$log', function($http, $q, $rootScope, $log) {
@@ -384,8 +388,12 @@
             }
             return prepend + path;
           };
-          context = data['@context'] != null ? data['@context'] : {};
-          graph = data['@graph'] != null ? data['@graph'] : {};
+          if (!((data[CONTEXT] != null) && (data[GRAPH] != null))) {
+            $rootScope.$broadcast('error', 'The analysis response is invalid. Please try again later.');
+            return false;
+          }
+          context = data[CONTEXT];
+          graph = data[GRAPH];
           for (_i = 0, _len = graph.length; _i < _len; _i++) {
             item = graph[_i];
             id = item['@id'];
@@ -663,6 +671,12 @@
           setArrowTop(pos.top - 50);
           return $('#wordlift-disambiguation-popover').show();
         }
+      });
+    }
+  ]).controller('ErrorController', [
+    '$scope', '$log', function($scope, $log) {
+      return $scope.$on('error', function(message) {
+        return $log.info(message);
       });
     }
   ]);

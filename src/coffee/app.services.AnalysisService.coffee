@@ -12,6 +12,10 @@
 #     * types      : a list of types as provided by the entity
 #     * thumbnails : URL to thumbnail images
 
+# Constants
+CONTEXT = '@context'
+GRAPH   = '@graph'
+
 angular.module( 'AnalysisService', [] )
   .service( 'AnalysisService', [ '$http', '$q', '$rootScope', '$log', ($http, $q, $rootScope, $log) ->
 
@@ -318,9 +322,14 @@ angular.module( 'AnalysisService', [] )
         # return the full path.
         prepend + path
 
+      # Check that the response is valid.
+      if not ( data[CONTEXT]? and data[GRAPH]? )
+        $rootScope.$broadcast 'error', 'The analysis response is invalid. Please try again later.'
+        return false
+
       # data is split in a context and a graph.
-      context  = if data['@context']? then data['@context'] else {}
-      graph    = if data['@graph']? then data['@graph'] else {}
+      context  = data[CONTEXT]
+      graph    = data[GRAPH]
 
       for item in graph
         id     = item['@id']

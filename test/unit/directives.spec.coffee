@@ -163,9 +163,6 @@ describe 'directives', ->
         entityAnnotations[0] = 'urn:enhancement-ee057616-a5b7-e0c1-1111-24d2304417ff'
         entityAnnotations[1] = 'urn:enhancement-1c03bb72-6cfe-3dfc-ad7f-3082a5ce086b'
 
-
-        dump elements
-
         # Simulate event broadcasted by EditorService on annotation click
         $rootScope.$broadcast 'textAnnotationClicked', elements[0].attr('id'), { target: elements[0] }
         scope.$digest()
