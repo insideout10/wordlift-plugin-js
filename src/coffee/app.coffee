@@ -7,35 +7,40 @@ angular.module('wordlift.tinymce.plugin', ['wordlift.tinymce.plugin.controllers'
 # Create the HTML fragment for the disambiguation popover that shows when a user clicks on a text annotation.
 $(
   container = $('''
-    <div id="wordlift-disambiguation-popover" class="metabox-holder">
-      <div class="postbox">
-        <div class="handlediv" title="Click to toggle"><br></div>
-        <h3 class="hndle"><span>Semantic Web</span></h3>
-        <div class="inside">
-          <form role="form">
-            <div class="form-group">
-              <div class="ui-widget">
-                <input type="text" class="form-control" id="search" placeholder="search or create">
+    <div id="wl-app" class="wl-app">
+      <div id="wl-error-controller" class="wl-error-controller" ng-controller="ErrorController"></div>
+      <div id="wordlift-disambiguation-popover" class="metabox-holder" ng-controller="EntitiesController">
+        <div class="postbox">
+          <div class="handlediv" title="Click to toggle"><br></div>
+          <h3 class="hndle"><span>Semantic Web</span></h3>
+          <div class="inside">
+            <form role="form">
+              <div class="form-group">
+                <div class="ui-widget">
+                  <input type="text" class="form-control" id="search" placeholder="search or create">
+                </div>
               </div>
-            </div>
 
-            <wl-entities on-select="onEntitySelected(textAnnotation, entityAnnotation)" text-annotation="textAnnotation"></wl-entities>
+              <wl-entities on-select="onEntitySelected(textAnnotation, entityAnnotation)" text-annotation="textAnnotation"></wl-entities>
 
-          </form>
+            </form>
 
-          <wl-entity-input-boxes text-annotations="analysis.textAnnotations"></wl-entity-input-boxes>
+            <wl-entity-input-boxes text-annotations="analysis.textAnnotations"></wl-entity-input-boxes>
+          </div>
         </div>
       </div>
     </div>
     ''')
   .appendTo('form[name=post]')
-  .css(
-      display: 'none'
-      height: $('body').height() - $('#wpadminbar').height() + 32
-      top: $('#wpadminbar').height() - 1
-      right: 0
-    )
-  .draggable()
+
+  $('#wordlift-disambiguation-popover')
+    .css(
+        display: 'none'
+        height: $('body').height() - $('#wpadminbar').height() + 32
+        top: $('#wpadminbar').height() - 1
+        right: 0
+      )
+    .draggable()
 
   $('#search').autocomplete
     source: ajaxurl + '?action=wordlift_search',
@@ -62,13 +67,13 @@ $(
 
   # When the user clicks on the handle, hide the popover.
   $('#wordlift-disambiguation-popover .handlediv').click (e) ->
-    container.hide()
+    $('#wordlift-disambiguation-popover').hide()
 
-  # Declare ng-controller as main app controller.
-  $('body').attr 'ng-controller', 'EntitiesController'
+#  # Declare ng-controller as main app controller.
+#  $('#wordlift-disambiguation-popover').attr 'ng-controller', 'EntitiesController'
 
   # Declare the whole document as bootstrap scope.
-  injector = angular.bootstrap(document, ['wordlift.tinymce.plugin']);
+  injector = angular.bootstrap $('#wl-app'), ['wordlift.tinymce.plugin']
 
   # Add WordLift as a plugin of the TinyMCE editor.
   tinymce.PluginManager.add 'wordlift', (editor, url) ->
@@ -82,14 +87,6 @@ $(
         injector.invoke(['EditorService', (EditorService) ->
           EditorService.analyze tinyMCE.activeEditor.getContent({format: 'text'})
         ])
-
-  # <a name="editor.onChange.add"></a>
-  # Map the editor onChange event to the [EditorService.onChange](app.services.EditorService.html#onChange) method.
-#    editor.onChange.add (ed, l) ->
-#      # The [EditorService](app.services.EditorService.html) is invoked via the AngularJS injector.
-#      injector.invoke(['EditorService', (EditorService) ->
-#        EditorService.onChange ed, l
-#      ])
 
 )
 

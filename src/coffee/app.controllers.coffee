@@ -89,5 +89,5 @@ angular.module('wordlift.tinymce.plugin.controllers',
   ])
 .controller('ErrorController', ['$scope', '$log', ($scope, $log) ->
 
-    $scope.$on 'error', (message) -> $log.info message
+    $scope.$on 'error', (message) -> $log.info "ErrorController [ message :: #{message} ]"
   ])

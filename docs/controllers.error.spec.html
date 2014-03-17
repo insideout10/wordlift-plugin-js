@@ -125,8 +125,6 @@
             
             <div class="content"><div class='highlight'><pre>  beforeEach <span class="hljs-built_in">module</span>(<span class="hljs-string">'wordlift.tinymce.plugin.controllers'</span>)
   beforeEach inject<span class="hljs-function"><span class="hljs-params">(($controller, $rootScope) -&gt;
-    scope = $rootScope.$<span class="hljs-keyword">new</span>()
-
 </span></span></pre></div></div>
             
         </li>
@@ -138,16 +136,11 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-3">&#182;</a>
               </div>
-              <p>Set-up the ErrorController.</p>
+              <p>Create the scope for the controller.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    controller = $controller <span class="hljs-string">'ErrorController'</span>, {<span class="hljs-attribute">$scope</span>: scope}
-  )
-
-  it <span class="hljs-string">"receives errors from failed analysis"</span>, inject<span class="hljs-function"><span class="hljs-params">((AnalysisService, $httpBackend) -&gt;
-
-</span></span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>    scope = $rootScope.$<span class="hljs-keyword">new</span>()</pre></div></div>
             
         </li>
         
@@ -157,6 +150,42 @@
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>Set-up the spy on the event receiver.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    spyOn(scope, <span class="hljs-string">'$on'</span>).<span class="hljs-keyword">and</span>.callThrough()</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>Set-up the ErrorController.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    controller = $controller <span class="hljs-string">'ErrorController'</span>, {<span class="hljs-attribute">$scope</span>: scope}
+
+  )
+
+  it <span class="hljs-string">"receives errors from failed analysis"</span>, inject<span class="hljs-function"><span class="hljs-params">((AnalysisService, $httpBackend) -&gt;
+
+</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
               <p>Request the mock up of an errored analysis.</p>
 
@@ -173,17 +202,32 @@
         </li>
         
         
-        <li id="section-5">
+        <li id="section-7">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-5">&#182;</a>
+                <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
               <p>Parse and merge the data.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      AnalysisService.parse data, <span class="hljs-literal">true</span>
+            <div class="content"><div class='highlight'><pre>      AnalysisService.parse data, <span class="hljs-literal">true</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p>Check that the error event has been called.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      expect(scope.$<span class="hljs-literal">on</span>).toHaveBeenCalledWith(<span class="hljs-string">'error'</span>, jasmine.any(Function))
   )</pre></div></div>
             
         </li>

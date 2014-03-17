@@ -394,7 +394,7 @@
   ])
 .controller<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'ErrorController'</span>, [<span class="hljs-string">'$scope'</span>, <span class="hljs-string">'$log'</span>, ($scope, $log) -&gt;
 
-    $scope.$<span class="hljs-literal">on</span> <span class="hljs-string">'error'</span>, (message) -&gt; $log.info message
+    $scope.$<span class="hljs-literal">on</span> <span class="hljs-string">'error'</span>, (message) -&gt; $log.info <span class="hljs-string">"ErrorController [ message :: <span class="hljs-subst">#{message}</span> ]"</span>
   ])</span>
 
 </span></pre></div></div>

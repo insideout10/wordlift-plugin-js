@@ -139,35 +139,40 @@
             
             <div class="content"><div class='highlight'><pre>$(
   container = $(<span class="hljs-string">'''
-    &lt;div id="wordlift-disambiguation-popover" class="metabox-holder"&gt;
-      &lt;div class="postbox"&gt;
-        &lt;div class="handlediv" title="Click to toggle"&gt;&lt;br&gt;&lt;/div&gt;
-        &lt;h3 class="hndle"&gt;&lt;span&gt;Semantic Web&lt;/span&gt;&lt;/h3&gt;
-        &lt;div class="inside"&gt;
-          &lt;form role="form"&gt;
-            &lt;div class="form-group"&gt;
-              &lt;div class="ui-widget"&gt;
-                &lt;input type="text" class="form-control" id="search" placeholder="search or create"&gt;
+    &lt;div id="wl-app" class="wl-app"&gt;
+      &lt;div id="wl-error-controller" class="wl-error-controller" ng-controller="ErrorController"&gt;&lt;/div&gt;
+      &lt;div id="wordlift-disambiguation-popover" class="metabox-holder" ng-controller="EntitiesController"&gt;
+        &lt;div class="postbox"&gt;
+          &lt;div class="handlediv" title="Click to toggle"&gt;&lt;br&gt;&lt;/div&gt;
+          &lt;h3 class="hndle"&gt;&lt;span&gt;Semantic Web&lt;/span&gt;&lt;/h3&gt;
+          &lt;div class="inside"&gt;
+            &lt;form role="form"&gt;
+              &lt;div class="form-group"&gt;
+                &lt;div class="ui-widget"&gt;
+                  &lt;input type="text" class="form-control" id="search" placeholder="search or create"&gt;
+                &lt;/div&gt;
               &lt;/div&gt;
-            &lt;/div&gt;
 
-            &lt;wl-entities on-select="onEntitySelected(textAnnotation, entityAnnotation)" text-annotation="textAnnotation"&gt;&lt;/wl-entities&gt;
+              &lt;wl-entities on-select="onEntitySelected(textAnnotation, entityAnnotation)" text-annotation="textAnnotation"&gt;&lt;/wl-entities&gt;
 
-          &lt;/form&gt;
+            &lt;/form&gt;
 
-          &lt;wl-entity-input-boxes text-annotations="analysis.textAnnotations"&gt;&lt;/wl-entity-input-boxes&gt;
+            &lt;wl-entity-input-boxes text-annotations="analysis.textAnnotations"&gt;&lt;/wl-entity-input-boxes&gt;
+          &lt;/div&gt;
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
     '''</span>)
   .appendTo(<span class="hljs-string">'form[name=post]'</span>)
-  .css(
-      <span class="hljs-attribute">display</span>: <span class="hljs-string">'none'</span>
-      <span class="hljs-attribute">height</span>: $(<span class="hljs-string">'body'</span>).height() - $(<span class="hljs-string">'#wpadminbar'</span>).height() + <span class="hljs-number">32</span>
-      <span class="hljs-attribute">top</span>: $(<span class="hljs-string">'#wpadminbar'</span>).height() - <span class="hljs-number">1</span>
-      <span class="hljs-attribute">right</span>: <span class="hljs-number">0</span>
-    )
-  .draggable()
+
+  $(<span class="hljs-string">'#wordlift-disambiguation-popover'</span>)
+    .css(
+        <span class="hljs-attribute">display</span>: <span class="hljs-string">'none'</span>
+        <span class="hljs-attribute">height</span>: $(<span class="hljs-string">'body'</span>).height() - $(<span class="hljs-string">'#wpadminbar'</span>).height() + <span class="hljs-number">32</span>
+        <span class="hljs-attribute">top</span>: $(<span class="hljs-string">'#wpadminbar'</span>).height() - <span class="hljs-number">1</span>
+        <span class="hljs-attribute">right</span>: <span class="hljs-number">0</span>
+      )
+    .draggable()
 
   $(<span class="hljs-string">'#search'</span>).autocomplete
     <span class="hljs-attribute">source</span>: ajaxurl + <span class="hljs-string">'?action=wordlift_search'</span>,
@@ -206,7 +211,7 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>  $<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'#wordlift-disambiguation-popover .handlediv'</span>)</span>.<span class="hljs-title">click</span> <span class="hljs-params">(e)</span> -&gt;</span>
-    container.hide()</pre></div></div>
+    $(<span class="hljs-string">'#wordlift-disambiguation-popover'</span>).hide()</pre></div></div>
             
         </li>
         
@@ -217,11 +222,10 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
-              <p>Declare ng-controller as main app controller.</p>
+              <h1 id="declare-ng-controller-as-main-app-controller-">Declare ng-controller as main app controller.</h1>
+<p> $(‘#wordlift-disambiguation-popover’).attr ‘ng-controller’, ‘EntitiesController’</p>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre>  $(<span class="hljs-string">'body'</span>).attr <span class="hljs-string">'ng-controller'</span>, <span class="hljs-string">'EntitiesController'</span></pre></div></div>
             
         </li>
         
@@ -236,7 +240,7 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  injector = angular.bootstrap(<span class="hljs-built_in">document</span>, [<span class="hljs-string">'wordlift.tinymce.plugin'</span>]);</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  injector = angular.bootstrap $(<span class="hljs-string">'#wl-app'</span>), [<span class="hljs-string">'wordlift.tinymce.plugin'</span>]</pre></div></div>
             
         </li>
         
@@ -288,29 +292,11 @@
           EditorService.analyze tinyMCE.activeEditor.getContent({format: <span class="hljs-string">'text'</span>})
         ])</span>
 
+)
+
+
+
 </span></pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-10">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-10">&#182;</a>
-              </div>
-              <p><a name="editor.onChange.add"></a>
-Map the editor onChange event to the <a href="app.services.EditorService.html#onChange">EditorService.onChange</a> method.
-   editor.onChange.add (ed, l) -&gt;</p>
-<pre><code> <span class="hljs-comment"># The [EditorService](app.services.EditorService.html) is invoked via the AngularJS injector.</span>
- injector.invoke<span class="hljs-function"><span class="hljs-params">([<span class="hljs-string">'EditorService'</span>, (EditorService) -&gt;
-   EditorService.onChange ed, l
- ])</span></span>
-</code></pre>
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>
-)</pre></div></div>
             
         </li>
         
