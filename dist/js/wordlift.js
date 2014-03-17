@@ -76,7 +76,13 @@
   angular.module('AnalysisService', []).service('AnalysisService', [
     '$http', '$q', '$rootScope', '$log', function($http, $q, $rootScope, $log) {
       return {
+        promise: void 0,
         isRunning: false,
+        abort: function() {
+          if (this.isRunning && (this.promise != null)) {
+            return this.promise.resolve();
+          }
+        },
         analyze: function(content, merge) {
           var that;
           if (merge == null) {
@@ -87,14 +93,21 @@
           }
           this.isRunning = true;
           that = this;
-          return $http.post(ajaxurl + '?action=wordlift_analyze', {
-            data: content
+          this.promise = $q.defer();
+          return $http({
+            method: 'post',
+            url: ajaxurl + '?action=wordlift_analyze',
+            data: content,
+            timeout: this.promise.promise
           }).success(function(data, status, headers, config) {
             $rootScope.$broadcast('analysisReceived', that.parse(data, merge));
             return that.isRunning = false;
           }).error(function(data, status, headers, config) {
-            console.log('error received');
-            return that.isRunning = false;
+            that.isRunning = false;
+            if (0 === status) {
+              return;
+            }
+            return $rootScope.$broadcast('error', 'An error occurred while requesting an analysis.');
           });
         },
         parse: function(data, merge) {

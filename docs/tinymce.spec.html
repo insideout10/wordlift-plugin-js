@@ -106,7 +106,9 @@
               
             </div>
             
-            <div class="content"><div class='highlight'><pre>describe <span class="hljs-string">"TinyMCE tests"</span>,<span class="hljs-function"> -&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>describe <span class="hljs-string">"TinyMCE tests"</span>,<span class="hljs-function"> -&gt;</span>
+  beforeEach <span class="hljs-built_in">module</span>(<span class="hljs-string">'wordlift.tinymce.plugin.services'</span>)
+  beforeEach <span class="hljs-built_in">module</span>(<span class="hljs-string">'AnalysisService'</span>)</pre></div></div>
             
         </li>
         
@@ -136,7 +138,12 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  beforeEach<span class="hljs-function"> -&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  beforeEach<span class="hljs-function"> -&gt;</span>
+    ed = tinyMCE.get(<span class="hljs-string">'content'</span>)
+
+  afterEach inject <span class="hljs-function"><span class="hljs-params">($httpBackend)</span> -&gt;</span>
+    $httpBackend.verifyNoOutstandingExpectation()
+    $httpBackend.verifyNoOutstandingRequest()</pre></div></div>
             
         </li>
         
@@ -146,27 +153,6 @@
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-4">&#182;</a>
-              </div>
-              <p>Set a reference to the editor.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    ed = tinyMCE.get(<span class="hljs-string">'content'</span>)
-
-    <span class="hljs-built_in">module</span> <span class="hljs-string">'wordlift.tinymce.plugin.services'</span>
-
-  afterEach inject <span class="hljs-function"><span class="hljs-params">($httpBackend)</span> -&gt;</span>
-    $httpBackend.verifyNoOutstandingExpectation()
-    $httpBackend.verifyNoOutstandingRequest()</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-5">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
               <p>Clean up editor after each test</p>
 
@@ -179,11 +165,11 @@
         </li>
         
         
-        <li id="section-6">
+        <li id="section-5">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-6">&#182;</a>
+                <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
               <p>Check that the editor is loaded and that the WordLift plugin is loaded too.</p>
 
@@ -198,11 +184,11 @@
         </li>
         
         
-        <li id="section-7">
+        <li id="section-6">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-7">&#182;</a>
+                <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
               <p>Check that the editor content is empty.</p>
 
@@ -213,11 +199,11 @@
         </li>
         
         
-        <li id="section-8">
+        <li id="section-7">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-8">&#182;</a>
+                <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
               <p>Load the sample text in the editor.</p>
 
@@ -231,11 +217,11 @@
         </li>
         
         
-        <li id="section-9">
+        <li id="section-8">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-9">&#182;</a>
+                <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
               <p>Set the editor content</p>
 
@@ -246,11 +232,11 @@
         </li>
         
         
-        <li id="section-10">
+        <li id="section-9">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-10">&#182;</a>
+                <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
               <p>Check for the editor content not to be empty.</p>
 
@@ -263,11 +249,11 @@
         </li>
         
         
-        <li id="section-11">
+        <li id="section-10">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-11">&#182;</a>
+                <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
               <p>Check that the editor content is empty.</p>
 
@@ -278,11 +264,11 @@
         </li>
         
         
-        <li id="section-12">
+        <li id="section-11">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-12">&#182;</a>
+                <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
               <p>Load the sample text in the editor.</p>
 
@@ -295,11 +281,11 @@
         </li>
         
         
-        <li id="section-13">
+        <li id="section-12">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-13">&#182;</a>
+                <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
               <p>Set the editor content</p>
 
@@ -310,11 +296,11 @@
         </li>
         
         
-        <li id="section-14">
+        <li id="section-13">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-14">&#182;</a>
+                <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
               <p>Check editor content is set properly</p>
 
@@ -325,11 +311,11 @@
         </li>
         
         
-        <li id="section-15">
+        <li id="section-14">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-15">&#182;</a>
+                <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
               <p>Load the sample response.</p>
 
@@ -343,11 +329,11 @@
         </li>
         
         
-        <li id="section-16">
+        <li id="section-15">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-16">&#182;</a>
+                <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
               <p>Catch all the requests to Freebase.</p>
 
@@ -359,11 +345,11 @@
         </li>
         
         
-        <li id="section-17">
+        <li id="section-16">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-17">&#182;</a>
+                <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
               <p>Check that text annotation spans clean up works properly</p>
 
@@ -376,11 +362,11 @@
         </li>
         
         
-        <li id="section-18">
+        <li id="section-17">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-18">&#182;</a>
+                <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
               <p>Check that the editor content is empty.</p>
 
@@ -391,11 +377,11 @@
         </li>
         
         
-        <li id="section-19">
+        <li id="section-18">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-19">&#182;</a>
+                <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
               <p>Load the sample text in the editor.</p>
 
@@ -408,11 +394,11 @@
         </li>
         
         
-        <li id="section-20">
+        <li id="section-19">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-20">&#182;</a>
+                <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
               <p>Set the editor content</p>
 
@@ -423,11 +409,11 @@
         </li>
         
         
-        <li id="section-21">
+        <li id="section-20">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-21">&#182;</a>
+                <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
               <p>Check editor content is set properly</p>
 
@@ -438,11 +424,11 @@
         </li>
         
         
-        <li id="section-22">
+        <li id="section-21">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-22">&#182;</a>
+                <a class="pilcrow" href="#section-21">&#182;</a>
               </div>
               <p>Load the sample response.</p>
 
@@ -456,11 +442,11 @@
         </li>
         
         
-        <li id="section-23">
+        <li id="section-22">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-23">&#182;</a>
+                <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
               <p>Catch all the requests to Freebase.</p>
 
@@ -472,11 +458,11 @@
         </li>
         
         
-        <li id="section-24">
+        <li id="section-23">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-24">&#182;</a>
+                <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
               <p>Check that text annotation spans clean up works properly
 and disambiguated item is preserved</p>
@@ -490,11 +476,11 @@ and disambiguated item is preserved</p>
         </li>
         
         
-        <li id="section-25">
+        <li id="section-24">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-25">&#182;</a>
+                <a class="pilcrow" href="#section-24">&#182;</a>
               </div>
               <p>Spy on the analyze method of the AnalysisService</p>
 
@@ -505,11 +491,11 @@ and disambiguated item is preserved</p>
         </li>
         
         
-        <li id="section-26">
+        <li id="section-25">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-26">&#182;</a>
+                <a class="pilcrow" href="#section-25">&#182;</a>
               </div>
               <p>By default the analysis is running is false</p>
 
@@ -520,11 +506,11 @@ and disambiguated item is preserved</p>
         </li>
         
         
-        <li id="section-27">
+        <li id="section-26">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-27">&#182;</a>
+                <a class="pilcrow" href="#section-26">&#182;</a>
               </div>
               <p>Set the analysis as running</p>
 
@@ -535,11 +521,11 @@ and disambiguated item is preserved</p>
         </li>
         
         
-        <li id="section-28">
+        <li id="section-27">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-28">&#182;</a>
+                <a class="pilcrow" href="#section-27">&#182;</a>
               </div>
               <p>Check that the flag is true</p>
 
@@ -550,11 +536,11 @@ and disambiguated item is preserved</p>
         </li>
         
         
-        <li id="section-29">
+        <li id="section-28">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-29">&#182;</a>
+                <a class="pilcrow" href="#section-28">&#182;</a>
               </div>
               <p>Call the analyze method of the editor.</p>
 
@@ -565,11 +551,11 @@ and disambiguated item is preserved</p>
         </li>
         
         
-        <li id="section-30">
+        <li id="section-29">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-30">&#182;</a>
+                <a class="pilcrow" href="#section-29">&#182;</a>
               </div>
               <p>The analysis service shouldn’t have been called</p>
 
@@ -583,11 +569,11 @@ and disambiguated item is preserved</p>
         </li>
         
         
-        <li id="section-31">
+        <li id="section-30">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-31">&#182;</a>
+                <a class="pilcrow" href="#section-30">&#182;</a>
               </div>
               <p>Spy on the analyze method of the AnalysisService</p>
 
@@ -598,11 +584,11 @@ and disambiguated item is preserved</p>
         </li>
         
         
-        <li id="section-32">
+        <li id="section-31">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-32">&#182;</a>
+                <a class="pilcrow" href="#section-31">&#182;</a>
               </div>
               <p>Spy on the editor embedAnalysis method of the EditorService</p>
 
@@ -613,11 +599,11 @@ and disambiguated item is preserved</p>
         </li>
         
         
-        <li id="section-33">
+        <li id="section-32">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-33">&#182;</a>
+                <a class="pilcrow" href="#section-32">&#182;</a>
               </div>
               <p>Spy on the root scope.</p>
 
@@ -628,11 +614,11 @@ and disambiguated item is preserved</p>
         </li>
         
         
-        <li id="section-34">
+        <li id="section-33">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-34">&#182;</a>
+                <a class="pilcrow" href="#section-33">&#182;</a>
               </div>
               <p>By default the analysis is running is false</p>
 
@@ -643,11 +629,11 @@ and disambiguated item is preserved</p>
         </li>
         
         
-        <li id="section-35">
+        <li id="section-34">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-35">&#182;</a>
+                <a class="pilcrow" href="#section-34">&#182;</a>
               </div>
               <p>Load the sample response.</p>
 
@@ -657,18 +643,17 @@ and disambiguated item is preserved</p>
       <span class="hljs-attribute">async</span>: <span class="hljs-literal">false</span>
 
     ).done <span class="hljs-function"><span class="hljs-params">(data)</span> -&gt;</span>
-
       $httpBackend.expectPOST(<span class="hljs-string">'/base/app/assets/english.json?action=wordlift_analyze'</span>)
-        .respond <span class="hljs-number">200</span>, data</pre></div></div>
+      .respond <span class="hljs-number">200</span>, data</pre></div></div>
             
         </li>
         
         
-        <li id="section-36">
+        <li id="section-35">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-36">&#182;</a>
+                <a class="pilcrow" href="#section-35">&#182;</a>
               </div>
               <p>Call the analyze method of the editor.</p>
 
@@ -679,11 +664,11 @@ and disambiguated item is preserved</p>
         </li>
         
         
-        <li id="section-37">
+        <li id="section-36">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-37">&#182;</a>
+                <a class="pilcrow" href="#section-36">&#182;</a>
               </div>
               <p>The analysis service shouldn’t have been called with the merge parameter set to true.</p>
 
@@ -693,16 +678,16 @@ and disambiguated item is preserved</p>
 
       $httpBackend.flush()
 
-      expect($rootScope.$broadcast.calls.count()).toEqual <span class="hljs-number">1</span></pre></div></div>
+      expect($rootScope.$broadcast).toHaveBeenCalledWith(<span class="hljs-string">'analysisReceived'</span>, jasmine.any(Object))</pre></div></div>
             
         </li>
         
         
-        <li id="section-38">
+        <li id="section-37">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-38">&#182;</a>
+                <a class="pilcrow" href="#section-37">&#182;</a>
               </div>
               <p>The analysis service shouldn’t have been called</p>
 
@@ -716,26 +701,26 @@ and disambiguated item is preserved</p>
         </li>
         
         
-        <li id="section-39">
+        <li id="section-38">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-39">&#182;</a>
+                <a class="pilcrow" href="#section-38">&#182;</a>
               </div>
               <p>Get a reference to the argument passed with the event.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      args     = $rootScope.$broadcast.calls.argsFor <span class="hljs-number">0</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>      args = $rootScope.$broadcast.calls.argsFor <span class="hljs-number">0</span></pre></div></div>
             
         </li>
         
         
-        <li id="section-40">
+        <li id="section-39">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-40">&#182;</a>
+                <a class="pilcrow" href="#section-39">&#182;</a>
               </div>
               <p>Get a reference to the analysis structure.</p>
 
@@ -746,11 +731,11 @@ and disambiguated item is preserved</p>
         </li>
         
         
-        <li id="section-41">
+        <li id="section-40">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-41">&#182;</a>
+                <a class="pilcrow" href="#section-40">&#182;</a>
               </div>
               <p>Check that the analysis results conform.</p>
 
@@ -771,11 +756,11 @@ and disambiguated item is preserved</p>
         </li>
         
         
-        <li id="section-42">
+        <li id="section-41">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-42">&#182;</a>
+                <a class="pilcrow" href="#section-41">&#182;</a>
               </div>
               <p>Check that the text annotations have been embedded in the content.</p>
 
@@ -786,19 +771,34 @@ and disambiguated item is preserved</p>
         </li>
         
         
+        <li id="section-42">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-42">&#182;</a>
+              </div>
+              <p>Get the editor raw content</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      content = ed.getContent { <span class="hljs-attribute">format</span>: <span class="hljs-string">'raw'</span> }
+
+      expect(content.length).toBeGreaterThan <span class="hljs-number">0</span></pre></div></div>
+            
+        </li>
+        
+        
         <li id="section-43">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-43">&#182;</a>
               </div>
-              <p>Get the editor raw content</p>
+              <p>Get a reference to the argument passed with the event.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      content = ed.getContent { format : <span class="hljs-string">'raw'</span> }
-
-      expect(content.length).toBeGreaterThan <span class="hljs-number">0</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>      args = $rootScope.$broadcast.calls.argsFor <span class="hljs-number">0</span></pre></div></div>
             
         </li>
         
@@ -809,11 +809,11 @@ and disambiguated item is preserved</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-44">&#182;</a>
               </div>
-              <p>Get a reference to the argument passed with the event.</p>
+              <p>Get a reference to the analysis structure.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      args     = $rootScope.$broadcast.calls.argsFor <span class="hljs-number">0</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>      analysis = args[<span class="hljs-number">1</span>]</pre></div></div>
             
         </li>
         
@@ -824,21 +824,6 @@ and disambiguated item is preserved</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-45">&#182;</a>
               </div>
-              <p>Get a reference to the analysis structure.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>      analysis = args[<span class="hljs-number">1</span>]</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-46">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-46">&#182;</a>
-              </div>
               <p>Get the text annotations.</p>
 
             </div>
@@ -848,11 +833,11 @@ and disambiguated item is preserved</p>
         </li>
         
         
-        <li id="section-47">
+        <li id="section-46">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-47">&#182;</a>
+                <a class="pilcrow" href="#section-46">&#182;</a>
               </div>
               <p>Look for SPANs in the content.</p>
 
@@ -864,20 +849,238 @@ and disambiguated item is preserved</p>
         </li>
         
         
+        <li id="section-47">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-47">&#182;</a>
+              </div>
+              <p>Check that every span matches a text annotation.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        id = match[<span class="hljs-number">1</span>]
+        text = match[<span class="hljs-number">2</span>]
+        expect(textAnnotations[id]).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">null</span>
+        expect(textAnnotations[id].selectedText).toEqual text
+
+
+describe <span class="hljs-string">"TinceMCE editor : analysis abort"</span>,<span class="hljs-function"> -&gt;</span>
+  beforeEach <span class="hljs-built_in">module</span>(<span class="hljs-string">'wordlift.tinymce.plugin.services'</span>)
+  beforeEach <span class="hljs-built_in">module</span>(<span class="hljs-string">'AnalysisService'</span>)</pre></div></div>
+            
+        </li>
+        
+        
         <li id="section-48">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-48">&#182;</a>
               </div>
-              <p>Check that every span matches a text annotation.</p>
+              <p>Global references</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        id   = match[<span class="hljs-number">1</span>]
-        text = match[<span class="hljs-number">2</span>]
-        expect(textAnnotations[id]).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">null</span>
-        expect(textAnnotations[id].selectedText).toEqual text</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  ed = <span class="hljs-literal">undefined</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-49">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-49">&#182;</a>
+              </div>
+              <p>Tests set-up.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  beforeEach<span class="hljs-function"> -&gt;</span>
+    ed = tinyMCE.get(<span class="hljs-string">'content'</span>)
+
+  it <span class="hljs-string">'aborts an analysis when requested'</span>, inject<span class="hljs-function"><span class="hljs-params">((AnalysisService, EditorService, $httpBackend, $rootScope) -&gt;
+
+</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-50">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-50">&#182;</a>
+              </div>
+              <p>Spy on the analyze method of the AnalysisService</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    spyOn(AnalysisService, <span class="hljs-string">'analyze'</span>).<span class="hljs-keyword">and</span>.callThrough()
+    spyOn($rootScope, <span class="hljs-string">'$broadcast'</span>).<span class="hljs-keyword">and</span>.callThrough()</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-51">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-51">&#182;</a>
+              </div>
+              <p>Check that the editor content is empty.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    expect(ed.getContent().length).toEqual <span class="hljs-number">0</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-52">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-52">&#182;</a>
+              </div>
+              <p>Get sample analysis data.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    analysisResults = <span class="hljs-literal">undefined</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-53">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-53">&#182;</a>
+              </div>
+              <p>Load the sample text in the editor.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    $.ajax<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'base/app/assets/english.json'</span>, { async: <span class="hljs-literal">false</span> })</span>.<span class="hljs-title">done</span> <span class="hljs-params">(data)</span> -&gt;</span>
+      analysisResults = data</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-54">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-54">&#182;</a>
+              </div>
+              <p>Load the sample text in the editor.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    $.ajax<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'base/app/assets/english_disambiguated.txt'</span>, { async: <span class="hljs-literal">false</span> })</span>.<span class="hljs-title">done</span> <span class="hljs-params">(source)</span> -&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-55">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-55">&#182;</a>
+              </div>
+              <p>Set the editor content</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      ed.setContent source</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-56">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-56">&#182;</a>
+              </div>
+              <p>Check editor content is set properly</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      expect(ed.getContent({<span class="hljs-attribute">format</span>: <span class="hljs-string">'raw'</span>})).toEqual(source)
+
+      $httpBackend.expectPOST<span class="hljs-function"><span class="hljs-params">(<span class="hljs-regexp">/wordlift_analyze$/</span>)</span>.<span class="hljs-title">respond</span> <span class="hljs-params">(method, url, data, headers)</span> -&gt;</span>
+        expect(AnalysisService.isRunning).toBe <span class="hljs-literal">true</span>
+        AnalysisService.abort()
+        [ <span class="hljs-number">0</span>, analysisResults, {} ]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-57">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-57">&#182;</a>
+              </div>
+              <p>Call the analyze method of the editor.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      EditorService.analyze ed.getContent { <span class="hljs-attribute">format</span>: <span class="hljs-string">'text'</span> }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-58">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-58">&#182;</a>
+              </div>
+              <p>The analysis service shouldn’t have been called with the merge parameter set to true.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      expect(AnalysisService.analyze).toHaveBeenCalledWith(jasmine.any(String), <span class="hljs-literal">true</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-59">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-59">&#182;</a>
+              </div>
+              <p>Flush the backend requests.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      $httpBackend.flush()
+
+      expect($rootScope.$broadcast).<span class="hljs-keyword">not</span>.toHaveBeenCalledWith(<span class="hljs-string">'analysisReceived'</span>, jasmine.any(Object))
+      expect($rootScope.$broadcast).<span class="hljs-keyword">not</span>.toHaveBeenCalledWith(<span class="hljs-string">'error'</span>, jasmine.any(Function))
+      expect(AnalysisService.isRunning).toBe <span class="hljs-literal">false</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-60">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-60">&#182;</a>
+              </div>
+              <pre><code> <span class="hljs-comment"># The analysis service shouldn't have been called</span>
+ expect(EditorService.embedAnalysis).toHaveBeenCalledWith(jasmine.any(Object))
+</code></pre>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+  )</pre></div></div>
             
         </li>
         

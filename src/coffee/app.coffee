@@ -68,11 +68,7 @@ $(
     .appendTo(ul)
 
   # When the user clicks on the handle, hide the popover.
-  $('#wordlift-disambiguation-popover .handlediv').click (e) ->
-    $('#wordlift-disambiguation-popover').hide()
-
-#  # Declare ng-controller as main app controller.
-#  $('#wordlift-disambiguation-popover').attr 'ng-controller', 'EntitiesController'
+  $('#wordlift-disambiguation-popover .handlediv').click (e) -> $('#wordlift-disambiguation-popover').hide()
 
   # Declare the whole document as bootstrap scope.
   injector = angular.bootstrap $('#wl-app'), ['wordlift.tinymce.plugin']

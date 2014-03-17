@@ -142,7 +142,7 @@
             
             <div class="content"><div class='highlight'><pre>    scope = $rootScope.$<span class="hljs-keyword">new</span>()
 
-    element = angular.element <span class="hljs-string">'&lt;div&gt;&lt;/div&gt;'</span></pre></div></div>
+    element = angular.element.find <span class="hljs-string">'#wl-error-controller'</span></pre></div></div>
             
         </li>
         
@@ -202,9 +202,7 @@
       $httpBackend.expectPOST(<span class="hljs-string">'/base/app/assets/english.json?action=wordlift_analyze'</span>)
       .respond <span class="hljs-number">200</span>, data
 
-      $httpBackend.<span class="hljs-keyword">when</span>(<span class="hljs-string">'HEAD'</span>, <span class="hljs-regexp">/.*/</span>).respond(<span class="hljs-number">200</span>, <span class="hljs-string">''</span>)
-
-      expect($(<span class="hljs-string">'#wl-error-controller'</span>)).<span class="hljs-keyword">not</span>.toBeVisible()</pre></div></div>
+      $httpBackend.<span class="hljs-keyword">when</span>(<span class="hljs-string">'HEAD'</span>, <span class="hljs-regexp">/.*/</span>).respond(<span class="hljs-number">200</span>, <span class="hljs-string">''</span>)</pre></div></div>
             
         </li>
         
@@ -215,11 +213,11 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
-              <p>Parse and merge the data.</p>
+              <p>Check for the dialog box not to be visible.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      AnalysisService.parse data, <span class="hljs-literal">true</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>      expect($(<span class="hljs-string">'#wl-error-controller'</span>)).<span class="hljs-keyword">not</span>.toBeVisible()</pre></div></div>
             
         </li>
         
@@ -230,14 +228,42 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
+              <p>Parse and merge the data.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      AnalysisService.parse data, <span class="hljs-literal">true</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
               <p>Check that the error event has been called.</p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre>      expect(scope.$<span class="hljs-literal">on</span>).toHaveBeenCalledWith(<span class="hljs-string">'error'</span>, jasmine.any(Function))
-      scope.$digest()
+      scope.$digest()</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p>Check that the dialog box is now visible.</p>
 
-      expect($(<span class="hljs-string">'#wl-error-controller'</span>)).toBeVisible()
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      expect($(<span class="hljs-string">'#wl-error-controller'</span>)).toBeVisible()
   )</pre></div></div>
             
         </li>

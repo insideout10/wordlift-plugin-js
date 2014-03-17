@@ -276,7 +276,7 @@ describe 'services', ->
         expect(entityAnnotation2.selected).toBe false
     )
 
-    it 'handles invalid responses', inject((AnalysisService, $httpBackend, $rootScope) ->
+    it 'handles invalid responses', inject((AnalysisService, $httpBackend) ->
 
       # Get the mock-up analysis.
       $.ajax('base/app/assets/error.html',

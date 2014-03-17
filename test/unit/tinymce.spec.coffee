@@ -1,13 +1,13 @@
 describe "TinyMCE tests", ->
+  beforeEach module('wordlift.tinymce.plugin.services')
+  beforeEach module('AnalysisService')
+
   # Global references
   ed = undefined
 
   # Tests set-up.
   beforeEach ->
-    # Set a reference to the editor.
     ed = tinyMCE.get('content')
-
-    module 'wordlift.tinymce.plugin.services'
 
   afterEach inject ($httpBackend) ->
     $httpBackend.verifyNoOutstandingExpectation()
@@ -49,7 +49,7 @@ describe "TinyMCE tests", ->
       ed.setContent source
       # Check editor content is set properly
       expect(ed.getContent({format: 'raw'})).toEqual(source)
-    
+
       # Load the sample response.
       $.ajax('base/app/assets/english.json',
         async: false
@@ -73,7 +73,7 @@ describe "TinyMCE tests", ->
       ed.setContent source
       # Check editor content is set properly
       expect(ed.getContent({format: 'raw'})).toEqual(source)
-    
+
       # Load the sample response.
       $.ajax('base/app/assets/english.json',
         async: false
@@ -126,9 +126,8 @@ describe "TinyMCE tests", ->
       async: false
 
     ).done (data) ->
-
       $httpBackend.expectPOST('/base/app/assets/english.json?action=wordlift_analyze')
-        .respond 200, data
+      .respond 200, data
 
       # Call the analyze method of the editor.
       EditorService.analyze ed.getContent { format: 'text' }
@@ -138,7 +137,7 @@ describe "TinyMCE tests", ->
 
       $httpBackend.flush()
 
-      expect($rootScope.$broadcast.calls.count()).toEqual 1
+      expect($rootScope.$broadcast).toHaveBeenCalledWith('analysisReceived', jasmine.any(Object))
 
       # The analysis service shouldn't have been called
       expect(EditorService.embedAnalysis).toHaveBeenCalledWith(jasmine.any(Object))
@@ -147,7 +146,7 @@ describe "TinyMCE tests", ->
     it "sends the analysis results", inject (AnalysisService, EditorService, $httpBackend, $rootScope) ->
 
       # Get a reference to the argument passed with the event.
-      args     = $rootScope.$broadcast.calls.argsFor 0
+      args = $rootScope.$broadcast.calls.argsFor 0
 
       # Get a reference to the analysis structure.
       analysis = args[1]
@@ -169,12 +168,12 @@ describe "TinyMCE tests", ->
     it "embeds the analysis results in the editor contents", inject (EditorService, $rootScope) ->
 
       # Get the editor raw content
-      content = ed.getContent { format : 'raw' }
+      content = ed.getContent { format: 'raw' }
 
       expect(content.length).toBeGreaterThan 0
 
       # Get a reference to the argument passed with the event.
-      args     = $rootScope.$broadcast.calls.argsFor 0
+      args = $rootScope.$broadcast.calls.argsFor 0
       # Get a reference to the analysis structure.
       analysis = args[1]
       # Get the text annotations.
@@ -184,7 +183,67 @@ describe "TinyMCE tests", ->
       regex = new RegExp(/<span id="([^"]+)" class="textannotation">([^<]+)<\/span>/g)
       while match = regex.exec content
         # Check that every span matches a text annotation.
-        id   = match[1]
+        id = match[1]
         text = match[2]
         expect(textAnnotations[id]).not.toBe null
         expect(textAnnotations[id].selectedText).toEqual text
+
+
+describe "TinceMCE editor : analysis abort", ->
+  beforeEach module('wordlift.tinymce.plugin.services')
+  beforeEach module('AnalysisService')
+
+  # Global references
+  ed = undefined
+
+  # Tests set-up.
+  beforeEach ->
+    ed = tinyMCE.get('content')
+
+  it 'aborts an analysis when requested', inject((AnalysisService, EditorService, $httpBackend, $rootScope) ->
+
+    # Spy on the analyze method of the AnalysisService
+    spyOn(AnalysisService, 'analyze').and.callThrough()
+    spyOn($rootScope, '$broadcast').and.callThrough()
+
+    # Check that the editor content is empty.
+    expect(ed.getContent().length).toEqual 0
+
+    # Get sample analysis data.
+    analysisResults = undefined
+    # Load the sample text in the editor.
+    $.ajax('base/app/assets/english.json', { async: false }).done (data) ->
+      analysisResults = data
+
+    # Load the sample text in the editor.
+    $.ajax('base/app/assets/english_disambiguated.txt', { async: false }).done (source) ->
+
+      # Set the editor content
+      ed.setContent source
+
+      # Check editor content is set properly
+      expect(ed.getContent({format: 'raw'})).toEqual(source)
+
+      $httpBackend.expectPOST(/wordlift_analyze$/).respond (method, url, data, headers) ->
+        expect(AnalysisService.isRunning).toBe true
+        AnalysisService.abort()
+        [ 0, analysisResults, {} ]
+
+      # Call the analyze method of the editor.
+      EditorService.analyze ed.getContent { format: 'text' }
+
+      # The analysis service shouldn't have been called with the merge parameter set to true.
+      expect(AnalysisService.analyze).toHaveBeenCalledWith(jasmine.any(String), true)
+
+      # Flush the backend requests.
+      $httpBackend.flush()
+
+      expect($rootScope.$broadcast).not.toHaveBeenCalledWith('analysisReceived', jasmine.any(Object))
+      expect($rootScope.$broadcast).not.toHaveBeenCalledWith('error', jasmine.any(Function))
+      expect(AnalysisService.isRunning).toBe false
+
+#
+#      # The analysis service shouldn't have been called
+#      expect(EditorService.embedAnalysis).toHaveBeenCalledWith(jasmine.any(Object))
+
+  )
