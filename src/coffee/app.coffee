@@ -36,13 +36,13 @@ $(
   .appendTo('form[name=post]')
 
   $('#wordlift-disambiguation-popover')
-    .css(
-        display: 'none'
-        height: $('body').height() - $('#wpadminbar').height() + 32
-        top: $('#wpadminbar').height() - 1
-        right: 0
-      )
-    .draggable()
+  .css(
+      display: 'none'
+      height: $('body').height() - $('#wpadminbar').height() + 32
+      top: $('#wpadminbar').height() - 1
+      right: 0
+    )
+  .draggable()
 
   $('#search').autocomplete
     source: ajaxurl + '?action=wordlift_search',
@@ -68,7 +68,8 @@ $(
     .appendTo(ul)
 
   # When the user clicks on the handle, hide the popover.
-  $('#wordlift-disambiguation-popover .handlediv').click (e) -> $('#wordlift-disambiguation-popover').hide()
+  $('#wordlift-disambiguation-popover .handlediv').click (e) ->
+    $('#wordlift-disambiguation-popover').hide()
 
   # Declare the whole document as bootstrap scope.
   injector = angular.bootstrap $('#wl-app'), ['wordlift.tinymce.plugin']
@@ -82,8 +83,10 @@ $(
       icon: false
     # When the editor is clicked, the [EditorService.analyze](app.services.EditorService.html#analyze) method is invoked.
       onclick: ->
-        injector.invoke(['EditorService', (EditorService) ->
-          EditorService.analyze tinyMCE.activeEditor.getContent({format: 'text'})
+        injector.invoke(['EditorService', '$rootScope', (EditorService, $rootScope) ->
+          $rootScope.$apply( ->
+            EditorService.analyze tinyMCE.activeEditor.getContent({format: 'text'})
+          )
         ])
 
 )

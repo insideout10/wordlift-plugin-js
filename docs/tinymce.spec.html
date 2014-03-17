@@ -1059,11 +1059,7 @@ describe <span class="hljs-string">"TinceMCE editor : analysis abort"</span>,<sp
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      $httpBackend.flush()
-
-      expect($rootScope.$broadcast).<span class="hljs-keyword">not</span>.toHaveBeenCalledWith(<span class="hljs-string">'analysisReceived'</span>, jasmine.any(Object))
-      expect($rootScope.$broadcast).<span class="hljs-keyword">not</span>.toHaveBeenCalledWith(<span class="hljs-string">'error'</span>, jasmine.any(Function))
-      expect(AnalysisService.isRunning).toBe <span class="hljs-literal">false</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>      $httpBackend.flush()</pre></div></div>
             
         </li>
         
@@ -1073,6 +1069,22 @@ describe <span class="hljs-string">"TinceMCE editor : analysis abort"</span>,<sp
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-60">&#182;</a>
+              </div>
+              <pre><code> expect($rootScope.$broadcast).<span class="hljs-keyword">not</span>.toHaveBeenCalledWith(<span class="hljs-string">'analysisReceived'</span>, jasmine.any(Object))
+</code></pre>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      expect($rootScope.$broadcast).<span class="hljs-keyword">not</span>.toHaveBeenCalledWith(<span class="hljs-string">'error'</span>, jasmine.any(Function))
+      expect(AnalysisService.isRunning).toBe <span class="hljs-literal">false</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-61">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-61">&#182;</a>
               </div>
               <pre><code> <span class="hljs-comment"># The analysis service shouldn't have been called</span>
  expect(EditorService.embedAnalysis).toHaveBeenCalledWith(jasmine.any(Object))

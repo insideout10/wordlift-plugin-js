@@ -238,7 +238,7 @@ describe "TinceMCE editor : analysis abort", ->
       # Flush the backend requests.
       $httpBackend.flush()
 
-      expect($rootScope.$broadcast).not.toHaveBeenCalledWith('analysisReceived', jasmine.any(Object))
+#      expect($rootScope.$broadcast).not.toHaveBeenCalledWith('analysisReceived', jasmine.any(Object))
       expect($rootScope.$broadcast).not.toHaveBeenCalledWith('error', jasmine.any(Function))
       expect(AnalysisService.isRunning).toBe false
 

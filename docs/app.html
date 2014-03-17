@@ -168,13 +168,13 @@
   .appendTo(<span class="hljs-string">'form[name=post]'</span>)
 
   $(<span class="hljs-string">'#wordlift-disambiguation-popover'</span>)
-    .css(
-        <span class="hljs-attribute">display</span>: <span class="hljs-string">'none'</span>
-        <span class="hljs-attribute">height</span>: $(<span class="hljs-string">'body'</span>).height() - $(<span class="hljs-string">'#wpadminbar'</span>).height() + <span class="hljs-number">32</span>
-        <span class="hljs-attribute">top</span>: $(<span class="hljs-string">'#wpadminbar'</span>).height() - <span class="hljs-number">1</span>
-        <span class="hljs-attribute">right</span>: <span class="hljs-number">0</span>
-      )
-    .draggable()
+  .css(
+      <span class="hljs-attribute">display</span>: <span class="hljs-string">'none'</span>
+      <span class="hljs-attribute">height</span>: $(<span class="hljs-string">'body'</span>).height() - $(<span class="hljs-string">'#wpadminbar'</span>).height() + <span class="hljs-number">32</span>
+      <span class="hljs-attribute">top</span>: $(<span class="hljs-string">'#wpadminbar'</span>).height() - <span class="hljs-number">1</span>
+      <span class="hljs-attribute">right</span>: <span class="hljs-number">0</span>
+    )
+  .draggable()
 
   $(<span class="hljs-string">'#search'</span>).autocomplete
     <span class="hljs-attribute">source</span>: ajaxurl + <span class="hljs-string">'?action=wordlift_search'</span>,
@@ -212,7 +212,8 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  $<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'#wordlift-disambiguation-popover .handlediv'</span>)</span>.<span class="hljs-title">click</span> <span class="hljs-params">(e)</span> -&gt;</span> $(<span class="hljs-string">'#wordlift-disambiguation-popover'</span>).hide()</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  $<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'#wordlift-disambiguation-popover .handlediv'</span>)</span>.<span class="hljs-title">click</span> <span class="hljs-params">(e)</span> -&gt;</span>
+    $(<span class="hljs-string">'#wordlift-disambiguation-popover'</span>).hide()</pre></div></div>
             
         </li>
         
@@ -275,8 +276,10 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>      <span class="hljs-attribute">onclick</span>:<span class="hljs-function"> -&gt;</span>
-        injector.invoke<span class="hljs-function"><span class="hljs-params">([<span class="hljs-string">'EditorService'</span>, (EditorService) -&gt;
-          EditorService.analyze tinyMCE.activeEditor.getContent({format: <span class="hljs-string">'text'</span>})
+        injector.invoke<span class="hljs-function"><span class="hljs-params">([<span class="hljs-string">'EditorService'</span>, <span class="hljs-string">'$rootScope'</span>, (EditorService, $rootScope) -&gt;
+          $rootScope.$apply( -&gt;
+            EditorService.analyze tinyMCE.activeEditor.getContent({format: <span class="hljs-string">'text'</span>})
+          )
         ])</span>
 
 )

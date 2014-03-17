@@ -1,5 +1,5 @@
 (function() {
-  var $, CONTEXT, GRAPH, container, injector,
+  var $, container, injector,
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   angular.module('wordlift.tinymce.plugin.config', []).constant('Configuration', {
@@ -69,13 +69,12 @@
     };
   });
 
-  CONTEXT = '@context';
-
-  GRAPH = '@graph';
-
   angular.module('AnalysisService', []).service('AnalysisService', [
     '$http', '$q', '$rootScope', '$log', function($http, $q, $rootScope, $log) {
-      return {
+      var CONTEXT, GRAPH, service;
+      CONTEXT = '@context';
+      GRAPH = '@graph';
+      service = {
         promise: void 0,
         isRunning: false,
         abort: function() {
@@ -92,8 +91,8 @@
             return;
           }
           this.isRunning = true;
-          that = this;
           this.promise = $q.defer();
+          that = this;
           return $http({
             method: 'post',
             url: ajaxurl + '?action=wordlift_analyze',
@@ -104,6 +103,7 @@
             return that.isRunning = false;
           }).error(function(data, status, headers, config) {
             that.isRunning = false;
+            $rootScope.$broadcast('analysisReceived', null);
             if (0 === status) {
               return;
             }
@@ -475,6 +475,7 @@
           };
         }
       };
+      return service;
     }
   ]);
 
@@ -528,11 +529,12 @@
         },
         analyze: function(content) {
           if (AnalysisService.isRunning) {
-            return;
+            return AnalysisService.abort();
+          } else {
+            $('.mce_wordlift').addClass('running');
+            tinyMCE.get('content').getBody().setAttribute('contenteditable', false);
+            return AnalysisService.analyze(content, true);
           }
-          $('.mce_wordlift').addClass('running');
-          tinyMCE.get('content').getBody().setAttribute('contenteditable', false);
-          return AnalysisService.analyze(content, true);
         },
         getEditor: function() {
           return tinyMCE.get('content');
@@ -567,7 +569,9 @@
         return dom.setAttrib(id, 'itemid', obj.entity.id);
       });
       $rootScope.$on('analysisReceived', function(event, analysis) {
-        service.embedAnalysis(analysis);
+        if (analysis != null) {
+          service.embedAnalysis(analysis);
+        }
         $('.mce_wordlift').removeClass('running');
         return tinyMCE.get('content').getBody().setAttribute('contenteditable', true);
       });
@@ -735,10 +739,12 @@
       icon: false,
       onclick: function() {
         return injector.invoke([
-          'EditorService', function(EditorService) {
-            return EditorService.analyze(tinyMCE.activeEditor.getContent({
-              format: 'text'
-            }));
+          'EditorService', '$rootScope', function(EditorService, $rootScope) {
+            return $rootScope.$apply(function() {
+              return EditorService.analyze(tinyMCE.activeEditor.getContent({
+                format: 'text'
+              }));
+            });
           }
         ]);
       }

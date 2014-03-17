@@ -97,7 +97,8 @@ angular.module('wordlift.tinymce.plugin.controllers',
       autoOpen: false
       closeOnEscape: true
       buttons:
-        Ok: -> $(this).dialog 'close'
+        Ok: ->
+          $(this).dialog 'close'
 
     # Show the dialog box when an error is raised.
     $scope.$on 'error', (event, message) ->
