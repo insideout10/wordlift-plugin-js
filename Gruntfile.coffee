@@ -66,12 +66,10 @@ module.exports = (grunt) ->
         src: [
           'wordlift.js',
           'wordlift.min.js',
-          'wordlift.<%= pkg.version %>.min.js',
           'wordlift.js.map',
-          'wordlift.min.map',
-          'wordlift.<%= pkg.version %>.min.map'
+          'wordlift.min.map'
         ]
-        dest: 'dist/js/'
+        dest: 'dist/<%= pkg.version %>/js/'
         flatten: true
 
       # Copy stylesheets to the dist folder.
@@ -81,10 +79,9 @@ module.exports = (grunt) ->
         src: [
           'wordlift.css',
           'wordlift.min.css',
-          'wordlift.<%= pkg.version %>.min.css',
           'wordlift.min.css.map'
         ]
-        dest: 'dist/css/'
+        dest: 'dist/<%= pkg.version %>/css/'
         flatten: true
 
       # Copy fonts to the dist folder.
@@ -92,7 +89,7 @@ module.exports = (grunt) ->
         expand: true
         cwd: 'app/fonts/'
         src: '*'
-        dest: 'dist/fonts/'
+        dest: 'dist/<%= pkg.version %>/fonts/'
         flatten: true
 
 
