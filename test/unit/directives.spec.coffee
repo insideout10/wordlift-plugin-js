@@ -191,49 +191,6 @@ describe 'directives', ->
         for id, entityAnnotation of scope.textAnnotation.entityAnnotations
           expect(entityAnnotation.selected).toBe false
 
-
-      #        entityAnnotation1 = analysis.textAnnotations['urn:enhancement-9de365a0-3312-4927-0cbd-8735d460901d']
-#        .entityAnnotations['urn:enhancement-1c03bb72-6cfe-3dfc-ad7f-3082a5ce086b']
-#        entityAnnotation2 = analysis.textAnnotations['urn:enhancement-d791d926-23e9-61f9-7b67-6414586bc49e']
-#        .entityAnnotations['urn:enhancement-1c03bb72-6cfe-3dfc-ad7f-3082a5ce086b']
-
-#        DUMP: '[ text-annotation id :: urn:enhancement-d791d926-23e9-61f9-7b67-6414586bc49e ][ selected text :: RDF query language ][ entity annotations count :: 2 ]'
-#      DUMP: '[ entity-annotation id :: urn:enhancement-1c03bb72-6cfe-3dfc-ad7f-3082a5ce086b ][ entity id :: http://dbpedia.org/resource/RDF_query_language ][ confidence :: 0.30222222 ]'
-#      DUMP: '[ entity-annotation id :: urn:enhancement-ee057616-a5b7-e0c1-1111-24d2304417ff ][ entity id :: http://dbpedia.org/resource/SPARQL ][ confidence :: 1 ]'
-#
-#      DUMP: '[ text-annotation id :: urn:enhancement-aaf7f73e-910a-3516-1f58-d5c41c42ab0b ][ selected text :: query language ][ entity annotations count :: 3 ]'
-#      DUMP: '[ entity-annotation id :: urn:enhancement-7aa0d159-7539-5b8f-a056-633710f8ef4f ][ entity id :: http://dbpedia.org/resource/RDF_query_language ][ confidence :: 0.34 ]'
-#      DUMP: '[ entity-annotation id :: urn:enhancement-d20e08d7-87fa-0ced-0dd2-216daa10b911 ][ entity id :: http://dbpedia.org/resource/Query_language ][ confidence :: 0.3157143 ]'
-#      DUMP: '[ entity-annotation id :: urn:enhancement-ee057616-a5b7-e0c1-1111-24d2304417ff ][ entity id :: http://dbpedia.org/resource/SPARQL ][ confidence :: 1 ]'
-#
-#      DUMP: '[ text-annotation id :: urn:enhancement-9de365a0-3312-4927-0cbd-8735d460901d ][ selected text :: RDF Query Language ][ entity annotations count :: 1 ]'
-#      DUMP: '[ entity-annotation id :: urn:enhancement-1c03bb72-6cfe-3dfc-ad7f-3082a5ce086b ][ entity id :: http://dbpedia.org/resource/RDF_query_language ][ confidence :: 0.30222222 ]'
-#
-#        # Set the ID of the entity annotations (from the mock file).
-#        id1 = 'urn:enhancement-1c03bb72-6cfe-3dfc-ad7f-3082a5ce086b'
-#        id2 = 'urn:enhancement-26a923a4-fbb8-b39d-53ad-e2922474b7fc'
-#
-#        # Click the first entity.
-#        entitiesElems[1].click()
-#        expect(scope.textAnnotation.entityAnnotations[id1].selected).toBe true
-#        expect(scope.textAnnotation.entityAnnotations[id2].selected).toBe false
-#        # Check that the select event has been called.
-#        expect(scope.select).toHaveBeenCalledWith(scope.textAnnotation, scope.textAnnotation.entityAnnotations[id1])
-#
-#        # Click on the second entity.
-#        entitiesElems[2].click()
-#        expect(scope.textAnnotation.entityAnnotations[id1].selected).toBe false
-#        expect(scope.textAnnotation.entityAnnotations[id2].selected).toBe true
-#        # Check that the select event has been called.
-#        expect(scope.select).toHaveBeenCalledWith(scope.textAnnotation, scope.textAnnotation.entityAnnotations[id2])
-#
-#        # Click again on the second entity.
-#        entitiesElems[2].click()
-#        expect(scope.textAnnotation.entityAnnotations[id1].selected).toBe false
-#        expect(scope.textAnnotation.entityAnnotations[id2].selected).toBe false
-#        # Check that the select event has been called.
-#        expect(scope.select).toHaveBeenCalledWith(scope.textAnnotation, null)
-
     )
 
   describe 'wlEntityInputBoxes', ->
@@ -296,7 +253,7 @@ describe 'directives', ->
 
         # Check that there are no input boxes (no entities selected).
         fieldName1 = "wl_entities\\[#{entityAnnotation1.entity.id}\\]"
-        expect(element.find('input').length).toEqual 7
+        expect(element.find('input').length).toEqual 9
         expect(element.find('textarea').length).toEqual 1
 
         expect(element.find("input[name='#{fieldName1}\\[uri\\]']")[0].value).toEqual entityAnnotation1.entity.id
@@ -336,7 +293,7 @@ describe 'directives', ->
         scope.$digest()
 
         # Check that the number of inputs matches.
-        expect(element.find('input').length).toEqual 11
+        expect(element.find('input').length).toEqual 15
         expect(element.find('textarea').length).toEqual 2
 
         # Check that there are no input boxes (no entities selected).
@@ -390,7 +347,7 @@ describe 'directives', ->
 
         # Check that there are no input boxes (no entities selected).
         fieldName1 = "wl_entities\\[#{entityAnnotation1.entity.id}\\]"
-        expect(element.find('input').length).toEqual 7
+        expect(element.find('input').length).toEqual 9
         expect(element.find('textarea').length).toEqual 1
 
         expect(element.find("input[name='#{fieldName1}\\[uri\\]']")[0].value).toEqual entityAnnotation1.entity.id
@@ -435,7 +392,7 @@ describe 'directives', ->
         scope.$digest()
 
         # Check that the number of inputs matches.
-        expect(element.find('input').length).toEqual 12
+        expect(element.find('input').length).toEqual 16
         expect(element.find('textarea').length).toEqual 2
 
         # Check that there are no input boxes (no entities selected).
@@ -489,7 +446,7 @@ describe 'directives', ->
 
         # Check that there are no input boxes (no entities selected).
         fieldName1 = "wl_entities\\[#{entityAnnotation1.entity.id}\\]"
-        expect(element.find('input').length).toEqual 7
+        expect(element.find('input').length).toEqual 9
         expect(element.find('textarea').length).toEqual 1
 
         expect(element.find("input[name='#{fieldName1}\\[uri\\]']")[0].value).toEqual entityAnnotation1.entity.id
@@ -529,7 +486,7 @@ describe 'directives', ->
         scope.$digest()
 
         # Check that the number of inputs matches.
-        expect(element.find('input').length).toEqual 11
+        expect(element.find('input').length).toEqual 15
         expect(element.find('textarea').length).toEqual 2
 
         # Check that there are no input boxes (no entities selected).
@@ -589,7 +546,7 @@ describe 'directives', ->
 
         # Check that there are no input boxes (no entities selected).
         fieldName = "wl_entities\\[#{entityAnnotation.entity.id}\\]"
-        expect(element.find('input').length).toEqual 17
+        expect(element.find('input').length).toEqual 19
         expect(element.find('textarea').length).toEqual 1
 
         expect(element.find("input[name='#{fieldName}\\[uri\\]']")[0].value).toEqual entityAnnotation.entity.id

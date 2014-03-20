@@ -1,6 +1,6 @@
 {
   "name": "wordlift",
-  "version": "3.0.0-SNAPSHOT",
+  "version": "3.0.0-beta",
   "homepage": "http://wordlift.it",
   "authors": [
     "David Riccitelli <david@insideout.io>"

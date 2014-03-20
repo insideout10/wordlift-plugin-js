@@ -106,22 +106,7 @@
               
             </div>
             
-            <div class="content"><div class='highlight'><pre>angular.<span class="hljs-built_in">module</span>(<span class="hljs-string">'wordlift.tinymce.plugin.directives'</span>, [<span class="hljs-string">'wordlift.tinymce.plugin.controllers'</span>])
-.directive(<span class="hljs-string">'wlMetaBoxSelectedEntity'</span>,<span class="hljs-function"> -&gt;</span>
-    <span class="hljs-attribute">restrict</span>: <span class="hljs-string">'AE'</span>
-    <span class="hljs-attribute">scope</span>:
-      <span class="hljs-attribute">index</span>: <span class="hljs-string">'='</span>
-      <span class="hljs-attribute">entity</span>: <span class="hljs-string">'='</span>
-    <span class="hljs-attribute">template</span>: <span class="hljs-string">"""
-      &lt;span&gt;{{entity.label}} (&lt;small&gt;{{entity.type}}&lt;/span&gt;)\n
-      &lt;br /&gt;&lt;small&gt;{{entity.thumbnail}}&lt;/small&gt;
-      &lt;input type="hidden" name="entities[{{index}}]['id']" value="{{entity.id}}" /&gt;\n
-      &lt;input type="hidden" name="entities[{{index}}]['label']" value="{{entity.label}}" /&gt;\n
-      &lt;input type="hidden" name="entities[{{index}}]['description']" value="{{entity.description}}" /&gt;\n
-      &lt;input type="hidden" name="entities[{{index}}]['type']" value="{{entity.type}}" /&gt;\n
-      &lt;input type="hidden" name="entities[{{index}}]['thumbnail']" value="{{entity.thumbnail}}" /&gt;\n
-    """</span>
-  )</pre></div></div>
+            <div class="content"><div class='highlight'><pre>angular.<span class="hljs-built_in">module</span>(<span class="hljs-string">'wordlift.tinymce.plugin.directives'</span>, [<span class="hljs-string">'wordlift.tinymce.plugin.controllers'</span>])</pre></div></div>
             
         </li>
         
@@ -320,6 +305,9 @@ in the select attribute is called.</p>
             name='wl_entities[{{entityAnnotation.entity.id}}][image][]' value='{{image}}'&gt;
           &lt;input ng-repeat="sameAs in entityAnnotation.entity.sameAs" type='text'
             name='wl_entities[{{entityAnnotation.entity.id}}][sameas][]' value='{{sameAs}}'&gt;
+
+          &lt;input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][latitude]' value='{{entityAnnotation.entity.latitude}}'&gt;
+          &lt;input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][longitude]' value='{{entityAnnotation.entity.longitude}}'&gt;
 
         &lt;/div&gt;
       &lt;/div&gt;
