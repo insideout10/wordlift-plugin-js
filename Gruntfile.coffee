@@ -66,7 +66,6 @@ module.exports = (grunt) ->
         src: [
           'wordlift.js',
           'wordlift.min.js',
-          'wordlift.js.map',
           'wordlift.min.map'
         ]
         dest: 'dist/<%= pkg.version %>/js/'
