@@ -558,7 +558,10 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          entity.description = <span class="hljs-string">''</span> <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> entity.description?</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          entity.description = <span class="hljs-string">''</span> <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> entity.description?
+
+          entity.latitude = get(<span class="hljs-string">'http://www.w3.org/2003/01/geo/wgs84_pos#lat'</span>, item)
+          entity.longitude = get(<span class="hljs-string">'http://www.w3.org/2003/01/geo/wgs84_pos#long'</span>, item)</pre></div></div>
             
         </li>
         
@@ -1131,7 +1134,9 @@ TODO: have a user-set priority.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>              entity.description = existing.description <span class="hljs-keyword">if</span> <span class="hljs-string">'dbpedia'</span> <span class="hljs-keyword">is</span> existing.source</pre></div></div>
+            <div class="content"><div class='highlight'><pre>              entity.description = existing.description <span class="hljs-keyword">if</span> <span class="hljs-string">'dbpedia'</span> <span class="hljs-keyword">is</span> existing.source
+              entity.longitude   = existing.longitude <span class="hljs-keyword">if</span> <span class="hljs-string">'dbpedia'</span> <span class="hljs-keyword">is</span> existing.source <span class="hljs-keyword">and</span> existing.longitude?
+              entity.latitude    = existing.latitude <span class="hljs-keyword">if</span> <span class="hljs-string">'dbpedia'</span> <span class="hljs-keyword">is</span> existing.source <span class="hljs-keyword">and</span> existing.latitude?</pre></div></div>
             
         </li>
         

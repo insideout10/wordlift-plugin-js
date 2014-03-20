@@ -237,6 +237,8 @@
             if (entity.description == null) {
               entity.description = '';
             }
+            entity.latitude = get('http://www.w3.org/2003/01/geo/wgs84_pos#lat', item);
+            entity.longitude = get('http://www.w3.org/2003/01/geo/wgs84_pos#long', item);
             return entity;
           };
           createEntityAnnotation = function(item) {
@@ -378,6 +380,12 @@
                 entity.source += ", " + existing.source;
                 if ('dbpedia' === existing.source) {
                   entity.description = existing.description;
+                }
+                if ('dbpedia' === existing.source && (existing.longitude != null)) {
+                  entity.longitude = existing.longitude;
+                }
+                if ('dbpedia' === existing.source && (existing.latitude != null)) {
+                  entity.latitude = existing.latitude;
                 }
                 entities[sameAs] = entity;
                 mergeEntities(entity, entities);

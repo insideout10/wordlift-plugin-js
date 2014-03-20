@@ -164,6 +164,9 @@ angular.module('AnalysisService', [])
           # Avoid null in entity description.
           entity.description = '' if not entity.description?
 
+          entity.latitude = get('http://www.w3.org/2003/01/geo/wgs84_pos#lat', item)
+          entity.longitude = get('http://www.w3.org/2003/01/geo/wgs84_pos#long', item)
+
           # Check if thumbnails exists.
           #        if thumbnails? and angular.isArray thumbnails
           #          $q.all(($http.head thumbnail for thumbnail in thumbnails))
@@ -312,6 +315,8 @@ angular.module('AnalysisService', [])
               # Prefer the DBpedia description.
               # TODO: have a user-set priority.
               entity.description = existing.description if 'dbpedia' is existing.source
+              entity.longitude   = existing.longitude if 'dbpedia' is existing.source and existing.longitude?
+              entity.latitude    = existing.latitude if 'dbpedia' is existing.source and existing.latitude?
 
               # Delete the sameAs entity from the index.
               entities[sameAs] = entity

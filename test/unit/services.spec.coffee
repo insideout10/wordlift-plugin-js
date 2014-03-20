@@ -293,6 +293,52 @@ describe 'services', ->
         expect(result).toEqual false
     )
 
+    it "parses the geo-location data", inject( (AnalysisService, $httpBackend) ->
+
+      # Get the mock-up analysis.
+      $.ajax('base/app/assets/rome.json',
+        async: false
+      ).done (data) ->
+
+        # Catch all the requests to Freebase.
+        $httpBackend.when('HEAD', /.*/).respond(200, '')
+
+        # Simulate event broadcasted by AnalysisService
+        analysis = AnalysisService.parse data, true
+
+        # Check that the analysis results conform.
+        expect(analysis).toEqual jasmine.any(Object)
+        expect(analysis.language).not.toBe undefined
+        expect(analysis.entities).not.toBe undefined
+        expect(analysis.entityAnnotations).not.toBe undefined
+        expect(analysis.textAnnotations).not.toBe undefined
+        expect(analysis.languages).not.toBe undefined
+        expect(analysis.language).toEqual 'en'
+
+        uri1 = 'http://rdf.freebase.com/ns/m.06c62'
+        uri2 = 'http://dbpedia.org/resource/Rome'
+
+        entity1 = analysis.entities[uri1]
+        entity2 = analysis.entities[uri2]
+
+        expect(entity1).not.toBe undefined
+        expect(entity2).not.toBe undefined
+
+        expect(entity1.latitude).not.toBe undefined
+        expect(entity1.longitude).not.toBe undefined
+
+        expect(entity2.latitude).not.toBe undefined
+        expect(entity2.longitude).not.toBe undefined
+
+        expect(entity1.latitude).toEqual 41.9
+        expect(entity1.longitude).toEqual 12.5
+
+        expect(entity2.latitude).toEqual 41.9
+        expect(entity2.longitude).toEqual 12.5
+
+        expect(entity1).toBe entity2
+    )
+
   describe 'EditorService', ->
 
     it "embeds analysis results also when there are parentheses in the selected text", inject( (AnalysisService, EditorService, $httpBackend) ->
