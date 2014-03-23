@@ -61,7 +61,10 @@ describe "TinyMCE tests", ->
         # Check that text annotation spans clean up works properly
         expect(ed.getContent({format: 'raw'})).toEqual(source)
 
-  it "perform analysis on analyzed content with a dismabiguated item", inject (AnalysisService, EditorService, $httpBackend) ->
+  it "perform analysis on analyzed content with a disambiguated item", inject (AnalysisService, EditorService, $httpBackend, $rootScope) ->
+     # Spy on the root scope.
+    spyOn($rootScope, '$broadcast').and.callThrough()
+
     # Check that the editor content is empty.
     expect(ed.getContent().length).toEqual 0
 
@@ -85,6 +88,13 @@ describe "TinyMCE tests", ->
         # Check that text annotation spans clean up works properly
         # and disambiguated item is preserved
         expect(ed.getContent({format: 'raw'})).toEqual(source)
+
+        # Check if disambiguated text annotations are properly
+        textAnnotationId = "urn:enhancement-233fd158-870d-6ca4-b7ce-30313e4a7015"
+        selectedEntityId = "http://data.redlink.io/353/wordlift/entity/David_Riccitelli"
+        expect($rootScope.$broadcast).toHaveBeenCalledWith('disambiguatedTextAnnotationDetected', textAnnotationId, selectedEntityId)
+
+
 
   it "doesn't run an analysis when an analysis is already running", inject (AnalysisService, EditorService) ->
 

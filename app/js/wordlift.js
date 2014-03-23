@@ -483,7 +483,7 @@
       var service;
       service = {
         embedAnalysis: function(analysis) {
-          var cleanUp, content, id, isDirty, m, matchResult, r, r2, replace, selPrefix, selSuffix, selText, spanre, textAnnotation, _ref;
+          var cleanUp, content, disambiguatedTextAnnotations, id, isDirty, m, matchResult, r, r2, replace, selPrefix, selSuffix, selText, spanre, textAnnotation, _i, _len, _ref;
           cleanUp = function(text) {
             return text.replace('\\', '\\\\').replace('\(', '\\(').replace('\)', '\\)').replace('\n', '\\n?').replace('-', '\\-').replace('\x20', '\\s').replace('\xa0', '&nbsp;').replace('\[', '\\[').replace('\]', '\\]');
           };
@@ -516,6 +516,11 @@
               }
               content = content.replace(r, replace);
             }
+          }
+          disambiguatedTextAnnotations = tinyMCE.get('content').dom.select('span.disambiguated');
+          for (_i = 0, _len = disambiguatedTextAnnotations.length; _i < _len; _i++) {
+            textAnnotation = disambiguatedTextAnnotations[_i];
+            $rootScope.$broadcast('disambiguatedTextAnnotationDetected', textAnnotation.id, textAnnotation.getAttribute('itemid'));
           }
           isDirty = tinyMCE.get('content').isDirty();
           tinyMCE.get('content').setContent(content);
@@ -673,6 +678,20 @@
       $scope.onEntitySelected = function(textAnnotation, entityAnnotation) {
         return $scope.$emit('DisambiguationWidget.entitySelected', entityAnnotation);
       };
+      $scope.$on('disambiguatedTextAnnotationDetected', function(event, textAnnotationId, entityId) {
+        var entityAnnotation, id, _ref, _results;
+        _ref = $scope.analysis.textAnnotations[textAnnotationId].entityAnnotations;
+        _results = [];
+        for (id in _ref) {
+          entityAnnotation = _ref[id];
+          if (entityAnnotation.entity.id === entityId) {
+            _results.push($scope.analysis.entityAnnotations[entityAnnotation.id].selected = true);
+          } else {
+            _results.push(void 0);
+          }
+        }
+        return _results;
+      });
       $scope.$on('analysisReceived', function(event, analysis) {
         return $scope.analysis = analysis;
       });

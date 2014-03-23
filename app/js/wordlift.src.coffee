@@ -593,7 +593,13 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
                 replace = "#{m}#{matchResult[2]}#{matchResult[3]}"
 
               content = content.replace(r, replace)
-
+          
+          # Loops over disambiguated textAnnotations 
+          # and notifies selected EntityAnnotations to EntitiesController
+          disambiguatedTextAnnotations = tinyMCE.get('content').dom.select('span.disambiguated')
+          for textAnnotation in disambiguatedTextAnnotations   
+            $rootScope.$broadcast 'disambiguatedTextAnnotationDetected', textAnnotation.id, textAnnotation.getAttribute('itemid')
+         
           isDirty = tinyMCE.get('content').isDirty()
           tinyMCE.get('content').setContent content
           tinyMCE.get('content').isNotDirty = 1 if not isDirty
@@ -809,6 +815,13 @@ angular.module('wordlift.tinymce.plugin.controllers',
 
       $scope.onEntitySelected = (textAnnotation, entityAnnotation) ->
         $scope.$emit 'DisambiguationWidget.entitySelected', entityAnnotation
+
+      # Receives notifications about disambiguated textAnnotations
+      # and flags selected entityAnnotations properly ... 
+      $scope.$on 'disambiguatedTextAnnotationDetected', (event, textAnnotationId, entityId) -> 
+        for id, entityAnnotation of $scope.analysis.textAnnotations[textAnnotationId].entityAnnotations
+          if entityAnnotation.entity.id == entityId
+            $scope.analysis.entityAnnotations[entityAnnotation.id].selected = true
 
       # Receive the analysis results and store them in the local scope.
       $scope.$on 'analysisReceived', (event, analysis) ->

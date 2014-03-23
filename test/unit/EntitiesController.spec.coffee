@@ -78,5 +78,31 @@ describe "EditorController tests", ->
 
         # Check that the disambiguation popover is visible.
         expect($('#wordlift-disambiguation-popover')).toBeVisible()
+  )
+  it "Load an analysis on a content including a disambiguated item", inject((AnalysisService, $httpBackend, $rootScope) ->
 
+    $.ajax('base/app/assets/english.json',
+      async: false
+    ).done (data) ->
+      # Catch all the requests to Freebase.
+      $httpBackend.when('HEAD', /.*/).respond(200, '')
+      
+      analysis = AnalysisService.parse data
+      expect($scope.analysis).toBe null
+      $rootScope.$broadcast 'analysisReceived', analysis
+      expect($scope.analysis).toEqual analysis
+
+      # Simulates event fired by EditorService 
+      # to notify disambiguated textAnnotations to the controller
+      
+      textAnnotationId = "urn:enhancement-233fd158-870d-6ca4-b7ce-30313e4a7015"
+      entityAnnotationId = "urn:enhancement-53bd49a5-4609-627c-be3f-468d30a35bdc"
+      selectedEntityId = "http://data.redlink.io/353/wordlift/entity/David_Riccitelli"
+
+      expect($scope.analysis.textAnnotations[textAnnotationId].entityAnnotations[entityAnnotationId].selected).toBe false
+      expect($scope.analysis.entityAnnotations[entityAnnotationId].selected).toBe false
+      $rootScope.$broadcast 'disambiguatedTextAnnotationDetected', textAnnotationId, selectedEntityId
+      expect($scope.analysis.textAnnotations[textAnnotationId].entityAnnotations[entityAnnotationId].selected).toBe true
+      expect($scope.analysis.entityAnnotations[entityAnnotationId].selected).toBe true
+      
   )

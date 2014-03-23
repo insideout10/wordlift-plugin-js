@@ -71,6 +71,59 @@ describe 'directives', ->
       expect(element.find('li').length).toEqual 0
     )
 
+    # Test entity box is not empty with one item preselected
+    it 'should not be empty with one item selected', inject(($compile, $rootScope, AnalysisService, $httpBackend) ->
+      
+      # Compile the directive.
+      $compile(element)(scope)
+      scope.$digest()
+
+      # Get the mock-up analysis.
+      $.ajax('base/app/assets/english.json',
+        async: false
+      ).done (data) ->
+
+        # Catch all the requests to Freebase.
+        $httpBackend.when('HEAD', /.*/).respond(200, '')
+
+        # Simulate event broadcasted by AnalysisService
+        $rootScope.$broadcast 'analysisReceived', AnalysisService.parse data
+
+        # Create a fake textAnnotation element (the textAnnotation exists in the mockup data).
+        textAnnotation = angular.element '<span id="urn:enhancement-233fd158-870d-6ca4-b7ce-30313e4a7015" class="textannotation highlight person disambiguated" itemscope="itemscope" itemtype="person" itemid="http://data.redlink.io/353/wordlift/entity/David_Riccitelli">David Riccitelli</span>'
+        # Simulate event broadcasted by EditorService on annotation click
+        $rootScope.$broadcast 'textAnnotationClicked', textAnnotation.attr('id'), { target: textAnnotation }
+
+        # Process changes.
+        scope.$digest()
+
+        # Check that there are entities selected.
+        entitiesElems = element.find('wl-entity > div.selected')
+        expect(entitiesElems.length).toEqual 0
+
+        textAnnotationId = "urn:enhancement-233fd158-870d-6ca4-b7ce-30313e4a7015"
+        entityAnnotationId = "urn:enhancement-53bd49a5-4609-627c-be3f-468d30a35bdc"
+        selectedEntityId = "http://data.redlink.io/353/wordlift/entity/David_Riccitelli"
+
+        # This event is fired by EditorController during analysis embedding
+        # One event is fired for each disambiguated text annotations
+        $rootScope.$broadcast 'disambiguatedTextAnnotationDetected', textAnnotationId, selectedEntityId
+        
+        # Process changes.
+        scope.$digest()
+
+        # Check that there is an entity selected
+        entitiesElems = element.find('wl-entity > div.selected')
+        expect(entitiesElems.length).toEqual 1
+        # Check that it is the right one
+        expect(angular.element(entitiesElems[0]).find('div.thumbnail')[0].getAttribute('title')).toEqual selectedEntityId
+
+        entitiesElems = element.find('wl-entity > div')
+        expect(entitiesElems.length).toEqual 3
+
+
+
+    )
     # Test entity is not empty.
     it 'should not be empty', inject(($compile, $rootScope, AnalysisService, $httpBackend) ->
       # Create a mock select method.

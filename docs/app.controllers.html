@@ -263,12 +263,15 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
-              <p>Receive the analysis results and store them in the local scope.</p>
+              <p>Receives notifications about disambiguated textAnnotations
+and flags selected entityAnnotations properly … </p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      $scope.$<span class="hljs-literal">on</span> <span class="hljs-string">'analysisReceived'</span>, <span class="hljs-function"><span class="hljs-params">(event, analysis)</span> -&gt;</span>
-        $scope.analysis = analysis</pre></div></div>
+            <div class="content"><div class='highlight'><pre>      $scope.$<span class="hljs-literal">on</span> <span class="hljs-string">'disambiguatedTextAnnotationDetected'</span>, <span class="hljs-function"><span class="hljs-params">(event, textAnnotationId, entityId)</span> -&gt;</span> 
+        <span class="hljs-keyword">for</span> id, entityAnnotation <span class="hljs-keyword">of</span> $scope.analysis.textAnnotations[textAnnotationId].entityAnnotations
+          <span class="hljs-keyword">if</span> entityAnnotation.entity.id == entityId
+            $scope.analysis.entityAnnotations[entityAnnotation.id].selected = <span class="hljs-literal">true</span></pre></div></div>
             
         </li>
         
@@ -279,11 +282,12 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
-              <p>When a text annotation is clicked, open the disambiguation popover.</p>
+              <p>Receive the analysis results and store them in the local scope.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      $scope.$<span class="hljs-literal">on</span> <span class="hljs-string">'textAnnotationClicked'</span>, <span class="hljs-function"><span class="hljs-params">(event, id, sourceElement)</span> -&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>      $scope.$<span class="hljs-literal">on</span> <span class="hljs-string">'analysisReceived'</span>, <span class="hljs-function"><span class="hljs-params">(event, analysis)</span> -&gt;</span>
+        $scope.analysis = analysis</pre></div></div>
             
         </li>
         
@@ -294,11 +298,11 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
-              <p>Get the text annotation with the provided id.</p>
+              <p>When a text annotation is clicked, open the disambiguation popover.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        $scope.textAnnotationSpan = angular.element sourceElement.target</pre></div></div>
+            <div class="content"><div class='highlight'><pre>      $scope.$<span class="hljs-literal">on</span> <span class="hljs-string">'textAnnotationClicked'</span>, <span class="hljs-function"><span class="hljs-params">(event, id, sourceElement)</span> -&gt;</span></pre></div></div>
             
         </li>
         
@@ -309,11 +313,11 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
-              <p>Set the current text annotation to the one specified.</p>
+              <p>Get the text annotation with the provided id.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        $scope.textAnnotation = $scope.analysis.textAnnotations[id]</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        $scope.textAnnotationSpan = angular.element sourceElement.target</pre></div></div>
             
         </li>
         
@@ -323,6 +327,21 @@
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <p>Set the current text annotation to the one specified.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        $scope.textAnnotation = $scope.analysis.textAnnotations[id]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
               <p>hide the popover if there are no entities.</p>
 
@@ -334,11 +353,11 @@
         </li>
         
         
-        <li id="section-14">
+        <li id="section-15">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-14">&#182;</a>
+                <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
               <p>show the popover.</p>
 
@@ -349,11 +368,11 @@
         </li>
         
         
-        <li id="section-15">
+        <li id="section-16">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-15">&#182;</a>
+                <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
               <p>get the position of the clicked element.</p>
 
@@ -364,11 +383,11 @@
         </li>
         
         
-        <li id="section-16">
+        <li id="section-17">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-16">&#182;</a>
+                <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
               <p>set the popover arrow to the element position.</p>
 
@@ -379,11 +398,11 @@
         </li>
         
         
-        <li id="section-17">
+        <li id="section-18">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-17">&#182;</a>
+                <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
               <p>show the popover.</p>
 
@@ -399,11 +418,11 @@
         </li>
         
         
-        <li id="section-18">
+        <li id="section-19">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-18">&#182;</a>
+                <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
               <p>Set the element as a jQuery UI Dialog.</p>
 
@@ -422,11 +441,11 @@
         </li>
         
         
-        <li id="section-19">
+        <li id="section-20">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-19">&#182;</a>
+                <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
               <p>Show the dialog box when an error is raised.</p>
 

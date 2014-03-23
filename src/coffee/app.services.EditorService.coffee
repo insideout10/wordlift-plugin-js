@@ -47,7 +47,13 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
                 replace = "#{m}#{matchResult[2]}#{matchResult[3]}"
 
               content = content.replace(r, replace)
-
+          
+          # Loops over disambiguated textAnnotations 
+          # and notifies selected EntityAnnotations to EntitiesController
+          disambiguatedTextAnnotations = tinyMCE.get('content').dom.select('span.disambiguated')
+          for textAnnotation in disambiguatedTextAnnotations   
+            $rootScope.$broadcast 'disambiguatedTextAnnotationDetected', textAnnotation.id, textAnnotation.getAttribute('itemid')
+         
           isDirty = tinyMCE.get('content').isDirty()
           tinyMCE.get('content').setContent content
           tinyMCE.get('content').isNotDirty = 1 if not isDirty
