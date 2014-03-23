@@ -585,7 +585,8 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
             # If there are disambiguated entities
             # the span is not added while the existing span id is replaced
             if matchResult = content.match r
-              replace = "#{matchResult[1]}<span class=\"textannotation\" id=\"#{id}\" typeof=\"http://fise.iks-project.eu/ontology/TextAnnotation\">#{matchResult[2]}</span>#{matchResult[3]}"
+              # Skip typeof attribute
+              replace = "#{matchResult[1]}<span class=\"textannotation\" id=\"#{id}\" >#{matchResult[2]}</span>#{matchResult[3]}"
               if r2.test matchResult[1]
                 m = matchResult[1].replace r2, "id=\"#{id}\""
                 replace = "#{m}#{matchResult[2]}#{matchResult[3]}"

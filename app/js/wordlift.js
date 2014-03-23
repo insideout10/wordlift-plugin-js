@@ -509,7 +509,7 @@
             r = new RegExp("(" + selPrefix + "(?:<[^>]+>){0,})(" + selText + ")((?:<[^>]+>){0,}" + selSuffix + ")(?![^<]*\"[^<]*>)");
             r2 = new RegExp("id=\"(urn:enhancement.[a-z,0-9,-]+)\"");
             if (matchResult = content.match(r)) {
-              replace = "" + matchResult[1] + "<span class=\"textannotation\" id=\"" + id + "\" typeof=\"http://fise.iks-project.eu/ontology/TextAnnotation\">" + matchResult[2] + "</span>" + matchResult[3];
+              replace = "" + matchResult[1] + "<span class=\"textannotation\" id=\"" + id + "\" >" + matchResult[2] + "</span>" + matchResult[3];
               if (r2.test(matchResult[1])) {
                 m = matchResult[1].replace(r2, "id=\"" + id + "\"");
                 replace = "" + m + matchResult[2] + matchResult[3];
