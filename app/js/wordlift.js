@@ -485,7 +485,7 @@
         embedAnalysis: function(analysis) {
           var cleanUp, content, id, isDirty, m, matchResult, r, r2, replace, selPrefix, selSuffix, selText, spanre, textAnnotation, _ref;
           cleanUp = function(text) {
-            return text.replace('\\', '\\\\').replace('\(', '\\(').replace('\)', '\\)').replace('\n', '\\n?').replace('-', '\\-').replace('\x20', '\\s').replace('\xa0', '&nbsp;').replace('[', '\[').replace(']', '\]');
+            return text.replace('\\', '\\\\').replace('\(', '\\(').replace('\)', '\\)').replace('\n', '\\n?').replace('-', '\\-').replace('\x20', '\\s').replace('\xa0', '&nbsp;').replace('\[', '\\[').replace('\]', '\\]');
           };
           content = tinyMCE.get('content').getContent({
             format: 'raw'
