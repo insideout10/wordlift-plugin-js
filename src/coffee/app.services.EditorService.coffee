@@ -9,8 +9,9 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
           # Clean up the selection prefix/suffix text.
           cleanUp = (text) ->
             text
-            .replace('\\', '\\\\').replace('(', '\\(').replace(')', '\\)').replace('\n', '\\n?')
+            .replace('\\', '\\\\').replace('\(', '\\(').replace('\)', '\\)').replace('\n', '\\n?')
             .replace('-', '\\-').replace('\x20', '\\s').replace('\xa0', '&nbsp;')
+            .replace('[', '\[').replace(']', '\]')
 
           # Get the TinyMCE editor content.
           content = tinyMCE.get('content').getContent({format: 'raw'})
