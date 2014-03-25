@@ -1336,6 +1336,22 @@
 .fa-plus-square-o:before {
   content: "\f196";
 }
+.wl-container {
+  display: inline-block;
+  position: relative;
+  width: 100%;
+}
+.wl-container .wl-dummy {
+  margin-top: 100%;
+  /* 4:3 aspect ratio */
+}
+.wl-container .wl-element {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
 .wl-entity-input-boxes {
   display: none;
 }

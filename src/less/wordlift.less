@@ -1,6 +1,25 @@
 @import '../../bower_components/components-font-awesome/less/font-awesome.less';
 @import 'colors.less';
 
+// see http://stackoverflow.com/questions/5445491/height-equal-to-dynamic-width-css-fluid-layout
+.wl-container {
+  display: inline-block;
+  position: relative;
+  width: 100%;
+
+  .wl-dummy {
+    margin-top: 100%; /* 4:3 aspect ratio */
+  }
+
+  .wl-element {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+}
+
 .wl-entity-input-boxes {
   display: none;
 }

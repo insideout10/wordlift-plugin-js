@@ -407,7 +407,7 @@ to notify disambiguated textAnnotations to the controller</p>
 
       expect($scope.analysis.textAnnotations[textAnnotationId].entityAnnotations[entityAnnotationId].selected).toBe <span class="hljs-literal">false</span>
       expect($scope.analysis.entityAnnotations[entityAnnotationId].selected).toBe <span class="hljs-literal">false</span>
-      $rootScope.$broadcast <span class="hljs-string">'disambiguatedTextAnnotationNotification'</span>, textAnnotationId, selectedEntityId
+      $rootScope.$broadcast <span class="hljs-string">'disambiguatedTextAnnotationDetected'</span>, textAnnotationId, selectedEntityId
       expect($scope.analysis.textAnnotations[textAnnotationId].entityAnnotations[entityAnnotationId].selected).toBe <span class="hljs-literal">true</span>
       expect($scope.analysis.entityAnnotations[entityAnnotationId].selected).toBe <span class="hljs-literal">true</span>
       
