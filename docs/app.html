@@ -59,6 +59,11 @@
               </a>
             
               
+              <a class="source" href="traslator.html">
+                traslator.coffee
+              </a>
+            
+              
               <a class="source" href="EntitiesController.spec.html">
                 EntitiesController.spec.coffee
               </a>
@@ -278,7 +283,13 @@
             <div class="content"><div class='highlight'><pre>      <span class="hljs-attribute">onclick</span>:<span class="hljs-function"> -&gt;</span>
         injector.invoke<span class="hljs-function"><span class="hljs-params">([<span class="hljs-string">'EditorService'</span>, <span class="hljs-string">'$rootScope'</span>, (EditorService, $rootScope) -&gt;
           $rootScope.$apply( -&gt;
-            EditorService.analyze tinyMCE.activeEditor.getContent({format: <span class="hljs-string">'text'</span>})
+            html = tinyMCE.activeEditor.getContent({format: <span class="hljs-string">'raw'</span>})
+            <span class="hljs-built_in">console</span>.log html
+            text = tinyMCE.activeEditor.getContent({format: <span class="hljs-string">'text'</span>})
+            <span class="hljs-built_in">console</span>.log text
+            text = Traslator.create(html).getText()
+            <span class="hljs-built_in">console</span>.log text
+            EditorService.analyze text
           )
         ])</span>
 

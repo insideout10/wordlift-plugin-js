@@ -7,57 +7,74 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
       # Embed the provided analysis in the editor.
         embedAnalysis: (analysis) ->
           # Clean up the selection prefix/suffix text.
-          cleanUp = (text) ->
-            text
-            .replace('\\', '\\\\').replace('\(', '\\(').replace('\)', '\\)').replace('\n', '\\n?')
-            .replace('-', '\\-').replace('\x20', '\\s').replace('\xa0', '&nbsp;')
-            .replace('\[', '\\[').replace('\]', '\\]')
+#          cleanUp = (text) ->
+#            text
+#            .replace('\\', '\\\\').replace('\(', '\\(').replace('\)', '\\)').replace('\n', '\\n?')
+#            .replace('-', '\\-').replace('\x20', '\\s').replace('\xa0', '&nbsp;')
+#            .replace('\[', '\\[').replace('\]', '\\]')
 
           # Get the TinyMCE editor content.
           content = tinyMCE.get('content').getContent({format: 'raw'})
 
-          # Remove the existing text annotation spans.
-          spanre = new RegExp("<span[^>]+class=\"textannotation\"[^>]*>([^<]*)</span>", "gi")
-          while spanre.test content
-            content = content.replace spanre, '$1'
+          # Prepare a traslator instance that will traslate Html and Text positions.
+          t = Traslator.create(content)
+
+          # TODO: this should be done before running the analysis. Remove the existing text annotation spans.
+#          spanre = new RegExp("<span[^>]+class=\"textannotation\"[^>]*>([^<]*)</span>", "gi")
+#          while spanre.test content
+#            content = content.replace spanre, '$1'
 
           for id, textAnnotation of analysis.textAnnotations
 
+            # Don't add the text annotation if there are no entity annotations.
+            continue if 0 is Object.keys(textAnnotation.entityAnnotations).length
+
+#            console.log "[ start :: #{textAnnotation.start} ][ end :: #{textAnnotation.end} ][ text :: #{textAnnotation.selectedText} ]"
+
+            # Insert the Html fragments before and after the selected text.
+            t.insertHtml "<span class=\"textAnnotation\" id=\"#{id}\">", {text: textAnnotation.start}
+            t.insertHtml '</span>', {text: textAnnotation.end}
+
             #console.log textAnnotation.id
             # get the selection prefix and suffix for the regexp.
-            selPrefix = cleanUp(textAnnotation.selectionPrefix.substr(-1))
-            selPrefix = '^|\\W' if '' is selPrefix
-            selSuffix = cleanUp(textAnnotation.selectionSuffix.substr(0, 1))
-            selSuffix = '$|\\W' if '' is selSuffix
-
-            selText = textAnnotation.selectedText.replace('(', '\\(').replace(')', '\\)')
-
-            # the new regular expression, may not match everything.
-            # TODO: enhance the matching.
-            r = new RegExp("(#{selPrefix}(?:<[^>]+>){0,})(#{selText})((?:<[^>]+>){0,}#{selSuffix})(?![^<]*\"[^<]*>)")
-            r2 = new RegExp("id=\"(urn:enhancement.[a-z,0-9,-]+)\"")
-
+#            selPrefix = cleanUp(textAnnotation.selectionPrefix.substr(-1))
+#            selPrefix = '^|\\W' if '' is selPrefix
+#            selSuffix = cleanUp(textAnnotation.selectionSuffix.substr(0, 1))
+#            selSuffix = '$|\\W' if '' is selSuffix
+#
+#            selText = textAnnotation.selectedText.replace('(', '\\(').replace(')', '\\)')
+#
+#            # the new regular expression, may not match everything.
+#            # TODO: enhance the matching.
+#            r = new RegExp("(#{selPrefix}(?:<[^>]+>){0,})(#{selText})((?:<[^>]+>){0,}#{selSuffix})(?![^<]*\"[^<]*>)")
+#            r2 = new RegExp("id=\"(urn:enhancement.[a-z,0-9,-]+)\"")
+#
             # If there are disambiguated entities
             # the span is not added while the existing span id is replaced
-            if matchResult = content.match r
-              # Skip typeof attribute
-              replace = "#{matchResult[1]}<span class=\"textannotation\" id=\"#{id}\" >#{matchResult[2]}</span>#{matchResult[3]}"
-              if r2.test matchResult[1]
-                m = matchResult[1].replace r2, "id=\"#{id}\""
-                replace = "#{m}#{matchResult[2]}#{matchResult[3]}"
+#            if matchResult = content.match r
+#              # Skip typeof attribute
+#              replace = "#{matchResult[1]}<span class=\"textannotation\" id=\"#{id}\" >#{matchResult[2]}</span>#{matchResult[3]}"
+#              if r2.test matchResult[1]
+#                m = matchResult[1].replace r2, "id=\"#{id}\""
+#                replace = "#{m}#{matchResult[2]}#{matchResult[3]}"
+#
+#              content = content.replace(r, replace)
 
-              content = content.replace(r, replace)
-          
-          # Loops over disambiguated textAnnotations 
+          # Loops over disambiguated textAnnotations
           # and notifies selected EntityAnnotations to EntitiesController
-          disambiguatedTextAnnotations = tinyMCE.get('content').dom.select('span.disambiguated')
-          for textAnnotation in disambiguatedTextAnnotations   
-            $rootScope.$broadcast 'disambiguatedTextAnnotationDetected', textAnnotation.id, textAnnotation.getAttribute('itemid')
-         
+#          disambiguatedTextAnnotations = tinyMCE.get('content').dom.select('span.disambiguated')
+#          for textAnnotation in disambiguatedTextAnnotations
+#            $rootScope.$broadcast 'disambiguatedTextAnnotationDetected', textAnnotation.id, textAnnotation.getAttribute('itemid')
+
+#          console.log "===== getHtml ====="
+#          console.log t.getHtml()
+#          console.log "===== /getHtml ====="
+
           isDirty = tinyMCE.get('content').isDirty()
-          tinyMCE.get('content').setContent content
+          tinyMCE.get('content').setContent t.getHtml()
           tinyMCE.get('content').isNotDirty = 1 if not isDirty
 
+          # TODO: move this outside of this method.
           # this event is raised when a textannotation is selected in the TinyMCE editor.
           tinyMCE.get('content').onClick.add (editor, e) ->
             # execute the following commands in the angular js context.

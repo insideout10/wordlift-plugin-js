@@ -1,3 +1,109 @@
+class Traslator
+
+  # Hold the html and textual positions.
+  _htmlPositions: []
+  _textPositions: []
+
+  # Hold the html and text contents.
+  _html: ''
+  _text: ''
+
+  # Create an instance of the traslator.
+  @create: (html) ->
+    traslator = new Traslator(html)
+    traslator.parse()
+    traslator
+
+  constructor: (html) ->
+    @_html = html
+
+  parse: ->
+    @_htmlPositions = []
+    @_textPositions = []
+    @_text = ''
+
+    pattern = /([^<]*)(<[^>]*>)([^<]*)/gim
+
+    textLength = 0
+    htmlLength = 0
+
+    while match = pattern.exec @_html
+
+      # Get the text pre/post and the html element
+      htmlPre = match[1]
+      htmlElem = match[2]
+      htmlPost = match[3]
+
+      # Get the text pre/post w/o new lines.
+      textPre = htmlPre + (if '</p>' is htmlElem.toLowerCase() then '\n\n' else '')
+#      dump "[ htmlPre length :: #{htmlPre.length} ][ textPre length :: #{textPre.length} ]"
+      textPost = htmlPost
+
+      # Sum the lengths to the existing lengths.
+      textLength += textPre.length
+      # For html add the length of the html element.
+      htmlLength += htmlPre.length + htmlElem.length
+
+      # If there's a text after the elem, add the position, otherwise skip this one.
+      if 0 < htmlPost.length
+        @_htmlPositions.push htmlLength
+        @_textPositions.push textLength
+
+      textLength += textPost.length
+      htmlLength += htmlPost.length
+
+      # Add the textual parts to the text.
+      @_text += textPre + textPost
+
+  # Get the html position, given a text position.
+  text2html: (pos) ->
+    htmlPos = @_textPositions[0]
+    textPos = @_textPositions[0]
+
+    for i in [0...@_textPositions.length]
+      break if pos < @_textPositions[i]
+      htmlPos = @_htmlPositions[i]
+      textPos = @_textPositions[i]
+
+    #    dump "#{htmlPos} + #{pos} - #{textPos}"
+    htmlPos + pos - textPos
+
+  # Get the text position, given an html position.
+  html2text: (pos) ->
+    htmlPos = @_textPositions[0]
+    textPos = @_textPositions[0]
+
+    for i in [0...@_htmlPositions.length]
+      break if pos < @_htmlPositions[i]
+      htmlPos = @_htmlPositions[i]
+      textPos = @_textPositions[i]
+
+    textPos + pos - htmlPos
+
+  # Insert an Html fragment at the specified location.
+  insertHtml: (fragment, pos) ->
+
+    #    dump "[ fragment :: #{fragment} ][ pos text :: #{pos.text} ]"
+    htmlPos = @text2html pos.text
+
+    @_html = @_html.substring(0, htmlPos) + fragment + @_html.substring(htmlPos)
+
+    # Reparse
+    @parse()
+
+    # Increment the position values for those position after the current.
+#    @_htmlPositions[i] += fragment.length for i in [0...@_htmlPositions.length] when @_htmlPositions[i] > htmlPos
+
+
+  # Return the html.
+  getHtml: ->
+    @_html
+
+  # Return the text.
+  getText: ->
+    @_text
+
+window.Traslator = Traslator
 angular.module('wordlift.tinymce.plugin.config', [])
 	.constant 'Configuration', 
 		supportedTypes: [
@@ -338,15 +444,19 @@ angular.module('AnalysisService', [])
 
 
         createTextAnnotation = (item) ->
-          {
-          id: get('@id', item),
-          selectedText: get('http://fise.iks-project.eu/ontology/selected-text', item)['@value'],
-          selectionPrefix: get('http://fise.iks-project.eu/ontology/selection-prefix', item)['@value'],
-          selectionSuffix: get('http://fise.iks-project.eu/ontology/selection-suffix', item)['@value'],
-          confidence: get('http://fise.iks-project.eu/ontology/confidence', item),
-          entityAnnotations: {},
-          _item: item
+          textAnnotation = {
+            id: get('@id', item)
+            selectedText: get('http://fise.iks-project.eu/ontology/selected-text', item)['@value']
+            selectionPrefix: get('http://fise.iks-project.eu/ontology/selection-prefix', item)['@value']
+            selectionSuffix: get('http://fise.iks-project.eu/ontology/selection-suffix', item)['@value']
+            start: get('http://fise.iks-project.eu/ontology/start', item)
+            end: get('http://fise.iks-project.eu/ontology/end', item)
+            confidence: get('http://fise.iks-project.eu/ontology/confidence', item)
+            entityAnnotations: {}
+            _item: item
           }
+          #          console.log "createTextAnnotation [ start :: #{textAnnotation.start} ][ end :: #{textAnnotation.end} ][ text :: #{textAnnotation.selectedText} ]"
+          textAnnotation
 
         createLanguage = (item) ->
           {
@@ -427,8 +537,8 @@ angular.module('AnalysisService', [])
               # Prefer the DBpedia description.
               # TODO: have a user-set priority.
               entity.description = existing.description if 'dbpedia' is existing.source
-              entity.longitude   = existing.longitude if 'dbpedia' is existing.source and existing.longitude?
-              entity.latitude    = existing.latitude if 'dbpedia' is existing.source and existing.latitude?
+              entity.longitude = existing.longitude if 'dbpedia' is existing.source and existing.longitude?
+              entity.latitude = existing.latitude if 'dbpedia' is existing.source and existing.latitude?
 
               # Delete the sameAs entity from the index.
               entities[sameAs] = entity
@@ -553,57 +663,74 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
       # Embed the provided analysis in the editor.
         embedAnalysis: (analysis) ->
           # Clean up the selection prefix/suffix text.
-          cleanUp = (text) ->
-            text
-            .replace('\\', '\\\\').replace('\(', '\\(').replace('\)', '\\)').replace('\n', '\\n?')
-            .replace('-', '\\-').replace('\x20', '\\s').replace('\xa0', '&nbsp;')
-            .replace('\[', '\\[').replace('\]', '\\]')
+#          cleanUp = (text) ->
+#            text
+#            .replace('\\', '\\\\').replace('\(', '\\(').replace('\)', '\\)').replace('\n', '\\n?')
+#            .replace('-', '\\-').replace('\x20', '\\s').replace('\xa0', '&nbsp;')
+#            .replace('\[', '\\[').replace('\]', '\\]')
 
           # Get the TinyMCE editor content.
           content = tinyMCE.get('content').getContent({format: 'raw'})
 
-          # Remove the existing text annotation spans.
-          spanre = new RegExp("<span[^>]+class=\"textannotation\"[^>]*>([^<]*)</span>", "gi")
-          while spanre.test content
-            content = content.replace spanre, '$1'
+          # Prepare a traslator instance that will traslate Html and Text positions.
+          t = Traslator.create(content)
+
+          # TODO: this should be done before running the analysis. Remove the existing text annotation spans.
+#          spanre = new RegExp("<span[^>]+class=\"textannotation\"[^>]*>([^<]*)</span>", "gi")
+#          while spanre.test content
+#            content = content.replace spanre, '$1'
 
           for id, textAnnotation of analysis.textAnnotations
 
+            # Don't add the text annotation if there are no entity annotations.
+            continue if 0 is Object.keys(textAnnotation.entityAnnotations).length
+
+#            console.log "[ start :: #{textAnnotation.start} ][ end :: #{textAnnotation.end} ][ text :: #{textAnnotation.selectedText} ]"
+
+            # Insert the Html fragments before and after the selected text.
+            t.insertHtml "<span class=\"textAnnotation\" id=\"#{id}\">", {text: textAnnotation.start}
+            t.insertHtml '</span>', {text: textAnnotation.end}
+
             #console.log textAnnotation.id
             # get the selection prefix and suffix for the regexp.
-            selPrefix = cleanUp(textAnnotation.selectionPrefix.substr(-1))
-            selPrefix = '^|\\W' if '' is selPrefix
-            selSuffix = cleanUp(textAnnotation.selectionSuffix.substr(0, 1))
-            selSuffix = '$|\\W' if '' is selSuffix
-
-            selText = textAnnotation.selectedText.replace('(', '\\(').replace(')', '\\)')
-
-            # the new regular expression, may not match everything.
-            # TODO: enhance the matching.
-            r = new RegExp("(#{selPrefix}(?:<[^>]+>){0,})(#{selText})((?:<[^>]+>){0,}#{selSuffix})(?![^<]*\"[^<]*>)")
-            r2 = new RegExp("id=\"(urn:enhancement.[a-z,0-9,-]+)\"")
-
+#            selPrefix = cleanUp(textAnnotation.selectionPrefix.substr(-1))
+#            selPrefix = '^|\\W' if '' is selPrefix
+#            selSuffix = cleanUp(textAnnotation.selectionSuffix.substr(0, 1))
+#            selSuffix = '$|\\W' if '' is selSuffix
+#
+#            selText = textAnnotation.selectedText.replace('(', '\\(').replace(')', '\\)')
+#
+#            # the new regular expression, may not match everything.
+#            # TODO: enhance the matching.
+#            r = new RegExp("(#{selPrefix}(?:<[^>]+>){0,})(#{selText})((?:<[^>]+>){0,}#{selSuffix})(?![^<]*\"[^<]*>)")
+#            r2 = new RegExp("id=\"(urn:enhancement.[a-z,0-9,-]+)\"")
+#
             # If there are disambiguated entities
             # the span is not added while the existing span id is replaced
-            if matchResult = content.match r
-              # Skip typeof attribute
-              replace = "#{matchResult[1]}<span class=\"textannotation\" id=\"#{id}\" >#{matchResult[2]}</span>#{matchResult[3]}"
-              if r2.test matchResult[1]
-                m = matchResult[1].replace r2, "id=\"#{id}\""
-                replace = "#{m}#{matchResult[2]}#{matchResult[3]}"
+#            if matchResult = content.match r
+#              # Skip typeof attribute
+#              replace = "#{matchResult[1]}<span class=\"textannotation\" id=\"#{id}\" >#{matchResult[2]}</span>#{matchResult[3]}"
+#              if r2.test matchResult[1]
+#                m = matchResult[1].replace r2, "id=\"#{id}\""
+#                replace = "#{m}#{matchResult[2]}#{matchResult[3]}"
+#
+#              content = content.replace(r, replace)
 
-              content = content.replace(r, replace)
-          
-          # Loops over disambiguated textAnnotations 
+          # Loops over disambiguated textAnnotations
           # and notifies selected EntityAnnotations to EntitiesController
-          disambiguatedTextAnnotations = tinyMCE.get('content').dom.select('span.disambiguated')
-          for textAnnotation in disambiguatedTextAnnotations   
-            $rootScope.$broadcast 'disambiguatedTextAnnotationDetected', textAnnotation.id, textAnnotation.getAttribute('itemid')
-         
+#          disambiguatedTextAnnotations = tinyMCE.get('content').dom.select('span.disambiguated')
+#          for textAnnotation in disambiguatedTextAnnotations
+#            $rootScope.$broadcast 'disambiguatedTextAnnotationDetected', textAnnotation.id, textAnnotation.getAttribute('itemid')
+
+#          console.log "===== getHtml ====="
+#          console.log t.getHtml()
+#          console.log "===== /getHtml ====="
+
           isDirty = tinyMCE.get('content').isDirty()
-          tinyMCE.get('content').setContent content
+          tinyMCE.get('content').setContent t.getHtml()
           tinyMCE.get('content').isNotDirty = 1 if not isDirty
 
+          # TODO: move this outside of this method.
           # this event is raised when a textannotation is selected in the TinyMCE editor.
           tinyMCE.get('content').onClick.add (editor, e) ->
             # execute the following commands in the angular js context.
@@ -958,7 +1085,13 @@ $(
       onclick: ->
         injector.invoke(['EditorService', '$rootScope', (EditorService, $rootScope) ->
           $rootScope.$apply( ->
-            EditorService.analyze tinyMCE.activeEditor.getContent({format: 'text'})
+            html = tinyMCE.activeEditor.getContent({format: 'raw'})
+            console.log html
+            text = tinyMCE.activeEditor.getContent({format: 'text'})
+            console.log text
+            text = Traslator.create(html).getText()
+            console.log text
+            EditorService.analyze text
           )
         ])
 

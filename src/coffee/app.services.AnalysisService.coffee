@@ -226,15 +226,19 @@ angular.module('AnalysisService', [])
 
 
         createTextAnnotation = (item) ->
-          {
-          id: get('@id', item),
-          selectedText: get('http://fise.iks-project.eu/ontology/selected-text', item)['@value'],
-          selectionPrefix: get('http://fise.iks-project.eu/ontology/selection-prefix', item)['@value'],
-          selectionSuffix: get('http://fise.iks-project.eu/ontology/selection-suffix', item)['@value'],
-          confidence: get('http://fise.iks-project.eu/ontology/confidence', item),
-          entityAnnotations: {},
-          _item: item
+          textAnnotation = {
+            id: get('@id', item)
+            selectedText: get('http://fise.iks-project.eu/ontology/selected-text', item)['@value']
+            selectionPrefix: get('http://fise.iks-project.eu/ontology/selection-prefix', item)['@value']
+            selectionSuffix: get('http://fise.iks-project.eu/ontology/selection-suffix', item)['@value']
+            start: get('http://fise.iks-project.eu/ontology/start', item)
+            end: get('http://fise.iks-project.eu/ontology/end', item)
+            confidence: get('http://fise.iks-project.eu/ontology/confidence', item)
+            entityAnnotations: {}
+            _item: item
           }
+          #          console.log "createTextAnnotation [ start :: #{textAnnotation.start} ][ end :: #{textAnnotation.end} ][ text :: #{textAnnotation.selectedText} ]"
+          textAnnotation
 
         createLanguage = (item) ->
           {
@@ -315,8 +319,8 @@ angular.module('AnalysisService', [])
               # Prefer the DBpedia description.
               # TODO: have a user-set priority.
               entity.description = existing.description if 'dbpedia' is existing.source
-              entity.longitude   = existing.longitude if 'dbpedia' is existing.source and existing.longitude?
-              entity.latitude    = existing.latitude if 'dbpedia' is existing.source and existing.latitude?
+              entity.longitude = existing.longitude if 'dbpedia' is existing.source and existing.longitude?
+              entity.latitude = existing.latitude if 'dbpedia' is existing.source and existing.latitude?
 
               # Delete the sameAs entity from the index.
               entities[sameAs] = entity

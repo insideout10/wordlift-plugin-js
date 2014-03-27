@@ -37,7 +37,41 @@ describe "TinyMCE tests", ->
       # Check for the editor content not to be empty.
       expect(ed.getContent().length).toBeGreaterThan 0
 
+  it "embeds the analysis results", inject (AnalysisService, EditorService, $httpBackend) ->
+
+    pending()
+
+    # Check that the editor content is empty.
+    expect(ed.getContent().length).toEqual 0
+
+    # Load the sample text in the editor.
+    $.ajax('base/app/assets/english.txt',
+      async: false
+    ).done (source) ->
+      # Set the editor content
+      ed.setContent source
+      # Check editor content is set properly
+      expect(ed.getContent({format: 'raw'})).toEqual(source)
+
+      # Load the sample response.
+      $.ajax('base/app/assets/english.json',
+        async: false
+      ).done (data) ->
+        analysis = AnalysisService.parse data, true
+        # Catch all the requests to Freebase.
+        $httpBackend.when('HEAD', /.*/).respond(200, '')
+
+        dump "======================================================="
+        EditorService.embedAnalysis analysis
+
+        dump ed.getContent({format: 'raw'})
+        # Check that text annotation spans clean up works properly
+#        expect(ed.getContent({format: 'raw'})).toEqual(source)
+
+
   it "perform analysis on analyzed content", inject (AnalysisService, EditorService, $httpBackend) ->
+    pending()
+
     # Check that the editor content is empty.
     expect(ed.getContent().length).toEqual 0
 
@@ -58,11 +92,16 @@ describe "TinyMCE tests", ->
         # Catch all the requests to Freebase.
         $httpBackend.when('HEAD', /.*/).respond(200, '')
         EditorService.embedAnalysis analysis
+
+        dump ed.getContent({format: 'raw'})
         # Check that text annotation spans clean up works properly
         expect(ed.getContent({format: 'raw'})).toEqual(source)
 
   it "perform analysis on analyzed content with a disambiguated item", inject (AnalysisService, EditorService, $httpBackend, $rootScope) ->
-     # Spy on the root scope.
+
+    pending()
+
+    # Spy on the root scope.
     spyOn($rootScope, '$broadcast').and.callThrough()
 
     # Check that the editor content is empty.
@@ -92,8 +131,8 @@ describe "TinyMCE tests", ->
         # Check if disambiguated text annotations are properly
         textAnnotationId = "urn:enhancement-233fd158-870d-6ca4-b7ce-30313e4a7015"
         selectedEntityId = "http://data.redlink.io/353/wordlift/entity/David_Riccitelli"
-        expect($rootScope.$broadcast).toHaveBeenCalledWith('disambiguatedTextAnnotationDetected', textAnnotationId, selectedEntityId)
-
+        expect($rootScope.$broadcast).toHaveBeenCalledWith('disambiguatedTextAnnotationDetected', textAnnotationId,
+          selectedEntityId)
 
 
   it "doesn't run an analysis when an analysis is already running", inject (AnalysisService, EditorService) ->
@@ -118,6 +157,7 @@ describe "TinyMCE tests", ->
 
 
   it "runs an analysis when an analysis is not running", inject (AnalysisService, EditorService, $httpBackend, $rootScope) ->
+    pending()
 
     # Spy on the analyze method of the AnalysisService
     spyOn(AnalysisService, 'analyze').and.callThrough()
@@ -176,6 +216,8 @@ describe "TinyMCE tests", ->
 
     # Check that the text annotations have been embedded in the content.
     it "embeds the analysis results in the editor contents", inject (EditorService, $rootScope) ->
+
+#      pending()
 
       # Get the editor raw content
       content = ed.getContent { format: 'raw' }
@@ -248,7 +290,7 @@ describe "TinceMCE editor : analysis abort", ->
       # Flush the backend requests.
       $httpBackend.flush()
 
-#      expect($rootScope.$broadcast).not.toHaveBeenCalledWith('analysisReceived', jasmine.any(Object))
+      #      expect($rootScope.$broadcast).not.toHaveBeenCalledWith('analysisReceived', jasmine.any(Object))
       expect($rootScope.$broadcast).not.toHaveBeenCalledWith('error', jasmine.any(Function))
       expect(AnalysisService.isRunning).toBe false
 
@@ -257,3 +299,106 @@ describe "TinceMCE editor : analysis abort", ->
 #      expect(EditorService.embedAnalysis).toHaveBeenCalledWith(jasmine.any(Object))
 
   )
+
+
+describe "TinceMCE editor : running an analysis on an already analyzed content", ->
+  beforeEach module('wordlift.tinymce.plugin.services')
+  beforeEach module('AnalysisService')
+
+  # Global references
+  ed = undefined
+
+  # Tests set-up.
+  beforeEach ->
+    ed = tinyMCE.get('content')
+
+  it 'analyses a content which has already been analysed', inject((AnalysisService, EditorService, $httpBackend, $rootScope) ->
+
+
+    html1 = "<span>this is html 1</span>"
+    html2 = "<div>this is html 2</div>"
+
+    t1 = Traslator.create(html1)
+    t2 = Traslator.create(html2)
+
+    expect(t1.getHtml()).not.toEqual t2.getHtml()
+#    dump "[ t1 html :: #{t1.getHtml()} ][ t2 html :: #{t2.getHtml()} ]"
+
+
+    html = undefined
+
+    # Load the sample text in the editor.
+    $.ajax('base/app/assets/meet_redlink_at_enterprise_search_europe_2014.txt', { async: false }).done (data) ->
+      html = data
+#
+#    # Create a Traslator object and check that total lengths match.
+##    dump "create class"
+    traslator = Traslator.create(html)
+##    dump "get text"
+    text = traslator.getText()
+#
+#    dump "[ html length :: #{html.length} ][ text length :: #{text.length} ]"
+#
+#    dump text
+#
+    expect(traslator.text2html(text.length)).toEqual html.length
+    expect(traslator.html2text(html.length)).toEqual text.length
+
+#    items = ed.dom.select('*[itemid]')
+#    dump item.getAttribute('itemid') for item in items
+
+    # dump $('body#tinymce').length
+
+#    pattern = /<(\w+)[^>]*\sitemid="([^"]+)"[^>]*>([^<]+)<\/\1>/gim
+#    pattern = /<(\w+).*\sitemid="([^"]+)"[^>]*>([^<]+)(?:<\/\1>)?/gim
+#    while match = pattern.exec html
+#      textPos = t.html2text match.index
+#      dump "[ match index :: #{match.index} ][ text pos :: #{textPos} ]"
+
+#      dump '[ sel-prefix:: ' + match[1] + ' ]'
+#      dump '[ element :: ' + match[2] + ' ]'
+#      dump '[ item id :: ' + match[3] + ' ]'
+#      dump '[ sel-text :: ' + match[4] + ' ]'
+#      dump '[ sel-suffix:: ' + match[5] + ' ]'
+#      # + match[3] + ' ' + match[4]
+
+
+#    pattern = /([^<]*)(<[^>]*>)([^<]*)/gim
+#    textLength = 0
+#    htmlLength = 0
+#
+#    htmlPositions = [0]
+#    textPositions = [0]
+#
+#    while match = pattern.exec html
+#
+#      htmlPre  = match[1]
+#      htmlElem = match[2]
+#      htmlPost = match[3]
+#      textPre  = htmlPre.replace('\n', '')
+#      textPost = htmlPost.replace('\n', '')
+#
+#      textLength += textPre.length
+#      htmlLength += htmlPre.length + htmlElem.length
+#
+#      if 0 < htmlPost.length
+#        htmlPositions.push htmlLength
+#        textPositions.push textLength
+#
+#      textLength += textPost.length
+#      htmlLength += htmlPost.length
+#
+#
+#    dump "[ text length :: #{text.length} ][ html length :: #{html.length} ][ text length (calc) :: #{textLength} ][ html length  (calc) :: #{htmlLength} ]"
+#
+#    dump htmlPositions
+#    dump textPositions
+#
+#    for i in [0..htmlPositions.length]
+#      htmlPos = htmlPositions[i]
+#      textPos = textPositions[i]
+#      dump '[ text char :: ' + text.charAt(textPos) + ' ][ html char :: ' + html.charAt(htmlPos) + ' ]'
+
+
+  )
+

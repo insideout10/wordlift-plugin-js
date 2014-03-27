@@ -85,7 +85,13 @@ $(
       onclick: ->
         injector.invoke(['EditorService', '$rootScope', (EditorService, $rootScope) ->
           $rootScope.$apply( ->
-            EditorService.analyze tinyMCE.activeEditor.getContent({format: 'text'})
+            html = tinyMCE.activeEditor.getContent({format: 'raw'})
+            console.log html
+            text = tinyMCE.activeEditor.getContent({format: 'text'})
+            console.log text
+            text = Traslator.create(html).getText()
+            console.log text
+            EditorService.analyze text
           )
         ])
 

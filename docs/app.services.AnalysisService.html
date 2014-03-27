@@ -59,6 +59,11 @@
               </a>
             
               
+              <a class="source" href="traslator.html">
+                traslator.coffee
+              </a>
+            
+              
               <a class="source" href="EntitiesController.spec.html">
                 EntitiesController.spec.coffee
               </a>
@@ -753,21 +758,16 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
 
 
         <span class="hljs-function"><span class="hljs-title">createTextAnnotation</span> = <span class="hljs-params">(item)</span> -&gt;</span>
-          {
-          <span class="hljs-attribute">id</span>: get(<span class="hljs-string">'@id'</span>, item),
-          <span class="hljs-attribute">selectedText</span>: get(<span class="hljs-string">'http://fise.iks-project.eu/ontology/selected-text'</span>, item)[<span class="hljs-string">'@value'</span>],
-          <span class="hljs-attribute">selectionPrefix</span>: get(<span class="hljs-string">'http://fise.iks-project.eu/ontology/selection-prefix'</span>, item)[<span class="hljs-string">'@value'</span>],
-          <span class="hljs-attribute">selectionSuffix</span>: get(<span class="hljs-string">'http://fise.iks-project.eu/ontology/selection-suffix'</span>, item)[<span class="hljs-string">'@value'</span>],
-          <span class="hljs-attribute">confidence</span>: get(<span class="hljs-string">'http://fise.iks-project.eu/ontology/confidence'</span>, item),
-          <span class="hljs-attribute">entityAnnotations</span>: {},
-          <span class="hljs-attribute">_item</span>: item
-          }
-
-        <span class="hljs-function"><span class="hljs-title">createLanguage</span> = <span class="hljs-params">(item)</span> -&gt;</span>
-          {
-          <span class="hljs-attribute">code</span>: get(<span class="hljs-string">'http://purl.org/dc/terms/language'</span>, item),
-          <span class="hljs-attribute">confidence</span>: get(<span class="hljs-string">'http://fise.iks-project.eu/ontology/confidence'</span>, item)
-          <span class="hljs-attribute">_item</span>: item
+          textAnnotation = {
+            <span class="hljs-attribute">id</span>: get(<span class="hljs-string">'@id'</span>, item)
+            <span class="hljs-attribute">selectedText</span>: get(<span class="hljs-string">'http://fise.iks-project.eu/ontology/selected-text'</span>, item)[<span class="hljs-string">'@value'</span>]
+            <span class="hljs-attribute">selectionPrefix</span>: get(<span class="hljs-string">'http://fise.iks-project.eu/ontology/selection-prefix'</span>, item)[<span class="hljs-string">'@value'</span>]
+            <span class="hljs-attribute">selectionSuffix</span>: get(<span class="hljs-string">'http://fise.iks-project.eu/ontology/selection-suffix'</span>, item)[<span class="hljs-string">'@value'</span>]
+            <span class="hljs-attribute">start</span>: get(<span class="hljs-string">'http://fise.iks-project.eu/ontology/start'</span>, item)
+            <span class="hljs-attribute">end</span>: get(<span class="hljs-string">'http://fise.iks-project.eu/ontology/end'</span>, item)
+            <span class="hljs-attribute">confidence</span>: get(<span class="hljs-string">'http://fise.iks-project.eu/ontology/confidence'</span>, item)
+            <span class="hljs-attribute">entityAnnotations</span>: {}
+            <span class="hljs-attribute">_item</span>: item
           }</pre></div></div>
             
         </li>
@@ -779,11 +779,18 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-36">&#182;</a>
               </div>
-              <p>Get the values associated with the specified key(s). Keys are expanded.</p>
-
+              <pre><code>     <span class="hljs-built_in">console</span>.log <span class="hljs-string">"createTextAnnotation [ start :: <span class="hljs-subst">#{textAnnotation.start}</span> ][ end :: <span class="hljs-subst">#{textAnnotation.end}</span> ][ text :: <span class="hljs-subst">#{textAnnotation.selectedText}</span> ]"</span>
+</code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-function"><span class="hljs-title">get</span> = <span class="hljs-params">(what, container, filter)</span> -&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>          textAnnotation
+
+        <span class="hljs-function"><span class="hljs-title">createLanguage</span> = <span class="hljs-params">(item)</span> -&gt;</span>
+          {
+          <span class="hljs-attribute">code</span>: get(<span class="hljs-string">'http://purl.org/dc/terms/language'</span>, item),
+          <span class="hljs-attribute">confidence</span>: get(<span class="hljs-string">'http://fise.iks-project.eu/ontology/confidence'</span>, item)
+          <span class="hljs-attribute">_item</span>: item
+          }</pre></div></div>
             
         </li>
         
@@ -794,11 +801,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-37">&#182;</a>
               </div>
-              <p>If it’s a single key, call getA</p>
+              <p>Get the values associated with the specified key(s). Keys are expanded.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">return</span> getA(what, container, filter) <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> angular.isArray what</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-function"><span class="hljs-title">get</span> = <span class="hljs-params">(what, container, filter)</span> -&gt;</span></pre></div></div>
             
         </li>
         
@@ -809,11 +816,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-38">&#182;</a>
               </div>
-              <p>Prepare the return array.</p>
+              <p>If it’s a single key, call getA</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          values = []</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">return</span> getA(what, container, filter) <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> angular.isArray what</pre></div></div>
             
         </li>
         
@@ -823,6 +830,21 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-39">&#182;</a>
+              </div>
+              <p>Prepare the return array.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          values = []</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-40">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-40">&#182;</a>
               </div>
               <p>For each key, add the result.</p>
 
@@ -834,11 +856,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-40">
+        <li id="section-41">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-40">&#182;</a>
+                <a class="pilcrow" href="#section-41">&#182;</a>
               </div>
               <p>Ensure the result is an array.</p>
 
@@ -849,11 +871,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-41">
+        <li id="section-42">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-41">&#182;</a>
+                <a class="pilcrow" href="#section-42">&#182;</a>
               </div>
               <p>Merge unique the results.</p>
 
@@ -864,11 +886,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-42">
+        <li id="section-43">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-42">&#182;</a>
+                <a class="pilcrow" href="#section-43">&#182;</a>
               </div>
               <p>Return the result array.</p>
 
@@ -879,11 +901,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-43">
+        <li id="section-44">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-43">&#182;</a>
+                <a class="pilcrow" href="#section-44">&#182;</a>
               </div>
               <p>Get the values associated with the specified key. Keys are expanded.</p>
 
@@ -895,11 +917,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-44">
+        <li id="section-45">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-44">&#182;</a>
+                <a class="pilcrow" href="#section-45">&#182;</a>
               </div>
               <p>expand the what key.</p>
 
@@ -910,11 +932,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-45">
+        <li id="section-46">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-45">&#182;</a>
+                <a class="pilcrow" href="#section-46">&#182;</a>
               </div>
               <p>return the value bound to the specified key.
        console.log “[ what exp :: #{whatExp} ][ key :: #{expand key} ][ value :: #{value} ][ match :: #{whatExp is expand(key)} ]” for key, value of container</p>
@@ -927,11 +949,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-46">
+        <li id="section-47">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-46">&#182;</a>
+                <a class="pilcrow" href="#section-47">&#182;</a>
               </div>
               <p>get the value for specified property (what) in the provided container in the specified language.
 items must conform to {‘@language’:…, ‘@value’:…} format.</p>
@@ -943,11 +965,11 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
         </li>
         
         
-        <li id="section-47">
+        <li id="section-48">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-47">&#182;</a>
+                <a class="pilcrow" href="#section-48">&#182;</a>
               </div>
               <p>if there’s no item return null.</p>
 
@@ -958,11 +980,11 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
         </li>
         
         
-        <li id="section-48">
+        <li id="section-49">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-48">&#182;</a>
+                <a class="pilcrow" href="#section-49">&#182;</a>
               </div>
               <p>transform to an array if it’s not already.</p>
 
@@ -973,11 +995,11 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
         </li>
         
         
-        <li id="section-49">
+        <li id="section-50">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-49">&#182;</a>
+                <a class="pilcrow" href="#section-50">&#182;</a>
               </div>
               <p>cycle through the array.</p>
 
@@ -988,11 +1010,11 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
         </li>
         
         
-        <li id="section-50">
+        <li id="section-51">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-50">&#182;</a>
+                <a class="pilcrow" href="#section-51">&#182;</a>
               </div>
               <p>if not found return null.</p>
 
@@ -1005,11 +1027,11 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
         </li>
         
         
-        <li id="section-51">
+        <li id="section-52">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-51">&#182;</a>
+                <a class="pilcrow" href="#section-52">&#182;</a>
               </div>
               <pre><code>   dump <span class="hljs-string">"containsOrEquals [ what :: <span class="hljs-subst">#{what}</span> ][ where :: <span class="hljs-subst">#{where}</span> ]"</span>
 </code></pre><p>if where is not defined return false.</p>
@@ -1021,11 +1043,11 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
         </li>
         
         
-        <li id="section-52">
+        <li id="section-53">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-52">&#182;</a>
+                <a class="pilcrow" href="#section-53">&#182;</a>
               </div>
               <p>ensure the where argument is an array.</p>
 
@@ -1036,11 +1058,11 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
         </li>
         
         
-        <li id="section-53">
+        <li id="section-54">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-53">&#182;</a>
+                <a class="pilcrow" href="#section-54">&#182;</a>
               </div>
               <p>expand the what string.</p>
 
@@ -1048,22 +1070,6 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
             
             <div class="content"><div class='highlight'><pre>          whatExp = expand(what)
           <span class="hljs-keyword">if</span> <span class="hljs-string">'@'</span> <span class="hljs-keyword">is</span> what.charAt(<span class="hljs-number">0</span>)</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-54">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-54">&#182;</a>
-              </div>
-              <p>return true if the string is found.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span> <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> whereArray <span class="hljs-keyword">when</span> whatExp <span class="hljs-keyword">is</span> expand(item)
-          <span class="hljs-keyword">else</span></pre></div></div>
             
         </li>
         
@@ -1078,7 +1084,8 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span> <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> whereArray <span class="hljs-keyword">when</span> whatExp <span class="hljs-keyword">is</span> expand(item)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span> <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> whereArray <span class="hljs-keyword">when</span> whatExp <span class="hljs-keyword">is</span> expand(item)
+          <span class="hljs-keyword">else</span></pre></div></div>
             
         </li>
         
@@ -1088,6 +1095,21 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-56">&#182;</a>
+              </div>
+              <p>return true if the string is found.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span> <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> whereArray <span class="hljs-keyword">when</span> whatExp <span class="hljs-keyword">is</span> expand(item)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-57">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-57">&#182;</a>
               </div>
               <p>otherwise false.</p>
 
@@ -1106,11 +1128,11 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
         </li>
         
         
-        <li id="section-57">
+        <li id="section-58">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-57">&#182;</a>
+                <a class="pilcrow" href="#section-58">&#182;</a>
               </div>
               <p>TODO: make concats unique.</p>
 
@@ -1123,11 +1145,11 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
         </li>
         
         
-        <li id="section-58">
+        <li id="section-59">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-58">&#182;</a>
+                <a class="pilcrow" href="#section-59">&#182;</a>
               </div>
               <p>Prefer the DBpedia description.
 TODO: have a user-set priority.</p>
@@ -1135,17 +1157,17 @@ TODO: have a user-set priority.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>              entity.description = existing.description <span class="hljs-keyword">if</span> <span class="hljs-string">'dbpedia'</span> <span class="hljs-keyword">is</span> existing.source
-              entity.longitude   = existing.longitude <span class="hljs-keyword">if</span> <span class="hljs-string">'dbpedia'</span> <span class="hljs-keyword">is</span> existing.source <span class="hljs-keyword">and</span> existing.longitude?
-              entity.latitude    = existing.latitude <span class="hljs-keyword">if</span> <span class="hljs-string">'dbpedia'</span> <span class="hljs-keyword">is</span> existing.source <span class="hljs-keyword">and</span> existing.latitude?</pre></div></div>
+              entity.longitude = existing.longitude <span class="hljs-keyword">if</span> <span class="hljs-string">'dbpedia'</span> <span class="hljs-keyword">is</span> existing.source <span class="hljs-keyword">and</span> existing.longitude?
+              entity.latitude = existing.latitude <span class="hljs-keyword">if</span> <span class="hljs-string">'dbpedia'</span> <span class="hljs-keyword">is</span> existing.source <span class="hljs-keyword">and</span> existing.latitude?</pre></div></div>
             
         </li>
         
         
-        <li id="section-59">
+        <li id="section-60">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-59">&#182;</a>
+                <a class="pilcrow" href="#section-60">&#182;</a>
               </div>
               <p>Delete the sameAs entity from the index.</p>
 
@@ -1158,11 +1180,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-60">
+        <li id="section-61">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-60">&#182;</a>
+                <a class="pilcrow" href="#section-61">&#182;</a>
               </div>
               <p>expand a string to a full path if it contains a prefix.</p>
 
@@ -1173,11 +1195,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-61">
+        <li id="section-62">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-61">&#182;</a>
+                <a class="pilcrow" href="#section-62">&#182;</a>
               </div>
               <p>if there’s no prefix, return the original string.</p>
 
@@ -1191,11 +1213,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-62">
+        <li id="section-63">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-62">&#182;</a>
+                <a class="pilcrow" href="#section-63">&#182;</a>
               </div>
               <p>get the prefix and the path.</p>
 
@@ -1207,11 +1229,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-63">
+        <li id="section-64">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-63">&#182;</a>
+                <a class="pilcrow" href="#section-64">&#182;</a>
               </div>
               <p>if the prefix is unknown, leave it.</p>
 
@@ -1225,11 +1247,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-64">
+        <li id="section-65">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-64">&#182;</a>
+                <a class="pilcrow" href="#section-65">&#182;</a>
               </div>
               <p>return the full path.</p>
 
@@ -1240,11 +1262,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-65">
+        <li id="section-66">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-65">&#182;</a>
+                <a class="pilcrow" href="#section-66">&#182;</a>
               </div>
               <p>Check that the response is valid.</p>
 
@@ -1257,11 +1279,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-66">
+        <li id="section-67">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-66">&#182;</a>
+                <a class="pilcrow" href="#section-67">&#182;</a>
               </div>
               <p>data is split in a context and a graph.</p>
 
@@ -1276,11 +1298,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-67">
+        <li id="section-68">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-67">&#182;</a>
+                <a class="pilcrow" href="#section-68">&#182;</a>
               </div>
               <pre><code>   <span class="hljs-built_in">console</span>.log <span class="hljs-string">"[ id :: <span class="hljs-subst">#{id}</span> ]"</span>
 </code></pre>
@@ -1293,11 +1315,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-68">
+        <li id="section-69">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-68">&#182;</a>
+                <a class="pilcrow" href="#section-69">&#182;</a>
               </div>
               <pre><code>   <span class="hljs-built_in">console</span>.log <span class="hljs-string">"[ id :: <span class="hljs-subst">#{id}</span> ][ dc:type :: <span class="hljs-subst">#{dctype}</span> ]"</span>
 </code></pre>
@@ -1306,11 +1328,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-69">
+        <li id="section-70">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-69">&#182;</a>
+                <a class="pilcrow" href="#section-70">&#182;</a>
               </div>
               <p>TextAnnotation/LinguisticSystem</p>
 
@@ -1322,11 +1344,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-70">
+        <li id="section-71">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-70">&#182;</a>
+                <a class="pilcrow" href="#section-71">&#182;</a>
               </div>
               <pre><code>     dump <span class="hljs-string">"language [ id :: <span class="hljs-subst">#{id}</span> ][ dc:type :: <span class="hljs-subst">#{dctype}</span> ]"</span>
 </code></pre>
@@ -1337,11 +1359,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-71">
+        <li id="section-72">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-71">&#182;</a>
+                <a class="pilcrow" href="#section-72">&#182;</a>
               </div>
               <p>TextAnnotation</p>
 
@@ -1352,11 +1374,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-72">
+        <li id="section-73">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-72">&#182;</a>
+                <a class="pilcrow" href="#section-73">&#182;</a>
               </div>
               <pre><code>     $log.debug <span class="hljs-string">"TextAnnotation [ @id :: <span class="hljs-subst">#{id}</span> ][ types :: <span class="hljs-subst">#{types}</span> ]"</span>
 </code></pre>
@@ -1367,11 +1389,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-73">
+        <li id="section-74">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-73">&#182;</a>
+                <a class="pilcrow" href="#section-74">&#182;</a>
               </div>
               <p>EntityAnnotation</p>
 
@@ -1382,11 +1404,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-74">
+        <li id="section-75">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-74">&#182;</a>
+                <a class="pilcrow" href="#section-75">&#182;</a>
               </div>
               <pre><code>     $log.debug <span class="hljs-string">"EntityAnnotation [ @id :: <span class="hljs-subst">#{id}</span> ][ types :: <span class="hljs-subst">#{types}</span> ]"</span>
 </code></pre>
@@ -1397,11 +1419,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-75">
+        <li id="section-76">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-75">&#182;</a>
+                <a class="pilcrow" href="#section-76">&#182;</a>
               </div>
               <p>Entity</p>
 
@@ -1412,11 +1434,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-76">
+        <li id="section-77">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-76">&#182;</a>
+                <a class="pilcrow" href="#section-77">&#182;</a>
               </div>
               <pre><code>     $log.debug <span class="hljs-string">"Entity [ @id :: <span class="hljs-subst">#{id}</span> ][ types :: <span class="hljs-subst">#{types}</span> ]"</span>
 </code></pre>
@@ -1427,11 +1449,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-77">
+        <li id="section-78">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-77">&#182;</a>
+                <a class="pilcrow" href="#section-78">&#182;</a>
               </div>
               <p>sort the languages by confidence.</p>
 
@@ -1447,11 +1469,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-78">
+        <li id="section-79">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-78">&#182;</a>
+                <a class="pilcrow" href="#section-79">&#182;</a>
               </div>
               <p>create a reference to the default language.</p>
 
@@ -1462,11 +1484,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-79">
+        <li id="section-80">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-79">&#182;</a>
+                <a class="pilcrow" href="#section-80">&#182;</a>
               </div>
               <p>Create entities instances in the entities array.</p>
 
@@ -1477,11 +1499,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-80">
+        <li id="section-81">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-80">&#182;</a>
+                <a class="pilcrow" href="#section-81">&#182;</a>
               </div>
               <p>Cycle in every entity.</p>
 
@@ -1492,11 +1514,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-81">
+        <li id="section-82">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-81">&#182;</a>
+                <a class="pilcrow" href="#section-82">&#182;</a>
               </div>
               <p>Create text annotation instances.</p>
 
@@ -1507,11 +1529,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-82">
+        <li id="section-83">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-82">&#182;</a>
+                <a class="pilcrow" href="#section-83">&#182;</a>
               </div>
               <p>Create entity annotations instances.</p>
 
@@ -1522,11 +1544,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-83">
+        <li id="section-84">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-83">&#182;</a>
+                <a class="pilcrow" href="#section-84">&#182;</a>
               </div>
               <pre><code>   <span class="hljs-built_in">console</span>.log <span class="hljs-string">"[ id :: <span class="hljs-subst">#{id}</span> ]"</span>
 </code></pre>
@@ -1537,11 +1559,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-84">
+        <li id="section-85">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-84">&#182;</a>
+                <a class="pilcrow" href="#section-85">&#182;</a>
               </div>
               <p>For every text annotation delete entity annotations that refer to the same entity (after merging).</p>
 
@@ -1552,11 +1574,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-85">
+        <li id="section-86">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-85">&#182;</a>
+                <a class="pilcrow" href="#section-86">&#182;</a>
               </div>
               <p>Cycle in text annotations.</p>
 
@@ -1567,11 +1589,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-86">
+        <li id="section-87">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-86">&#182;</a>
+                <a class="pilcrow" href="#section-87">&#182;</a>
               </div>
               <p>Cycle in entity annotations.</p>
 
@@ -1582,11 +1604,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-87">
+        <li id="section-88">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-87">&#182;</a>
+                <a class="pilcrow" href="#section-88">&#182;</a>
               </div>
               <pre><code>       <span class="hljs-built_in">console</span>.log <span class="hljs-string">"[ text-annotation id :: <span class="hljs-subst">#{textAnnotationId}</span> ][ entity-annotation id :: <span class="hljs-subst">#{entityAnnotation.id}</span> ]"</span>
 </code></pre><p>Check if there are entity annotations referring to the same entity, and if so, delete it.</p>
@@ -1598,11 +1620,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-88">
+        <li id="section-89">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-88">&#182;</a>
+                <a class="pilcrow" href="#section-89">&#182;</a>
               </div>
               <pre><code>         <span class="hljs-built_in">console</span>.log <span class="hljs-string">"[ id :: <span class="hljs-subst">#{id}</span> ][ another id :: <span class="hljs-subst">#{anotherId}</span> ]"</span>
 </code></pre>
@@ -1613,11 +1635,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-89">
+        <li id="section-90">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-89">&#182;</a>
+                <a class="pilcrow" href="#section-90">&#182;</a>
               </div>
               <p>return the analysis result.</p>
 
@@ -1634,11 +1656,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-90">
+        <li id="section-91">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-90">&#182;</a>
+                <a class="pilcrow" href="#section-91">&#182;</a>
               </div>
               <p>Return the service instance</p>
 

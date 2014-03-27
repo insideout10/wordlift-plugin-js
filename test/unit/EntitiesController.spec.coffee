@@ -18,6 +18,9 @@ describe "EditorController tests", ->
   )
 
   it "loads an analysis", inject((AnalysisService, $httpBackend, $rootScope) ->
+
+    pending()
+    
     $.ajax('base/app/assets/english.json',
       async: false
 
@@ -80,6 +83,9 @@ describe "EditorController tests", ->
         expect($('#wordlift-disambiguation-popover')).toBeVisible()
   )
   it "Load an analysis on a content including a disambiguated item", inject((AnalysisService, $httpBackend, $rootScope) ->
+
+    # TODO: move this test to an appropriate location.
+    pending()
 
     $.ajax('base/app/assets/english.json',
       async: false

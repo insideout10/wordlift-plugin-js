@@ -73,7 +73,9 @@ describe 'directives', ->
 
     # Test entity box is not empty with one item preselected
     it 'should not be empty with one item selected', inject(($compile, $rootScope, AnalysisService, $httpBackend) ->
-      
+
+      pending()
+
       # Compile the directive.
       $compile(element)(scope)
       scope.$digest()
@@ -126,6 +128,9 @@ describe 'directives', ->
     )
     # Test entity is not empty.
     it 'should not be empty', inject(($compile, $rootScope, AnalysisService, $httpBackend) ->
+
+      pending()
+
       # Create a mock select method.
       scope.select = (ta, ea) -> # Do nothing
       spyOn scope, 'select'
@@ -269,6 +274,8 @@ describe 'directives', ->
     # Test for the entity to empty.
     it 'creates input boxes and textareas with entity data (non-merged)', inject((AnalysisService, $compile, $httpBackend, $rootScope) ->
 
+      pending()
+
       # Compile the directive.
       $compile(element)(scope)
       scope.$digest()
@@ -362,6 +369,8 @@ describe 'directives', ->
 
     # Test for the entity to empty.
     it 'creates input boxes and textareas with entity data (merged)', inject((AnalysisService, $compile, $httpBackend, $rootScope) ->
+
+      pending()
 
       # Compile the directive.
       $compile(element)(scope)
@@ -461,6 +470,8 @@ describe 'directives', ->
 
     # Test for the entity to empty.
     it 'creates input boxes and textareas with entity data (non-merged)', inject((AnalysisService, $compile, $httpBackend, $rootScope) ->
+
+      pending()
 
       # Compile the directive.
       $compile(element)(scope)

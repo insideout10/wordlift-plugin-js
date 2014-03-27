@@ -10,6 +10,8 @@ describe 'services', ->
 
     it 'parses analysis data', inject((AnalysisService, $httpBackend, $rootScope) ->
 
+      pending()
+
       # Get the mock-up analysis.
       $.ajax('base/app/assets/english.json',
         async: false
@@ -57,6 +59,8 @@ describe 'services', ->
     )
 
     it 'parses and merges analysis data', inject((AnalysisService, $httpBackend, $rootScope) ->
+
+      pending()
 
       # Get the mock-up analysis.
       $.ajax('base/app/assets/english.json',

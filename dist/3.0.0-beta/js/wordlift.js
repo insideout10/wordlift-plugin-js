@@ -1,6 +1,103 @@
 (function() {
-  var $, container, injector,
+  var $, Traslator, container, injector,
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+
+  Traslator = (function() {
+    Traslator.prototype._htmlPositions = [];
+
+    Traslator.prototype._textPositions = [];
+
+    Traslator.prototype._html = '';
+
+    Traslator.prototype._text = '';
+
+    Traslator.create = function(html) {
+      var traslator;
+      traslator = new Traslator(html);
+      traslator.parse();
+      return traslator;
+    };
+
+    function Traslator(html) {
+      this._html = html;
+    }
+
+    Traslator.prototype.parse = function() {
+      var htmlElem, htmlLength, htmlPost, htmlPre, match, pattern, textLength, textPost, textPre, _results;
+      this._htmlPositions = [];
+      this._textPositions = [];
+      this._text = '';
+      pattern = /([^<]*)(<[^>]*>)([^<]*)/gim;
+      textLength = 0;
+      htmlLength = 0;
+      _results = [];
+      while (match = pattern.exec(this._html)) {
+        htmlPre = match[1];
+        htmlElem = match[2];
+        htmlPost = match[3];
+        textPre = htmlPre + ('</p>' === htmlElem.toLowerCase() ? '\n\n' : '');
+        textPost = htmlPost;
+        textLength += textPre.length;
+        htmlLength += htmlPre.length + htmlElem.length;
+        if (0 < htmlPost.length) {
+          this._htmlPositions.push(htmlLength);
+          this._textPositions.push(textLength);
+        }
+        textLength += textPost.length;
+        htmlLength += htmlPost.length;
+        _results.push(this._text += textPre + textPost);
+      }
+      return _results;
+    };
+
+    Traslator.prototype.text2html = function(pos) {
+      var htmlPos, i, textPos, _i, _ref;
+      htmlPos = this._textPositions[0];
+      textPos = this._textPositions[0];
+      for (i = _i = 0, _ref = this._textPositions.length; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
+        if (pos < this._textPositions[i]) {
+          break;
+        }
+        htmlPos = this._htmlPositions[i];
+        textPos = this._textPositions[i];
+      }
+      return htmlPos + pos - textPos;
+    };
+
+    Traslator.prototype.html2text = function(pos) {
+      var htmlPos, i, textPos, _i, _ref;
+      htmlPos = this._textPositions[0];
+      textPos = this._textPositions[0];
+      for (i = _i = 0, _ref = this._htmlPositions.length; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
+        if (pos < this._htmlPositions[i]) {
+          break;
+        }
+        htmlPos = this._htmlPositions[i];
+        textPos = this._textPositions[i];
+      }
+      return textPos + pos - htmlPos;
+    };
+
+    Traslator.prototype.insertHtml = function(fragment, pos) {
+      var htmlPos;
+      htmlPos = this.text2html(pos.text);
+      this._html = this._html.substring(0, htmlPos) + fragment + this._html.substring(htmlPos);
+      return this.parse();
+    };
+
+    Traslator.prototype.getHtml = function() {
+      return this._html;
+    };
+
+    Traslator.prototype.getText = function() {
+      return this._text;
+    };
+
+    return Traslator;
+
+  })();
+
+  window.Traslator = Traslator;
 
   angular.module('wordlift.tinymce.plugin.config', []).constant('Configuration', {
     supportedTypes: ['schema:Place', 'schema:Event', 'schema:CreativeWork', 'schema:Product', 'schema:Person', 'schema:Organization'],
@@ -263,15 +360,19 @@
             return annotations[0];
           };
           createTextAnnotation = function(item) {
-            return {
+            var textAnnotation;
+            textAnnotation = {
               id: get('@id', item),
               selectedText: get('http://fise.iks-project.eu/ontology/selected-text', item)['@value'],
               selectionPrefix: get('http://fise.iks-project.eu/ontology/selection-prefix', item)['@value'],
               selectionSuffix: get('http://fise.iks-project.eu/ontology/selection-suffix', item)['@value'],
+              start: get('http://fise.iks-project.eu/ontology/start', item),
+              end: get('http://fise.iks-project.eu/ontology/end', item),
               confidence: get('http://fise.iks-project.eu/ontology/confidence', item),
               entityAnnotations: {},
               _item: item
             };
+            return textAnnotation;
           };
           createLanguage = function(item) {
             return {
@@ -483,47 +584,26 @@
       var service;
       service = {
         embedAnalysis: function(analysis) {
-          var cleanUp, content, disambiguatedTextAnnotations, id, isDirty, m, matchResult, r, r2, replace, selPrefix, selSuffix, selText, spanre, textAnnotation, _i, _len, _ref;
-          cleanUp = function(text) {
-            return text.replace('\\', '\\\\').replace('\(', '\\(').replace('\)', '\\)').replace('\n', '\\n?').replace('-', '\\-').replace('\x20', '\\s').replace('\xa0', '&nbsp;').replace('\[', '\\[').replace('\]', '\\]');
-          };
+          var content, id, isDirty, t, textAnnotation, _ref;
           content = tinyMCE.get('content').getContent({
             format: 'raw'
           });
-          spanre = new RegExp("<span[^>]+class=\"textannotation\"[^>]*>([^<]*)</span>", "gi");
-          while (spanre.test(content)) {
-            content = content.replace(spanre, '$1');
-          }
+          t = Traslator.create(content);
           _ref = analysis.textAnnotations;
           for (id in _ref) {
             textAnnotation = _ref[id];
-            selPrefix = cleanUp(textAnnotation.selectionPrefix.substr(-1));
-            if ('' === selPrefix) {
-              selPrefix = '^|\\W';
+            if (0 === Object.keys(textAnnotation.entityAnnotations).length) {
+              continue;
             }
-            selSuffix = cleanUp(textAnnotation.selectionSuffix.substr(0, 1));
-            if ('' === selSuffix) {
-              selSuffix = '$|\\W';
-            }
-            selText = textAnnotation.selectedText.replace('(', '\\(').replace(')', '\\)');
-            r = new RegExp("(" + selPrefix + "(?:<[^>]+>){0,})(" + selText + ")((?:<[^>]+>){0,}" + selSuffix + ")(?![^<]*\"[^<]*>)");
-            r2 = new RegExp("id=\"(urn:enhancement.[a-z,0-9,-]+)\"");
-            if (matchResult = content.match(r)) {
-              replace = "" + matchResult[1] + "<span class=\"textannotation\" id=\"" + id + "\" >" + matchResult[2] + "</span>" + matchResult[3];
-              if (r2.test(matchResult[1])) {
-                m = matchResult[1].replace(r2, "id=\"" + id + "\"");
-                replace = "" + m + matchResult[2] + matchResult[3];
-              }
-              content = content.replace(r, replace);
-            }
-          }
-          disambiguatedTextAnnotations = tinyMCE.get('content').dom.select('span.disambiguated');
-          for (_i = 0, _len = disambiguatedTextAnnotations.length; _i < _len; _i++) {
-            textAnnotation = disambiguatedTextAnnotations[_i];
-            $rootScope.$broadcast('disambiguatedTextAnnotationDetected', textAnnotation.id, textAnnotation.getAttribute('itemid'));
+            t.insertHtml("<span class=\"textAnnotation\" id=\"" + id + "\">", {
+              text: textAnnotation.start
+            });
+            t.insertHtml('</span>', {
+              text: textAnnotation.end
+            });
           }
           isDirty = tinyMCE.get('content').isDirty();
-          tinyMCE.get('content').setContent(content);
+          tinyMCE.get('content').setContent(t.getHtml());
           if (!isDirty) {
             tinyMCE.get('content').isNotDirty = 1;
           }
@@ -759,9 +839,18 @@
         return injector.invoke([
           'EditorService', '$rootScope', function(EditorService, $rootScope) {
             return $rootScope.$apply(function() {
-              return EditorService.analyze(tinyMCE.activeEditor.getContent({
+              var html, text;
+              html = tinyMCE.activeEditor.getContent({
+                format: 'raw'
+              });
+              console.log(html);
+              text = tinyMCE.activeEditor.getContent({
                 format: 'text'
-              }));
+              });
+              console.log(text);
+              text = Traslator.create(html).getText();
+              console.log(text);
+              return EditorService.analyze(text);
             });
           }
         ]);
