@@ -352,7 +352,7 @@ and flags selected entityAnnotations properly … </p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> <span class="hljs-number">0</span> <span class="hljs-keyword">is</span> $scope.textAnnotation?.entityAnnotations?.length
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> $scope.textAnnotation?.entityAnnotations? <span class="hljs-keyword">or</span> <span class="hljs-number">0</span> <span class="hljs-keyword">is</span> Object.keys($scope.textAnnotation.entityAnnotations).length
           $(<span class="hljs-string">'#wordlift-disambiguation-popover'</span>).hide()</pre></div></div>
             
         </li>

@@ -656,89 +656,136 @@ angular.module('AnalysisService', [])
 
 angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tinymce.plugin.config', 'AnalysisService'])
 .service('EditorService',
-    ['AnalysisService', '$rootScope', '$log', 'Configuration', (AnalysisService, $rootScope, $log, Configuration) ->
+    ['AnalysisService', '$rootScope', '$log', (AnalysisService, $rootScope, $log) ->
 
       # Define the EditorService.
       service =
       # Embed the provided analysis in the editor.
         embedAnalysis: (analysis) ->
-          # Clean up the selection prefix/suffix text.
-#          cleanUp = (text) ->
-#            text
-#            .replace('\\', '\\\\').replace('\(', '\\(').replace('\)', '\\)').replace('\n', '\\n?')
-#            .replace('-', '\\-').replace('\x20', '\\s').replace('\xa0', '&nbsp;')
-#            .replace('\[', '\\[').replace('\]', '\\]')
 
-          # Get the TinyMCE editor content.
-          content = tinyMCE.get('content').getContent({format: 'raw'})
+          findTextAnnotation = (textAnnotations, start, end) ->
+            return textAnnotation for id, textAnnotation of analysis.textAnnotations when textAnnotation.start is start and textAnnotation.end is end
+            null
+
+          findEntityAnnotation = (entityAnnotations, uri) ->
+            return entityAnnotation for id, entityAnnotation of entityAnnotations when uri is entityAnnotation.entity.id or uri in entityAnnotation.entity.sameAs
+            null
+
+
+          # Get the TinyMCE editor html content.
+          html = tinyMCE.get('content').getContent({format: 'raw'})
+
+          # Find existing entities.
+          entities = @findEntities html
+
+          # Remove existing text annotations.
+          html = html.replace(/<(\w+)[^>]*\sclass="textannotation[^"]*"[^>]*>([^<]+)<\/\1>/gim, '$2')
 
           # Prepare a traslator instance that will traslate Html and Text positions.
-          t = Traslator.create(content)
+          traslator = Traslator.create html
 
-          # TODO: this should be done before running the analysis. Remove the existing text annotation spans.
-#          spanre = new RegExp("<span[^>]+class=\"textannotation\"[^>]*>([^<]*)</span>", "gi")
-#          while spanre.test content
-#            content = content.replace spanre, '$1'
+          # Find the existing entities in the html
+          for match in entities
+
+            textAnnotation = findTextAnnotation analysis.textAnnotations, match.text.start, match.text.end
+            if textAnnotation
+              entityAnnotation = findEntityAnnotation textAnnotation.entityAnnotations, match.uri
+              entityAnnotation.selected = true if entityAnnotation?
+              console.log "match [ id :: #{textAnnotation.id} ][ start :: #{textAnnotation.start} ][ end :: #{textAnnotation.end} ][ label :: #{match.label} ]"
+            else
+              console.log "no match [ start :: #{match.text.start} ][ end :: #{match.text.end} ][ label :: #{match.label} ]"
 
           for id, textAnnotation of analysis.textAnnotations
+            start = textAnnotation.start
+            end = textAnnotation.end
+            text = textAnnotation.selectedText
+            console.log "textAnnotation [ start :: #{start} ][ end :: #{end} ][ text :: #{text} ]"
+
+          # TODO: this should be done before running the analysis. Remove the existing text annotation spans.
+          #          spanre = new RegExp("<span[^>]+class=\"textannotation\"[^>]*>([^<]*)</span>", "gi")
+          #          while spanre.test content
+          #            content = content.replace spanre, '$1'
+
+          for textAnnotationId, textAnnotation of analysis.textAnnotations
 
             # Don't add the text annotation if there are no entity annotations.
             continue if 0 is Object.keys(textAnnotation.entityAnnotations).length
 
-#            console.log "[ start :: #{textAnnotation.start} ][ end :: #{textAnnotation.end} ][ text :: #{textAnnotation.selectedText} ]"
+            #            console.log "[ start :: #{textAnnotation.start} ][ end :: #{textAnnotation.end} ][ text :: #{textAnnotation.selectedText} ]"
 
             # Insert the Html fragments before and after the selected text.
-            t.insertHtml "<span class=\"textAnnotation\" id=\"#{id}\">", {text: textAnnotation.start}
-            t.insertHtml '</span>', {text: textAnnotation.end}
+            itemid = ''
+            itemid = " itemid=\"#{entityAnnotation.entity.id}\"" for id, entityAnnotation of textAnnotation.entityAnnotations when entityAnnotation.selected
+            traslator.insertHtml "<span class=\"textannotation\" id=\"#{textAnnotationId}\"#{itemid}>", {text: textAnnotation.start}
+            traslator.insertHtml '</span>', {text: textAnnotation.end}
 
-            #console.log textAnnotation.id
-            # get the selection prefix and suffix for the regexp.
-#            selPrefix = cleanUp(textAnnotation.selectionPrefix.substr(-1))
-#            selPrefix = '^|\\W' if '' is selPrefix
-#            selSuffix = cleanUp(textAnnotation.selectionSuffix.substr(0, 1))
-#            selSuffix = '$|\\W' if '' is selSuffix
-#
-#            selText = textAnnotation.selectedText.replace('(', '\\(').replace(')', '\\)')
-#
-#            # the new regular expression, may not match everything.
-#            # TODO: enhance the matching.
-#            r = new RegExp("(#{selPrefix}(?:<[^>]+>){0,})(#{selText})((?:<[^>]+>){0,}#{selSuffix})(?![^<]*\"[^<]*>)")
-#            r2 = new RegExp("id=\"(urn:enhancement.[a-z,0-9,-]+)\"")
-#
-            # If there are disambiguated entities
-            # the span is not added while the existing span id is replaced
-#            if matchResult = content.match r
-#              # Skip typeof attribute
-#              replace = "#{matchResult[1]}<span class=\"textannotation\" id=\"#{id}\" >#{matchResult[2]}</span>#{matchResult[3]}"
-#              if r2.test matchResult[1]
-#                m = matchResult[1].replace r2, "id=\"#{id}\""
-#                replace = "#{m}#{matchResult[2]}#{matchResult[3]}"
-#
-#              content = content.replace(r, replace)
+          #console.log textAnnotation.id
+          # get the selection prefix and suffix for the regexp.
+          #            selPrefix = cleanUp(textAnnotation.selectionPrefix.substr(-1))
+          #            selPrefix = '^|\\W' if '' is selPrefix
+          #            selSuffix = cleanUp(textAnnotation.selectionSuffix.substr(0, 1))
+          #            selSuffix = '$|\\W' if '' is selSuffix
+          #
+          #            selText = textAnnotation.selectedText.replace('(', '\\(').replace(')', '\\)')
+          #
+          #            # the new regular expression, may not match everything.
+          #            # TODO: enhance the matching.
+          #            r = new RegExp("(#{selPrefix}(?:<[^>]+>){0,})(#{selText})((?:<[^>]+>){0,}#{selSuffix})(?![^<]*\"[^<]*>)")
+          #            r2 = new RegExp("id=\"(urn:enhancement.[a-z,0-9,-]+)\"")
+          #
+          # If there are disambiguated entities
+          # the span is not added while the existing span id is replaced
+          #            if matchResult = content.match r
+          #              # Skip typeof attribute
+          #              replace = "#{matchResult[1]}<span class=\"textannotation\" id=\"#{id}\" >#{matchResult[2]}</span>#{matchResult[3]}"
+          #              if r2.test matchResult[1]
+          #                m = matchResult[1].replace r2, "id=\"#{id}\""
+          #                replace = "#{m}#{matchResult[2]}#{matchResult[3]}"
+          #
+          #              content = content.replace(r, replace)
 
           # Loops over disambiguated textAnnotations
           # and notifies selected EntityAnnotations to EntitiesController
-#          disambiguatedTextAnnotations = tinyMCE.get('content').dom.select('span.disambiguated')
-#          for textAnnotation in disambiguatedTextAnnotations
-#            $rootScope.$broadcast 'disambiguatedTextAnnotationDetected', textAnnotation.id, textAnnotation.getAttribute('itemid')
+          #          disambiguatedTextAnnotations = tinyMCE.get('content').dom.select('span.disambiguated')
+          #          for textAnnotation in disambiguatedTextAnnotations
+          #            $rootScope.$broadcast 'disambiguatedTextAnnotationDetected', textAnnotation.id, textAnnotation.getAttribute('itemid')
 
-#          console.log "===== getHtml ====="
-#          console.log t.getHtml()
-#          console.log "===== /getHtml ====="
+          #          console.log "===== getHtml ====="
+          #          console.log t.getHtml()
+          #          console.log "===== /getHtml ====="
 
           isDirty = tinyMCE.get('content').isDirty()
-          tinyMCE.get('content').setContent t.getHtml()
+          tinyMCE.get('content').setContent traslator.getHtml()
           tinyMCE.get('content').isNotDirty = 1 if not isDirty
 
-          # TODO: move this outside of this method.
-          # this event is raised when a textannotation is selected in the TinyMCE editor.
-          tinyMCE.get('content').onClick.add (editor, e) ->
-            # execute the following commands in the angular js context.
-            $rootScope.$apply(
-              $log.debug "Going to notify click on annotation with id #{e.target.id}"
-              # send a message about the currently clicked annotation.
-              $rootScope.$broadcast 'textAnnotationClicked', e.target.id, e
-            )
+        findEntities: (html) ->
+
+          # Get a traslator instance.
+          traslator = Traslator.create(html)
+
+          # Set the pattern to look for *itemid* attributes.
+          pattern = /<(\w+)[^>]*\sitemid="([^"]+)"[^>]*>([^<]+)<\/\1>/gim
+
+          # Get the matches and return them.
+          (while match = pattern.exec html
+            # Do sth
+            start = match.index
+            end = start + match[0].length
+            uri = match[2]
+            label = match[3]
+
+            {
+            html:
+              start: start
+              end: end
+            text:
+              start: traslator.html2text start
+              end: traslator.html2text end
+            uri: uri
+            label: label
+            }
+          )
+
 
       # <a name="analyze"></a>
       # Send the provided content for analysis using the [AnalysisService.analyze](app.services.AnalysisService.html#analyze) method.
@@ -752,6 +799,14 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
 
             # Make the editor read-obly.
             tinyMCE.get('content').getBody().setAttribute 'contenteditable', false
+
+            # Get entities already discovered.
+            html = tinyMCE.get('content').getContent({format: 'raw'})
+
+            pattern = /\sitemid="([^"]+)"/gim
+            while match = pattern.exec html
+              # Do sth
+              console.log match
 
             # Call the [AnalysisService](AnalysisService.html) to analyze the provided content, asking to merge sameAs related entities.
             AnalysisService.analyze content, true
@@ -964,7 +1019,7 @@ angular.module('wordlift.tinymce.plugin.controllers',
         $scope.textAnnotation = $scope.analysis.textAnnotations[id]
 
         # hide the popover if there are no entities.
-        if 0 is $scope.textAnnotation?.entityAnnotations?.length
+        if not $scope.textAnnotation?.entityAnnotations? or 0 is Object.keys($scope.textAnnotation.entityAnnotations).length
           $('#wordlift-disambiguation-popover').hide()
           # show the popover.
         else
@@ -1081,20 +1136,32 @@ $(
     editor.addButton 'wordlift',
       text: 'WordLift'
       icon: false
+
     # When the editor is clicked, the [EditorService.analyze](app.services.EditorService.html#analyze) method is invoked.
       onclick: ->
         injector.invoke(['EditorService', '$rootScope', (EditorService, $rootScope) ->
           $rootScope.$apply( ->
+            # Get the html content of the editor.
             html = tinyMCE.activeEditor.getContent({format: 'raw'})
-            console.log html
-            text = tinyMCE.activeEditor.getContent({format: 'text'})
-            console.log text
+
+            # Get the text content from the Html.
             text = Traslator.create(html).getText()
-            console.log text
+
+            # Send the text content for analysis.
             EditorService.analyze text
           )
         ])
 
+    # TODO: move this outside of this method.
+    # this event is raised when a textannotation is selected in the TinyMCE editor.
+    editor.onClick.add (editor, e) ->
+      injector.invoke(['$rootScope', ($rootScope) ->
+        # execute the following commands in the angular js context.
+        $rootScope.$apply(  ->
+          # send a message about the currently clicked annotation.
+          $rootScope.$broadcast 'textAnnotationClicked', e.target.id, e
+        )
+      ])
 )
 
 

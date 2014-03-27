@@ -20,7 +20,7 @@ describe "EditorController tests", ->
   it "loads an analysis", inject((AnalysisService, $httpBackend, $rootScope) ->
 
     pending()
-    
+
     $.ajax('base/app/assets/english.json',
       async: false
 

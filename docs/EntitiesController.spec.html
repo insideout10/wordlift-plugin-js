@@ -181,6 +181,9 @@
   )
 
   it <span class="hljs-string">"loads an analysis"</span>, inject<span class="hljs-function"><span class="hljs-params">((AnalysisService, $httpBackend, $rootScope) -&gt;
+
+    pending()
+
     $.ajax(<span class="hljs-string">'base/app/assets/english.json'</span>,
       async: <span class="hljs-literal">false</span>
 
@@ -366,9 +369,6 @@
   )
   it <span class="hljs-string">"Load an analysis on a content including a disambiguated item"</span>, inject<span class="hljs-function"><span class="hljs-params">((AnalysisService, $httpBackend, $rootScope) -&gt;
 
-    $.ajax(<span class="hljs-string">'base/app/assets/english.json'</span>,
-      async: <span class="hljs-literal">false</span>
-    ).done (data) -&gt;
 </span></span></pre></div></div>
             
         </li>
@@ -379,6 +379,25 @@
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <p>TODO: move this test to an appropriate location.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    pending()
+
+    $.ajax(<span class="hljs-string">'base/app/assets/english.json'</span>,
+      <span class="hljs-attribute">async</span>: <span class="hljs-literal">false</span>
+    ).done <span class="hljs-function"><span class="hljs-params">(data)</span> -&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
               <p>Catch all the requests to Freebase.</p>
 
@@ -394,11 +413,11 @@
         </li>
         
         
-        <li id="section-17">
+        <li id="section-18">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-17">&#182;</a>
+                <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
               <p>Simulates event fired by EditorService 
 to notify disambiguated textAnnotations to the controller</p>

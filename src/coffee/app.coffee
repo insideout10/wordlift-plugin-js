@@ -81,20 +81,32 @@ $(
     editor.addButton 'wordlift',
       text: 'WordLift'
       icon: false
+
     # When the editor is clicked, the [EditorService.analyze](app.services.EditorService.html#analyze) method is invoked.
       onclick: ->
         injector.invoke(['EditorService', '$rootScope', (EditorService, $rootScope) ->
           $rootScope.$apply( ->
+            # Get the html content of the editor.
             html = tinyMCE.activeEditor.getContent({format: 'raw'})
-            console.log html
-            text = tinyMCE.activeEditor.getContent({format: 'text'})
-            console.log text
+
+            # Get the text content from the Html.
             text = Traslator.create(html).getText()
-            console.log text
+
+            # Send the text content for analysis.
             EditorService.analyze text
           )
         ])
 
+    # TODO: move this outside of this method.
+    # this event is raised when a textannotation is selected in the TinyMCE editor.
+    editor.onClick.add (editor, e) ->
+      injector.invoke(['$rootScope', ($rootScope) ->
+        # execute the following commands in the angular js context.
+        $rootScope.$apply(  ->
+          # send a message about the currently clicked annotation.
+          $rootScope.$broadcast 'textAnnotationClicked', e.target.id, e
+        )
+      ])
 )
 
 

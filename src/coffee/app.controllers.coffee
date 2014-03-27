@@ -80,7 +80,7 @@ angular.module('wordlift.tinymce.plugin.controllers',
         $scope.textAnnotation = $scope.analysis.textAnnotations[id]
 
         # hide the popover if there are no entities.
-        if 0 is $scope.textAnnotation?.entityAnnotations?.length
+        if not $scope.textAnnotation?.entityAnnotations? or 0 is Object.keys($scope.textAnnotation.entityAnnotations).length
           $('#wordlift-disambiguation-popover').hide()
           # show the popover.
         else

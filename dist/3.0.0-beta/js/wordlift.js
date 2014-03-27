@@ -580,43 +580,125 @@
   ]);
 
   angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tinymce.plugin.config', 'AnalysisService']).service('EditorService', [
-    'AnalysisService', '$rootScope', '$log', 'Configuration', function(AnalysisService, $rootScope, $log, Configuration) {
+    'AnalysisService', '$rootScope', '$log', function(AnalysisService, $rootScope, $log) {
       var service;
       service = {
         embedAnalysis: function(analysis) {
-          var content, id, isDirty, t, textAnnotation, _ref;
-          content = tinyMCE.get('content').getContent({
+          var end, entities, entityAnnotation, findEntityAnnotation, findTextAnnotation, html, id, isDirty, itemid, match, start, text, textAnnotation, textAnnotationId, traslator, _i, _len, _ref, _ref1, _ref2;
+          findTextAnnotation = function(textAnnotations, start, end) {
+            var id, textAnnotation, _ref;
+            _ref = analysis.textAnnotations;
+            for (id in _ref) {
+              textAnnotation = _ref[id];
+              if (textAnnotation.start === start && textAnnotation.end === end) {
+                return textAnnotation;
+              }
+            }
+            return null;
+          };
+          findEntityAnnotation = function(entityAnnotations, uri) {
+            var entityAnnotation, id;
+            for (id in entityAnnotations) {
+              entityAnnotation = entityAnnotations[id];
+              if (uri === entityAnnotation.entity.id || __indexOf.call(entityAnnotation.entity.sameAs, uri) >= 0) {
+                return entityAnnotation;
+              }
+            }
+            return null;
+          };
+          html = tinyMCE.get('content').getContent({
             format: 'raw'
           });
-          t = Traslator.create(content);
+          entities = this.findEntities(html);
+          html = html.replace(/<(\w+)[^>]*\sclass="textannotation[^"]*"[^>]*>([^<]+)<\/\1>/gim, '$2');
+          traslator = Traslator.create(html);
+          for (_i = 0, _len = entities.length; _i < _len; _i++) {
+            match = entities[_i];
+            textAnnotation = findTextAnnotation(analysis.textAnnotations, match.text.start, match.text.end);
+            if (textAnnotation) {
+              entityAnnotation = findEntityAnnotation(textAnnotation.entityAnnotations, match.uri);
+              if (entityAnnotation != null) {
+                entityAnnotation.selected = true;
+              }
+              console.log("match [ id :: " + textAnnotation.id + " ][ start :: " + textAnnotation.start + " ][ end :: " + textAnnotation.end + " ][ label :: " + match.label + " ]");
+            } else {
+              console.log("no match [ start :: " + match.text.start + " ][ end :: " + match.text.end + " ][ label :: " + match.label + " ]");
+            }
+          }
           _ref = analysis.textAnnotations;
           for (id in _ref) {
             textAnnotation = _ref[id];
+            start = textAnnotation.start;
+            end = textAnnotation.end;
+            text = textAnnotation.selectedText;
+            console.log("textAnnotation [ start :: " + start + " ][ end :: " + end + " ][ text :: " + text + " ]");
+          }
+          _ref1 = analysis.textAnnotations;
+          for (textAnnotationId in _ref1) {
+            textAnnotation = _ref1[textAnnotationId];
             if (0 === Object.keys(textAnnotation.entityAnnotations).length) {
               continue;
             }
-            t.insertHtml("<span class=\"textAnnotation\" id=\"" + id + "\">", {
+            itemid = '';
+            _ref2 = textAnnotation.entityAnnotations;
+            for (id in _ref2) {
+              entityAnnotation = _ref2[id];
+              if (entityAnnotation.selected) {
+                itemid = " itemid=\"" + entityAnnotation.entity.id + "\"";
+              }
+            }
+            traslator.insertHtml("<span class=\"textannotation\" id=\"" + textAnnotationId + "\"" + itemid + ">", {
               text: textAnnotation.start
             });
-            t.insertHtml('</span>', {
+            traslator.insertHtml('</span>', {
               text: textAnnotation.end
             });
           }
           isDirty = tinyMCE.get('content').isDirty();
-          tinyMCE.get('content').setContent(t.getHtml());
+          tinyMCE.get('content').setContent(traslator.getHtml());
           if (!isDirty) {
-            tinyMCE.get('content').isNotDirty = 1;
+            return tinyMCE.get('content').isNotDirty = 1;
           }
-          return tinyMCE.get('content').onClick.add(function(editor, e) {
-            return $rootScope.$apply($log.debug("Going to notify click on annotation with id " + e.target.id), $rootScope.$broadcast('textAnnotationClicked', e.target.id, e));
-          });
+        },
+        findEntities: function(html) {
+          var end, label, match, pattern, start, traslator, uri, _results;
+          traslator = Traslator.create(html);
+          pattern = /<(\w+)[^>]*\sitemid="([^"]+)"[^>]*>([^<]+)<\/\1>/gim;
+          _results = [];
+          while (match = pattern.exec(html)) {
+            start = match.index;
+            end = start + match[0].length;
+            uri = match[2];
+            label = match[3];
+            _results.push({
+              html: {
+                start: start,
+                end: end
+              },
+              text: {
+                start: traslator.html2text(start),
+                end: traslator.html2text(end)
+              },
+              uri: uri,
+              label: label
+            });
+          }
+          return _results;
         },
         analyze: function(content) {
+          var html, match, pattern;
           if (AnalysisService.isRunning) {
             return AnalysisService.abort();
           } else {
             $('.mce_wordlift').addClass('running');
             tinyMCE.get('content').getBody().setAttribute('contenteditable', false);
+            html = tinyMCE.get('content').getContent({
+              format: 'raw'
+            });
+            pattern = /\sitemid="([^"]+)"/gim;
+            while (match = pattern.exec(html)) {
+              console.log(match);
+            }
             return AnalysisService.analyze(content, true);
           }
         },
@@ -776,10 +858,10 @@
         return $scope.analysis = analysis;
       });
       return $scope.$on('textAnnotationClicked', function(event, id, sourceElement) {
-        var pos, _ref, _ref1;
+        var pos, _ref;
         $scope.textAnnotationSpan = angular.element(sourceElement.target);
         $scope.textAnnotation = $scope.analysis.textAnnotations[id];
-        if (0 === ((_ref = $scope.textAnnotation) != null ? (_ref1 = _ref.entityAnnotations) != null ? _ref1.length : void 0 : void 0)) {
+        if ((((_ref = $scope.textAnnotation) != null ? _ref.entityAnnotations : void 0) == null) || 0 === Object.keys($scope.textAnnotation.entityAnnotations).length) {
           return $('#wordlift-disambiguation-popover').hide();
         } else {
           pos = EditorService.getWinPos(sourceElement);
@@ -832,7 +914,7 @@
   }, $('#wordlift-disambiguation-popover .handlediv').click(function(e) {
     return $('#wordlift-disambiguation-popover').hide();
   }), injector = angular.bootstrap($('#wl-app'), ['wordlift.tinymce.plugin']), tinymce.PluginManager.add('wordlift', function(editor, url) {
-    return editor.addButton('wordlift', {
+    editor.addButton('wordlift', {
       text: 'WordLift',
       icon: false,
       onclick: function() {
@@ -843,18 +925,21 @@
               html = tinyMCE.activeEditor.getContent({
                 format: 'raw'
               });
-              console.log(html);
-              text = tinyMCE.activeEditor.getContent({
-                format: 'text'
-              });
-              console.log(text);
               text = Traslator.create(html).getText();
-              console.log(text);
               return EditorService.analyze(text);
             });
           }
         ]);
       }
+    });
+    return editor.onClick.add(function(editor, e) {
+      return injector.invoke([
+        '$rootScope', function($rootScope) {
+          return $rootScope.$apply(function() {
+            return $rootScope.$broadcast('textAnnotationClicked', e.target.id, e);
+          });
+        }
+      ]);
     });
   }));
 

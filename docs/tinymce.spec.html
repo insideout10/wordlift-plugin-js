@@ -249,7 +249,9 @@
             
             <div class="content"><div class='highlight'><pre>      expect(ed.getContent().length).toBeGreaterThan <span class="hljs-number">0</span>
 
-  it <span class="hljs-string">"embeds the analysis results"</span>, inject <span class="hljs-function"><span class="hljs-params">(AnalysisService, EditorService, $httpBackend)</span> -&gt;</span></pre></div></div>
+  it <span class="hljs-string">"embeds the analysis results"</span>, inject <span class="hljs-function"><span class="hljs-params">(AnalysisService, EditorService, $httpBackend)</span> -&gt;</span>
+
+    pending()</pre></div></div>
             
         </li>
         
@@ -726,7 +728,8 @@ and disambiguated item is preserved</p>
             <div class="content"><div class='highlight'><pre>    expect(AnalysisService.analyze).<span class="hljs-keyword">not</span>.toHaveBeenCalled()
 
 
-  it <span class="hljs-string">"runs an analysis when an analysis is not running"</span>, inject <span class="hljs-function"><span class="hljs-params">(AnalysisService, EditorService, $httpBackend, $rootScope)</span> -&gt;</span></pre></div></div>
+  it <span class="hljs-string">"runs an analysis when an analysis is not running"</span>, inject <span class="hljs-function"><span class="hljs-params">(AnalysisService, EditorService, $httpBackend, $rootScope)</span> -&gt;</span>
+    pending()</pre></div></div>
             
         </li>
         
@@ -939,6 +942,19 @@ and disambiguated item is preserved</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-51">&#182;</a>
               </div>
+              <pre><code> pending()
+</code></pre>
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-52">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-52">&#182;</a>
+              </div>
               <p>Get the editor raw content</p>
 
             </div>
@@ -950,11 +966,11 @@ and disambiguated item is preserved</p>
         </li>
         
         
-        <li id="section-52">
+        <li id="section-53">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-52">&#182;</a>
+                <a class="pilcrow" href="#section-53">&#182;</a>
               </div>
               <p>Get a reference to the argument passed with the event.</p>
 
@@ -965,11 +981,11 @@ and disambiguated item is preserved</p>
         </li>
         
         
-        <li id="section-53">
+        <li id="section-54">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-53">&#182;</a>
+                <a class="pilcrow" href="#section-54">&#182;</a>
               </div>
               <p>Get a reference to the analysis structure.</p>
 
@@ -980,11 +996,11 @@ and disambiguated item is preserved</p>
         </li>
         
         
-        <li id="section-54">
+        <li id="section-55">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-54">&#182;</a>
+                <a class="pilcrow" href="#section-55">&#182;</a>
               </div>
               <p>Get the text annotations.</p>
 
@@ -995,11 +1011,11 @@ and disambiguated item is preserved</p>
         </li>
         
         
-        <li id="section-55">
+        <li id="section-56">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-55">&#182;</a>
+                <a class="pilcrow" href="#section-56">&#182;</a>
               </div>
               <p>Look for SPANs in the content.</p>
 
@@ -1011,11 +1027,11 @@ and disambiguated item is preserved</p>
         </li>
         
         
-        <li id="section-56">
+        <li id="section-57">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-56">&#182;</a>
+                <a class="pilcrow" href="#section-57">&#182;</a>
               </div>
               <p>Check that every span matches a text annotation.</p>
 
@@ -1034,11 +1050,11 @@ describe <span class="hljs-string">"TinceMCE editor : analysis abort"</span>,<sp
         </li>
         
         
-        <li id="section-57">
+        <li id="section-58">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-57">&#182;</a>
+                <a class="pilcrow" href="#section-58">&#182;</a>
               </div>
               <p>Global references</p>
 
@@ -1049,11 +1065,11 @@ describe <span class="hljs-string">"TinceMCE editor : analysis abort"</span>,<sp
         </li>
         
         
-        <li id="section-58">
+        <li id="section-59">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-58">&#182;</a>
+                <a class="pilcrow" href="#section-59">&#182;</a>
               </div>
               <p>Tests set-up.</p>
 
@@ -1069,11 +1085,11 @@ describe <span class="hljs-string">"TinceMCE editor : analysis abort"</span>,<sp
         </li>
         
         
-        <li id="section-59">
+        <li id="section-60">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-59">&#182;</a>
+                <a class="pilcrow" href="#section-60">&#182;</a>
               </div>
               <p>Spy on the analyze method of the AnalysisService</p>
 
@@ -1085,11 +1101,11 @@ describe <span class="hljs-string">"TinceMCE editor : analysis abort"</span>,<sp
         </li>
         
         
-        <li id="section-60">
+        <li id="section-61">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-60">&#182;</a>
+                <a class="pilcrow" href="#section-61">&#182;</a>
               </div>
               <p>Check that the editor content is empty.</p>
 
@@ -1100,33 +1116,17 @@ describe <span class="hljs-string">"TinceMCE editor : analysis abort"</span>,<sp
         </li>
         
         
-        <li id="section-61">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-61">&#182;</a>
-              </div>
-              <p>Get sample analysis data.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    analysisResults = <span class="hljs-literal">undefined</span></pre></div></div>
-            
-        </li>
-        
-        
         <li id="section-62">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-62">&#182;</a>
               </div>
-              <p>Load the sample text in the editor.</p>
+              <p>Get sample analysis data.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    $.ajax<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'base/app/assets/english.json'</span>, { async: <span class="hljs-literal">false</span> })</span>.<span class="hljs-title">done</span> <span class="hljs-params">(data)</span> -&gt;</span>
-      analysisResults = data</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    analysisResults = <span class="hljs-literal">undefined</span></pre></div></div>
             
         </li>
         
@@ -1141,7 +1141,8 @@ describe <span class="hljs-string">"TinceMCE editor : analysis abort"</span>,<sp
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    $.ajax<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'base/app/assets/english_disambiguated.txt'</span>, { async: <span class="hljs-literal">false</span> })</span>.<span class="hljs-title">done</span> <span class="hljs-params">(source)</span> -&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>    $.ajax<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'base/app/assets/english.json'</span>, { async: <span class="hljs-literal">false</span> })</span>.<span class="hljs-title">done</span> <span class="hljs-params">(data)</span> -&gt;</span>
+      analysisResults = data</pre></div></div>
             
         </li>
         
@@ -1152,11 +1153,11 @@ describe <span class="hljs-string">"TinceMCE editor : analysis abort"</span>,<sp
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-64">&#182;</a>
               </div>
-              <p>Set the editor content</p>
+              <p>Load the sample text in the editor.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      ed.setContent source</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    $.ajax<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'base/app/assets/english_disambiguated.txt'</span>, { async: <span class="hljs-literal">false</span> })</span>.<span class="hljs-title">done</span> <span class="hljs-params">(source)</span> -&gt;</span></pre></div></div>
             
         </li>
         
@@ -1166,6 +1167,21 @@ describe <span class="hljs-string">"TinceMCE editor : analysis abort"</span>,<sp
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-65">&#182;</a>
+              </div>
+              <p>Set the editor content</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      ed.setContent source</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-66">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-66">&#182;</a>
               </div>
               <p>Check editor content is set properly</p>
 
@@ -1181,11 +1197,11 @@ describe <span class="hljs-string">"TinceMCE editor : analysis abort"</span>,<sp
         </li>
         
         
-        <li id="section-66">
+        <li id="section-67">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-66">&#182;</a>
+                <a class="pilcrow" href="#section-67">&#182;</a>
               </div>
               <p>Call the analyze method of the editor.</p>
 
@@ -1196,11 +1212,11 @@ describe <span class="hljs-string">"TinceMCE editor : analysis abort"</span>,<sp
         </li>
         
         
-        <li id="section-67">
+        <li id="section-68">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-67">&#182;</a>
+                <a class="pilcrow" href="#section-68">&#182;</a>
               </div>
               <p>The analysis service shouldn’t have been called with the merge parameter set to true.</p>
 
@@ -1211,11 +1227,11 @@ describe <span class="hljs-string">"TinceMCE editor : analysis abort"</span>,<sp
         </li>
         
         
-        <li id="section-68">
+        <li id="section-69">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-68">&#182;</a>
+                <a class="pilcrow" href="#section-69">&#182;</a>
               </div>
               <p>Flush the backend requests.</p>
 
@@ -1226,11 +1242,11 @@ describe <span class="hljs-string">"TinceMCE editor : analysis abort"</span>,<sp
         </li>
         
         
-        <li id="section-69">
+        <li id="section-70">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-69">&#182;</a>
+                <a class="pilcrow" href="#section-70">&#182;</a>
               </div>
               <pre><code> expect($rootScope.$broadcast).<span class="hljs-keyword">not</span>.toHaveBeenCalledWith(<span class="hljs-string">'analysisReceived'</span>, jasmine.any(Object))
 </code></pre>
@@ -1242,11 +1258,11 @@ describe <span class="hljs-string">"TinceMCE editor : analysis abort"</span>,<sp
         </li>
         
         
-        <li id="section-70">
+        <li id="section-71">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-70">&#182;</a>
+                <a class="pilcrow" href="#section-71">&#182;</a>
               </div>
               <pre><code> <span class="hljs-comment"># The analysis service shouldn't have been called</span>
  expect(EditorService.embedAnalysis).toHaveBeenCalledWith(jasmine.any(Object))
@@ -1264,11 +1280,11 @@ describe <span class="hljs-string">"TinceMCE editor : running an analysis on an 
         </li>
         
         
-        <li id="section-71">
+        <li id="section-72">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-71">&#182;</a>
+                <a class="pilcrow" href="#section-72">&#182;</a>
               </div>
               <p>Global references</p>
 
@@ -1279,11 +1295,11 @@ describe <span class="hljs-string">"TinceMCE editor : running an analysis on an 
         </li>
         
         
-        <li id="section-72">
+        <li id="section-73">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-72">&#182;</a>
+                <a class="pilcrow" href="#section-73">&#182;</a>
               </div>
               <p>Tests set-up.</p>
 
@@ -1307,11 +1323,11 @@ describe <span class="hljs-string">"TinceMCE editor : running an analysis on an 
         </li>
         
         
-        <li id="section-73">
+        <li id="section-74">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-73">&#182;</a>
+                <a class="pilcrow" href="#section-74">&#182;</a>
               </div>
               <p>   dump “[ t1 html :: #{t1.getHtml()} ][ t2 html :: #{t2.getHtml()} ]”</p>
 
@@ -1324,11 +1340,11 @@ describe <span class="hljs-string">"TinceMCE editor : running an analysis on an 
         </li>
         
         
-        <li id="section-74">
+        <li id="section-75">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-74">&#182;</a>
+                <a class="pilcrow" href="#section-75">&#182;</a>
               </div>
               <p>Load the sample text in the editor.</p>
 
@@ -1340,11 +1356,11 @@ describe <span class="hljs-string">"TinceMCE editor : running an analysis on an 
         </li>
         
         
-        <li id="section-75">
+        <li id="section-76">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-75">&#182;</a>
+                <a class="pilcrow" href="#section-76">&#182;</a>
               </div>
               <h1 id="create-a-traslator-object-and-check-that-total-lengths-match-">Create a Traslator object and check that total lengths match.</h1>
 <h1 id="dump-create-class-">dump “create class”</h1>
@@ -1356,11 +1372,11 @@ describe <span class="hljs-string">"TinceMCE editor : running an analysis on an 
         </li>
         
         
-        <li id="section-76">
+        <li id="section-77">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-76">&#182;</a>
+                <a class="pilcrow" href="#section-77">&#182;</a>
               </div>
               <h1 id="dump-get-text-">dump “get text”</h1>
 
@@ -1371,11 +1387,11 @@ describe <span class="hljs-string">"TinceMCE editor : running an analysis on an 
         </li>
         
         
-        <li id="section-77">
+        <li id="section-78">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-77">&#182;</a>
+                <a class="pilcrow" href="#section-78">&#182;</a>
               </div>
               <p>   dump “[ html length :: #{html.length} ][ text length :: #{text.length} ]”</p>
 <p>   dump text</p>
@@ -1388,27 +1404,14 @@ describe <span class="hljs-string">"TinceMCE editor : running an analysis on an 
         </li>
         
         
-        <li id="section-78">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-78">&#182;</a>
-              </div>
-              <p>   items = ed.dom.select(‘*[itemid]’)
-   dump item.getAttribute(‘itemid’) for item in items</p>
-
-            </div>
-            
-        </li>
-        
-        
         <li id="section-79">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-79">&#182;</a>
               </div>
-              <p>dump $(‘body#tinymce’).length</p>
+              <p>   items = ed.dom.select(‘*[itemid]’)
+   dump item.getAttribute(‘itemid’) for item in items</p>
 
             </div>
             
@@ -1421,11 +1424,7 @@ describe <span class="hljs-string">"TinceMCE editor : running an analysis on an 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-80">&#182;</a>
               </div>
-              <p>   pattern = /&lt;(\w+)[^&gt;]<em>\sitemid=”([^”]+)”[^&gt;]</em>&gt;([^&lt;]+)&lt;\/\1&gt;/gim
-   pattern = /&lt;(\w+).<em>\sitemid=”([^”]+)”[^&gt;]</em>&gt;([^&lt;]+)(?:&lt;\/\1&gt;)?/gim
-   while match = pattern.exec html
-     textPos = t.html2text match.index
-     dump “[ match index :: #{match.index} ][ text pos :: #{textPos} ]”</p>
+              <p>dump $(‘body#tinymce’).length</p>
 
             </div>
             
@@ -1437,6 +1436,23 @@ describe <span class="hljs-string">"TinceMCE editor : running an analysis on an 
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-81">&#182;</a>
+              </div>
+              <p>   pattern = /&lt;(\w+)[^&gt;]<em>\sitemid=”([^”]+)”[^&gt;]</em>&gt;([^&lt;]+)&lt;\/\1&gt;/gim
+   pattern = /&lt;(\w+).<em>\sitemid=”([^”]+)”[^&gt;]</em>&gt;([^&lt;]+)(?:&lt;\/\1&gt;)?/gim
+   while match = pattern.exec html
+     textPos = t.html2text match.index
+     dump “[ match index :: #{match.index} ][ text pos :: #{textPos} ]”</p>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-82">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-82">&#182;</a>
               </div>
               <pre><code> dump <span class="hljs-string">'[ sel-prefix:: '</span> + match[<span class="hljs-number">1</span>] + <span class="hljs-string">' ]'</span>
  dump <span class="hljs-string">'[ element :: '</span> + match[<span class="hljs-number">2</span>] + <span class="hljs-string">' ]'</span>
@@ -1450,11 +1466,11 @@ describe <span class="hljs-string">"TinceMCE editor : running an analysis on an 
         </li>
         
         
-        <li id="section-82">
+        <li id="section-83">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-82">&#182;</a>
+                <a class="pilcrow" href="#section-83">&#182;</a>
               </div>
               <p>   pattern = /([^&lt;]<em>)(&lt;[^&gt;]</em>&gt;)([^&lt;]*)/gim
    textLength = 0

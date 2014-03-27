@@ -147,6 +147,8 @@
 
     it <span class="hljs-string">'parses analysis data'</span>, inject<span class="hljs-function"><span class="hljs-params">((AnalysisService, $httpBackend, $rootScope) -&gt;
 
+      pending()
+
 </span></span></pre></div></div>
             
         </li>
@@ -256,6 +258,8 @@
     )
 
     it <span class="hljs-string">'parses and merges analysis data'</span>, inject<span class="hljs-function"><span class="hljs-params">((AnalysisService, $httpBackend, $rootScope) -&gt;
+
+      pending()
 
 </span></span></pre></div></div>
             
@@ -1116,6 +1120,118 @@
             <div class="content"><div class='highlight'><pre>        expect(analysis).toEqual jasmine.any(Object)
 
         EditorService.embedAnalysis analysis
+
+    )
+
+    it <span class="hljs-string">'finds entities using the itemid attribute'</span>, inject<span class="hljs-function"><span class="hljs-params">( (AnalysisService, EditorService) -&gt;
+
+      html = <span class="hljs-string">''</span>
+      results = <span class="hljs-string">''</span>
+
+</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-54">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-54">&#182;</a>
+              </div>
+              <p>Get the html against which the analysis has been run.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      $.ajax<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'base/app/assets/insideout10.html'</span>, { async: <span class="hljs-literal">false</span> } )</span>.<span class="hljs-title">done</span> <span class="hljs-params">(data)</span> -&gt;</span>
+        html = data</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-55">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-55">&#182;</a>
+              </div>
+              <p>Get the mock-up analysis results.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      $.ajax<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'base/app/assets/insideout10.json'</span>, { async: <span class="hljs-literal">false</span> } )</span>.<span class="hljs-title">done</span> <span class="hljs-params">(data)</span> -&gt;</span>
+        results = data
+
+      existingEntities = EditorService.findEntities html</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-56">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-56">&#182;</a>
+              </div>
+              <p>Parse and merge the analysis results.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      analysis = AnalysisService.parse results, <span class="hljs-literal">true</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-57">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-57">&#182;</a>
+              </div>
+              <p>Check that the analysis results exist.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      expect(analysis).toEqual jasmine.any(Object)
+
+      <span class="hljs-function"><span class="hljs-title">findTextAnnotation</span> = <span class="hljs-params">(textAnnotations, start, end)</span> -&gt;</span>
+        <span class="hljs-keyword">return</span> textAnnotation <span class="hljs-keyword">for</span> id, textAnnotation <span class="hljs-keyword">of</span> analysis.textAnnotations <span class="hljs-keyword">when</span> textAnnotation.start <span class="hljs-keyword">is</span> start <span class="hljs-keyword">and</span> textAnnotation.end <span class="hljs-keyword">is</span> end
+        <span class="hljs-literal">null</span>
+
+      <span class="hljs-function"><span class="hljs-title">findEntityAnnotation</span> = <span class="hljs-params">(entityAnnotations, uri)</span> -&gt;</span>
+        <span class="hljs-keyword">for</span> id, entityAnnotation <span class="hljs-keyword">of</span> entityAnnotations
+          <span class="hljs-keyword">return</span> entityAnnotation <span class="hljs-keyword">if</span> uri <span class="hljs-keyword">is</span> entityAnnotation.entity.id <span class="hljs-keyword">or</span> uri <span class="hljs-keyword">in</span> entityAnnotation.entity.sameAs
+        <span class="hljs-literal">null</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-58">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-58">&#182;</a>
+              </div>
+              <p>Find the existing entities in the html</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">for</span> match <span class="hljs-keyword">in</span> existingEntities
+
+        textAnnotation = findTextAnnotation analysis.textAnnotations, match.text.start, match.text.end
+        <span class="hljs-keyword">if</span> textAnnotation
+          entityAnnotation = findEntityAnnotation textAnnotation.entityAnnotations, match.uri
+          entityAnnotation.selected = <span class="hljs-literal">true</span>
+          dump <span class="hljs-string">"match [ id :: <span class="hljs-subst">#{textAnnotation.id}</span> ][ start :: <span class="hljs-subst">#{textAnnotation.start}</span> ][ end :: <span class="hljs-subst">#{textAnnotation.end}</span> ][ entity annotation :: <span class="hljs-subst">#{entityAnnotation.id}</span> ]"</span>
+        <span class="hljs-keyword">else</span>
+          dump <span class="hljs-string">"no match [ start :: <span class="hljs-subst">#{match.text.start}</span> ][ end :: <span class="hljs-subst">#{match.text.end}</span> ][ label :: <span class="hljs-subst">#{match.label}</span> ]"</span>
+
+      <span class="hljs-keyword">for</span> id, textAnnotation <span class="hljs-keyword">of</span> analysis.textAnnotations
+        start = textAnnotation.start
+        end = textAnnotation.end
+        text = textAnnotation.selectedText
+        dump <span class="hljs-string">"textAnnotation [ start :: <span class="hljs-subst">#{start}</span> ][ end :: <span class="hljs-subst">#{end}</span> ][ text :: <span class="hljs-subst">#{text}</span> ]"</span>
+
 
     )</pre></div></div>
             
