@@ -149,8 +149,15 @@
             <span class="hljs-keyword">return</span> textAnnotation <span class="hljs-keyword">for</span> id, textAnnotation <span class="hljs-keyword">of</span> analysis.textAnnotations <span class="hljs-keyword">when</span> textAnnotation.start <span class="hljs-keyword">is</span> start <span class="hljs-keyword">and</span> textAnnotation.end <span class="hljs-keyword">is</span> end
             <span class="hljs-literal">null</span>
 
-          <span class="hljs-function"><span class="hljs-title">findEntityAnnotation</span> = <span class="hljs-params">(entityAnnotations, uri)</span> -&gt;</span>
-            <span class="hljs-keyword">return</span> entityAnnotation <span class="hljs-keyword">for</span> id, entityAnnotation <span class="hljs-keyword">of</span> entityAnnotations <span class="hljs-keyword">when</span> uri <span class="hljs-keyword">is</span> entityAnnotation.entity.id <span class="hljs-keyword">or</span> uri <span class="hljs-keyword">in</span> entityAnnotation.entity.sameAs
+          <span class="hljs-function"><span class="hljs-title">findEntityAnnotation</span> = <span class="hljs-params">(entityAnnotations, filter)</span> -&gt;</span>
+            <span class="hljs-keyword">if</span> filter.uri?
+              <span class="hljs-keyword">return</span> entityAnnotation <span class="hljs-keyword">for</span> id, entityAnnotation <span class="hljs-keyword">of</span> entityAnnotations <span class="hljs-keyword">when</span> filter.uri <span class="hljs-keyword">is</span> entityAnnotation.entity.id <span class="hljs-keyword">or</span> filter.uri <span class="hljs-keyword">in</span> entityAnnotation.entity.sameAs
+              <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>
+
+            <span class="hljs-keyword">if</span> filter.selected?
+              <span class="hljs-keyword">return</span> entityAnnotation <span class="hljs-keyword">for</span> id, entityAnnotation <span class="hljs-keyword">of</span> entityAnnotations <span class="hljs-keyword">when</span> entityAnnotation.selected
+              <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>
+
             <span class="hljs-literal">null</span></pre></div></div>
             
         </li>
@@ -230,7 +237,7 @@
 
             textAnnotation = findTextAnnotation analysis.textAnnotations, match.text.start, match.text.end
             <span class="hljs-keyword">if</span> textAnnotation
-              entityAnnotation = findEntityAnnotation textAnnotation.entityAnnotations, match.uri
+              entityAnnotation = findEntityAnnotation textAnnotation.entityAnnotations, {<span class="hljs-attribute">uri</span>: match.uri}
               entityAnnotation.selected = <span class="hljs-literal">true</span> <span class="hljs-keyword">if</span> entityAnnotation?
               <span class="hljs-built_in">console</span>.log <span class="hljs-string">"match [ id :: <span class="hljs-subst">#{textAnnotation.id}</span> ][ start :: <span class="hljs-subst">#{textAnnotation.start}</span> ][ end :: <span class="hljs-subst">#{textAnnotation.end}</span> ][ label :: <span class="hljs-subst">#{match.label}</span> ]"</span>
             <span class="hljs-keyword">else</span>
@@ -302,9 +309,14 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            itemid = <span class="hljs-string">''</span>
-            itemid = <span class="hljs-string">" itemid=\"<span class="hljs-subst">#{entityAnnotation.entity.id}</span>\""</span> <span class="hljs-keyword">for</span> id, entityAnnotation <span class="hljs-keyword">of</span> textAnnotation.entityAnnotations <span class="hljs-keyword">when</span> entityAnnotation.selected
-            traslator.insertHtml <span class="hljs-string">"&lt;span class=\"textannotation\" id=\"<span class="hljs-subst">#{textAnnotationId}</span>\"<span class="hljs-subst">#{itemid}</span>&gt;"</span>, {<span class="hljs-attribute">text</span>: textAnnotation.start}
+            <div class="content"><div class='highlight'><pre>            entityAnnotation = findEntityAnnotation textAnnotation.entityAnnotations, {<span class="hljs-attribute">selected</span>: <span class="hljs-literal">true</span>}
+            <span class="hljs-keyword">if</span> entityAnnotation?
+              entity = entityAnnotation.entity
+              element = <span class="hljs-string">"&lt;span class=\"textannotation highlight <span class="hljs-subst">#{entity.type}</span>\" id=\"<span class="hljs-subst">#{textAnnotationId}</span>\" itemid=\"<span class="hljs-subst">#{entity.id}</span>\"&gt;"</span>
+            <span class="hljs-keyword">else</span>
+              element = <span class="hljs-string">"&lt;span class=\"textannotation\" id=\"<span class="hljs-subst">#{textAnnotationId}</span>\"&gt;"</span>
+
+            traslator.insertHtml element, {<span class="hljs-attribute">text</span>: textAnnotation.start}
             traslator.insertHtml <span class="hljs-string">'&lt;/span&gt;'</span>, {<span class="hljs-attribute">text</span>: textAnnotation.end}</pre></div></div>
             
         </li>

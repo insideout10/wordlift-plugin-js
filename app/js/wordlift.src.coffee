@@ -667,10 +667,16 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
             return textAnnotation for id, textAnnotation of analysis.textAnnotations when textAnnotation.start is start and textAnnotation.end is end
             null
 
-          findEntityAnnotation = (entityAnnotations, uri) ->
-            return entityAnnotation for id, entityAnnotation of entityAnnotations when uri is entityAnnotation.entity.id or uri in entityAnnotation.entity.sameAs
-            null
+          findEntityAnnotation = (entityAnnotations, filter) ->
+            if filter.uri?
+              return entityAnnotation for id, entityAnnotation of entityAnnotations when filter.uri is entityAnnotation.entity.id or filter.uri in entityAnnotation.entity.sameAs
+              return null
 
+            if filter.selected?
+              return entityAnnotation for id, entityAnnotation of entityAnnotations when entityAnnotation.selected
+              return null
+
+            null
 
           # Get the TinyMCE editor html content.
           html = tinyMCE.get('content').getContent({format: 'raw'})
@@ -689,7 +695,7 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
 
             textAnnotation = findTextAnnotation analysis.textAnnotations, match.text.start, match.text.end
             if textAnnotation
-              entityAnnotation = findEntityAnnotation textAnnotation.entityAnnotations, match.uri
+              entityAnnotation = findEntityAnnotation textAnnotation.entityAnnotations, {uri: match.uri}
               entityAnnotation.selected = true if entityAnnotation?
               console.log "match [ id :: #{textAnnotation.id} ][ start :: #{textAnnotation.start} ][ end :: #{textAnnotation.end} ][ label :: #{match.label} ]"
             else
@@ -714,9 +720,14 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
             #            console.log "[ start :: #{textAnnotation.start} ][ end :: #{textAnnotation.end} ][ text :: #{textAnnotation.selectedText} ]"
 
             # Insert the Html fragments before and after the selected text.
-            itemid = ''
-            itemid = " itemid=\"#{entityAnnotation.entity.id}\"" for id, entityAnnotation of textAnnotation.entityAnnotations when entityAnnotation.selected
-            traslator.insertHtml "<span class=\"textannotation\" id=\"#{textAnnotationId}\"#{itemid}>", {text: textAnnotation.start}
+            entityAnnotation = findEntityAnnotation textAnnotation.entityAnnotations, {selected: true}
+            if entityAnnotation?
+              entity = entityAnnotation.entity
+              element = "<span class=\"textannotation highlight #{entity.type}\" id=\"#{textAnnotationId}\" itemid=\"#{entity.id}\">"
+            else
+              element = "<span class=\"textannotation\" id=\"#{textAnnotationId}\">"
+
+            traslator.insertHtml element, {text: textAnnotation.start}
             traslator.insertHtml '</span>', {text: textAnnotation.end}
 
           #console.log textAnnotation.id

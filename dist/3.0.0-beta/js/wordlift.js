@@ -584,7 +584,7 @@
       var service;
       service = {
         embedAnalysis: function(analysis) {
-          var end, entities, entityAnnotation, findEntityAnnotation, findTextAnnotation, html, id, isDirty, itemid, match, start, text, textAnnotation, textAnnotationId, traslator, _i, _len, _ref, _ref1, _ref2;
+          var element, end, entities, entity, entityAnnotation, findEntityAnnotation, findTextAnnotation, html, id, isDirty, match, start, text, textAnnotation, textAnnotationId, traslator, _i, _len, _ref, _ref1;
           findTextAnnotation = function(textAnnotations, start, end) {
             var id, textAnnotation, _ref;
             _ref = analysis.textAnnotations;
@@ -596,13 +596,25 @@
             }
             return null;
           };
-          findEntityAnnotation = function(entityAnnotations, uri) {
-            var entityAnnotation, id;
-            for (id in entityAnnotations) {
-              entityAnnotation = entityAnnotations[id];
-              if (uri === entityAnnotation.entity.id || __indexOf.call(entityAnnotation.entity.sameAs, uri) >= 0) {
-                return entityAnnotation;
+          findEntityAnnotation = function(entityAnnotations, filter) {
+            var entityAnnotation, id, _ref;
+            if (filter.uri != null) {
+              for (id in entityAnnotations) {
+                entityAnnotation = entityAnnotations[id];
+                if (filter.uri === entityAnnotation.entity.id || (_ref = filter.uri, __indexOf.call(entityAnnotation.entity.sameAs, _ref) >= 0)) {
+                  return entityAnnotation;
+                }
               }
+              return null;
+            }
+            if (filter.selected != null) {
+              for (id in entityAnnotations) {
+                entityAnnotation = entityAnnotations[id];
+                if (entityAnnotation.selected) {
+                  return entityAnnotation;
+                }
+              }
+              return null;
             }
             return null;
           };
@@ -616,7 +628,9 @@
             match = entities[_i];
             textAnnotation = findTextAnnotation(analysis.textAnnotations, match.text.start, match.text.end);
             if (textAnnotation) {
-              entityAnnotation = findEntityAnnotation(textAnnotation.entityAnnotations, match.uri);
+              entityAnnotation = findEntityAnnotation(textAnnotation.entityAnnotations, {
+                uri: match.uri
+              });
               if (entityAnnotation != null) {
                 entityAnnotation.selected = true;
               }
@@ -639,15 +653,16 @@
             if (0 === Object.keys(textAnnotation.entityAnnotations).length) {
               continue;
             }
-            itemid = '';
-            _ref2 = textAnnotation.entityAnnotations;
-            for (id in _ref2) {
-              entityAnnotation = _ref2[id];
-              if (entityAnnotation.selected) {
-                itemid = " itemid=\"" + entityAnnotation.entity.id + "\"";
-              }
+            entityAnnotation = findEntityAnnotation(textAnnotation.entityAnnotations, {
+              selected: true
+            });
+            if (entityAnnotation != null) {
+              entity = entityAnnotation.entity;
+              element = "<span class=\"textannotation highlight " + entity.type + "\" id=\"" + textAnnotationId + "\" itemid=\"" + entity.id + "\">";
+            } else {
+              element = "<span class=\"textannotation\" id=\"" + textAnnotationId + "\">";
             }
-            traslator.insertHtml("<span class=\"textannotation\" id=\"" + textAnnotationId + "\"" + itemid + ">", {
+            traslator.insertHtml(element, {
               text: textAnnotation.start
             });
             traslator.insertHtml('</span>', {
