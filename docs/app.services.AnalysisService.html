@@ -149,6 +149,7 @@ angular.<span class="hljs-built_in">module</span>(<span class="hljs-string">'Ana
             
             <div class="content"><div class='highlight'><pre>    CONTEXT = <span class="hljs-string">'@context'</span>
     GRAPH = <span class="hljs-string">'@graph'</span>
+    VALUE = <span class="hljs-string">'@value'</span>
 
     ANALYSIS_EVENT = <span class="hljs-string">'analysisReceived'</span>
 
@@ -162,8 +163,9 @@ angular.<span class="hljs-built_in">module</span>(<span class="hljs-string">'Ana
     RDFS_LABEL = <span class="hljs-string">"<span class="hljs-subst">#{RDFS}</span>label"</span>
     RDFS_COMMENT = <span class="hljs-string">"<span class="hljs-subst">#{RDFS}</span>comment"</span>
 
-    FREEBASE = <span class="hljs-string">'http://rdf.freebase.com/'</span>
-    FREEBASE_NS = <span class="hljs-string">"<span class="hljs-subst">#{FREEBASE}</span>ns/"</span>
+    FREEBASE = <span class="hljs-string">'freebase'</span>
+    FREEBASE_COM = <span class="hljs-string">"http://rdf.<span class="hljs-subst">#{FREEBASE}</span>.com/"</span>
+    FREEBASE_NS = <span class="hljs-string">"<span class="hljs-subst">#{FREEBASE_COM}</span>ns/"</span>
     FREEBASE_NS_DESCRIPTION = <span class="hljs-string">"<span class="hljs-subst">#{FREEBASE_NS}</span>common.topic.description"</span>
 
     SCHEMA_ORG = <span class="hljs-string">'http://schema.org/'</span>
@@ -174,7 +176,12 @@ angular.<span class="hljs-built_in">module</span>(<span class="hljs-string">'Ana
     FISE_ONT_TEXT_ANNOTATION = <span class="hljs-string">"<span class="hljs-subst">#{FISE_ONT}</span>TextAnnotation"</span>
     FISE_ONT_CONFIDENCE = <span class="hljs-string">"<span class="hljs-subst">#{FISE_ONT}</span>confidence"</span>
 
-    DCTERMS = <span class="hljs-string">'http://purl.org/dc/terms/'</span></pre></div></div>
+    DCTERMS = <span class="hljs-string">'http://purl.org/dc/terms/'</span>
+
+    DBPEDIA = <span class="hljs-string">'dbpedia'</span>
+    DBPEDIA_ORG = <span class="hljs-string">"http://<span class="hljs-subst">#{DBPEDIA}</span>.org/"</span>
+
+    WGS84_POS = <span class="hljs-string">'http://www.w3.org/2003/01/geo/wgs84_pos#'</span></pre></div></div>
             
         </li>
         
@@ -507,7 +514,7 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
           <span class="hljs-keyword">return</span> PLACE        <span class="hljs-keyword">for</span> type <span class="hljs-keyword">in</span> typesArray <span class="hljs-keyword">when</span> <span class="hljs-string">"<span class="hljs-subst">#{SCHEMA_ORG}</span>Place"</span> <span class="hljs-keyword">is</span> expand(type)
           <span class="hljs-keyword">return</span> PLACE        <span class="hljs-keyword">for</span> type <span class="hljs-keyword">in</span> typesArray <span class="hljs-keyword">when</span> <span class="hljs-string">"<span class="hljs-subst">#{FREEBASE_NS}</span>location.location"</span> <span class="hljs-keyword">is</span> expand(type)
           <span class="hljs-keyword">return</span> EVENT        <span class="hljs-keyword">for</span> type <span class="hljs-keyword">in</span> typesArray <span class="hljs-keyword">when</span> <span class="hljs-string">"<span class="hljs-subst">#{SCHEMA_ORG}</span>Event"</span> <span class="hljs-keyword">is</span> expand(type)
-          <span class="hljs-keyword">return</span> EVENT        <span class="hljs-keyword">for</span> type <span class="hljs-keyword">in</span> typesArray <span class="hljs-keyword">when</span> <span class="hljs-string">'http://dbpedia.org/ontology/Event'</span> <span class="hljs-keyword">is</span> expand(type)
+          <span class="hljs-keyword">return</span> EVENT        <span class="hljs-keyword">for</span> type <span class="hljs-keyword">in</span> typesArray <span class="hljs-keyword">when</span> <span class="hljs-string">"<span class="hljs-subst">#{DBPEDIA_ORG}</span>ontology/Event"</span> <span class="hljs-keyword">is</span> expand(type)
           <span class="hljs-keyword">return</span> MUSIC        <span class="hljs-keyword">for</span> type <span class="hljs-keyword">in</span> typesArray <span class="hljs-keyword">when</span> <span class="hljs-string">"<span class="hljs-subst">#{FREEBASE_NS}</span>music.artist"</span> <span class="hljs-keyword">is</span> expand(type)
           <span class="hljs-keyword">return</span> MUSIC        <span class="hljs-keyword">for</span> type <span class="hljs-keyword">in</span> typesArray <span class="hljs-keyword">when</span> <span class="hljs-string">"<span class="hljs-subst">#{SCHEMA_ORG}</span>MusicAlbum"</span> <span class="hljs-keyword">is</span> expand(type)
           <span class="hljs-keyword">return</span> PLACE        <span class="hljs-keyword">for</span> type <span class="hljs-keyword">in</span> typesArray <span class="hljs-keyword">when</span> <span class="hljs-string">'http://www.opengis.net/gml/_Feature'</span> <span class="hljs-keyword">is</span> expand(type)
@@ -587,7 +594,7 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                <span class="hljs-string">"https://usercontent.googleapis.com/freebase/v1/image/m/<span class="hljs-subst">#{match[<span class="hljs-number">1</span>]}</span>?maxwidth=4096&amp;maxheight=4096"</span>
+            <div class="content"><div class='highlight'><pre>                <span class="hljs-string">"https://usercontent.googleapis.com/<span class="hljs-subst">#{FREEBASE}</span>/v1/image/m/<span class="hljs-subst">#{match[<span class="hljs-number">1</span>]}</span>?maxwidth=4096&amp;maxheight=4096"</span>
           )</pre></div></div>
             
         </li>
@@ -612,10 +619,10 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
             <span class="hljs-attribute">label</span>: getLanguage(RDFS_LABEL, item, language)
             <span class="hljs-attribute">labels</span>: get(RDFS_LABEL, item)
             <span class="hljs-attribute">sameAs</span>: sameAs
-            <span class="hljs-attribute">source</span>: <span class="hljs-keyword">if</span> id.match(<span class="hljs-string">"^<span class="hljs-subst">#{FREEBASE}</span>.*$"</span>)
-              <span class="hljs-string">'freebase'</span>
-            <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> id.match(<span class="hljs-string">'^http://dbpedia.org/.*$'</span>)
-              <span class="hljs-string">'dbpedia'</span>
+            <span class="hljs-attribute">source</span>: <span class="hljs-keyword">if</span> id.match(<span class="hljs-string">"^<span class="hljs-subst">#{FREEBASE_COM}</span>.*$"</span>)
+              FREEBASE
+            <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> id.match(<span class="hljs-string">"^<span class="hljs-subst">#{DBPEDIA_ORG}</span>.*$"</span>)
+              DBPEDIA
             <span class="hljs-keyword">else</span>
               <span class="hljs-string">'wordlift'</span>
             <span class="hljs-attribute">_item</span>: item
@@ -651,8 +658,8 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
             
             <div class="content"><div class='highlight'><pre>          entity.description = <span class="hljs-string">''</span> <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> entity.description?
 
-          entity.latitude = get(<span class="hljs-string">'http://www.w3.org/2003/01/geo/wgs84_pos#lat'</span>, item)
-          entity.longitude = get(<span class="hljs-string">'http://www.w3.org/2003/01/geo/wgs84_pos#long'</span>, item)</pre></div></div>
+          entity.latitude = get <span class="hljs-string">"<span class="hljs-subst">#{WGS84_POS}</span>lat"</span>, item
+          entity.longitude = get <span class="hljs-string">"<span class="hljs-subst">#{WGS84_POS}</span>long"</span>, item</pre></div></div>
             
         </li>
         
@@ -692,7 +699,7 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
             <div class="content"><div class='highlight'><pre>          entity
 
         <span class="hljs-function"><span class="hljs-title">createEntityAnnotation</span> = <span class="hljs-params">(item)</span> -&gt;</span>
-          reference = get(<span class="hljs-string">'http://fise.iks-project.eu/ontology/entity-reference'</span>, item)
+          reference = get <span class="hljs-string">"<span class="hljs-subst">#{FISE_ONT}</span>entity-reference"</span>, item
           entity = entities[reference]</pre></div></div>
             
         </li>
@@ -846,9 +853,9 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         <span class="hljs-function"><span class="hljs-title">createTextAnnotation</span> = <span class="hljs-params">(item)</span> -&gt;</span>
           textAnnotation = {
             <span class="hljs-attribute">id</span>: get(<span class="hljs-string">'@id'</span>, item)
-            <span class="hljs-attribute">selectedText</span>: get(<span class="hljs-string">"<span class="hljs-subst">#{FISE_ONT}</span>selected-text"</span>, item)[<span class="hljs-string">'@value'</span>]
-            <span class="hljs-attribute">selectionPrefix</span>: get(<span class="hljs-string">"<span class="hljs-subst">#{FISE_ONT}</span>selection-prefix"</span>, item)[<span class="hljs-string">'@value'</span>]
-            <span class="hljs-attribute">selectionSuffix</span>: get(<span class="hljs-string">"<span class="hljs-subst">#{FISE_ONT}</span>selection-suffix"</span>, item)[<span class="hljs-string">'@value'</span>]
+            <span class="hljs-attribute">selectedText</span>: get(<span class="hljs-string">"<span class="hljs-subst">#{FISE_ONT}</span>selected-text"</span>, item)[VALUE]
+            <span class="hljs-attribute">selectionPrefix</span>: get(<span class="hljs-string">"<span class="hljs-subst">#{FISE_ONT}</span>selection-prefix"</span>, item)[VALUE]
+            <span class="hljs-attribute">selectionSuffix</span>: get(<span class="hljs-string">"<span class="hljs-subst">#{FISE_ONT}</span>selection-suffix"</span>, item)[VALUE]
             <span class="hljs-attribute">start</span>: get <span class="hljs-string">"<span class="hljs-subst">#{FISE_ONT}</span>start"</span>, item
             <span class="hljs-attribute">end</span>: get <span class="hljs-string">"<span class="hljs-subst">#{FISE_ONT}</span>end"</span>, item
             <span class="hljs-attribute">confidence</span>: get FISE_ONT_CONFIDENCE, item
@@ -1091,7 +1098,7 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">return</span> item[<span class="hljs-string">'@value'</span>] <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> items <span class="hljs-keyword">when</span> language <span class="hljs-keyword">is</span> item[<span class="hljs-string">'@language'</span>]</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">return</span> item[VALUE] <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> items <span class="hljs-keyword">when</span> language <span class="hljs-keyword">is</span> item[<span class="hljs-string">'@language'</span>]</pre></div></div>
             
         </li>
         
@@ -1242,9 +1249,9 @@ TODO: have a user-set priority.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>              entity.description = existing.description <span class="hljs-keyword">if</span> <span class="hljs-string">'dbpedia'</span> <span class="hljs-keyword">is</span> existing.source
-              entity.longitude = existing.longitude <span class="hljs-keyword">if</span> <span class="hljs-string">'dbpedia'</span> <span class="hljs-keyword">is</span> existing.source <span class="hljs-keyword">and</span> existing.longitude?
-              entity.latitude = existing.latitude <span class="hljs-keyword">if</span> <span class="hljs-string">'dbpedia'</span> <span class="hljs-keyword">is</span> existing.source <span class="hljs-keyword">and</span> existing.latitude?</pre></div></div>
+            <div class="content"><div class='highlight'><pre>              entity.description = existing.description <span class="hljs-keyword">if</span> DBPEDIA <span class="hljs-keyword">is</span> existing.source
+              entity.longitude = existing.longitude <span class="hljs-keyword">if</span> DBPEDIA <span class="hljs-keyword">is</span> existing.source <span class="hljs-keyword">and</span> existing.longitude?
+              entity.latitude = existing.latitude <span class="hljs-keyword">if</span> DBPEDIA <span class="hljs-keyword">is</span> existing.source <span class="hljs-keyword">and</span> existing.latitude?</pre></div></div>
             
         </li>
         

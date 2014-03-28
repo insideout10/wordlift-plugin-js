@@ -161,9 +161,10 @@
 
   angular.module('AnalysisService', []).service('AnalysisService', [
     '$http', '$q', '$rootScope', function($http, $q, $rootScope) {
-      var ANALYSIS_EVENT, CONTEXT, DCTERMS, EVENT, FISE_ONT, FISE_ONT_CONFIDENCE, FISE_ONT_ENTITY_ANNOTATION, FISE_ONT_TEXT_ANNOTATION, FREEBASE, FREEBASE_NS, FREEBASE_NS_DESCRIPTION, GRAPH, MUSIC, ORGANIZATION, PERSON, PLACE, RDFS, RDFS_COMMENT, RDFS_LABEL, SCHEMA_ORG, SCHEMA_ORG_DESCRIPTION, findTextAnnotation, service;
+      var ANALYSIS_EVENT, CONTEXT, DBPEDIA, DBPEDIA_ORG, DCTERMS, EVENT, FISE_ONT, FISE_ONT_CONFIDENCE, FISE_ONT_ENTITY_ANNOTATION, FISE_ONT_TEXT_ANNOTATION, FREEBASE, FREEBASE_COM, FREEBASE_NS, FREEBASE_NS_DESCRIPTION, GRAPH, MUSIC, ORGANIZATION, PERSON, PLACE, RDFS, RDFS_COMMENT, RDFS_LABEL, SCHEMA_ORG, SCHEMA_ORG_DESCRIPTION, VALUE, WGS84_POS, findTextAnnotation, service;
       CONTEXT = '@context';
       GRAPH = '@graph';
+      VALUE = '@value';
       ANALYSIS_EVENT = 'analysisReceived';
       PERSON = 'person';
       ORGANIZATION = 'organization';
@@ -173,8 +174,9 @@
       RDFS = 'http://www.w3.org/2000/01/rdf-schema#';
       RDFS_LABEL = "" + RDFS + "label";
       RDFS_COMMENT = "" + RDFS + "comment";
-      FREEBASE = 'http://rdf.freebase.com/';
-      FREEBASE_NS = "" + FREEBASE + "ns/";
+      FREEBASE = 'freebase';
+      FREEBASE_COM = "http://rdf." + FREEBASE + ".com/";
+      FREEBASE_NS = "" + FREEBASE_COM + "ns/";
       FREEBASE_NS_DESCRIPTION = "" + FREEBASE_NS + "common.topic.description";
       SCHEMA_ORG = 'http://schema.org/';
       SCHEMA_ORG_DESCRIPTION = "" + SCHEMA_ORG + "description";
@@ -183,6 +185,9 @@
       FISE_ONT_TEXT_ANNOTATION = "" + FISE_ONT + "TextAnnotation";
       FISE_ONT_CONFIDENCE = "" + FISE_ONT + "confidence";
       DCTERMS = 'http://purl.org/dc/terms/';
+      DBPEDIA = 'dbpedia';
+      DBPEDIA_ORG = "http://" + DBPEDIA + ".org/";
+      WGS84_POS = 'http://www.w3.org/2003/01/geo/wgs84_pos#';
       findTextAnnotation = function(textAnnotations, start, end) {
         var textAnnotation, textAnnotationId;
         for (textAnnotationId in textAnnotations) {
@@ -333,7 +338,7 @@
             }
             for (_q = 0, _len8 = typesArray.length; _q < _len8; _q++) {
               type = typesArray[_q];
-              if ('http://dbpedia.org/ontology/Event' === expand(type)) {
+              if (("" + DBPEDIA_ORG + "ontology/Event") === expand(type)) {
                 return EVENT;
               }
             }
@@ -373,7 +378,7 @@
                 if (null === match) {
                   _results.push(value);
                 } else {
-                  _results.push("https://usercontent.googleapis.com/freebase/v1/image/m/" + match[1] + "?maxwidth=4096&maxheight=4096");
+                  _results.push("https://usercontent.googleapis.com/" + FREEBASE + "/v1/image/m/" + match[1] + "?maxwidth=4096&maxheight=4096");
                 }
               }
               return _results;
@@ -387,7 +392,7 @@
               label: getLanguage(RDFS_LABEL, item, language),
               labels: get(RDFS_LABEL, item),
               sameAs: sameAs,
-              source: id.match("^" + FREEBASE + ".*$") ? 'freebase' : id.match('^http://dbpedia.org/.*$') ? 'dbpedia' : 'wordlift',
+              source: id.match("^" + FREEBASE_COM + ".*$") ? FREEBASE : id.match("^" + DBPEDIA_ORG + ".*$") ? DBPEDIA : 'wordlift',
               _item: item
             };
             entity.description = getLanguage([RDFS_COMMENT, FREEBASE_NS_DESCRIPTION, SCHEMA_ORG_DESCRIPTION], item, language);
@@ -395,13 +400,13 @@
             if (entity.description == null) {
               entity.description = '';
             }
-            entity.latitude = get('http://www.w3.org/2003/01/geo/wgs84_pos#lat', item);
-            entity.longitude = get('http://www.w3.org/2003/01/geo/wgs84_pos#long', item);
+            entity.latitude = get("" + WGS84_POS + "lat", item);
+            entity.longitude = get("" + WGS84_POS + "long", item);
             return entity;
           };
           createEntityAnnotation = function(item) {
             var annotations, entity, entityAnnotation, id, reference, relation, relations, textAnnotation, _i, _len;
-            reference = get('http://fise.iks-project.eu/ontology/entity-reference', item);
+            reference = get("" + FISE_ONT + "entity-reference", item);
             entity = entities[reference];
             if (entity == null) {
               return null;
@@ -433,9 +438,9 @@
             var textAnnotation;
             textAnnotation = {
               id: get('@id', item),
-              selectedText: get("" + FISE_ONT + "selected-text", item)['@value'],
-              selectionPrefix: get("" + FISE_ONT + "selection-prefix", item)['@value'],
-              selectionSuffix: get("" + FISE_ONT + "selection-suffix", item)['@value'],
+              selectedText: get("" + FISE_ONT + "selected-text", item)[VALUE],
+              selectionPrefix: get("" + FISE_ONT + "selection-prefix", item)[VALUE],
+              selectionSuffix: get("" + FISE_ONT + "selection-suffix", item)[VALUE],
               start: get("" + FISE_ONT + "start", item),
               end: get("" + FISE_ONT + "end", item),
               confidence: get(FISE_ONT_CONFIDENCE, item),
@@ -490,7 +495,7 @@
             for (_i = 0, _len = items.length; _i < _len; _i++) {
               item = items[_i];
               if (language === item['@language']) {
-                return item['@value'];
+                return item[VALUE];
               }
             }
             return null;
@@ -540,13 +545,13 @@
                 mergeUnique(entity.sameAs, existing.sameAs);
                 mergeUnique(entity.thumbnails, existing.thumbnails);
                 entity.source += ", " + existing.source;
-                if ('dbpedia' === existing.source) {
+                if (DBPEDIA === existing.source) {
                   entity.description = existing.description;
                 }
-                if ('dbpedia' === existing.source && (existing.longitude != null)) {
+                if (DBPEDIA === existing.source && (existing.longitude != null)) {
                   entity.longitude = existing.longitude;
                 }
-                if ('dbpedia' === existing.source && (existing.latitude != null)) {
+                if (DBPEDIA === existing.source && (existing.latitude != null)) {
                   entity.latitude = existing.latitude;
                 }
                 entities[sameAs] = entity;

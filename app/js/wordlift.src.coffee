@@ -240,6 +240,7 @@ angular.module('AnalysisService', [])
     # Constants
     CONTEXT = '@context'
     GRAPH = '@graph'
+    VALUE = '@value'
 
     ANALYSIS_EVENT = 'analysisReceived'
 
@@ -253,8 +254,9 @@ angular.module('AnalysisService', [])
     RDFS_LABEL = "#{RDFS}label"
     RDFS_COMMENT = "#{RDFS}comment"
 
-    FREEBASE = 'http://rdf.freebase.com/'
-    FREEBASE_NS = "#{FREEBASE}ns/"
+    FREEBASE = 'freebase'
+    FREEBASE_COM = "http://rdf.#{FREEBASE}.com/"
+    FREEBASE_NS = "#{FREEBASE_COM}ns/"
     FREEBASE_NS_DESCRIPTION = "#{FREEBASE_NS}common.topic.description"
 
     SCHEMA_ORG = 'http://schema.org/'
@@ -266,6 +268,11 @@ angular.module('AnalysisService', [])
     FISE_ONT_CONFIDENCE = "#{FISE_ONT}confidence"
 
     DCTERMS = 'http://purl.org/dc/terms/'
+
+    DBPEDIA = 'dbpedia'
+    DBPEDIA_ORG = "http://#{DBPEDIA}.org/"
+
+    WGS84_POS = 'http://www.w3.org/2003/01/geo/wgs84_pos#'
 
     # Find a text annotation in the provided collection which matches the start and end values.
     findTextAnnotation = (textAnnotations, start, end) ->
@@ -363,7 +370,7 @@ angular.module('AnalysisService', [])
           return PLACE        for type in typesArray when "#{SCHEMA_ORG}Place" is expand(type)
           return PLACE        for type in typesArray when "#{FREEBASE_NS}location.location" is expand(type)
           return EVENT        for type in typesArray when "#{SCHEMA_ORG}Event" is expand(type)
-          return EVENT        for type in typesArray when 'http://dbpedia.org/ontology/Event' is expand(type)
+          return EVENT        for type in typesArray when "#{DBPEDIA_ORG}ontology/Event" is expand(type)
           return MUSIC        for type in typesArray when "#{FREEBASE_NS}music.artist" is expand(type)
           return MUSIC        for type in typesArray when "#{SCHEMA_ORG}MusicAlbum" is expand(type)
           return PLACE        for type in typesArray when 'http://www.opengis.net/gml/_Feature' is expand(type)
@@ -395,7 +402,7 @@ angular.module('AnalysisService', [])
                 value
               else
                 # If it's a Freebase URL normalize the link to the image.
-                "https://usercontent.googleapis.com/freebase/v1/image/m/#{match[1]}?maxwidth=4096&maxheight=4096"
+                "https://usercontent.googleapis.com/#{FREEBASE}/v1/image/m/#{match[1]}?maxwidth=4096&maxheight=4096"
           )
 
           # create the entity model.
@@ -408,10 +415,10 @@ angular.module('AnalysisService', [])
             label: getLanguage(RDFS_LABEL, item, language)
             labels: get(RDFS_LABEL, item)
             sameAs: sameAs
-            source: if id.match("^#{FREEBASE}.*$")
-              'freebase'
-            else if id.match('^http://dbpedia.org/.*$')
-              'dbpedia'
+            source: if id.match("^#{FREEBASE_COM}.*$")
+              FREEBASE
+            else if id.match("^#{DBPEDIA_ORG}.*$")
+              DBPEDIA
             else
               'wordlift'
             _item: item
@@ -435,8 +442,8 @@ angular.module('AnalysisService', [])
           # Avoid null in entity description.
           entity.description = '' if not entity.description?
 
-          entity.latitude = get('http://www.w3.org/2003/01/geo/wgs84_pos#lat', item)
-          entity.longitude = get('http://www.w3.org/2003/01/geo/wgs84_pos#long', item)
+          entity.latitude = get "#{WGS84_POS}lat", item
+          entity.longitude = get "#{WGS84_POS}long", item
 
           # Check if thumbnails exists.
           #        if thumbnails? and angular.isArray thumbnails
@@ -453,7 +460,7 @@ angular.module('AnalysisService', [])
           entity
 
         createEntityAnnotation = (item) ->
-          reference = get('http://fise.iks-project.eu/ontology/entity-reference', item)
+          reference = get "#{FISE_ONT}entity-reference", item
           entity = entities[reference]
 
           #        console.log "[ reference :: #{reference} ][ entity :: #{entity} ]"
@@ -499,9 +506,9 @@ angular.module('AnalysisService', [])
         createTextAnnotation = (item) ->
           textAnnotation = {
             id: get('@id', item)
-            selectedText: get("#{FISE_ONT}selected-text", item)['@value']
-            selectionPrefix: get("#{FISE_ONT}selection-prefix", item)['@value']
-            selectionSuffix: get("#{FISE_ONT}selection-suffix", item)['@value']
+            selectedText: get("#{FISE_ONT}selected-text", item)[VALUE]
+            selectionPrefix: get("#{FISE_ONT}selection-prefix", item)[VALUE]
+            selectionSuffix: get("#{FISE_ONT}selection-suffix", item)[VALUE]
             start: get "#{FISE_ONT}start", item
             end: get "#{FISE_ONT}end", item
             confidence: get FISE_ONT_CONFIDENCE, item
@@ -555,7 +562,7 @@ angular.module('AnalysisService', [])
           # transform to an array if it's not already.
           items = if angular.isArray items then items else [ items ]
           # cycle through the array.
-          return item['@value'] for item in items when language is item['@language']
+          return item[VALUE] for item in items when language is item['@language']
           # if not found return null.
           null
 
@@ -589,9 +596,9 @@ angular.module('AnalysisService', [])
               entity.source += ", #{existing.source}"
               # Prefer the DBpedia description.
               # TODO: have a user-set priority.
-              entity.description = existing.description if 'dbpedia' is existing.source
-              entity.longitude = existing.longitude if 'dbpedia' is existing.source and existing.longitude?
-              entity.latitude = existing.latitude if 'dbpedia' is existing.source and existing.latitude?
+              entity.description = existing.description if DBPEDIA is existing.source
+              entity.longitude = existing.longitude if DBPEDIA is existing.source and existing.longitude?
+              entity.latitude = existing.latitude if DBPEDIA is existing.source and existing.latitude?
 
               # Delete the sameAs entity from the index.
               entities[sameAs] = entity
