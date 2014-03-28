@@ -402,3 +402,83 @@ describe "TinceMCE editor : running an analysis on an already analyzed content",
 
   )
 
+describe 'TinyMCE', ->
+  beforeEach module('wordlift.tinymce.plugin.services')
+  beforeEach module('AnalysisService')
+
+  # A reference to the TinyMCE editor.
+  ed = undefined
+
+  # Tests set-up.
+  beforeEach ->
+    # Set the reference to the TinyMCE editor.
+    ed = tinyMCE.get('content')
+
+  it 'content is analyzed', inject( (AnalysisService, EditorService) ->
+
+    # The textual content.
+    text = ''
+
+    # The analysis results.
+    json = ''
+
+    # Load the sample text in the editor.
+    $.ajax('base/app/assets/english.txt', async: false).done (data) ->
+      text = data
+
+    # Load the sample analysis results.
+    $.ajax('base/app/assets/english.json', async: false).done (data) ->
+      json = data
+
+    # Set the textual content in the editor.
+    ed.setContent text, format: 'raw'
+
+    # Get the analysis instance, by parsing the json and merging the results.
+    analysis = AnalysisService.parse json, true
+
+    # Embed the analysis results.
+    EditorService.embedAnalysis analysis
+
+    # Get the html content of the editor.
+    html = ed.getContent(format: 'raw')
+
+    # Expect to find 9 text annotations.
+    elements = ed.dom.select('span[class="textannotation"]')
+    expect(elements.length).toEqual 9
+
+    # Expected annotations.
+    annotations = [
+      label: 'Andrea Volpini'
+      uri: 'urn:enhancement-6bb3f451-8332-65de-8fe0-6367553bcf8c'
+    ,
+      label: 'David Riccitelli'
+      uri: 'urn:enhancement-fcf5c18e-dfed-104a-2ad2-17e5a031c246'
+    ,
+      label: 'Insideout10'
+      uri: 'urn:enhancement-b083b4d7-00e4-e076-86c3-e93d20113622'
+    ,
+      label: 'Central Archives of the State'
+      uri: 'urn:enhancement-4acc5839-64c3-25e9-aa3a-ee8d039bf2c8'
+    ,
+      label: 'Rome'
+      uri: 'urn:enhancement-5adbf3ee-54d0-2445-6fdc-c09fec19c76f'
+    ,
+      label: 'Linked Open Data'
+      uri: 'urn:enhancement-5a999e26-6a15-5619-e00e-515dd3b1344b'
+    ,
+      label: 'WordPress'
+      uri: 'urn:enhancement-e90c2d93-945d-1d15-104e-eeb675064238'
+    ,
+      label: 'Semantic Web'
+      uri: 'urn:enhancement-5ac3cd31-85fa-eaa8-bb5c-886190c0f683'
+    ,
+      label: 'Linked Open Data'
+      uri: 'urn:enhancement-fbcfb67c-dc95-6c35-91ee-a2e49be98681'
+    ]
+
+    for i in [0...elements.length]
+      expect(elements[i].textContent).toEqual annotations[i].label
+      expect(elements[i].id).toEqual annotations[i].uri
+
+    dump html
+  )

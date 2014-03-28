@@ -1505,6 +1505,246 @@ describe <span class="hljs-string">"TinceMCE editor : running an analysis on an 
             
             <div class="content"><div class='highlight'><pre>
 
+  )
+
+describe <span class="hljs-string">'TinyMCE'</span>,<span class="hljs-function"> -&gt;</span>
+  beforeEach <span class="hljs-built_in">module</span>(<span class="hljs-string">'wordlift.tinymce.plugin.services'</span>)
+  beforeEach <span class="hljs-built_in">module</span>(<span class="hljs-string">'AnalysisService'</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-84">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-84">&#182;</a>
+              </div>
+              <p>A reference to the TinyMCE editor.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  ed = <span class="hljs-literal">undefined</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-85">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-85">&#182;</a>
+              </div>
+              <p>Tests set-up.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  beforeEach<span class="hljs-function"> -&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-86">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-86">&#182;</a>
+              </div>
+              <p>Set the reference to the TinyMCE editor.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    ed = tinyMCE.get(<span class="hljs-string">'content'</span>)
+
+  it <span class="hljs-string">'content is analyzed'</span>, inject<span class="hljs-function"><span class="hljs-params">( (AnalysisService, EditorService) -&gt;
+
+</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-87">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-87">&#182;</a>
+              </div>
+              <p>The textual content.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    text = <span class="hljs-string">''</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-88">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-88">&#182;</a>
+              </div>
+              <p>The analysis results.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    json = <span class="hljs-string">''</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-89">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-89">&#182;</a>
+              </div>
+              <p>Load the sample text in the editor.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    $.ajax<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'base/app/assets/english.txt'</span>, async: <span class="hljs-literal">false</span>)</span>.<span class="hljs-title">done</span> <span class="hljs-params">(data)</span> -&gt;</span>
+      text = data</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-90">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-90">&#182;</a>
+              </div>
+              <p>Load the sample analysis results.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    $.ajax<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'base/app/assets/english.json'</span>, async: <span class="hljs-literal">false</span>)</span>.<span class="hljs-title">done</span> <span class="hljs-params">(data)</span> -&gt;</span>
+      json = data</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-91">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-91">&#182;</a>
+              </div>
+              <p>Set the textual content in the editor.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    ed.setContent text, <span class="hljs-attribute">format</span>: <span class="hljs-string">'raw'</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-92">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-92">&#182;</a>
+              </div>
+              <p>Get the analysis instance, by parsing the json and merging the results.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    analysis = AnalysisService.parse json, <span class="hljs-literal">true</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-93">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-93">&#182;</a>
+              </div>
+              <p>Embed the analysis results.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    EditorService.embedAnalysis analysis</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-94">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-94">&#182;</a>
+              </div>
+              <p>Get the html content of the editor.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    html = ed.getContent(<span class="hljs-attribute">format</span>: <span class="hljs-string">'raw'</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-95">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-95">&#182;</a>
+              </div>
+              <p>Expect to find 9 text annotations.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    elements = ed.dom.select(<span class="hljs-string">'span[class="textannotation"]'</span>)
+    expect(elements.length).toEqual <span class="hljs-number">9</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-96">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-96">&#182;</a>
+              </div>
+              <p>   expect = [
+     uri: ‘urn:enhancement-4acc5839-64c3-25e9-aa3a-ee8d039bf2c8’
+     label: ‘Andrea Volpini’
+   ,
+     uri: ‘urn:enhancement-6bb3f451-8332-65de-8fe0-6367553bcf8c’
+     label: ‘David Riccitelli’
+   ,
+     uri: ‘urn:enhancement-fcf5c18e-dfed-104a-2ad2-17e5a031c246’
+     label: ‘Insideout10’
+   ,
+     uri: ‘urn:enhancement-b083b4d7-00e4-e076-86c3-e93d20113622’
+     label: ‘Rome’
+   ,
+     uri: ‘urn:enhancement-5adbf3ee-54d0-2445-6fdc-c09fec19c76f’
+     label: ‘Linked Open Data’
+   ,
+     uri: ‘urn:enhancement-5a999e26-6a15-5619-e00e-515dd3b1344b’
+     label: ‘WordPress’
+   ,
+     uri: ‘urn:enhancement-e90c2d93-945d-1d15-104e-eeb675064238’
+     label: ‘Semantic Web’
+   ,
+     uri: ‘urn:enhancement-5ac3cd31-85fa-eaa8-bb5c-886190c0f683’
+     label: ‘Linked Open Data’
+   ,
+     uri: ‘urn:enhancement-fbcfb67c-dc95-6c35-91ee-a2e49be98681’
+     label: ‘Linked Open Data’
+   ]</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+    <span class="hljs-keyword">for</span> element <span class="hljs-keyword">in</span> elements
+      dump element.textContent
+      dump ed.dom.getAttrib(element, <span class="hljs-string">'id'</span>)
+
+
+    dump html
   )</pre></div></div>
             
         </li>

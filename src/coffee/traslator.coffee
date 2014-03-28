@@ -55,6 +55,11 @@ class Traslator
       # Add the textual parts to the text.
       @_text += textPre + textPost
 
+    # Add text position 0 if it's not already set.
+    if 0 is @_textPositions.length or 0 isnt @_textPositions[0]
+      @_htmlPositions.unshift 0
+      @_textPositions.unshift 0
+
   # Get the html position, given a text position.
   text2html: (pos) ->
     htmlPos = @_textPositions[0]
@@ -83,7 +88,10 @@ class Traslator
   # Insert an Html fragment at the specified location.
   insertHtml: (fragment, pos) ->
 
-    #    dump "[ fragment :: #{fragment} ][ pos text :: #{pos.text} ]"
+#    dump @_htmlPositions
+#    dump @_textPositions
+#    dump "[ fragment :: #{fragment} ][ pos text :: #{pos.text} ]"
+
     htmlPos = @text2html pos.text
 
     @_html = @_html.substring(0, htmlPos) + fragment + @_html.substring(htmlPos)

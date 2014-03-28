@@ -23,14 +23,13 @@
     }
 
     Traslator.prototype.parse = function() {
-      var htmlElem, htmlLength, htmlPost, htmlPre, match, pattern, textLength, textPost, textPre, _results;
+      var htmlElem, htmlLength, htmlPost, htmlPre, match, pattern, textLength, textPost, textPre;
       this._htmlPositions = [];
       this._textPositions = [];
       this._text = '';
       pattern = /([^<]*)(<[^>]*>)([^<]*)/gim;
       textLength = 0;
       htmlLength = 0;
-      _results = [];
       while (match = pattern.exec(this._html)) {
         htmlPre = match[1];
         htmlElem = match[2];
@@ -45,9 +44,12 @@
         }
         textLength += textPost.length;
         htmlLength += htmlPost.length;
-        _results.push(this._text += textPre + textPost);
+        this._text += textPre + textPost;
       }
-      return _results;
+      if (0 === this._textPositions.length || 0 !== this._textPositions[0]) {
+        this._htmlPositions.unshift(0);
+        return this._textPositions.unshift(0);
+      }
     };
 
     Traslator.prototype.text2html = function(pos) {

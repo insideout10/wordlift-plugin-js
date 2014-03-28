@@ -299,6 +299,23 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
+              <p>Add text position 0 if it’s not already set.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> <span class="hljs-number">0</span> <span class="hljs-keyword">is</span> <span class="hljs-property">@_textPositions</span>.length <span class="hljs-keyword">or</span> <span class="hljs-number">0</span> <span class="hljs-keyword">isnt</span> <span class="hljs-property">@_textPositions</span>[<span class="hljs-number">0</span>]
+      <span class="hljs-property">@_htmlPositions</span>.unshift <span class="hljs-number">0</span>
+      <span class="hljs-property">@_textPositions</span>.unshift <span class="hljs-number">0</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
               <p>Get the html position, given a text position.</p>
 
             </div>
@@ -315,11 +332,11 @@
         </li>
         
         
-        <li id="section-13">
+        <li id="section-14">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-13">&#182;</a>
+                <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
               <p>   dump “#{htmlPos} + #{pos} - #{textPos}”</p>
 
@@ -330,11 +347,11 @@
         </li>
         
         
-        <li id="section-14">
+        <li id="section-15">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-14">&#182;</a>
+                <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
               <p>Get the text position, given an html position.</p>
 
@@ -354,11 +371,11 @@
         </li>
         
         
-        <li id="section-15">
+        <li id="section-16">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-15">&#182;</a>
+                <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
               <p>Insert an Html fragment at the specified location.</p>
 
@@ -369,34 +386,22 @@
         </li>
         
         
-        <li id="section-16">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-16">&#182;</a>
-              </div>
-              <p>   dump “[ fragment :: #{fragment} ][ pos text :: #{pos.text} ]”</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    htmlPos = <span class="hljs-property">@text2html</span> pos.text
-
-    <span class="hljs-property">@_html</span> = <span class="hljs-property">@_html</span>.substring(<span class="hljs-number">0</span>, htmlPos) + fragment + <span class="hljs-property">@_html</span>.substring(htmlPos)</pre></div></div>
-            
-        </li>
-        
-        
         <li id="section-17">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
-              <p>Reparse</p>
+              <p>   dump @_htmlPositions
+   dump @_textPositions
+   dump “[ fragment :: #{fragment} ][ pos text :: #{pos.text} ]”</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-property">@parse</span>()</pre></div></div>
+            <div class="content"><div class='highlight'><pre>
+    htmlPos = <span class="hljs-property">@text2html</span> pos.text
+
+    <span class="hljs-property">@_html</span> = <span class="hljs-property">@_html</span>.substring(<span class="hljs-number">0</span>, htmlPos) + fragment + <span class="hljs-property">@_html</span>.substring(htmlPos)</pre></div></div>
             
         </li>
         
@@ -407,10 +412,11 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
-              <p>Increment the position values for those position after the current.
-   @_htmlPositions[i] += fragment.length for i in [0…@_htmlPositions.length] when @_htmlPositions[i] &gt; htmlPos</p>
+              <p>Reparse</p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-property">@parse</span>()</pre></div></div>
             
         </li>
         
@@ -420,6 +426,20 @@
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-19">&#182;</a>
+              </div>
+              <p>Increment the position values for those position after the current.
+   @_htmlPositions[i] += fragment.length for i in [0…@_htmlPositions.length] when @_htmlPositions[i] &gt; htmlPos</p>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-20">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
               <p>Return the html.</p>
 
@@ -431,11 +451,11 @@
         </li>
         
         
-        <li id="section-20">
+        <li id="section-21">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-20">&#182;</a>
+                <a class="pilcrow" href="#section-21">&#182;</a>
               </div>
               <p>Return the text.</p>
 
