@@ -638,7 +638,7 @@ When an analysis is completed, remove the <em>running</em> class from the WordLi
             </div>
             
             <div class="content"><div class='highlight'><pre>      $rootScope.$<span class="hljs-literal">on</span> <span class="hljs-string">'analysisReceived'</span>, <span class="hljs-function"><span class="hljs-params">(event, analysis)</span> -&gt;</span>
-        service.embedAnalysis analysis <span class="hljs-keyword">if</span> analysis.textAnnotations?</pre></div></div>
+        service.embedAnalysis analysis <span class="hljs-keyword">if</span> analysis? <span class="hljs-keyword">and</span> analysis.textAnnotations?</pre></div></div>
             
         </li>
         

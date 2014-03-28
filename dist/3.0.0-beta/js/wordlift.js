@@ -737,7 +737,7 @@
         return dom.setAttrib(id, 'itemid', obj.entity.id);
       });
       $rootScope.$on('analysisReceived', function(event, analysis) {
-        if (analysis.textAnnotations != null) {
+        if ((analysis != null) && (analysis.textAnnotations != null)) {
           service.embedAnalysis(analysis);
         }
         $(MCE_WORDLIFT).removeClass(RUNNING_CLASS);

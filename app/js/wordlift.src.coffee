@@ -829,7 +829,7 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
       # When an analysis is completed, remove the *running* class from the WordLift toolbar button.
       # (The button is set to running when [an analysis is called](#analyze).
       $rootScope.$on 'analysisReceived', (event, analysis) ->
-        service.embedAnalysis analysis if analysis.textAnnotations?
+        service.embedAnalysis analysis if analysis? and analysis.textAnnotations?
 
         # Remove the *running* class.
         $(MCE_WORDLIFT).removeClass RUNNING_CLASS
