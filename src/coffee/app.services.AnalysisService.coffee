@@ -14,12 +14,32 @@
 
 angular.module('AnalysisService', [])
 .service('AnalysisService', [ '$http', '$q', '$rootScope', '$log', ($http, $q, $rootScope, $log) ->
+
     # Constants
     CONTEXT = '@context'
     GRAPH = '@graph'
 
+    ANALYSIS_EVENT = 'analysisReceived'
+
+    PERSON = 'person'
+    ORGANIZATION = 'organization'
+    PLACE = 'place'
+    EVENT = 'event'
+    MUSIC = 'music'
+
+    RDFS = 'http://www.w3.org/2000/01/rdf-schema#'
+    RDFS_LABEL = "#{RDFS}label"
+    RDFS_COMMENT = "#{RDFS}comment"
+
+    FREEBASE_NS = 'http://rdf.freebase.com/ns/'
+    FREEBASE_NS_DESCRIPTION = "#{FREEBASE_NS}common.topic.description"
+
+    SCHEMA_ORG = 'http://schema.org/'
+    SCHEMA_ORG_DESCRIPTION = "#{SCHEMA_ORG}description"
+
+    # Find a text annotation in the provided collection which matches the start and end values.
     findTextAnnotation = (textAnnotations, start, end) ->
-      return textAnnotation for id, textAnnotation of textAnnotations when textAnnotation.start is start and textAnnotation.end is end
+      return textAnnotation for textAnnotationId, textAnnotation of textAnnotations when textAnnotation.start is start and textAnnotation.end is end
       null
 
     service =
@@ -34,7 +54,9 @@ angular.module('AnalysisService', [])
         # Abort the analysis if an analysis is running and there's a reference to its promise.
         @promise.resolve() if @isRunning and @promise?
 
+    # Preselect entity annotations in the provided analysis using the provided collection of annotations.
       preselect: (analysis, annotations) ->
+
         # Find the existing entities in the html
         for annotation in annotations
           textAnnotation = findTextAnnotation analysis.textAnnotations, annotation.start, annotation.end
@@ -42,28 +64,21 @@ angular.module('AnalysisService', [])
             entityAnnotation = @findEntityAnnotation textAnnotation.entityAnnotations, {uri: annotation.uri}
             entityAnnotation.selected = true if entityAnnotation?
 
-#            console.log "match [ id :: #{textAnnotation.id} ][ start :: #{textAnnotation.start} ][ end :: #{textAnnotation.end} ][ label :: #{match.label} ]"
-#          else
-#            console.log "no match [ start :: #{match.text.start} ][ end :: #{match.text.end} ][ label :: #{match.label} ]"
-
-
-
     # <a name="analyze"></a>
     # Analyze the provided content. Only one analysis at a time is run.
     # The merge parameter is passed to the parse call and merges together entities related via sameAs.
       analyze: (content, merge = false) ->
         # Exit if an analysis is already running.
         return if @isRunning
+
         # Set that an analysis is running.
         @isRunning = true
 
-        #      ajaxurl = '/wp-content/plugins/wordlift/tests/english.json'
-        # Alternatively you can fix the URL to a local test json, e.g.:
-        #
-        #     '/wp-content/plugins/wordlift/tests/english.json'
+        # Store the promise in the class to allow interrupting the request.
         @promise = $q.defer()
 
         that = @
+
         $http(
           method: 'post'
           url: ajaxurl + '?action=wordlift_analyze'
@@ -71,30 +86,26 @@ angular.module('AnalysisService', [])
           timeout: @promise.promise
         )
         # If successful, broadcast an *analysisReceived* event.
-        .success (data, status, headers, config) ->
-            $rootScope.$broadcast 'analysisReceived', that.parse(data, merge)
+        .success (data) ->
+            $rootScope.$broadcast ANALYSIS_EVENT, that.parse(data, merge)
             # Set that the analysis is complete.
             that.isRunning = false
 
-        # In case of error, we don't do anything (for now).
-        .error (data, status, headers, config) ->
+        .error (data, status) ->
             # Set that the analysis is complete.
             that.isRunning = false
+            $rootScope.$broadcast ANALYSIS_EVENT, undefined
 
-            $rootScope.$broadcast 'analysisReceived', undefined
             return if 0 is status # analysis aborted.
             $rootScope.$broadcast 'error', 'An error occurred while requesting an analysis.'
 
+    # Find an entity annotation in the provided collection using the provided filter.
       findEntityAnnotation: (entityAnnotations, filter) ->
         if filter.uri?
-          return entityAnnotation for id, entityAnnotation of entityAnnotations when filter.uri is entityAnnotation.entity.id or filter.uri in entityAnnotation.entity.sameAs
-          return null
+          return entityAnnotation for entityAnnotationId, entityAnnotation of entityAnnotations when filter.uri is entityAnnotation.entity.id or filter.uri in entityAnnotation.entity.sameAs
 
         if filter.selected?
-          return entityAnnotation for id, entityAnnotation of entityAnnotations when entityAnnotation.selected
-          return null
-
-        null
+          return entityAnnotation for entityAnnotationId, entityAnnotation of entityAnnotations when entityAnnotation.selected
 
     # Parse the response data from the analysis request (Redlink).
     # If *merge* is set to true, entity annotations and entities with matching sameAs will be merged.
@@ -114,20 +125,19 @@ angular.module('AnalysisService', [])
           return 'thing' if not types?
 
           typesArray = if angular.isArray types then types else [ types ]
-          return 'person'       for type in typesArray when 'http://schema.org/Person' is expand(type)
-          return 'person'       for type in typesArray when 'http://rdf.freebase.com/ns/people.person' is expand(type)
-          return 'organization' for type in typesArray when 'http://schema.org/Organization' is expand(type)
-          return 'organization' for type in typesArray when 'http://rdf.freebase.com/ns/government.government' is expand(type)
-          return 'organization' for type in typesArray when 'http://schema.org/Newspaper' is expand(type)
-          return 'place'        for type in typesArray when 'http://schema.org/Place' is expand(type)
-          return 'place'        for type in typesArray when 'http://rdf.freebase.com/ns/location.location' is expand(type)
-          return 'event'        for type in typesArray when 'http://schema.org/Event' is expand(type)
-          return 'event'        for type in typesArray when 'http://dbpedia.org/ontology/Event' is expand(type)
-          return 'music'        for type in typesArray when 'http://rdf.freebase.com/ns/music.artist' is expand(type)
-          return 'music'        for type in typesArray when 'http://schema.org/MusicAlbum' is expand(type)
-          return 'place'        for type in typesArray when 'http://www.opengis.net/gml/_Feature' is expand(type)
+          return PERSON       for type in typesArray when 'http://schema.org/Person' is expand(type)
+          return PERSON       for type in typesArray when 'http://rdf.freebase.com/ns/people.person' is expand(type)
+          return ORGANIZATION for type in typesArray when 'http://schema.org/Organization' is expand(type)
+          return ORGANIZATION for type in typesArray when 'http://rdf.freebase.com/ns/government.government' is expand(type)
+          return ORGANIZATION for type in typesArray when 'http://schema.org/Newspaper' is expand(type)
+          return PLACE        for type in typesArray when 'http://schema.org/Place' is expand(type)
+          return PLACE        for type in typesArray when 'http://rdf.freebase.com/ns/location.location' is expand(type)
+          return EVENT        for type in typesArray when 'http://schema.org/Event' is expand(type)
+          return EVENT        for type in typesArray when 'http://dbpedia.org/ontology/Event' is expand(type)
+          return MUSIC        for type in typesArray when 'http://rdf.freebase.com/ns/music.artist' is expand(type)
+          return MUSIC        for type in typesArray when 'http://schema.org/MusicAlbum' is expand(type)
+          return PLACE        for type in typesArray when 'http://www.opengis.net/gml/_Feature' is expand(type)
 
-          #        $log.debug "[ types :: #{typesArray} ]"
           'thing'
 
         # create an entity.
@@ -162,8 +172,8 @@ angular.module('AnalysisService', [])
             thumbnails: thumbnails
             type: getKnownType(types)
             types: types
-            label: getLanguage('http://www.w3.org/2000/01/rdf-schema#label', item, language)
-            labels: get('http://www.w3.org/2000/01/rdf-schema#label', item)
+            label: getLanguage(RDFS_LABEL, item, language)
+            labels: get(RDFS_LABEL, item)
             sameAs: sameAs
             source: if id.match('^http://rdf.freebase.com/.*$')
               'freebase'
@@ -175,16 +185,16 @@ angular.module('AnalysisService', [])
 
           entity.description = getLanguage(
             [
-              'http://www.w3.org/2000/01/rdf-schema#comment',
-              'http://rdf.freebase.com/ns/common.topic.description',
-              'http://schema.org/description'
+              RDFS_COMMENT
+              FREEBASE_NS_DESCRIPTION
+              SCHEMA_ORG_DESCRIPTION
             ], item, language
           )
           entity.descriptions = get(
             [
-              'http://www.w3.org/2000/01/rdf-schema#comment',
-              'http://rdf.freebase.com/ns/common.topic.description',
-              'http://schema.org/description'
+              RDFS_COMMENT
+              FREEBASE_NS_DESCRIPTION
+              SCHEMA_ORG_DESCRIPTION
             ],
             item
           )

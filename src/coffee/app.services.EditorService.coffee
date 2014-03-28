@@ -123,6 +123,7 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
 
         # If an entity annotation is selected then prepare the values, otherwise set them null (i.e. remove).
         if args.ea?
+          # Set a reference to the entity.
           entity = args.ea.entity
           cls +=  " highlight #{entity.type}"
           itemscope = 'itemscope'

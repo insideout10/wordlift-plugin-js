@@ -161,13 +161,26 @@
 
   angular.module('AnalysisService', []).service('AnalysisService', [
     '$http', '$q', '$rootScope', '$log', function($http, $q, $rootScope, $log) {
-      var CONTEXT, GRAPH, findTextAnnotation, service;
+      var ANALYSIS_EVENT, CONTEXT, EVENT, FREEBASE_NS, FREEBASE_NS_DESCRIPTION, GRAPH, MUSIC, ORGANIZATION, PERSON, PLACE, RDFS, RDFS_COMMENT, RDFS_LABEL, SCHEMA_ORG, SCHEMA_ORG_DESCRIPTION, findTextAnnotation, service;
       CONTEXT = '@context';
       GRAPH = '@graph';
+      ANALYSIS_EVENT = 'analysisReceived';
+      PERSON = 'person';
+      ORGANIZATION = 'organization';
+      PLACE = 'place';
+      EVENT = 'event';
+      MUSIC = 'music';
+      RDFS = 'http://www.w3.org/2000/01/rdf-schema#';
+      RDFS_LABEL = "" + RDFS + "label";
+      RDFS_COMMENT = "" + RDFS + "comment";
+      FREEBASE_NS = 'http://rdf.freebase.com/ns/';
+      FREEBASE_NS_DESCRIPTION = "" + FREEBASE_NS + "common.topic.description";
+      SCHEMA_ORG = 'http://schema.org/';
+      SCHEMA_ORG_DESCRIPTION = "" + SCHEMA_ORG + "description";
       findTextAnnotation = function(textAnnotations, start, end) {
-        var id, textAnnotation;
-        for (id in textAnnotations) {
-          textAnnotation = textAnnotations[id];
+        var textAnnotation, textAnnotationId;
+        for (textAnnotationId in textAnnotations) {
+          textAnnotation = textAnnotations[textAnnotationId];
           if (textAnnotation.start === start && textAnnotation.end === end) {
             return textAnnotation;
           }
@@ -219,12 +232,12 @@
             url: ajaxurl + '?action=wordlift_analyze',
             data: content,
             timeout: this.promise.promise
-          }).success(function(data, status, headers, config) {
-            $rootScope.$broadcast('analysisReceived', that.parse(data, merge));
+          }).success(function(data) {
+            $rootScope.$broadcast(ANALYSIS_EVENT, that.parse(data, merge));
             return that.isRunning = false;
-          }).error(function(data, status, headers, config) {
+          }).error(function(data, status) {
             that.isRunning = false;
-            $rootScope.$broadcast('analysisReceived', void 0);
+            $rootScope.$broadcast(ANALYSIS_EVENT, void 0);
             if (0 === status) {
               return;
             }
@@ -232,26 +245,23 @@
           });
         },
         findEntityAnnotation: function(entityAnnotations, filter) {
-          var entityAnnotation, id, _ref;
+          var entityAnnotation, entityAnnotationId, _ref;
           if (filter.uri != null) {
-            for (id in entityAnnotations) {
-              entityAnnotation = entityAnnotations[id];
+            for (entityAnnotationId in entityAnnotations) {
+              entityAnnotation = entityAnnotations[entityAnnotationId];
               if (filter.uri === entityAnnotation.entity.id || (_ref = filter.uri, __indexOf.call(entityAnnotation.entity.sameAs, _ref) >= 0)) {
                 return entityAnnotation;
               }
             }
-            return null;
           }
           if (filter.selected != null) {
-            for (id in entityAnnotations) {
-              entityAnnotation = entityAnnotations[id];
+            for (entityAnnotationId in entityAnnotations) {
+              entityAnnotation = entityAnnotations[entityAnnotationId];
               if (entityAnnotation.selected) {
                 return entityAnnotation;
               }
             }
-            return null;
           }
-          return null;
         },
         parse: function(data, merge) {
           var anotherEntityAnnotation, anotherId, containsOrEquals, context, createEntity, createEntityAnnotation, createLanguage, createTextAnnotation, dctype, entities, entity, entityAnnotation, entityAnnotations, expand, get, getA, getKnownType, getLanguage, graph, id, item, language, languages, mergeEntities, mergeUnique, textAnnotation, textAnnotationId, textAnnotations, types, _i, _len, _ref, _ref1;
@@ -271,73 +281,73 @@
             for (_i = 0, _len = typesArray.length; _i < _len; _i++) {
               type = typesArray[_i];
               if ('http://schema.org/Person' === expand(type)) {
-                return 'person';
+                return PERSON;
               }
             }
             for (_j = 0, _len1 = typesArray.length; _j < _len1; _j++) {
               type = typesArray[_j];
               if ('http://rdf.freebase.com/ns/people.person' === expand(type)) {
-                return 'person';
+                return PERSON;
               }
             }
             for (_k = 0, _len2 = typesArray.length; _k < _len2; _k++) {
               type = typesArray[_k];
               if ('http://schema.org/Organization' === expand(type)) {
-                return 'organization';
+                return ORGANIZATION;
               }
             }
             for (_l = 0, _len3 = typesArray.length; _l < _len3; _l++) {
               type = typesArray[_l];
               if ('http://rdf.freebase.com/ns/government.government' === expand(type)) {
-                return 'organization';
+                return ORGANIZATION;
               }
             }
             for (_m = 0, _len4 = typesArray.length; _m < _len4; _m++) {
               type = typesArray[_m];
               if ('http://schema.org/Newspaper' === expand(type)) {
-                return 'organization';
+                return ORGANIZATION;
               }
             }
             for (_n = 0, _len5 = typesArray.length; _n < _len5; _n++) {
               type = typesArray[_n];
               if ('http://schema.org/Place' === expand(type)) {
-                return 'place';
+                return PLACE;
               }
             }
             for (_o = 0, _len6 = typesArray.length; _o < _len6; _o++) {
               type = typesArray[_o];
               if ('http://rdf.freebase.com/ns/location.location' === expand(type)) {
-                return 'place';
+                return PLACE;
               }
             }
             for (_p = 0, _len7 = typesArray.length; _p < _len7; _p++) {
               type = typesArray[_p];
               if ('http://schema.org/Event' === expand(type)) {
-                return 'event';
+                return EVENT;
               }
             }
             for (_q = 0, _len8 = typesArray.length; _q < _len8; _q++) {
               type = typesArray[_q];
               if ('http://dbpedia.org/ontology/Event' === expand(type)) {
-                return 'event';
+                return EVENT;
               }
             }
             for (_r = 0, _len9 = typesArray.length; _r < _len9; _r++) {
               type = typesArray[_r];
               if ('http://rdf.freebase.com/ns/music.artist' === expand(type)) {
-                return 'music';
+                return MUSIC;
               }
             }
             for (_s = 0, _len10 = typesArray.length; _s < _len10; _s++) {
               type = typesArray[_s];
               if ('http://schema.org/MusicAlbum' === expand(type)) {
-                return 'music';
+                return MUSIC;
               }
             }
             for (_t = 0, _len11 = typesArray.length; _t < _len11; _t++) {
               type = typesArray[_t];
               if ('http://www.opengis.net/gml/_Feature' === expand(type)) {
-                return 'place';
+                return PLACE;
               }
             }
             return 'thing';
@@ -369,14 +379,14 @@
               thumbnails: thumbnails,
               type: getKnownType(types),
               types: types,
-              label: getLanguage('http://www.w3.org/2000/01/rdf-schema#label', item, language),
-              labels: get('http://www.w3.org/2000/01/rdf-schema#label', item),
+              label: getLanguage(RDFS_LABEL, item, language),
+              labels: get(RDFS_LABEL, item),
               sameAs: sameAs,
               source: id.match('^http://rdf.freebase.com/.*$') ? 'freebase' : id.match('^http://dbpedia.org/.*$') ? 'dbpedia' : 'wordlift',
               _item: item
             };
-            entity.description = getLanguage(['http://www.w3.org/2000/01/rdf-schema#comment', 'http://rdf.freebase.com/ns/common.topic.description', 'http://schema.org/description'], item, language);
-            entity.descriptions = get(['http://www.w3.org/2000/01/rdf-schema#comment', 'http://rdf.freebase.com/ns/common.topic.description', 'http://schema.org/description'], item);
+            entity.description = getLanguage([RDFS_COMMENT, FREEBASE_NS_DESCRIPTION, SCHEMA_ORG_DESCRIPTION], item, language);
+            entity.descriptions = get([RDFS_COMMENT, FREEBASE_NS_DESCRIPTION, SCHEMA_ORG_DESCRIPTION], item);
             if (entity.description == null) {
               entity.description = '';
             }
