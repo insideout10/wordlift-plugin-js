@@ -18,6 +18,10 @@ angular.module('AnalysisService', [])
     CONTEXT = '@context'
     GRAPH = '@graph'
 
+    findTextAnnotation = (textAnnotations, start, end) ->
+      return textAnnotation for id, textAnnotation of textAnnotations when textAnnotation.start is start and textAnnotation.end is end
+      null
+
     service =
     # Holds the analysis promise, used to abort the analysis.
       promise: undefined
@@ -29,6 +33,20 @@ angular.module('AnalysisService', [])
       abort: ->
         # Abort the analysis if an analysis is running and there's a reference to its promise.
         @promise.resolve() if @isRunning and @promise?
+
+      preselect: (analysis, annotations) ->
+        # Find the existing entities in the html
+        for annotation in annotations
+          textAnnotation = findTextAnnotation analysis.textAnnotations, annotation.start, annotation.end
+          if textAnnotation?
+            entityAnnotation = @findEntityAnnotation textAnnotation.entityAnnotations, {uri: annotation.uri}
+            entityAnnotation.selected = true if entityAnnotation?
+
+#            console.log "match [ id :: #{textAnnotation.id} ][ start :: #{textAnnotation.start} ][ end :: #{textAnnotation.end} ][ label :: #{match.label} ]"
+#          else
+#            console.log "no match [ start :: #{match.text.start} ][ end :: #{match.text.end} ][ label :: #{match.label} ]"
+
+
 
     # <a name="analyze"></a>
     # Analyze the provided content. Only one analysis at a time is run.
@@ -67,6 +85,16 @@ angular.module('AnalysisService', [])
             return if 0 is status # analysis aborted.
             $rootScope.$broadcast 'error', 'An error occurred while requesting an analysis.'
 
+      findEntityAnnotation: (entityAnnotations, filter) ->
+        if filter.uri?
+          return entityAnnotation for id, entityAnnotation of entityAnnotations when filter.uri is entityAnnotation.entity.id or filter.uri in entityAnnotation.entity.sameAs
+          return null
+
+        if filter.selected?
+          return entityAnnotation for id, entityAnnotation of entityAnnotations when entityAnnotation.selected
+          return null
+
+        null
 
     # Parse the response data from the analysis request (Redlink).
     # If *merge* is set to true, entity annotations and entities with matching sameAs will be merged.

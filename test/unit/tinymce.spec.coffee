@@ -414,7 +414,7 @@ describe 'TinyMCE', ->
     # Set the reference to the TinyMCE editor.
     ed = tinyMCE.get('content')
 
-  it 'content is analyzed', inject( (AnalysisService, EditorService) ->
+  it 'features embedded annotations', inject( (AnalysisService, EditorService) ->
 
     # The textual content.
     text = ''
@@ -438,9 +438,6 @@ describe 'TinyMCE', ->
 
     # Embed the analysis results.
     EditorService.embedAnalysis analysis
-
-    # Get the html content of the editor.
-    html = ed.getContent(format: 'raw')
 
     # Expect to find 9 text annotations.
     elements = ed.dom.select('span[class="textannotation"]')
@@ -476,9 +473,56 @@ describe 'TinyMCE', ->
       uri: 'urn:enhancement-fbcfb67c-dc95-6c35-91ee-a2e49be98681'
     ]
 
+    # Validate eaach annotation.
     for i in [0...elements.length]
       expect(elements[i].textContent).toEqual annotations[i].label
       expect(elements[i].id).toEqual annotations[i].uri
 
-    dump html
+    # Dump the html output
+#    dump ed.getContent(format: 'raw')
+  )
+
+  it 'features entities preselections in the analysis results', inject( (AnalysisService, EditorService) ->
+
+    # The html content.
+    html = ''
+
+    # The analysis results.
+    json = ''
+
+    # Load the sample text in the editor.
+    $.ajax('base/app/assets/insideout10_with_3_selections_pre.html', async: false).done (data) ->
+      html = data
+
+    # Load the sample analysis results.
+    $.ajax('base/app/assets/insideout10_with_3_selections.json', async: false).done (data) ->
+      json = data
+
+    # Set the textual content in the editor.
+    ed.setContent html, format: 'raw'
+
+    # Get the analysis instance, by parsing the json and merging the results.
+    analysis = AnalysisService.parse json, true
+
+    # Embed the analysis results.
+    EditorService.embedAnalysis analysis
+
+    # We expect these entity annotations to be already selected.
+    selected = [
+      'urn:enhancement-49b1cf1e-b260-4033-403e-4e494039d241'
+      'urn:enhancement-33ff847c-da6a-d889-9f1e-b347f17d6d7a'
+      'urn:enhancement-15a22024-9c09-771d-535a-3b00c929717b'
+    ]
+
+    # Check for selections.
+    expect(Object.keys(analysis.entityAnnotations).length).toEqual 22
+    for entityAnnotationId, entityAnnotation of analysis.entityAnnotations
+      expect(entityAnnotation.selected).toBe (entityAnnotation.id in selected)
+
+#    for textAnnotationId, textAnnotation of analysis.textAnnotations
+#      for entityAnnotationId, entityAnnotation of textAnnotation.entityAnnotations
+#        entity = entityAnnotation.entity
+#        dump "[ entityAnnotationId :: #{entityAnnotationId} ][ selected :: #{entityAnnotation.selected} ][ entity id :: #{entity.id} ]"
+
+
   )

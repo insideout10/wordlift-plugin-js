@@ -1556,7 +1556,7 @@ describe <span class="hljs-string">'TinyMCE'</span>,<span class="hljs-function">
             
             <div class="content"><div class='highlight'><pre>    ed = tinyMCE.get(<span class="hljs-string">'content'</span>)
 
-  it <span class="hljs-string">'content is analyzed'</span>, inject<span class="hljs-function"><span class="hljs-params">( (AnalysisService, EditorService) -&gt;
+  it <span class="hljs-string">'features embedded annotations'</span>, inject<span class="hljs-function"><span class="hljs-params">( (AnalysisService, EditorService) -&gt;
 
 </span></span></pre></div></div>
             
@@ -1676,21 +1676,6 @@ describe <span class="hljs-string">'TinyMCE'</span>,<span class="hljs-function">
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-94">&#182;</a>
               </div>
-              <p>Get the html content of the editor.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    html = ed.getContent(<span class="hljs-attribute">format</span>: <span class="hljs-string">'raw'</span>)</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-95">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-95">&#182;</a>
-              </div>
               <p>Expect to find 9 text annotations.</p>
 
             </div>
@@ -1701,50 +1686,243 @@ describe <span class="hljs-string">'TinyMCE'</span>,<span class="hljs-function">
         </li>
         
         
+        <li id="section-95">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-95">&#182;</a>
+              </div>
+              <p>Expected annotations.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    annotations = [
+      <span class="hljs-attribute">label</span>: <span class="hljs-string">'Andrea Volpini'</span>
+      <span class="hljs-attribute">uri</span>: <span class="hljs-string">'urn:enhancement-6bb3f451-8332-65de-8fe0-6367553bcf8c'</span>
+    ,
+      <span class="hljs-attribute">label</span>: <span class="hljs-string">'David Riccitelli'</span>
+      <span class="hljs-attribute">uri</span>: <span class="hljs-string">'urn:enhancement-fcf5c18e-dfed-104a-2ad2-17e5a031c246'</span>
+    ,
+      <span class="hljs-attribute">label</span>: <span class="hljs-string">'Insideout10'</span>
+      <span class="hljs-attribute">uri</span>: <span class="hljs-string">'urn:enhancement-b083b4d7-00e4-e076-86c3-e93d20113622'</span>
+    ,
+      <span class="hljs-attribute">label</span>: <span class="hljs-string">'Central Archives of the State'</span>
+      <span class="hljs-attribute">uri</span>: <span class="hljs-string">'urn:enhancement-4acc5839-64c3-25e9-aa3a-ee8d039bf2c8'</span>
+    ,
+      <span class="hljs-attribute">label</span>: <span class="hljs-string">'Rome'</span>
+      <span class="hljs-attribute">uri</span>: <span class="hljs-string">'urn:enhancement-5adbf3ee-54d0-2445-6fdc-c09fec19c76f'</span>
+    ,
+      <span class="hljs-attribute">label</span>: <span class="hljs-string">'Linked Open Data'</span>
+      <span class="hljs-attribute">uri</span>: <span class="hljs-string">'urn:enhancement-5a999e26-6a15-5619-e00e-515dd3b1344b'</span>
+    ,
+      <span class="hljs-attribute">label</span>: <span class="hljs-string">'WordPress'</span>
+      <span class="hljs-attribute">uri</span>: <span class="hljs-string">'urn:enhancement-e90c2d93-945d-1d15-104e-eeb675064238'</span>
+    ,
+      <span class="hljs-attribute">label</span>: <span class="hljs-string">'Semantic Web'</span>
+      <span class="hljs-attribute">uri</span>: <span class="hljs-string">'urn:enhancement-5ac3cd31-85fa-eaa8-bb5c-886190c0f683'</span>
+    ,
+      <span class="hljs-attribute">label</span>: <span class="hljs-string">'Linked Open Data'</span>
+      <span class="hljs-attribute">uri</span>: <span class="hljs-string">'urn:enhancement-fbcfb67c-dc95-6c35-91ee-a2e49be98681'</span>
+    ]</pre></div></div>
+            
+        </li>
+        
+        
         <li id="section-96">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-96">&#182;</a>
               </div>
-              <p>   expect = [
-     uri: ‘urn:enhancement-4acc5839-64c3-25e9-aa3a-ee8d039bf2c8’
-     label: ‘Andrea Volpini’
-   ,
-     uri: ‘urn:enhancement-6bb3f451-8332-65de-8fe0-6367553bcf8c’
-     label: ‘David Riccitelli’
-   ,
-     uri: ‘urn:enhancement-fcf5c18e-dfed-104a-2ad2-17e5a031c246’
-     label: ‘Insideout10’
-   ,
-     uri: ‘urn:enhancement-b083b4d7-00e4-e076-86c3-e93d20113622’
-     label: ‘Rome’
-   ,
-     uri: ‘urn:enhancement-5adbf3ee-54d0-2445-6fdc-c09fec19c76f’
-     label: ‘Linked Open Data’
-   ,
-     uri: ‘urn:enhancement-5a999e26-6a15-5619-e00e-515dd3b1344b’
-     label: ‘WordPress’
-   ,
-     uri: ‘urn:enhancement-e90c2d93-945d-1d15-104e-eeb675064238’
-     label: ‘Semantic Web’
-   ,
-     uri: ‘urn:enhancement-5ac3cd31-85fa-eaa8-bb5c-886190c0f683’
-     label: ‘Linked Open Data’
-   ,
-     uri: ‘urn:enhancement-fbcfb67c-dc95-6c35-91ee-a2e49be98681’
-     label: ‘Linked Open Data’
-   ]</p>
+              <p>Validate eaach annotation.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">0.</span>..elements.length]
+      expect(elements[i].textContent).toEqual annotations[i].label
+      expect(elements[i].id).toEqual annotations[i].uri</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-97">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-97">&#182;</a>
+              </div>
+              <p>Dump the html output
+   dump ed.getContent(format: ‘raw’)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  )
+
+  it <span class="hljs-string">'features entities preselections in the analysis results'</span>, inject<span class="hljs-function"><span class="hljs-params">( (AnalysisService, EditorService) -&gt;
+
+</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-98">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-98">&#182;</a>
+              </div>
+              <p>The html content.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    html = <span class="hljs-string">''</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-99">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-99">&#182;</a>
+              </div>
+              <p>The analysis results.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    json = <span class="hljs-string">''</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-100">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-100">&#182;</a>
+              </div>
+              <p>Load the sample text in the editor.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    $.ajax<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'base/app/assets/insideout10_with_3_selections_pre.html'</span>, async: <span class="hljs-literal">false</span>)</span>.<span class="hljs-title">done</span> <span class="hljs-params">(data)</span> -&gt;</span>
+      html = data</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-101">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-101">&#182;</a>
+              </div>
+              <p>Load the sample analysis results.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    $.ajax<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'base/app/assets/insideout10_with_3_selections.json'</span>, async: <span class="hljs-literal">false</span>)</span>.<span class="hljs-title">done</span> <span class="hljs-params">(data)</span> -&gt;</span>
+      json = data</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-102">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-102">&#182;</a>
+              </div>
+              <p>Set the textual content in the editor.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    ed.setContent html, <span class="hljs-attribute">format</span>: <span class="hljs-string">'raw'</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-103">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-103">&#182;</a>
+              </div>
+              <p>Get the analysis instance, by parsing the json and merging the results.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    analysis = AnalysisService.parse json, <span class="hljs-literal">true</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-104">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-104">&#182;</a>
+              </div>
+              <p>Embed the analysis results.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    EditorService.embedAnalysis analysis</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-105">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-105">&#182;</a>
+              </div>
+              <p>We expect these entity annotations to be already selected.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    selected = [
+      <span class="hljs-string">'urn:enhancement-49b1cf1e-b260-4033-403e-4e494039d241'</span>
+      <span class="hljs-string">'urn:enhancement-33ff847c-da6a-d889-9f1e-b347f17d6d7a'</span>
+      <span class="hljs-string">'urn:enhancement-15a22024-9c09-771d-535a-3b00c929717b'</span>
+    ]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-106">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-106">&#182;</a>
+              </div>
+              <p>Check for selections.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    expect(Object.keys(analysis.entityAnnotations).length).toEqual <span class="hljs-number">22</span>
+    <span class="hljs-keyword">for</span> entityAnnotationId, entityAnnotation <span class="hljs-keyword">of</span> analysis.entityAnnotations
+      expect(entityAnnotation.selected).toBe (entityAnnotation.id <span class="hljs-keyword">in</span> selected)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-107">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-107">&#182;</a>
+              </div>
+              <p>   for textAnnotationId, textAnnotation of analysis.textAnnotations
+     for entityAnnotationId, entityAnnotation of textAnnotation.entityAnnotations
+       entity = entityAnnotation.entity
+       dump “[ entityAnnotationId :: #{entityAnnotationId} ][ selected :: #{entityAnnotation.selected} ][ entity id :: #{entity.id} ]”</p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre>
-    <span class="hljs-keyword">for</span> element <span class="hljs-keyword">in</span> elements
-      dump element.textContent
-      dump ed.dom.getAttrib(element, <span class="hljs-string">'id'</span>)
 
-
-    dump html
   )</pre></div></div>
             
         </li>

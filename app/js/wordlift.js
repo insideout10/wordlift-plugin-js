@@ -161,9 +161,19 @@
 
   angular.module('AnalysisService', []).service('AnalysisService', [
     '$http', '$q', '$rootScope', '$log', function($http, $q, $rootScope, $log) {
-      var CONTEXT, GRAPH, service;
+      var CONTEXT, GRAPH, findTextAnnotation, service;
       CONTEXT = '@context';
       GRAPH = '@graph';
+      findTextAnnotation = function(textAnnotations, start, end) {
+        var id, textAnnotation;
+        for (id in textAnnotations) {
+          textAnnotation = textAnnotations[id];
+          if (textAnnotation.start === start && textAnnotation.end === end) {
+            return textAnnotation;
+          }
+        }
+        return null;
+      };
       service = {
         promise: void 0,
         isRunning: false,
@@ -171,6 +181,27 @@
           if (this.isRunning && (this.promise != null)) {
             return this.promise.resolve();
           }
+        },
+        preselect: function(analysis, annotations) {
+          var annotation, entityAnnotation, textAnnotation, _i, _len, _results;
+          _results = [];
+          for (_i = 0, _len = annotations.length; _i < _len; _i++) {
+            annotation = annotations[_i];
+            textAnnotation = findTextAnnotation(analysis.textAnnotations, annotation.start, annotation.end);
+            if (textAnnotation != null) {
+              entityAnnotation = this.findEntityAnnotation(textAnnotation.entityAnnotations, {
+                uri: annotation.uri
+              });
+              if (entityAnnotation != null) {
+                _results.push(entityAnnotation.selected = true);
+              } else {
+                _results.push(void 0);
+              }
+            } else {
+              _results.push(void 0);
+            }
+          }
+          return _results;
         },
         analyze: function(content, merge) {
           var that;
@@ -199,6 +230,28 @@
             }
             return $rootScope.$broadcast('error', 'An error occurred while requesting an analysis.');
           });
+        },
+        findEntityAnnotation: function(entityAnnotations, filter) {
+          var entityAnnotation, id, _ref;
+          if (filter.uri != null) {
+            for (id in entityAnnotations) {
+              entityAnnotation = entityAnnotations[id];
+              if (filter.uri === entityAnnotation.entity.id || (_ref = filter.uri, __indexOf.call(entityAnnotation.entity.sameAs, _ref) >= 0)) {
+                return entityAnnotation;
+              }
+            }
+            return null;
+          }
+          if (filter.selected != null) {
+            for (id in entityAnnotations) {
+              entityAnnotation = entityAnnotations[id];
+              if (entityAnnotation.selected) {
+                return entityAnnotation;
+              }
+            }
+            return null;
+          }
+          return null;
         },
         parse: function(data, merge) {
           var anotherEntityAnnotation, anotherId, containsOrEquals, context, createEntity, createEntityAnnotation, createLanguage, createTextAnnotation, dctype, entities, entity, entityAnnotation, entityAnnotations, expand, get, getA, getKnownType, getLanguage, graph, id, item, language, languages, mergeEntities, mergeUnique, textAnnotation, textAnnotationId, textAnnotations, types, _i, _len, _ref, _ref1;
@@ -586,76 +639,21 @@
       var service;
       service = {
         embedAnalysis: function(analysis) {
-          var element, end, entities, entity, entityAnnotation, findEntityAnnotation, findTextAnnotation, html, id, isDirty, match, start, text, textAnnotation, textAnnotationId, traslator, _i, _len, _ref, _ref1;
-          findTextAnnotation = function(textAnnotations, start, end) {
-            var id, textAnnotation, _ref;
-            _ref = analysis.textAnnotations;
-            for (id in _ref) {
-              textAnnotation = _ref[id];
-              if (textAnnotation.start === start && textAnnotation.end === end) {
-                return textAnnotation;
-              }
-            }
-            return null;
-          };
-          findEntityAnnotation = function(entityAnnotations, filter) {
-            var entityAnnotation, id, _ref;
-            if (filter.uri != null) {
-              for (id in entityAnnotations) {
-                entityAnnotation = entityAnnotations[id];
-                if (filter.uri === entityAnnotation.entity.id || (_ref = filter.uri, __indexOf.call(entityAnnotation.entity.sameAs, _ref) >= 0)) {
-                  return entityAnnotation;
-                }
-              }
-              return null;
-            }
-            if (filter.selected != null) {
-              for (id in entityAnnotations) {
-                entityAnnotation = entityAnnotations[id];
-                if (entityAnnotation.selected) {
-                  return entityAnnotation;
-                }
-              }
-              return null;
-            }
-            return null;
-          };
+          var element, entities, entity, entityAnnotation, html, isDirty, textAnnotation, textAnnotationId, traslator, _ref;
           html = tinyMCE.get('content').getContent({
             format: 'raw'
           });
           entities = this.findEntities(html);
+          AnalysisService.preselect(analysis, entities);
           html = html.replace(/<(\w+)[^>]*\sclass="textannotation[^"]*"[^>]*>([^<]+)<\/\1>/gim, '$2');
           traslator = Traslator.create(html);
-          for (_i = 0, _len = entities.length; _i < _len; _i++) {
-            match = entities[_i];
-            textAnnotation = findTextAnnotation(analysis.textAnnotations, match.text.start, match.text.end);
-            if (textAnnotation) {
-              entityAnnotation = findEntityAnnotation(textAnnotation.entityAnnotations, {
-                uri: match.uri
-              });
-              if (entityAnnotation != null) {
-                entityAnnotation.selected = true;
-              }
-              console.log("match [ id :: " + textAnnotation.id + " ][ start :: " + textAnnotation.start + " ][ end :: " + textAnnotation.end + " ][ label :: " + match.label + " ]");
-            } else {
-              console.log("no match [ start :: " + match.text.start + " ][ end :: " + match.text.end + " ][ label :: " + match.label + " ]");
-            }
-          }
           _ref = analysis.textAnnotations;
-          for (id in _ref) {
-            textAnnotation = _ref[id];
-            start = textAnnotation.start;
-            end = textAnnotation.end;
-            text = textAnnotation.selectedText;
-            console.log("textAnnotation [ start :: " + start + " ][ end :: " + end + " ][ text :: " + text + " ]");
-          }
-          _ref1 = analysis.textAnnotations;
-          for (textAnnotationId in _ref1) {
-            textAnnotation = _ref1[textAnnotationId];
-            if (0 === Object.keys(textAnnotation.entityAnnotations).length) {
+          for (textAnnotationId in _ref) {
+            textAnnotation = _ref[textAnnotationId];
+            if (!(0 < Object.keys(textAnnotation.entityAnnotations).length)) {
               continue;
             }
-            entityAnnotation = findEntityAnnotation(textAnnotation.entityAnnotations, {
+            entityAnnotation = AnalysisService.findEntityAnnotation(textAnnotation.entityAnnotations, {
               selected: true
             });
             if (entityAnnotation != null) {
@@ -688,14 +686,8 @@
             uri = match[2];
             label = match[3];
             _results.push({
-              html: {
-                start: start,
-                end: end
-              },
-              text: {
-                start: traslator.html2text(start),
-                end: traslator.html2text(end)
-              },
+              start: traslator.html2text(start),
+              end: traslator.html2text(end),
               uri: uri,
               label: label
             });

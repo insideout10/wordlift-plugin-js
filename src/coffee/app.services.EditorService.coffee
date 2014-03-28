@@ -7,26 +7,14 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
       # Embed the provided analysis in the editor.
         embedAnalysis: (analysis) ->
 
-          findTextAnnotation = (textAnnotations, start, end) ->
-            return textAnnotation for id, textAnnotation of analysis.textAnnotations when textAnnotation.start is start and textAnnotation.end is end
-            null
-
-          findEntityAnnotation = (entityAnnotations, filter) ->
-            if filter.uri?
-              return entityAnnotation for id, entityAnnotation of entityAnnotations when filter.uri is entityAnnotation.entity.id or filter.uri in entityAnnotation.entity.sameAs
-              return null
-
-            if filter.selected?
-              return entityAnnotation for id, entityAnnotation of entityAnnotations when entityAnnotation.selected
-              return null
-
-            null
-
           # Get the TinyMCE editor html content.
-          html = tinyMCE.get('content').getContent({format: 'raw'})
+          html = tinyMCE.get('content').getContent(format: 'raw')
 
           # Find existing entities.
           entities = @findEntities html
+
+          # Preselect entities found in html.
+          AnalysisService.preselect analysis, entities
 
           # Remove existing text annotations.
           html = html.replace(/<(\w+)[^>]*\sclass="textannotation[^"]*"[^>]*>([^<]+)<\/\1>/gim, '$2')
@@ -34,81 +22,23 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
           # Prepare a traslator instance that will traslate Html and Text positions.
           traslator = Traslator.create html
 
-          # Find the existing entities in the html
-          for match in entities
-
-            textAnnotation = findTextAnnotation analysis.textAnnotations, match.text.start, match.text.end
-            if textAnnotation
-              entityAnnotation = findEntityAnnotation textAnnotation.entityAnnotations, {uri: match.uri}
-              entityAnnotation.selected = true if entityAnnotation?
-              console.log "match [ id :: #{textAnnotation.id} ][ start :: #{textAnnotation.start} ][ end :: #{textAnnotation.end} ][ label :: #{match.label} ]"
-            else
-              console.log "no match [ start :: #{match.text.start} ][ end :: #{match.text.end} ][ label :: #{match.label} ]"
-
-          for id, textAnnotation of analysis.textAnnotations
-            start = textAnnotation.start
-            end = textAnnotation.end
-            text = textAnnotation.selectedText
-            console.log "textAnnotation [ start :: #{start} ][ end :: #{end} ][ text :: #{text} ]"
-
-          # TODO: this should be done before running the analysis. Remove the existing text annotation spans.
-          #          spanre = new RegExp("<span[^>]+class=\"textannotation\"[^>]*>([^<]*)</span>", "gi")
-          #          while spanre.test content
-          #            content = content.replace spanre, '$1'
-
-          for textAnnotationId, textAnnotation of analysis.textAnnotations
-
-            # Don't add the text annotation if there are no entity annotations.
-            continue if 0 is Object.keys(textAnnotation.entityAnnotations).length
-
-            #            console.log "[ start :: #{textAnnotation.start} ][ end :: #{textAnnotation.end} ][ text :: #{textAnnotation.selectedText} ]"
+          # Add text annotations to the html (skip those text annotations that don't have entity annotations).
+          for textAnnotationId, textAnnotation of analysis.textAnnotations when 0 < Object.keys(textAnnotation.entityAnnotations).length
 
             # Insert the Html fragments before and after the selected text.
-            entityAnnotation = findEntityAnnotation textAnnotation.entityAnnotations, {selected: true}
+            entityAnnotation = AnalysisService.findEntityAnnotation textAnnotation.entityAnnotations, {selected: true}
             if entityAnnotation?
               entity = entityAnnotation.entity
               element = "<span class=\"textannotation highlight #{entity.type}\" id=\"#{textAnnotationId}\" itemid=\"#{entity.id}\">"
             else
               element = "<span class=\"textannotation\" id=\"#{textAnnotationId}\">"
 
+            # Finally insert the HTML code.
             traslator.insertHtml element, {text: textAnnotation.start}
             traslator.insertHtml '</span>', {text: textAnnotation.end}
 
-          #console.log textAnnotation.id
-          # get the selection prefix and suffix for the regexp.
-          #            selPrefix = cleanUp(textAnnotation.selectionPrefix.substr(-1))
-          #            selPrefix = '^|\\W' if '' is selPrefix
-          #            selSuffix = cleanUp(textAnnotation.selectionSuffix.substr(0, 1))
-          #            selSuffix = '$|\\W' if '' is selSuffix
-          #
-          #            selText = textAnnotation.selectedText.replace('(', '\\(').replace(')', '\\)')
-          #
-          #            # the new regular expression, may not match everything.
-          #            # TODO: enhance the matching.
-          #            r = new RegExp("(#{selPrefix}(?:<[^>]+>){0,})(#{selText})((?:<[^>]+>){0,}#{selSuffix})(?![^<]*\"[^<]*>)")
-          #            r2 = new RegExp("id=\"(urn:enhancement.[a-z,0-9,-]+)\"")
-          #
-          # If there are disambiguated entities
-          # the span is not added while the existing span id is replaced
-          #            if matchResult = content.match r
-          #              # Skip typeof attribute
-          #              replace = "#{matchResult[1]}<span class=\"textannotation\" id=\"#{id}\" >#{matchResult[2]}</span>#{matchResult[3]}"
-          #              if r2.test matchResult[1]
-          #                m = matchResult[1].replace r2, "id=\"#{id}\""
-          #                replace = "#{m}#{matchResult[2]}#{matchResult[3]}"
-          #
-          #              content = content.replace(r, replace)
 
-          # Loops over disambiguated textAnnotations
-          # and notifies selected EntityAnnotations to EntitiesController
-          #          disambiguatedTextAnnotations = tinyMCE.get('content').dom.select('span.disambiguated')
-          #          for textAnnotation in disambiguatedTextAnnotations
-          #            $rootScope.$broadcast 'disambiguatedTextAnnotationDetected', textAnnotation.id, textAnnotation.getAttribute('itemid')
-
-          #          console.log "===== getHtml ====="
-          #          console.log t.getHtml()
-          #          console.log "===== /getHtml ====="
-
+          # Update the editor Html code.
           isDirty = tinyMCE.get('content').isDirty()
           tinyMCE.get('content').setContent traslator.getHtml()
           tinyMCE.get('content').isNotDirty = 1 if not isDirty
@@ -130,12 +60,8 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
             label = match[3]
 
             {
-            html:
-              start: start
-              end: end
-            text:
-              start: traslator.html2text start
-              end: traslator.html2text end
+            start: traslator.html2text start
+            end: traslator.html2text end
             uri: uri
             label: label
             }
