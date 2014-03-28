@@ -81,7 +81,7 @@ angular.module('AnalysisService', [])
             # Set that the analysis is complete.
             that.isRunning = false
 
-            $rootScope.$broadcast 'analysisReceived', null
+            $rootScope.$broadcast 'analysisReceived', undefined
             return if 0 is status # analysis aborted.
             $rootScope.$broadcast 'error', 'An error occurred while requesting an analysis.'
 

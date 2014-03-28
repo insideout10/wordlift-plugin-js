@@ -307,7 +307,7 @@ angular.module('AnalysisService', [])
             # Set that the analysis is complete.
             that.isRunning = false
 
-            $rootScope.$broadcast 'analysisReceived', null
+            $rootScope.$broadcast 'analysisReceived', undefined
             return if 0 is status # analysis aborted.
             $rootScope.$broadcast 'error', 'An error occurred while requesting an analysis.'
 
@@ -694,16 +694,47 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
 .service('EditorService',
     ['AnalysisService', '$rootScope', '$log', (AnalysisService, $rootScope, $log) ->
 
+      EDITOR_ID = 'content'
+      TEXT_ANNOTATION = 'textannotation'
+      CONTENT_IFRAME = '#content_ifr'
+      RUNNING_CLASS = 'running'
+      MCE_WORDLIFT = '.mce_wordlift'
+      CONTENT_EDITABLE = 'contenteditable'
+
+      editor = -> tinyMCE.get(EDITOR_ID)
+
+      # Find existing entities selected in the html content (by looking for *itemid* attributes).
+      findEntities = (html) ->
+
+        # Prepare a traslator instance that will traslate Html and Text positions.
+        traslator = Traslator.create html
+
+      # Set the pattern to look for *itemid* attributes.
+        pattern = /<(\w+)[^>]*\sitemid="([^"]+)"[^>]*>([^<]+)<\/\1>/gim
+
+        # Get the matches and return them.
+        (while match = pattern.exec html
+          {
+            start: traslator.html2text match.index
+            end: traslator.html2text (match.index + match[0].length)
+            uri: match[2]
+            label: match[3]
+          }
+        )
+
       # Define the EditorService.
       service =
       # Embed the provided analysis in the editor.
         embedAnalysis: (analysis) ->
 
+          # A reference to the editor.
+          ed = editor()
+
           # Get the TinyMCE editor html content.
-          html = tinyMCE.get('content').getContent(format: 'raw')
+          html = ed.getContent(format: 'raw')
 
           # Find existing entities.
-          entities = @findEntities html
+          entities = findEntities html
 
           # Preselect entities found in html.
           AnalysisService.preselect analysis, entities
@@ -717,13 +748,17 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
           # Add text annotations to the html (skip those text annotations that don't have entity annotations).
           for textAnnotationId, textAnnotation of analysis.textAnnotations when 0 < Object.keys(textAnnotation.entityAnnotations).length
 
+            # Start the element.
+            element = "<span id=\"#{textAnnotationId}\" class=\"#{TEXT_ANNOTATION}"
+
             # Insert the Html fragments before and after the selected text.
-            entityAnnotation = AnalysisService.findEntityAnnotation textAnnotation.entityAnnotations, {selected: true}
+            entityAnnotation = AnalysisService.findEntityAnnotation textAnnotation.entityAnnotations, selected: true
             if entityAnnotation?
               entity = entityAnnotation.entity
-              element = "<span class=\"textannotation highlight #{entity.type}\" id=\"#{textAnnotationId}\" itemid=\"#{entity.id}\">"
-            else
-              element = "<span class=\"textannotation\" id=\"#{textAnnotationId}\">"
+              element += " highlight #{entity.type}\" itemid=\"#{entity.id}"
+
+            # Close the element.
+            element += '">'
 
             # Finally insert the HTML code.
             traslator.insertHtml element, {text: textAnnotation.start}
@@ -731,34 +766,9 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
 
 
           # Update the editor Html code.
-          isDirty = tinyMCE.get('content').isDirty()
-          tinyMCE.get('content').setContent traslator.getHtml()
-          tinyMCE.get('content').isNotDirty = 1 if not isDirty
-
-        findEntities: (html) ->
-
-          # Get a traslator instance.
-          traslator = Traslator.create(html)
-
-          # Set the pattern to look for *itemid* attributes.
-          pattern = /<(\w+)[^>]*\sitemid="([^"]+)"[^>]*>([^<]+)<\/\1>/gim
-
-          # Get the matches and return them.
-          (while match = pattern.exec html
-            # Do sth
-            start = match.index
-            end = start + match[0].length
-            uri = match[2]
-            label = match[3]
-
-            {
-            start: traslator.html2text start
-            end: traslator.html2text end
-            uri: uri
-            label: label
-            }
-          )
-
+          isDirty = ed.isDirty()
+          ed.setContent traslator.getHtml()
+          ed.isNotDirty = not isDirty
 
       # <a name="analyze"></a>
       # Send the provided content for analysis using the [AnalysisService.analyze](app.services.AnalysisService.html#analyze) method.
@@ -768,13 +778,13 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
             AnalysisService.abort()
           else
             # Disable the button and set the spinner while analysis is running.
-            $('.mce_wordlift').addClass 'running'
+            $(MCE_WORDLIFT).addClass RUNNING_CLASS
 
             # Make the editor read-obly.
-            tinyMCE.get('content').getBody().setAttribute 'contenteditable', false
+            editor().getBody().setAttribute CONTENT_EDITABLE, false
 
             # Get entities already discovered.
-            html = tinyMCE.get('content').getContent({format: 'raw'})
+            html = editor().getContent(format: 'raw')
 
             pattern = /\sitemid="([^"]+)"/gim
             while match = pattern.exec html
@@ -784,25 +794,17 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
             # Call the [AnalysisService](AnalysisService.html) to analyze the provided content, asking to merge sameAs related entities.
             AnalysisService.analyze content, true
 
-      # set some predefined variables.
-        getEditor: ->
-          tinyMCE.get('content')
-        getBody: ->
-          @getEditor().getBody()
-        getDOM: ->
-          @getEditor().dom
-
       # get the window position of an element inside the editor.
       # @param element elem The element.
         getWinPos: (elem) ->
           # get a reference to the editor and its body
-          ed = @getEditor()
+          ed = editor()
           el = elem.target
 
-          top = $('#content_ifr').offset().top - $('body').scrollTop() +
+          top = $(CONTENT_IFRAME).offset().top - $('body').scrollTop() +
           el.offsetTop - $(ed.getBody()).scrollTop()
 
-          left = $('#content_ifr').offset().left - $('body').scrollLeft() +
+          left = $(CONTENT_IFRAME).offset().left - $('body').scrollLeft() +
           el.offsetLeft - $(ed.getBody()).scrollLeft()
 
           # Return the coordinates.
@@ -811,15 +813,13 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
 
       # Hook the service to the events. This event is captured when an entity is selected in the disambiguation popover.
       $rootScope.$on 'DisambiguationWidget.entitySelected', (event, obj) ->
-        cssClasses = "textannotation highlight #{obj.entity.type} disambiguated"
-
         # create a reference to the TinyMCE editor dom.
-        dom = tinyMCE.get("content").dom
+        dom = editor().dom
+
         # the element id containing the attributes for the text annotation.
         id = obj.relation.id
-        elem = dom.get(id)
 
-        dom.setAttrib(id, 'class', cssClasses);
+        dom.setAttrib(id, 'class', "#{TEXT_ANNOTATION} highlight #{obj.entity.type}");
         dom.setAttrib(id, 'itemscope', 'itemscope');
         dom.setAttrib(id, 'itemtype', obj.entity.type);
         dom.setAttrib(id, 'itemid', obj.entity.id);
@@ -829,12 +829,13 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
       # When an analysis is completed, remove the *running* class from the WordLift toolbar button.
       # (The button is set to running when [an analysis is called](#analyze).
       $rootScope.$on 'analysisReceived', (event, analysis) ->
-        service.embedAnalysis analysis if analysis?
+        service.embedAnalysis analysis if analysis.textAnnotations?
 
         # Remove the *running* class.
-        $('.mce_wordlift').removeClass 'running'
+        $(MCE_WORDLIFT).removeClass RUNNING_CLASS
+
         # Make the editor read/write.
-        tinyMCE.get('content').getBody().setAttribute 'contenteditable', true
+        editor().getBody().setAttribute CONTENT_EDITABLE, true
 
       # Return the service definition.
       service

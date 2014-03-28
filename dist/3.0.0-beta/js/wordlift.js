@@ -224,7 +224,7 @@
             return that.isRunning = false;
           }).error(function(data, status, headers, config) {
             that.isRunning = false;
-            $rootScope.$broadcast('analysisReceived', null);
+            $rootScope.$broadcast('analysisReceived', void 0);
             if (0 === status) {
               return;
             }
@@ -636,14 +636,39 @@
 
   angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tinymce.plugin.config', 'AnalysisService']).service('EditorService', [
     'AnalysisService', '$rootScope', '$log', function(AnalysisService, $rootScope, $log) {
-      var service;
+      var CONTENT_EDITABLE, CONTENT_IFRAME, EDITOR_ID, MCE_WORDLIFT, RUNNING_CLASS, TEXT_ANNOTATION, editor, findEntities, service;
+      EDITOR_ID = 'content';
+      TEXT_ANNOTATION = 'textannotation';
+      CONTENT_IFRAME = '#content_ifr';
+      RUNNING_CLASS = 'running';
+      MCE_WORDLIFT = '.mce_wordlift';
+      CONTENT_EDITABLE = 'contenteditable';
+      editor = function() {
+        return tinyMCE.get(EDITOR_ID);
+      };
+      findEntities = function(html) {
+        var match, pattern, traslator, _results;
+        traslator = Traslator.create(html);
+        pattern = /<(\w+)[^>]*\sitemid="([^"]+)"[^>]*>([^<]+)<\/\1>/gim;
+        _results = [];
+        while (match = pattern.exec(html)) {
+          _results.push({
+            start: traslator.html2text(match.index),
+            end: traslator.html2text(match.index + match[0].length),
+            uri: match[2],
+            label: match[3]
+          });
+        }
+        return _results;
+      };
       service = {
         embedAnalysis: function(analysis) {
-          var element, entities, entity, entityAnnotation, html, isDirty, textAnnotation, textAnnotationId, traslator, _ref;
-          html = tinyMCE.get('content').getContent({
+          var ed, element, entities, entity, entityAnnotation, html, isDirty, textAnnotation, textAnnotationId, traslator, _ref;
+          ed = editor();
+          html = ed.getContent({
             format: 'raw'
           });
-          entities = this.findEntities(html);
+          entities = findEntities(html);
           AnalysisService.preselect(analysis, entities);
           html = html.replace(/<(\w+)[^>]*\sclass="textannotation[^"]*"[^>]*>([^<]+)<\/\1>/gim, '$2');
           traslator = Traslator.create(html);
@@ -653,15 +678,15 @@
             if (!(0 < Object.keys(textAnnotation.entityAnnotations).length)) {
               continue;
             }
+            element = "<span id=\"" + textAnnotationId + "\" class=\"" + TEXT_ANNOTATION;
             entityAnnotation = AnalysisService.findEntityAnnotation(textAnnotation.entityAnnotations, {
               selected: true
             });
             if (entityAnnotation != null) {
               entity = entityAnnotation.entity;
-              element = "<span class=\"textannotation highlight " + entity.type + "\" id=\"" + textAnnotationId + "\" itemid=\"" + entity.id + "\">";
-            } else {
-              element = "<span class=\"textannotation\" id=\"" + textAnnotationId + "\">";
+              element += " highlight " + entity.type + "\" itemid=\"" + entity.id;
             }
+            element += '">';
             traslator.insertHtml(element, {
               text: textAnnotation.start
             });
@@ -669,39 +694,18 @@
               text: textAnnotation.end
             });
           }
-          isDirty = tinyMCE.get('content').isDirty();
-          tinyMCE.get('content').setContent(traslator.getHtml());
-          if (!isDirty) {
-            return tinyMCE.get('content').isNotDirty = 1;
-          }
-        },
-        findEntities: function(html) {
-          var end, label, match, pattern, start, traslator, uri, _results;
-          traslator = Traslator.create(html);
-          pattern = /<(\w+)[^>]*\sitemid="([^"]+)"[^>]*>([^<]+)<\/\1>/gim;
-          _results = [];
-          while (match = pattern.exec(html)) {
-            start = match.index;
-            end = start + match[0].length;
-            uri = match[2];
-            label = match[3];
-            _results.push({
-              start: traslator.html2text(start),
-              end: traslator.html2text(end),
-              uri: uri,
-              label: label
-            });
-          }
-          return _results;
+          isDirty = ed.isDirty();
+          ed.setContent(traslator.getHtml());
+          return ed.isNotDirty = !isDirty;
         },
         analyze: function(content) {
           var html, match, pattern;
           if (AnalysisService.isRunning) {
             return AnalysisService.abort();
           } else {
-            $('.mce_wordlift').addClass('running');
-            tinyMCE.get('content').getBody().setAttribute('contenteditable', false);
-            html = tinyMCE.get('content').getContent({
+            $(MCE_WORDLIFT).addClass(RUNNING_CLASS);
+            editor().getBody().setAttribute(CONTENT_EDITABLE, false);
+            html = editor().getContent({
               format: 'raw'
             });
             pattern = /\sitemid="([^"]+)"/gim;
@@ -711,21 +715,12 @@
             return AnalysisService.analyze(content, true);
           }
         },
-        getEditor: function() {
-          return tinyMCE.get('content');
-        },
-        getBody: function() {
-          return this.getEditor().getBody();
-        },
-        getDOM: function() {
-          return this.getEditor().dom;
-        },
         getWinPos: function(elem) {
           var ed, el, left, top;
-          ed = this.getEditor();
+          ed = editor();
           el = elem.target;
-          top = $('#content_ifr').offset().top - $('body').scrollTop() + el.offsetTop - $(ed.getBody()).scrollTop();
-          left = $('#content_ifr').offset().left - $('body').scrollLeft() + el.offsetLeft - $(ed.getBody()).scrollLeft();
+          top = $(CONTENT_IFRAME).offset().top - $('body').scrollTop() + el.offsetTop - $(ed.getBody()).scrollTop();
+          left = $(CONTENT_IFRAME).offset().left - $('body').scrollLeft() + el.offsetLeft - $(ed.getBody()).scrollLeft();
           return {
             top: top,
             left: left
@@ -733,22 +728,20 @@
         }
       };
       $rootScope.$on('DisambiguationWidget.entitySelected', function(event, obj) {
-        var cssClasses, dom, elem, id;
-        cssClasses = "textannotation highlight " + obj.entity.type + " disambiguated";
-        dom = tinyMCE.get("content").dom;
+        var dom, id;
+        dom = editor().dom;
         id = obj.relation.id;
-        elem = dom.get(id);
-        dom.setAttrib(id, 'class', cssClasses);
+        dom.setAttrib(id, 'class', "" + TEXT_ANNOTATION + " highlight " + obj.entity.type);
         dom.setAttrib(id, 'itemscope', 'itemscope');
         dom.setAttrib(id, 'itemtype', obj.entity.type);
         return dom.setAttrib(id, 'itemid', obj.entity.id);
       });
       $rootScope.$on('analysisReceived', function(event, analysis) {
-        if (analysis != null) {
+        if (analysis.textAnnotations != null) {
           service.embedAnalysis(analysis);
         }
-        $('.mce_wordlift').removeClass('running');
-        return tinyMCE.get('content').getBody().setAttribute('contenteditable', true);
+        $(MCE_WORDLIFT).removeClass(RUNNING_CLASS);
+        return editor().getBody().setAttribute(CONTENT_EDITABLE, true);
       });
       return service;
     }

@@ -384,7 +384,7 @@ The merge parameter is passed to the parse call and merges together entities rel
             
             <div class="content"><div class='highlight'><pre>            that.isRunning = <span class="hljs-literal">false</span>
 
-            $rootScope.$broadcast <span class="hljs-string">'analysisReceived'</span>, <span class="hljs-literal">null</span>
+            $rootScope.$broadcast <span class="hljs-string">'analysisReceived'</span>, <span class="hljs-literal">undefined</span>
             <span class="hljs-keyword">return</span> <span class="hljs-keyword">if</span> <span class="hljs-number">0</span> <span class="hljs-keyword">is</span> status <span class="hljs-comment"># analysis aborted.</span>
             $rootScope.$broadcast <span class="hljs-string">'error'</span>, <span class="hljs-string">'An error occurred while requesting an analysis.'</span>
 
