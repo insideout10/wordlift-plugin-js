@@ -162,11 +162,19 @@ angular.<span class="hljs-built_in">module</span>(<span class="hljs-string">'Ana
     RDFS_LABEL = <span class="hljs-string">"<span class="hljs-subst">#{RDFS}</span>label"</span>
     RDFS_COMMENT = <span class="hljs-string">"<span class="hljs-subst">#{RDFS}</span>comment"</span>
 
-    FREEBASE_NS = <span class="hljs-string">'http://rdf.freebase.com/ns/'</span>
+    FREEBASE = <span class="hljs-string">'http://rdf.freebase.com/'</span>
+    FREEBASE_NS = <span class="hljs-string">"<span class="hljs-subst">#{FREEBASE}</span>ns/"</span>
     FREEBASE_NS_DESCRIPTION = <span class="hljs-string">"<span class="hljs-subst">#{FREEBASE_NS}</span>common.topic.description"</span>
 
     SCHEMA_ORG = <span class="hljs-string">'http://schema.org/'</span>
-    SCHEMA_ORG_DESCRIPTION = <span class="hljs-string">"<span class="hljs-subst">#{SCHEMA_ORG}</span>description"</span></pre></div></div>
+    SCHEMA_ORG_DESCRIPTION = <span class="hljs-string">"<span class="hljs-subst">#{SCHEMA_ORG}</span>description"</span>
+
+    FISE_ONT = <span class="hljs-string">'http://fise.iks-project.eu/ontology/'</span>
+    FISE_ONT_ENTITY_ANNOTATION = <span class="hljs-string">"<span class="hljs-subst">#{FISE_ONT}</span>EntityAnnotation"</span>
+    FISE_ONT_TEXT_ANNOTATION = <span class="hljs-string">"<span class="hljs-subst">#{FISE_ONT}</span>TextAnnotation"</span>
+    FISE_ONT_CONFIDENCE = <span class="hljs-string">"<span class="hljs-subst">#{FISE_ONT}</span>confidence"</span>
+
+    DCTERMS = <span class="hljs-string">'http://purl.org/dc/terms/'</span></pre></div></div>
             
         </li>
         
@@ -492,16 +500,16 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
 
           typesArray = <span class="hljs-keyword">if</span> angular.isArray types <span class="hljs-keyword">then</span> types <span class="hljs-keyword">else</span> [ types ]
           <span class="hljs-keyword">return</span> PERSON       <span class="hljs-keyword">for</span> type <span class="hljs-keyword">in</span> typesArray <span class="hljs-keyword">when</span> <span class="hljs-string">"<span class="hljs-subst">#{SCHEMA_ORG}</span>Person"</span> <span class="hljs-keyword">is</span> expand(type)
-          <span class="hljs-keyword">return</span> PERSON       <span class="hljs-keyword">for</span> type <span class="hljs-keyword">in</span> typesArray <span class="hljs-keyword">when</span> <span class="hljs-string">'http://rdf.freebase.com/ns/people.person'</span> <span class="hljs-keyword">is</span> expand(type)
+          <span class="hljs-keyword">return</span> PERSON       <span class="hljs-keyword">for</span> type <span class="hljs-keyword">in</span> typesArray <span class="hljs-keyword">when</span> <span class="hljs-string">"<span class="hljs-subst">#{FREEBASE_NS}</span>people.person"</span> <span class="hljs-keyword">is</span> expand(type)
           <span class="hljs-keyword">return</span> ORGANIZATION <span class="hljs-keyword">for</span> type <span class="hljs-keyword">in</span> typesArray <span class="hljs-keyword">when</span> <span class="hljs-string">"<span class="hljs-subst">#{SCHEMA_ORG}</span>Organization"</span> <span class="hljs-keyword">is</span> expand(type)
-          <span class="hljs-keyword">return</span> ORGANIZATION <span class="hljs-keyword">for</span> type <span class="hljs-keyword">in</span> typesArray <span class="hljs-keyword">when</span> <span class="hljs-string">'http://rdf.freebase.com/ns/government.government'</span> <span class="hljs-keyword">is</span> expand(type)
+          <span class="hljs-keyword">return</span> ORGANIZATION <span class="hljs-keyword">for</span> type <span class="hljs-keyword">in</span> typesArray <span class="hljs-keyword">when</span> <span class="hljs-string">"<span class="hljs-subst">#{FREEBASE_NS}</span>government.government"</span> <span class="hljs-keyword">is</span> expand(type)
           <span class="hljs-keyword">return</span> ORGANIZATION <span class="hljs-keyword">for</span> type <span class="hljs-keyword">in</span> typesArray <span class="hljs-keyword">when</span> <span class="hljs-string">"<span class="hljs-subst">#{SCHEMA_ORG}</span>Newspaper"</span> <span class="hljs-keyword">is</span> expand(type)
           <span class="hljs-keyword">return</span> PLACE        <span class="hljs-keyword">for</span> type <span class="hljs-keyword">in</span> typesArray <span class="hljs-keyword">when</span> <span class="hljs-string">"<span class="hljs-subst">#{SCHEMA_ORG}</span>Place"</span> <span class="hljs-keyword">is</span> expand(type)
-          <span class="hljs-keyword">return</span> PLACE        <span class="hljs-keyword">for</span> type <span class="hljs-keyword">in</span> typesArray <span class="hljs-keyword">when</span> <span class="hljs-string">'http://rdf.freebase.com/ns/location.location'</span> <span class="hljs-keyword">is</span> expand(type)
+          <span class="hljs-keyword">return</span> PLACE        <span class="hljs-keyword">for</span> type <span class="hljs-keyword">in</span> typesArray <span class="hljs-keyword">when</span> <span class="hljs-string">"<span class="hljs-subst">#{FREEBASE_NS}</span>location.location"</span> <span class="hljs-keyword">is</span> expand(type)
           <span class="hljs-keyword">return</span> EVENT        <span class="hljs-keyword">for</span> type <span class="hljs-keyword">in</span> typesArray <span class="hljs-keyword">when</span> <span class="hljs-string">"<span class="hljs-subst">#{SCHEMA_ORG}</span>Event"</span> <span class="hljs-keyword">is</span> expand(type)
           <span class="hljs-keyword">return</span> EVENT        <span class="hljs-keyword">for</span> type <span class="hljs-keyword">in</span> typesArray <span class="hljs-keyword">when</span> <span class="hljs-string">'http://dbpedia.org/ontology/Event'</span> <span class="hljs-keyword">is</span> expand(type)
-          <span class="hljs-keyword">return</span> MUSIC        <span class="hljs-keyword">for</span> type <span class="hljs-keyword">in</span> typesArray <span class="hljs-keyword">when</span> <span class="hljs-string">'http://rdf.freebase.com/ns/music.artist'</span> <span class="hljs-keyword">is</span> expand(type)
-          <span class="hljs-keyword">return</span> MUSIC        <span class="hljs-keyword">for</span> type <span class="hljs-keyword">in</span> typesArray <span class="hljs-keyword">when</span> <span class="hljs-string">'http://schema.org/MusicAlbum'</span> <span class="hljs-keyword">is</span> expand(type)
+          <span class="hljs-keyword">return</span> MUSIC        <span class="hljs-keyword">for</span> type <span class="hljs-keyword">in</span> typesArray <span class="hljs-keyword">when</span> <span class="hljs-string">"<span class="hljs-subst">#{FREEBASE_NS}</span>music.artist"</span> <span class="hljs-keyword">is</span> expand(type)
+          <span class="hljs-keyword">return</span> MUSIC        <span class="hljs-keyword">for</span> type <span class="hljs-keyword">in</span> typesArray <span class="hljs-keyword">when</span> <span class="hljs-string">"<span class="hljs-subst">#{SCHEMA_ORG}</span>MusicAlbum"</span> <span class="hljs-keyword">is</span> expand(type)
           <span class="hljs-keyword">return</span> PLACE        <span class="hljs-keyword">for</span> type <span class="hljs-keyword">in</span> typesArray <span class="hljs-keyword">when</span> <span class="hljs-string">'http://www.opengis.net/gml/_Feature'</span> <span class="hljs-keyword">is</span> expand(type)
 
           <span class="hljs-string">'thing'</span></pre></div></div>
@@ -552,8 +560,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
             </div>
             
             <div class="content"><div class='highlight'><pre>          thumbnails = get(
-            [<span class="hljs-string">'http://xmlns.com/foaf/0.1/depiction'</span>, <span class="hljs-string">'http://rdf.freebase.com/ns/common.topic.image'</span>,
-             <span class="hljs-string">'http://schema.org/image'</span>],
+            [
+              <span class="hljs-string">'http://xmlns.com/foaf/0.1/depiction'</span>
+              <span class="hljs-string">"<span class="hljs-subst">#{FREEBASE_NS}</span>common.topic.image"</span>
+              <span class="hljs-string">"<span class="hljs-subst">#{SCHEMA_ORG}</span>image"</span>
+            ],
             item,
           <span class="hljs-function"><span class="hljs-params">(values)</span> -&gt;</span>
             values = <span class="hljs-keyword">if</span> angular.isArray values <span class="hljs-keyword">then</span> values <span class="hljs-keyword">else</span> [ values ]
@@ -601,7 +612,7 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
             <span class="hljs-attribute">label</span>: getLanguage(RDFS_LABEL, item, language)
             <span class="hljs-attribute">labels</span>: get(RDFS_LABEL, item)
             <span class="hljs-attribute">sameAs</span>: sameAs
-            <span class="hljs-attribute">source</span>: <span class="hljs-keyword">if</span> id.match(<span class="hljs-string">'^http://rdf.freebase.com/.*$'</span>)
+            <span class="hljs-attribute">source</span>: <span class="hljs-keyword">if</span> id.match(<span class="hljs-string">"^<span class="hljs-subst">#{FREEBASE}</span>.*$"</span>)
               <span class="hljs-string">'freebase'</span>
             <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> id.match(<span class="hljs-string">'^http://dbpedia.org/.*$'</span>)
               <span class="hljs-string">'dbpedia'</span>
@@ -730,7 +741,7 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          relations = get(<span class="hljs-string">'http://purl.org/dc/terms/relation'</span>, item)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          relations = get <span class="hljs-string">"<span class="hljs-subst">#{DCTERMS}</span>relation"</span>, item</pre></div></div>
             
         </li>
         
@@ -778,8 +789,8 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
             
             <div class="content"><div class='highlight'><pre>            entityAnnotation = {
               <span class="hljs-attribute">id</span>: id
-              <span class="hljs-attribute">label</span>: get(<span class="hljs-string">'http://fise.iks-project.eu/ontology/entity-label'</span>, item)
-              <span class="hljs-attribute">confidence</span>: get(<span class="hljs-string">'http://fise.iks-project.eu/ontology/confidence'</span>, item)
+              <span class="hljs-attribute">label</span>: get <span class="hljs-string">"<span class="hljs-subst">#{FISE_ONT}</span>entity-label"</span>, item
+              <span class="hljs-attribute">confidence</span>: get FISE_ONT_CONFIDENCE, item
               <span class="hljs-attribute">entity</span>: entity
               <span class="hljs-attribute">relation</span>: textAnnotation
               <span class="hljs-attribute">_item</span>: item
@@ -835,12 +846,12 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         <span class="hljs-function"><span class="hljs-title">createTextAnnotation</span> = <span class="hljs-params">(item)</span> -&gt;</span>
           textAnnotation = {
             <span class="hljs-attribute">id</span>: get(<span class="hljs-string">'@id'</span>, item)
-            <span class="hljs-attribute">selectedText</span>: get(<span class="hljs-string">'http://fise.iks-project.eu/ontology/selected-text'</span>, item)[<span class="hljs-string">'@value'</span>]
-            <span class="hljs-attribute">selectionPrefix</span>: get(<span class="hljs-string">'http://fise.iks-project.eu/ontology/selection-prefix'</span>, item)[<span class="hljs-string">'@value'</span>]
-            <span class="hljs-attribute">selectionSuffix</span>: get(<span class="hljs-string">'http://fise.iks-project.eu/ontology/selection-suffix'</span>, item)[<span class="hljs-string">'@value'</span>]
-            <span class="hljs-attribute">start</span>: get(<span class="hljs-string">'http://fise.iks-project.eu/ontology/start'</span>, item)
-            <span class="hljs-attribute">end</span>: get(<span class="hljs-string">'http://fise.iks-project.eu/ontology/end'</span>, item)
-            <span class="hljs-attribute">confidence</span>: get(<span class="hljs-string">'http://fise.iks-project.eu/ontology/confidence'</span>, item)
+            <span class="hljs-attribute">selectedText</span>: get(<span class="hljs-string">"<span class="hljs-subst">#{FISE_ONT}</span>selected-text"</span>, item)[<span class="hljs-string">'@value'</span>]
+            <span class="hljs-attribute">selectionPrefix</span>: get(<span class="hljs-string">"<span class="hljs-subst">#{FISE_ONT}</span>selection-prefix"</span>, item)[<span class="hljs-string">'@value'</span>]
+            <span class="hljs-attribute">selectionSuffix</span>: get(<span class="hljs-string">"<span class="hljs-subst">#{FISE_ONT}</span>selection-suffix"</span>, item)[<span class="hljs-string">'@value'</span>]
+            <span class="hljs-attribute">start</span>: get <span class="hljs-string">"<span class="hljs-subst">#{FISE_ONT}</span>start"</span>, item
+            <span class="hljs-attribute">end</span>: get <span class="hljs-string">"<span class="hljs-subst">#{FISE_ONT}</span>end"</span>, item
+            <span class="hljs-attribute">confidence</span>: get FISE_ONT_CONFIDENCE, item
             <span class="hljs-attribute">entityAnnotations</span>: {}
             <span class="hljs-attribute">_item</span>: item
           }</pre></div></div>
@@ -862,8 +873,8 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
 
         <span class="hljs-function"><span class="hljs-title">createLanguage</span> = <span class="hljs-params">(item)</span> -&gt;</span>
           {
-          <span class="hljs-attribute">code</span>: get(<span class="hljs-string">'http://purl.org/dc/terms/language'</span>, item),
-          <span class="hljs-attribute">confidence</span>: get(<span class="hljs-string">'http://fise.iks-project.eu/ontology/confidence'</span>, item)
+          <span class="hljs-attribute">code</span>: get <span class="hljs-string">"<span class="hljs-subst">#{DCTERMS}</span>language"</span>, item
+          <span class="hljs-attribute">confidence</span>: get FISE_ONT_CONFIDENCE, item
           <span class="hljs-attribute">_item</span>: item
           }</pre></div></div>
             
@@ -1385,7 +1396,7 @@ TODO: have a user-set priority.</p>
             
             <div class="content"><div class='highlight'><pre>
           types = item[<span class="hljs-string">'@type'</span>]
-          dctype = get(<span class="hljs-string">'http://purl.org/dc/terms/type'</span>, item)</pre></div></div>
+          dctype = get <span class="hljs-string">"<span class="hljs-subst">#{DCTERMS}</span>type"</span>, item</pre></div></div>
             
         </li>
         
@@ -1413,8 +1424,8 @@ TODO: have a user-set priority.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">if</span> containsOrEquals(<span class="hljs-string">'http://fise.iks-project.eu/ontology/TextAnnotation'</span>,
-            types) <span class="hljs-keyword">and</span> containsOrEquals(<span class="hljs-string">'http://purl.org/dc/terms/LinguisticSystem'</span>, dctype)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">if</span> containsOrEquals(FISE_ONT_TEXT_ANNOTATION,
+            types) <span class="hljs-keyword">and</span> containsOrEquals(<span class="hljs-string">"<span class="hljs-subst">#{DCTERMS}</span>LinguisticSystem"</span>, dctype)</pre></div></div>
             
         </li>
         
@@ -1444,7 +1455,7 @@ TODO: have a user-set priority.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> containsOrEquals(<span class="hljs-string">'http://fise.iks-project.eu/ontology/TextAnnotation'</span>, types)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> containsOrEquals(FISE_ONT_TEXT_ANNOTATION, types)</pre></div></div>
             
         </li>
         
@@ -1474,7 +1485,7 @@ TODO: have a user-set priority.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> containsOrEquals(<span class="hljs-string">'http://fise.iks-project.eu/ontology/EntityAnnotation'</span>, types)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> containsOrEquals(FISE_ONT_ENTITY_ANNOTATION, types)</pre></div></div>
             
         </li>
         

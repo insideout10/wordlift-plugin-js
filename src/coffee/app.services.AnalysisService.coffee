@@ -31,11 +31,19 @@ angular.module('AnalysisService', [])
     RDFS_LABEL = "#{RDFS}label"
     RDFS_COMMENT = "#{RDFS}comment"
 
-    FREEBASE_NS = 'http://rdf.freebase.com/ns/'
+    FREEBASE = 'http://rdf.freebase.com/'
+    FREEBASE_NS = "#{FREEBASE}ns/"
     FREEBASE_NS_DESCRIPTION = "#{FREEBASE_NS}common.topic.description"
 
     SCHEMA_ORG = 'http://schema.org/'
     SCHEMA_ORG_DESCRIPTION = "#{SCHEMA_ORG}description"
+
+    FISE_ONT = 'http://fise.iks-project.eu/ontology/'
+    FISE_ONT_ENTITY_ANNOTATION = "#{FISE_ONT}EntityAnnotation"
+    FISE_ONT_TEXT_ANNOTATION = "#{FISE_ONT}TextAnnotation"
+    FISE_ONT_CONFIDENCE = "#{FISE_ONT}confidence"
+
+    DCTERMS = 'http://purl.org/dc/terms/'
 
     # Find a text annotation in the provided collection which matches the start and end values.
     findTextAnnotation = (textAnnotations, start, end) ->
@@ -62,7 +70,7 @@ angular.module('AnalysisService', [])
           if textAnnotation?
             entityAnnotation = @findEntityAnnotation textAnnotation.entityAnnotations, uri: annotation.uri
             entityAnnotation.selected = true if entityAnnotation?
-            # TODO: if the entity is not found, it needs to be added.
+    # TODO: if the entity is not found, it needs to be added.
 
     # <a name="analyze"></a>
     # Analyze the provided content. Only one analysis at a time is run.
@@ -126,16 +134,16 @@ angular.module('AnalysisService', [])
 
           typesArray = if angular.isArray types then types else [ types ]
           return PERSON       for type in typesArray when "#{SCHEMA_ORG}Person" is expand(type)
-          return PERSON       for type in typesArray when 'http://rdf.freebase.com/ns/people.person' is expand(type)
+          return PERSON       for type in typesArray when "#{FREEBASE_NS}people.person" is expand(type)
           return ORGANIZATION for type in typesArray when "#{SCHEMA_ORG}Organization" is expand(type)
-          return ORGANIZATION for type in typesArray when 'http://rdf.freebase.com/ns/government.government' is expand(type)
+          return ORGANIZATION for type in typesArray when "#{FREEBASE_NS}government.government" is expand(type)
           return ORGANIZATION for type in typesArray when "#{SCHEMA_ORG}Newspaper" is expand(type)
           return PLACE        for type in typesArray when "#{SCHEMA_ORG}Place" is expand(type)
-          return PLACE        for type in typesArray when 'http://rdf.freebase.com/ns/location.location' is expand(type)
+          return PLACE        for type in typesArray when "#{FREEBASE_NS}location.location" is expand(type)
           return EVENT        for type in typesArray when "#{SCHEMA_ORG}Event" is expand(type)
           return EVENT        for type in typesArray when 'http://dbpedia.org/ontology/Event' is expand(type)
-          return MUSIC        for type in typesArray when 'http://rdf.freebase.com/ns/music.artist' is expand(type)
-          return MUSIC        for type in typesArray when 'http://schema.org/MusicAlbum' is expand(type)
+          return MUSIC        for type in typesArray when "#{FREEBASE_NS}music.artist" is expand(type)
+          return MUSIC        for type in typesArray when "#{SCHEMA_ORG}MusicAlbum" is expand(type)
           return PLACE        for type in typesArray when 'http://www.opengis.net/gml/_Feature' is expand(type)
 
           'thing'
@@ -151,8 +159,11 @@ angular.module('AnalysisService', [])
 
           # Get all the thumbnails; for each thumbnail execute the provided function.
           thumbnails = get(
-            ['http://xmlns.com/foaf/0.1/depiction', 'http://rdf.freebase.com/ns/common.topic.image',
-             'http://schema.org/image'],
+            [
+              'http://xmlns.com/foaf/0.1/depiction'
+              "#{FREEBASE_NS}common.topic.image"
+              "#{SCHEMA_ORG}image"
+            ],
             item,
           (values) ->
             values = if angular.isArray values then values else [ values ]
@@ -175,7 +186,7 @@ angular.module('AnalysisService', [])
             label: getLanguage(RDFS_LABEL, item, language)
             labels: get(RDFS_LABEL, item)
             sameAs: sameAs
-            source: if id.match('^http://rdf.freebase.com/.*$')
+            source: if id.match("^#{FREEBASE}.*$")
               'freebase'
             else if id.match('^http://dbpedia.org/.*$')
               'dbpedia'
@@ -233,7 +244,7 @@ angular.module('AnalysisService', [])
           id = get('@id', item)
 
           # get the related text annotation.
-          relations = get('http://purl.org/dc/terms/relation', item)
+          relations = get "#{DCTERMS}relation", item
           # Ensure we're dealing with an array.
           relations = if angular.isArray relations then relations else [ relations ]
 
@@ -244,8 +255,8 @@ angular.module('AnalysisService', [])
             # Create an entity annotation.
             entityAnnotation = {
               id: id
-              label: get('http://fise.iks-project.eu/ontology/entity-label', item)
-              confidence: get('http://fise.iks-project.eu/ontology/confidence', item)
+              label: get "#{FISE_ONT}entity-label", item
+              confidence: get FISE_ONT_CONFIDENCE, item
               entity: entity
               relation: textAnnotation
               _item: item
@@ -266,12 +277,12 @@ angular.module('AnalysisService', [])
         createTextAnnotation = (item) ->
           textAnnotation = {
             id: get('@id', item)
-            selectedText: get('http://fise.iks-project.eu/ontology/selected-text', item)['@value']
-            selectionPrefix: get('http://fise.iks-project.eu/ontology/selection-prefix', item)['@value']
-            selectionSuffix: get('http://fise.iks-project.eu/ontology/selection-suffix', item)['@value']
-            start: get('http://fise.iks-project.eu/ontology/start', item)
-            end: get('http://fise.iks-project.eu/ontology/end', item)
-            confidence: get('http://fise.iks-project.eu/ontology/confidence', item)
+            selectedText: get("#{FISE_ONT}selected-text", item)['@value']
+            selectionPrefix: get("#{FISE_ONT}selection-prefix", item)['@value']
+            selectionSuffix: get("#{FISE_ONT}selection-suffix", item)['@value']
+            start: get "#{FISE_ONT}start", item
+            end: get "#{FISE_ONT}end", item
+            confidence: get FISE_ONT_CONFIDENCE, item
             entityAnnotations: {}
             _item: item
           }
@@ -280,8 +291,8 @@ angular.module('AnalysisService', [])
 
         createLanguage = (item) ->
           {
-          code: get('http://purl.org/dc/terms/language', item),
-          confidence: get('http://fise.iks-project.eu/ontology/confidence', item)
+          code: get "#{DCTERMS}language", item
+          confidence: get FISE_ONT_CONFIDENCE, item
           _item: item
           }
 
@@ -399,23 +410,23 @@ angular.module('AnalysisService', [])
           #        console.log "[ id :: #{id} ]"
 
           types = item['@type']
-          dctype = get('http://purl.org/dc/terms/type', item)
+          dctype = get "#{DCTERMS}type", item
 
           #        console.log "[ id :: #{id} ][ dc:type :: #{dctype} ]"
 
           # TextAnnotation/LinguisticSystem
-          if containsOrEquals('http://fise.iks-project.eu/ontology/TextAnnotation',
-            types) and containsOrEquals('http://purl.org/dc/terms/LinguisticSystem', dctype)
+          if containsOrEquals(FISE_ONT_TEXT_ANNOTATION,
+            types) and containsOrEquals("#{DCTERMS}LinguisticSystem", dctype)
             #          dump "language [ id :: #{id} ][ dc:type :: #{dctype} ]"
             languages.push createLanguage(item)
 
             # TextAnnotation
-          else if containsOrEquals('http://fise.iks-project.eu/ontology/TextAnnotation', types)
+          else if containsOrEquals(FISE_ONT_TEXT_ANNOTATION, types)
             #          $log.debug "TextAnnotation [ @id :: #{id} ][ types :: #{types} ]"
             textAnnotations[id] = item
 
             # EntityAnnotation
-          else if containsOrEquals('http://fise.iks-project.eu/ontology/EntityAnnotation', types)
+          else if containsOrEquals(FISE_ONT_ENTITY_ANNOTATION, types)
             #          $log.debug "EntityAnnotation [ @id :: #{id} ][ types :: #{types} ]"
             entityAnnotations[id] = item
 

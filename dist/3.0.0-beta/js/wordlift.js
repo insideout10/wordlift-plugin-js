@@ -161,7 +161,7 @@
 
   angular.module('AnalysisService', []).service('AnalysisService', [
     '$http', '$q', '$rootScope', function($http, $q, $rootScope) {
-      var ANALYSIS_EVENT, CONTEXT, EVENT, FREEBASE_NS, FREEBASE_NS_DESCRIPTION, GRAPH, MUSIC, ORGANIZATION, PERSON, PLACE, RDFS, RDFS_COMMENT, RDFS_LABEL, SCHEMA_ORG, SCHEMA_ORG_DESCRIPTION, findTextAnnotation, service;
+      var ANALYSIS_EVENT, CONTEXT, DCTERMS, EVENT, FISE_ONT, FISE_ONT_CONFIDENCE, FISE_ONT_ENTITY_ANNOTATION, FISE_ONT_TEXT_ANNOTATION, FREEBASE, FREEBASE_NS, FREEBASE_NS_DESCRIPTION, GRAPH, MUSIC, ORGANIZATION, PERSON, PLACE, RDFS, RDFS_COMMENT, RDFS_LABEL, SCHEMA_ORG, SCHEMA_ORG_DESCRIPTION, findTextAnnotation, service;
       CONTEXT = '@context';
       GRAPH = '@graph';
       ANALYSIS_EVENT = 'analysisReceived';
@@ -173,10 +173,16 @@
       RDFS = 'http://www.w3.org/2000/01/rdf-schema#';
       RDFS_LABEL = "" + RDFS + "label";
       RDFS_COMMENT = "" + RDFS + "comment";
-      FREEBASE_NS = 'http://rdf.freebase.com/ns/';
+      FREEBASE = 'http://rdf.freebase.com/';
+      FREEBASE_NS = "" + FREEBASE + "ns/";
       FREEBASE_NS_DESCRIPTION = "" + FREEBASE_NS + "common.topic.description";
       SCHEMA_ORG = 'http://schema.org/';
       SCHEMA_ORG_DESCRIPTION = "" + SCHEMA_ORG + "description";
+      FISE_ONT = 'http://fise.iks-project.eu/ontology/';
+      FISE_ONT_ENTITY_ANNOTATION = "" + FISE_ONT + "EntityAnnotation";
+      FISE_ONT_TEXT_ANNOTATION = "" + FISE_ONT + "TextAnnotation";
+      FISE_ONT_CONFIDENCE = "" + FISE_ONT + "confidence";
+      DCTERMS = 'http://purl.org/dc/terms/';
       findTextAnnotation = function(textAnnotations, start, end) {
         var textAnnotation, textAnnotationId;
         for (textAnnotationId in textAnnotations) {
@@ -285,7 +291,7 @@
             }
             for (_j = 0, _len1 = typesArray.length; _j < _len1; _j++) {
               type = typesArray[_j];
-              if ('http://rdf.freebase.com/ns/people.person' === expand(type)) {
+              if (("" + FREEBASE_NS + "people.person") === expand(type)) {
                 return PERSON;
               }
             }
@@ -297,7 +303,7 @@
             }
             for (_l = 0, _len3 = typesArray.length; _l < _len3; _l++) {
               type = typesArray[_l];
-              if ('http://rdf.freebase.com/ns/government.government' === expand(type)) {
+              if (("" + FREEBASE_NS + "government.government") === expand(type)) {
                 return ORGANIZATION;
               }
             }
@@ -315,7 +321,7 @@
             }
             for (_o = 0, _len6 = typesArray.length; _o < _len6; _o++) {
               type = typesArray[_o];
-              if ('http://rdf.freebase.com/ns/location.location' === expand(type)) {
+              if (("" + FREEBASE_NS + "location.location") === expand(type)) {
                 return PLACE;
               }
             }
@@ -333,13 +339,13 @@
             }
             for (_r = 0, _len9 = typesArray.length; _r < _len9; _r++) {
               type = typesArray[_r];
-              if ('http://rdf.freebase.com/ns/music.artist' === expand(type)) {
+              if (("" + FREEBASE_NS + "music.artist") === expand(type)) {
                 return MUSIC;
               }
             }
             for (_s = 0, _len10 = typesArray.length; _s < _len10; _s++) {
               type = typesArray[_s];
-              if ('http://schema.org/MusicAlbum' === expand(type)) {
+              if (("" + SCHEMA_ORG + "MusicAlbum") === expand(type)) {
                 return MUSIC;
               }
             }
@@ -357,7 +363,7 @@
             types = get('@type', item);
             sameAs = get('http://www.w3.org/2002/07/owl#sameAs', item);
             sameAs = angular.isArray(sameAs) ? sameAs : [sameAs];
-            thumbnails = get(['http://xmlns.com/foaf/0.1/depiction', 'http://rdf.freebase.com/ns/common.topic.image', 'http://schema.org/image'], item, function(values) {
+            thumbnails = get(['http://xmlns.com/foaf/0.1/depiction', "" + FREEBASE_NS + "common.topic.image", "" + SCHEMA_ORG + "image"], item, function(values) {
               var match, value, _i, _len, _results;
               values = angular.isArray(values) ? values : [values];
               _results = [];
@@ -381,7 +387,7 @@
               label: getLanguage(RDFS_LABEL, item, language),
               labels: get(RDFS_LABEL, item),
               sameAs: sameAs,
-              source: id.match('^http://rdf.freebase.com/.*$') ? 'freebase' : id.match('^http://dbpedia.org/.*$') ? 'dbpedia' : 'wordlift',
+              source: id.match("^" + FREEBASE + ".*$") ? 'freebase' : id.match('^http://dbpedia.org/.*$') ? 'dbpedia' : 'wordlift',
               _item: item
             };
             entity.description = getLanguage([RDFS_COMMENT, FREEBASE_NS_DESCRIPTION, SCHEMA_ORG_DESCRIPTION], item, language);
@@ -402,15 +408,15 @@
             }
             annotations = [];
             id = get('@id', item);
-            relations = get('http://purl.org/dc/terms/relation', item);
+            relations = get("" + DCTERMS + "relation", item);
             relations = angular.isArray(relations) ? relations : [relations];
             for (_i = 0, _len = relations.length; _i < _len; _i++) {
               relation = relations[_i];
               textAnnotation = textAnnotations[relation];
               entityAnnotation = {
                 id: id,
-                label: get('http://fise.iks-project.eu/ontology/entity-label', item),
-                confidence: get('http://fise.iks-project.eu/ontology/confidence', item),
+                label: get("" + FISE_ONT + "entity-label", item),
+                confidence: get(FISE_ONT_CONFIDENCE, item),
                 entity: entity,
                 relation: textAnnotation,
                 _item: item,
@@ -427,12 +433,12 @@
             var textAnnotation;
             textAnnotation = {
               id: get('@id', item),
-              selectedText: get('http://fise.iks-project.eu/ontology/selected-text', item)['@value'],
-              selectionPrefix: get('http://fise.iks-project.eu/ontology/selection-prefix', item)['@value'],
-              selectionSuffix: get('http://fise.iks-project.eu/ontology/selection-suffix', item)['@value'],
-              start: get('http://fise.iks-project.eu/ontology/start', item),
-              end: get('http://fise.iks-project.eu/ontology/end', item),
-              confidence: get('http://fise.iks-project.eu/ontology/confidence', item),
+              selectedText: get("" + FISE_ONT + "selected-text", item)['@value'],
+              selectionPrefix: get("" + FISE_ONT + "selection-prefix", item)['@value'],
+              selectionSuffix: get("" + FISE_ONT + "selection-suffix", item)['@value'],
+              start: get("" + FISE_ONT + "start", item),
+              end: get("" + FISE_ONT + "end", item),
+              confidence: get(FISE_ONT_CONFIDENCE, item),
               entityAnnotations: {},
               _item: item
             };
@@ -440,8 +446,8 @@
           };
           createLanguage = function(item) {
             return {
-              code: get('http://purl.org/dc/terms/language', item),
-              confidence: get('http://fise.iks-project.eu/ontology/confidence', item),
+              code: get("" + DCTERMS + "language", item),
+              confidence: get(FISE_ONT_CONFIDENCE, item),
               _item: item
             };
           };
@@ -575,12 +581,12 @@
             item = graph[_i];
             id = item['@id'];
             types = item['@type'];
-            dctype = get('http://purl.org/dc/terms/type', item);
-            if (containsOrEquals('http://fise.iks-project.eu/ontology/TextAnnotation', types) && containsOrEquals('http://purl.org/dc/terms/LinguisticSystem', dctype)) {
+            dctype = get("" + DCTERMS + "type", item);
+            if (containsOrEquals(FISE_ONT_TEXT_ANNOTATION, types) && containsOrEquals("" + DCTERMS + "LinguisticSystem", dctype)) {
               languages.push(createLanguage(item));
-            } else if (containsOrEquals('http://fise.iks-project.eu/ontology/TextAnnotation', types)) {
+            } else if (containsOrEquals(FISE_ONT_TEXT_ANNOTATION, types)) {
               textAnnotations[id] = item;
-            } else if (containsOrEquals('http://fise.iks-project.eu/ontology/EntityAnnotation', types)) {
+            } else if (containsOrEquals(FISE_ONT_ENTITY_ANNOTATION, types)) {
               entityAnnotations[id] = item;
             } else {
               entities[id] = item;
