@@ -635,7 +635,7 @@
   ]);
 
   angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tinymce.plugin.config', 'AnalysisService']).service('EditorService', [
-    'AnalysisService', '$rootScope', '$log', function(AnalysisService, $rootScope, $log) {
+    'AnalysisService', '$rootScope', function(AnalysisService, $rootScope) {
       var CONTENT_EDITABLE, CONTENT_IFRAME, EDITOR_ID, MCE_WORDLIFT, RUNNING_CLASS, TEXT_ANNOTATION, editor, findEntities, service;
       EDITOR_ID = 'content';
       TEXT_ANNOTATION = 'textannotation';

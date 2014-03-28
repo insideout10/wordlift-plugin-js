@@ -692,7 +692,7 @@ angular.module('AnalysisService', [])
 
 angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tinymce.plugin.config', 'AnalysisService'])
 .service('EditorService',
-    ['AnalysisService', '$rootScope', '$log', (AnalysisService, $rootScope, $log) ->
+    ['AnalysisService', '$rootScope', (AnalysisService, $rootScope) ->
 
       # Define some constants for commonly used strings.
       EDITOR_ID = 'content'
