@@ -694,6 +694,7 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
 .service('EditorService',
     ['AnalysisService', '$rootScope', '$log', (AnalysisService, $rootScope, $log) ->
 
+      # Define some constants for commonly used strings.
       EDITOR_ID = 'content'
       TEXT_ANNOTATION = 'textannotation'
       CONTENT_IFRAME = '#content_ifr'
@@ -701,7 +702,8 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
       MCE_WORDLIFT = '.mce_wordlift'
       CONTENT_EDITABLE = 'contenteditable'
 
-      editor = -> tinyMCE.get(EDITOR_ID)
+      editor = ->
+        tinyMCE.get(EDITOR_ID)
 
       # Find existing entities selected in the html content (by looking for *itemid* attributes).
       findEntities = (html) ->
@@ -709,7 +711,7 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
         # Prepare a traslator instance that will traslate Html and Text positions.
         traslator = Traslator.create html
 
-      # Set the pattern to look for *itemid* attributes.
+        # Set the pattern to look for *itemid* attributes.
         pattern = /<(\w+)[^>]*\sitemid="([^"]+)"[^>]*>([^<]+)<\/\1>/gim
 
         # Get the matches and return them.
@@ -773,26 +775,17 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
       # <a name="analyze"></a>
       # Send the provided content for analysis using the [AnalysisService.analyze](app.services.AnalysisService.html#analyze) method.
         analyze: (content) ->
-          if AnalysisService.isRunning
-            # If the service is running abort the current request.
-            AnalysisService.abort()
-          else
-            # Disable the button and set the spinner while analysis is running.
-            $(MCE_WORDLIFT).addClass RUNNING_CLASS
+          # If the service is running abort the current request.
+          return AnalysisService.abort() if AnalysisService.isRunning
 
-            # Make the editor read-obly.
-            editor().getBody().setAttribute CONTENT_EDITABLE, false
+          # Disable the button and set the spinner while analysis is running.
+          $(MCE_WORDLIFT).addClass RUNNING_CLASS
 
-            # Get entities already discovered.
-            html = editor().getContent(format: 'raw')
+          # Make the editor read-obly.
+          editor().getBody().setAttribute CONTENT_EDITABLE, false
 
-            pattern = /\sitemid="([^"]+)"/gim
-            while match = pattern.exec html
-              # Do sth
-              console.log match
-
-            # Call the [AnalysisService](AnalysisService.html) to analyze the provided content, asking to merge sameAs related entities.
-            AnalysisService.analyze content, true
+          # Call the [AnalysisService](AnalysisService.html) to analyze the provided content, asking to merge sameAs related entities.
+          AnalysisService.analyze content, true
 
       # get the window position of an element inside the editor.
       # @param element elem The element.
@@ -801,28 +794,42 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
           ed = editor()
           el = elem.target
 
-          top = $(CONTENT_IFRAME).offset().top - $('body').scrollTop() +
-          el.offsetTop - $(ed.getBody()).scrollTop()
-
-          left = $(CONTENT_IFRAME).offset().left - $('body').scrollLeft() +
-          el.offsetLeft - $(ed.getBody()).scrollLeft()
-
           # Return the coordinates.
-          {top: top, left: left}
+          {
+            top: $(CONTENT_IFRAME).offset().top - $('body').scrollTop() + el.offsetTop - $(ed.getBody()).scrollTop()
+            left: $(CONTENT_IFRAME).offset().left - $('body').scrollLeft() + el.offsetLeft - $(ed.getBody()).scrollLeft()
+          }
 
 
       # Hook the service to the events. This event is captured when an entity is selected in the disambiguation popover.
-      $rootScope.$on 'DisambiguationWidget.entitySelected', (event, obj) ->
+      $rootScope.$on 'selectEntity', (event, args) ->
+
         # create a reference to the TinyMCE editor dom.
         dom = editor().dom
 
         # the element id containing the attributes for the text annotation.
-        id = obj.relation.id
+        id = args.ta.id
 
-        dom.setAttrib(id, 'class', "#{TEXT_ANNOTATION} highlight #{obj.entity.type}");
-        dom.setAttrib(id, 'itemscope', 'itemscope');
-        dom.setAttrib(id, 'itemtype', obj.entity.type);
-        dom.setAttrib(id, 'itemid', obj.entity.id);
+        # Preset the stylesheet class.
+        cls = TEXT_ANNOTATION
+
+        # If an entity annotation is selected then prepare the values, otherwise set them null (i.e. remove).
+        if args.ea?
+          entity = args.ea.entity
+          cls +=  " highlight #{entity.type}"
+          itemscope = 'itemscope'
+          itemtype = entity.type
+          itemid = entity.id
+        else
+          itemscope = null
+          itemtype = null
+          itemid = null
+
+        # Apply changes to the dom.
+        dom.setAttrib id, 'class', cls
+        dom.setAttrib id, 'itemscope', itemscope
+        dom.setAttrib id, 'itemtype', itemtype
+        dom.setAttrib id, 'itemid', itemid
 
       # Receive annotations from the analysis (there is a mirror method in PHP for testing purposes, please try to keep
       # the two aligned - tests/functions.php *wl_embed_analysis* )
@@ -970,7 +977,7 @@ angular.module('wordlift.tinymce.plugin.controllers',
       $('#content_ifr').contents().scroll(scroll)
 
       $scope.onEntitySelected = (textAnnotation, entityAnnotation) ->
-        $scope.$emit 'DisambiguationWidget.entitySelected', entityAnnotation
+        $scope.$emit 'selectEntity', ta: textAnnotation, ea: entityAnnotation
 
       # Receives notifications about disambiguated textAnnotations
       # and flags selected entityAnnotations properly ... 

@@ -113,16 +113,7 @@
             
             <div class="content"><div class='highlight'><pre>angular.<span class="hljs-built_in">module</span>(<span class="hljs-string">'wordlift.tinymce.plugin.services.EditorService'</span>, [<span class="hljs-string">'wordlift.tinymce.plugin.config'</span>, <span class="hljs-string">'AnalysisService'</span>])
 .service(<span class="hljs-string">'EditorService'</span>,
-    [<span class="hljs-string">'AnalysisService'</span>, <span class="hljs-string">'$rootScope'</span>, <span class="hljs-string">'$log'</span>, <span class="hljs-function"><span class="hljs-params">(AnalysisService, $rootScope, $log)</span> -&gt;</span>
-
-      EDITOR_ID = <span class="hljs-string">'content'</span>
-      TEXT_ANNOTATION = <span class="hljs-string">'textannotation'</span>
-      CONTENT_IFRAME = <span class="hljs-string">'#content_ifr'</span>
-      RUNNING_CLASS = <span class="hljs-string">'running'</span>
-      MCE_WORDLIFT = <span class="hljs-string">'.mce_wordlift'</span>
-      CONTENT_EDITABLE = <span class="hljs-string">'contenteditable'</span>
-
-      <span class="hljs-function"><span class="hljs-title">editor</span> = -&gt;</span> tinyMCE.get(EDITOR_ID)</pre></div></div>
+    [<span class="hljs-string">'AnalysisService'</span>, <span class="hljs-string">'$rootScope'</span>, <span class="hljs-string">'$log'</span>, <span class="hljs-function"><span class="hljs-params">(AnalysisService, $rootScope, $log)</span> -&gt;</span></pre></div></div>
             
         </li>
         
@@ -133,11 +124,19 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
-              <p>Find existing entities selected in the html content (by looking for <em>itemid</em> attributes).</p>
+              <p>Define some constants for commonly used strings.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      <span class="hljs-function"><span class="hljs-title">findEntities</span> = <span class="hljs-params">(html)</span> -&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>      EDITOR_ID = <span class="hljs-string">'content'</span>
+      TEXT_ANNOTATION = <span class="hljs-string">'textannotation'</span>
+      CONTENT_IFRAME = <span class="hljs-string">'#content_ifr'</span>
+      RUNNING_CLASS = <span class="hljs-string">'running'</span>
+      MCE_WORDLIFT = <span class="hljs-string">'.mce_wordlift'</span>
+      CONTENT_EDITABLE = <span class="hljs-string">'contenteditable'</span>
+
+      <span class="hljs-function"><span class="hljs-title">editor</span> = -&gt;</span>
+        tinyMCE.get(EDITOR_ID)</pre></div></div>
             
         </li>
         
@@ -148,11 +147,11 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-3">&#182;</a>
               </div>
-              <p>Prepare a traslator instance that will traslate Html and Text positions.</p>
+              <p>Find existing entities selected in the html content (by looking for <em>itemid</em> attributes).</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        traslator = Traslator.create html</pre></div></div>
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-function"><span class="hljs-title">findEntities</span> = <span class="hljs-params">(html)</span> -&gt;</span></pre></div></div>
             
         </li>
         
@@ -163,11 +162,11 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
-              <p>Set the pattern to look for <em>itemid</em> attributes.</p>
+              <p>Prepare a traslator instance that will traslate Html and Text positions.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        pattern = <span class="hljs-regexp">/&lt;(\w+)[^&gt;]*\sitemid="([^"]+)"[^&gt;]*&gt;([^&lt;]+)&lt;\/\1&gt;/gim</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>        traslator = Traslator.create html</pre></div></div>
             
         </li>
         
@@ -177,6 +176,21 @@
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>Set the pattern to look for <em>itemid</em> attributes.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        pattern = <span class="hljs-regexp">/&lt;(\w+)[^&gt;]*\sitemid="([^"]+)"[^&gt;]*&gt;([^&lt;]+)&lt;\/\1&gt;/gim</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
               <p>Get the matches and return them.</p>
 
@@ -194,11 +208,11 @@
         </li>
         
         
-        <li id="section-6">
+        <li id="section-7">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-6">&#182;</a>
+                <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
               <p>Define the EditorService.</p>
 
@@ -209,11 +223,11 @@
         </li>
         
         
-        <li id="section-7">
+        <li id="section-8">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-7">&#182;</a>
+                <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
               <p>Embed the provided analysis in the editor.</p>
 
@@ -224,11 +238,11 @@
         </li>
         
         
-        <li id="section-8">
+        <li id="section-9">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-8">&#182;</a>
+                <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
               <p>A reference to the editor.</p>
 
@@ -239,11 +253,11 @@
         </li>
         
         
-        <li id="section-9">
+        <li id="section-10">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-9">&#182;</a>
+                <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
               <p>Get the TinyMCE editor html content.</p>
 
@@ -254,11 +268,11 @@
         </li>
         
         
-        <li id="section-10">
+        <li id="section-11">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-10">&#182;</a>
+                <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
               <p>Find existing entities.</p>
 
@@ -269,11 +283,11 @@
         </li>
         
         
-        <li id="section-11">
+        <li id="section-12">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-11">&#182;</a>
+                <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
               <p>Preselect entities found in html.</p>
 
@@ -284,11 +298,11 @@
         </li>
         
         
-        <li id="section-12">
+        <li id="section-13">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-12">&#182;</a>
+                <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
               <p>Remove existing text annotations.</p>
 
@@ -299,11 +313,11 @@
         </li>
         
         
-        <li id="section-13">
+        <li id="section-14">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-13">&#182;</a>
+                <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
               <p>Prepare a traslator instance that will traslate Html and Text positions.</p>
 
@@ -314,11 +328,11 @@
         </li>
         
         
-        <li id="section-14">
+        <li id="section-15">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-14">&#182;</a>
+                <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
               <p>Add text annotations to the html (skip those text annotations that don’t have entity annotations).</p>
 
@@ -329,11 +343,11 @@
         </li>
         
         
-        <li id="section-15">
+        <li id="section-16">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-15">&#182;</a>
+                <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
               <p>Start the element.</p>
 
@@ -344,11 +358,11 @@
         </li>
         
         
-        <li id="section-16">
+        <li id="section-17">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-16">&#182;</a>
+                <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
               <p>Insert the Html fragments before and after the selected text.</p>
 
@@ -362,11 +376,11 @@
         </li>
         
         
-        <li id="section-17">
+        <li id="section-18">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-17">&#182;</a>
+                <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
               <p>Close the element.</p>
 
@@ -377,11 +391,11 @@
         </li>
         
         
-        <li id="section-18">
+        <li id="section-19">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-18">&#182;</a>
+                <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
               <p>Finally insert the HTML code.</p>
 
@@ -393,11 +407,11 @@
         </li>
         
         
-        <li id="section-19">
+        <li id="section-20">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-19">&#182;</a>
+                <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
               <p>Update the editor Html code.</p>
 
@@ -410,35 +424,18 @@
         </li>
         
         
-        <li id="section-20">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-20">&#182;</a>
-              </div>
-              <p><a name="analyze"></a>
-Send the provided content for analysis using the <a href="app.services.AnalysisService.html#analyze">AnalysisService.analyze</a> method.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-attribute">analyze</span>: <span class="hljs-function"><span class="hljs-params">(content)</span> -&gt;</span>
-          <span class="hljs-keyword">if</span> AnalysisService.isRunning</pre></div></div>
-            
-        </li>
-        
-        
         <li id="section-21">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-21">&#182;</a>
               </div>
-              <p>If the service is running abort the current request.</p>
+              <p><a name="analyze"></a>
+Send the provided content for analysis using the <a href="app.services.AnalysisService.html#analyze">AnalysisService.analyze</a> method.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            AnalysisService.abort()
-          <span class="hljs-keyword">else</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-attribute">analyze</span>: <span class="hljs-function"><span class="hljs-params">(content)</span> -&gt;</span></pre></div></div>
             
         </li>
         
@@ -449,11 +446,11 @@ Send the provided content for analysis using the <a href="app.services.AnalysisS
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
-              <p>Disable the button and set the spinner while analysis is running.</p>
+              <p>If the service is running abort the current request.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            $(MCE_WORDLIFT).addClass RUNNING_CLASS</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">return</span> AnalysisService.abort() <span class="hljs-keyword">if</span> AnalysisService.isRunning</pre></div></div>
             
         </li>
         
@@ -464,11 +461,11 @@ Send the provided content for analysis using the <a href="app.services.AnalysisS
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
-              <p>Make the editor read-obly.</p>
+              <p>Disable the button and set the spinner while analysis is running.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            editor().getBody().setAttribute CONTENT_EDITABLE, <span class="hljs-literal">false</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>          $(MCE_WORDLIFT).addClass RUNNING_CLASS</pre></div></div>
             
         </li>
         
@@ -479,14 +476,11 @@ Send the provided content for analysis using the <a href="app.services.AnalysisS
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-24">&#182;</a>
               </div>
-              <p>Get entities already discovered.</p>
+              <p>Make the editor read-obly.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            html = editor().getContent(<span class="hljs-attribute">format</span>: <span class="hljs-string">'raw'</span>)
-
-            pattern = <span class="hljs-regexp">/\sitemid="([^"]+)"/gim</span>
-            <span class="hljs-keyword">while</span> match = pattern.exec html</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          editor().getBody().setAttribute CONTENT_EDITABLE, <span class="hljs-literal">false</span></pre></div></div>
             
         </li>
         
@@ -497,11 +491,11 @@ Send the provided content for analysis using the <a href="app.services.AnalysisS
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-25">&#182;</a>
               </div>
-              <p>Do sth</p>
+              <p>Call the <a href="AnalysisService.html">AnalysisService</a> to analyze the provided content, asking to merge sameAs related entities.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>              <span class="hljs-built_in">console</span>.log match</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          AnalysisService.analyze content, <span class="hljs-literal">true</span></pre></div></div>
             
         </li>
         
@@ -511,21 +505,6 @@ Send the provided content for analysis using the <a href="app.services.AnalysisS
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-26">&#182;</a>
-              </div>
-              <p>Call the <a href="AnalysisService.html">AnalysisService</a> to analyze the provided content, asking to merge sameAs related entities.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>            AnalysisService.analyze content, <span class="hljs-literal">true</span></pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-27">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-27">&#182;</a>
               </div>
               <p>get the window position of an element inside the editor.
 @param element elem The element.</p>
@@ -537,24 +516,36 @@ Send the provided content for analysis using the <a href="app.services.AnalysisS
         </li>
         
         
-        <li id="section-28">
+        <li id="section-27">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-28">&#182;</a>
+                <a class="pilcrow" href="#section-27">&#182;</a>
               </div>
               <p>get a reference to the editor and its body</p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre>          ed = editor()
-          el = elem.target
+          el = elem.target</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-28">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-28">&#182;</a>
+              </div>
+              <p>Return the coordinates.</p>
 
-          top = $(CONTENT_IFRAME).offset().top - $(<span class="hljs-string">'body'</span>).scrollTop() +
-          el.offsetTop - $(ed.getBody()).scrollTop()
-
-          left = $(CONTENT_IFRAME).offset().left - $(<span class="hljs-string">'body'</span>).scrollLeft() +
-          el.offsetLeft - $(ed.getBody()).scrollLeft()</pre></div></div>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          {
+            <span class="hljs-attribute">top</span>: $(CONTENT_IFRAME).offset().top - $(<span class="hljs-string">'body'</span>).scrollTop() + el.offsetTop - $(ed.getBody()).scrollTop()
+            <span class="hljs-attribute">left</span>: $(CONTENT_IFRAME).offset().left - $(<span class="hljs-string">'body'</span>).scrollLeft() + el.offsetLeft - $(ed.getBody()).scrollLeft()
+          }</pre></div></div>
             
         </li>
         
@@ -565,11 +556,11 @@ Send the provided content for analysis using the <a href="app.services.AnalysisS
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-29">&#182;</a>
               </div>
-              <p>Return the coordinates.</p>
+              <p>Hook the service to the events. This event is captured when an entity is selected in the disambiguation popover.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          {<span class="hljs-attribute">top</span>: top, <span class="hljs-attribute">left</span>: left}</pre></div></div>
+            <div class="content"><div class='highlight'><pre>      $rootScope.$<span class="hljs-literal">on</span> <span class="hljs-string">'selectEntity'</span>, <span class="hljs-function"><span class="hljs-params">(event, args)</span> -&gt;</span></pre></div></div>
             
         </li>
         
@@ -580,11 +571,11 @@ Send the provided content for analysis using the <a href="app.services.AnalysisS
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-30">&#182;</a>
               </div>
-              <p>Hook the service to the events. This event is captured when an entity is selected in the disambiguation popover.</p>
+              <p>create a reference to the TinyMCE editor dom.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      $rootScope.$<span class="hljs-literal">on</span> <span class="hljs-string">'DisambiguationWidget.entitySelected'</span>, <span class="hljs-function"><span class="hljs-params">(event, obj)</span> -&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>        dom = editor().dom</pre></div></div>
             
         </li>
         
@@ -595,11 +586,11 @@ Send the provided content for analysis using the <a href="app.services.AnalysisS
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-31">&#182;</a>
               </div>
-              <p>create a reference to the TinyMCE editor dom.</p>
+              <p>the element id containing the attributes for the text annotation.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        dom = editor().dom</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        id = args.ta.id</pre></div></div>
             
         </li>
         
@@ -610,16 +601,11 @@ Send the provided content for analysis using the <a href="app.services.AnalysisS
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-32">&#182;</a>
               </div>
-              <p>the element id containing the attributes for the text annotation.</p>
+              <p>Preset the stylesheet class.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        id = obj.relation.id
-
-        dom.setAttrib(id, <span class="hljs-string">'class'</span>, <span class="hljs-string">"<span class="hljs-subst">#{TEXT_ANNOTATION}</span> highlight <span class="hljs-subst">#{obj.entity.type}</span>"</span>);
-        dom.setAttrib(id, <span class="hljs-string">'itemscope'</span>, <span class="hljs-string">'itemscope'</span>);
-        dom.setAttrib(id, <span class="hljs-string">'itemtype'</span>, obj.entity.type);
-        dom.setAttrib(id, <span class="hljs-string">'itemid'</span>, obj.entity.id);</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        cls = TEXT_ANNOTATION</pre></div></div>
             
         </li>
         
@@ -629,6 +615,48 @@ Send the provided content for analysis using the <a href="app.services.AnalysisS
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-33">&#182;</a>
+              </div>
+              <p>If an entity annotation is selected then prepare the values, otherwise set them null (i.e. remove).</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> args.ea?
+          entity = args.ea.entity
+          cls +=  <span class="hljs-string">" highlight <span class="hljs-subst">#{entity.type}</span>"</span>
+          itemscope = <span class="hljs-string">'itemscope'</span>
+          itemtype = entity.type
+          itemid = entity.id
+        <span class="hljs-keyword">else</span>
+          itemscope = <span class="hljs-literal">null</span>
+          itemtype = <span class="hljs-literal">null</span>
+          itemid = <span class="hljs-literal">null</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-34">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-34">&#182;</a>
+              </div>
+              <p>Apply changes to the dom.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        dom.setAttrib id, <span class="hljs-string">'class'</span>, cls
+        dom.setAttrib id, <span class="hljs-string">'itemscope'</span>, itemscope
+        dom.setAttrib id, <span class="hljs-string">'itemtype'</span>, itemtype
+        dom.setAttrib id, <span class="hljs-string">'itemid'</span>, itemid</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-35">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-35">&#182;</a>
               </div>
               <p>Receive annotations from the analysis (there is a mirror method in PHP for testing purposes, please try to keep
 the two aligned - tests/functions.php <em>wl_embed_analysis</em> )
@@ -643,11 +671,11 @@ When an analysis is completed, remove the <em>running</em> class from the WordLi
         </li>
         
         
-        <li id="section-34">
+        <li id="section-36">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-34">&#182;</a>
+                <a class="pilcrow" href="#section-36">&#182;</a>
               </div>
               <p>Remove the <em>running</em> class.</p>
 
@@ -658,11 +686,11 @@ When an analysis is completed, remove the <em>running</em> class from the WordLi
         </li>
         
         
-        <li id="section-35">
+        <li id="section-37">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-35">&#182;</a>
+                <a class="pilcrow" href="#section-37">&#182;</a>
               </div>
               <p>Make the editor read/write.</p>
 
@@ -673,11 +701,11 @@ When an analysis is completed, remove the <em>running</em> class from the WordLi
         </li>
         
         
-        <li id="section-36">
+        <li id="section-38">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-36">&#182;</a>
+                <a class="pilcrow" href="#section-38">&#182;</a>
               </div>
               <p>Return the service definition.</p>
 

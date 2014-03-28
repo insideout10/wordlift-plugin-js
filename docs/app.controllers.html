@@ -257,7 +257,7 @@
       $(<span class="hljs-string">'#content_ifr'</span>).contents().scroll(scroll)
 
       $scope.<span class="hljs-function"><span class="hljs-title">onEntitySelected</span> = <span class="hljs-params">(textAnnotation, entityAnnotation)</span> -&gt;</span>
-        $scope.$emit <span class="hljs-string">'DisambiguationWidget.entitySelected'</span>, entityAnnotation</pre></div></div>
+        $scope.$emit <span class="hljs-string">'selectEntity'</span>, <span class="hljs-attribute">ta</span>: textAnnotation, <span class="hljs-attribute">ea</span>: entityAnnotation</pre></div></div>
             
         </li>
         

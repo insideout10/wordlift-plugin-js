@@ -57,7 +57,7 @@ angular.module('wordlift.tinymce.plugin.controllers',
       $('#content_ifr').contents().scroll(scroll)
 
       $scope.onEntitySelected = (textAnnotation, entityAnnotation) ->
-        $scope.$emit 'DisambiguationWidget.entitySelected', entityAnnotation
+        $scope.$emit 'selectEntity', ta: textAnnotation, ea: entityAnnotation
 
       # Receives notifications about disambiguated textAnnotations
       # and flags selected entityAnnotations properly ... 

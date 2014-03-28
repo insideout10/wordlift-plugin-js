@@ -699,42 +699,43 @@
           return ed.isNotDirty = !isDirty;
         },
         analyze: function(content) {
-          var html, match, pattern;
           if (AnalysisService.isRunning) {
             return AnalysisService.abort();
-          } else {
-            $(MCE_WORDLIFT).addClass(RUNNING_CLASS);
-            editor().getBody().setAttribute(CONTENT_EDITABLE, false);
-            html = editor().getContent({
-              format: 'raw'
-            });
-            pattern = /\sitemid="([^"]+)"/gim;
-            while (match = pattern.exec(html)) {
-              console.log(match);
-            }
-            return AnalysisService.analyze(content, true);
           }
+          $(MCE_WORDLIFT).addClass(RUNNING_CLASS);
+          editor().getBody().setAttribute(CONTENT_EDITABLE, false);
+          return AnalysisService.analyze(content, true);
         },
         getWinPos: function(elem) {
-          var ed, el, left, top;
+          var ed, el;
           ed = editor();
           el = elem.target;
-          top = $(CONTENT_IFRAME).offset().top - $('body').scrollTop() + el.offsetTop - $(ed.getBody()).scrollTop();
-          left = $(CONTENT_IFRAME).offset().left - $('body').scrollLeft() + el.offsetLeft - $(ed.getBody()).scrollLeft();
           return {
-            top: top,
-            left: left
+            top: $(CONTENT_IFRAME).offset().top - $('body').scrollTop() + el.offsetTop - $(ed.getBody()).scrollTop(),
+            left: $(CONTENT_IFRAME).offset().left - $('body').scrollLeft() + el.offsetLeft - $(ed.getBody()).scrollLeft()
           };
         }
       };
-      $rootScope.$on('DisambiguationWidget.entitySelected', function(event, obj) {
-        var dom, id;
+      $rootScope.$on('selectEntity', function(event, args) {
+        var cls, dom, entity, id, itemid, itemscope, itemtype;
         dom = editor().dom;
-        id = obj.relation.id;
-        dom.setAttrib(id, 'class', "" + TEXT_ANNOTATION + " highlight " + obj.entity.type);
-        dom.setAttrib(id, 'itemscope', 'itemscope');
-        dom.setAttrib(id, 'itemtype', obj.entity.type);
-        return dom.setAttrib(id, 'itemid', obj.entity.id);
+        id = args.ta.id;
+        cls = TEXT_ANNOTATION;
+        if (args.ea != null) {
+          entity = args.ea.entity;
+          cls += " highlight " + entity.type;
+          itemscope = 'itemscope';
+          itemtype = entity.type;
+          itemid = entity.id;
+        } else {
+          itemscope = null;
+          itemtype = null;
+          itemid = null;
+        }
+        dom.setAttrib(id, 'class', cls);
+        dom.setAttrib(id, 'itemscope', itemscope);
+        dom.setAttrib(id, 'itemtype', itemtype);
+        return dom.setAttrib(id, 'itemid', itemid);
       });
       $rootScope.$on('analysisReceived', function(event, analysis) {
         if ((analysis != null) && (analysis.textAnnotations != null)) {
@@ -840,7 +841,10 @@
       $(window).scroll(scroll);
       $('#content_ifr').contents().scroll(scroll);
       $scope.onEntitySelected = function(textAnnotation, entityAnnotation) {
-        return $scope.$emit('DisambiguationWidget.entitySelected', entityAnnotation);
+        return $scope.$emit('selectEntity', {
+          ta: textAnnotation,
+          ea: entityAnnotation
+        });
       };
       $scope.$on('disambiguatedTextAnnotationDetected', function(event, textAnnotationId, entityId) {
         var entityAnnotation, id, _ref, _results;
