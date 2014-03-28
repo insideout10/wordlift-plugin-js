@@ -185,7 +185,6 @@
             return textAnnotation;
           }
         }
-        return null;
       };
       service = {
         promise: void 0,
@@ -280,7 +279,7 @@
             typesArray = angular.isArray(types) ? types : [types];
             for (_i = 0, _len = typesArray.length; _i < _len; _i++) {
               type = typesArray[_i];
-              if ('http://schema.org/Person' === expand(type)) {
+              if (("" + SCHEMA_ORG + "Person") === expand(type)) {
                 return PERSON;
               }
             }
@@ -292,7 +291,7 @@
             }
             for (_k = 0, _len2 = typesArray.length; _k < _len2; _k++) {
               type = typesArray[_k];
-              if ('http://schema.org/Organization' === expand(type)) {
+              if (("" + SCHEMA_ORG + "Organization") === expand(type)) {
                 return ORGANIZATION;
               }
             }
@@ -304,13 +303,13 @@
             }
             for (_m = 0, _len4 = typesArray.length; _m < _len4; _m++) {
               type = typesArray[_m];
-              if ('http://schema.org/Newspaper' === expand(type)) {
+              if (("" + SCHEMA_ORG + "Newspaper") === expand(type)) {
                 return ORGANIZATION;
               }
             }
             for (_n = 0, _len5 = typesArray.length; _n < _len5; _n++) {
               type = typesArray[_n];
-              if ('http://schema.org/Place' === expand(type)) {
+              if (("" + SCHEMA_ORG + "Place") === expand(type)) {
                 return PLACE;
               }
             }
@@ -322,7 +321,7 @@
             }
             for (_p = 0, _len7 = typesArray.length; _p < _len7; _p++) {
               type = typesArray[_p];
-              if ('http://schema.org/Event' === expand(type)) {
+              if (("" + SCHEMA_ORG + "Event") === expand(type)) {
                 return EVENT;
               }
             }

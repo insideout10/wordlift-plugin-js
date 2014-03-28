@@ -41,7 +41,7 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
           ed = editor()
 
           # Get the TinyMCE editor html content.
-          html = ed.getContent(format: 'raw')
+          html = ed.getContent format: 'raw'
 
           # Find existing entities.
           entities = findEntities html
@@ -71,8 +71,8 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
             element += '">'
 
             # Finally insert the HTML code.
-            traslator.insertHtml element, {text: textAnnotation.start}
-            traslator.insertHtml '</span>', {text: textAnnotation.end}
+            traslator.insertHtml element, text: textAnnotation.start
+            traslator.insertHtml '</span>', text: textAnnotation.end
 
 
           # Update the editor Html code.

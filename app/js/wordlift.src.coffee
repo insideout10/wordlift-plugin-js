@@ -99,10 +99,6 @@ class Traslator
     # Reparse
     @parse()
 
-    # Increment the position values for those position after the current.
-#    @_htmlPositions[i] += fragment.length for i in [0...@_htmlPositions.length] when @_htmlPositions[i] > htmlPos
-
-
   # Return the html.
   getHtml: ->
     @_html
@@ -266,7 +262,6 @@ angular.module('AnalysisService', [])
     # Find a text annotation in the provided collection which matches the start and end values.
     findTextAnnotation = (textAnnotations, start, end) ->
       return textAnnotation for textAnnotationId, textAnnotation of textAnnotations when textAnnotation.start is start and textAnnotation.end is end
-      null
 
     service =
     # Holds the analysis promise, used to abort the analysis.
@@ -287,8 +282,9 @@ angular.module('AnalysisService', [])
         for annotation in annotations
           textAnnotation = findTextAnnotation analysis.textAnnotations, annotation.start, annotation.end
           if textAnnotation?
-            entityAnnotation = @findEntityAnnotation textAnnotation.entityAnnotations, {uri: annotation.uri}
+            entityAnnotation = @findEntityAnnotation textAnnotation.entityAnnotations, uri: annotation.uri
             entityAnnotation.selected = true if entityAnnotation?
+            # TODO: if the entity is not found, it needs to be added.
 
     # <a name="analyze"></a>
     # Analyze the provided content. Only one analysis at a time is run.
@@ -351,14 +347,14 @@ angular.module('AnalysisService', [])
           return 'thing' if not types?
 
           typesArray = if angular.isArray types then types else [ types ]
-          return PERSON       for type in typesArray when 'http://schema.org/Person' is expand(type)
+          return PERSON       for type in typesArray when "#{SCHEMA_ORG}Person" is expand(type)
           return PERSON       for type in typesArray when 'http://rdf.freebase.com/ns/people.person' is expand(type)
-          return ORGANIZATION for type in typesArray when 'http://schema.org/Organization' is expand(type)
+          return ORGANIZATION for type in typesArray when "#{SCHEMA_ORG}Organization" is expand(type)
           return ORGANIZATION for type in typesArray when 'http://rdf.freebase.com/ns/government.government' is expand(type)
-          return ORGANIZATION for type in typesArray when 'http://schema.org/Newspaper' is expand(type)
-          return PLACE        for type in typesArray when 'http://schema.org/Place' is expand(type)
+          return ORGANIZATION for type in typesArray when "#{SCHEMA_ORG}Newspaper" is expand(type)
+          return PLACE        for type in typesArray when "#{SCHEMA_ORG}Place" is expand(type)
           return PLACE        for type in typesArray when 'http://rdf.freebase.com/ns/location.location' is expand(type)
-          return EVENT        for type in typesArray when 'http://schema.org/Event' is expand(type)
+          return EVENT        for type in typesArray when "#{SCHEMA_ORG}Event" is expand(type)
           return EVENT        for type in typesArray when 'http://dbpedia.org/ontology/Event' is expand(type)
           return MUSIC        for type in typesArray when 'http://rdf.freebase.com/ns/music.artist' is expand(type)
           return MUSIC        for type in typesArray when 'http://schema.org/MusicAlbum' is expand(type)
@@ -743,7 +739,7 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
           ed = editor()
 
           # Get the TinyMCE editor html content.
-          html = ed.getContent(format: 'raw')
+          html = ed.getContent format: 'raw'
 
           # Find existing entities.
           entities = findEntities html
@@ -773,8 +769,8 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
             element += '">'
 
             # Finally insert the HTML code.
-            traslator.insertHtml element, {text: textAnnotation.start}
-            traslator.insertHtml '</span>', {text: textAnnotation.end}
+            traslator.insertHtml element, text: textAnnotation.start
+            traslator.insertHtml '</span>', text: textAnnotation.end
 
 
           # Update the editor Html code.

@@ -99,10 +99,6 @@ class Traslator
     # Reparse
     @parse()
 
-    # Increment the position values for those position after the current.
-#    @_htmlPositions[i] += fragment.length for i in [0...@_htmlPositions.length] when @_htmlPositions[i] > htmlPos
-
-
   # Return the html.
   getHtml: ->
     @_html
