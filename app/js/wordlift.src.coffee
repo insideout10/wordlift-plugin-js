@@ -235,7 +235,7 @@ angular.module('wordlift.tinymce.plugin.directives', ['wordlift.tinymce.plugin.c
 #     * thumbnails : URL to thumbnail images
 
 angular.module('AnalysisService', [])
-.service('AnalysisService', [ '$http', '$q', '$rootScope', '$log', ($http, $q, $rootScope, $log) ->
+.service('AnalysisService', [ '$http', '$q', '$rootScope', ($http, $q, $rootScope) ->
 
     # Constants
     CONTEXT = '@context'

@@ -160,7 +160,7 @@
   });
 
   angular.module('AnalysisService', []).service('AnalysisService', [
-    '$http', '$q', '$rootScope', '$log', function($http, $q, $rootScope, $log) {
+    '$http', '$q', '$rootScope', function($http, $q, $rootScope) {
       var ANALYSIS_EVENT, CONTEXT, EVENT, FREEBASE_NS, FREEBASE_NS_DESCRIPTION, GRAPH, MUSIC, ORGANIZATION, PERSON, PLACE, RDFS, RDFS_COMMENT, RDFS_LABEL, SCHEMA_ORG, SCHEMA_ORG_DESCRIPTION, findTextAnnotation, service;
       CONTEXT = '@context';
       GRAPH = '@graph';
