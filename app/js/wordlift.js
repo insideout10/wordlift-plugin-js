@@ -768,45 +768,7 @@
     }
   ]);
 
-  angular.module('wordlift.tinymce.plugin.services.EntityService', ['wordlift.tinymce.plugin.config']).service('EntityService', [
-    '$log', function($log) {
-      var container;
-      container = $('#wordlift_selected_entitities_box');
-      return {
-        select: function(entityAnnotation) {
-          var description, entity, entityDiv, id, image, images, label, type, _i, _len;
-          $log.info('select');
-          $log.info(entityAnnotation);
-          entity = entityAnnotation.entity;
-          id = entity.id;
-          label = entity.label;
-          description = entity.description != null ? entity.description : '';
-          images = entity.thumbnails;
-          type = entity.type;
-          entityDiv = $("<div itemid='" + id + "'></div>").append("<input type='text' name='wl_entities[" + id + "][uri]' value='" + id + "'>").append("<input type='text' name='wl_entities[" + id + "][label]' value='" + label + "'>").append("<input type='text' name='wl_entities[" + id + "][description]' value='" + description + "'>").append("<input type='text' name='wl_entities[" + id + "][type]' value='" + type + "'>");
-          if (angular.isArray(images)) {
-            for (_i = 0, _len = images.length; _i < _len; _i++) {
-              image = images[_i];
-              entityDiv.append("<input type='text' name='wl_entities[" + id + "][image]' value='" + image + "'>");
-            }
-          } else {
-            entityDiv.append("<input type='text' name='wl_entities[" + id + "][image]' value='" + images + "'>");
-          }
-          return container.append(entityDiv);
-        },
-        deselect: function(entityAnnotation) {
-          var entity, id;
-          $log.info('deselect');
-          $log.info(entityAnnotation);
-          entity = entityAnnotation.entity;
-          id = entity.id;
-          return $("div[itemid='" + id + "']").remove();
-        }
-      };
-    }
-  ]);
-
-  angular.module('wordlift.tinymce.plugin.services', ['wordlift.tinymce.plugin.config', 'wordlift.tinymce.plugin.services.EditorService', 'AnalysisService', 'wordlift.tinymce.plugin.services.EntityService']);
+  angular.module('wordlift.tinymce.plugin.services', ['wordlift.tinymce.plugin.config', 'wordlift.tinymce.plugin.services.EditorService', 'AnalysisService']);
 
   angular.module('wordlift.tinymce.plugin.controllers', ['wordlift.tinymce.plugin.config', 'wordlift.tinymce.plugin.services']).filter('orderObjectBy', function() {
     return function(items, field, reverse) {
@@ -835,7 +797,7 @@
       return filtered;
     };
   }).controller('EntitiesController', [
-    'EditorService', 'EntityService', '$log', '$scope', 'Configuration', function(EditorService, EntityService, $log, $scope, Configuration) {
+    'EditorService', '$log', '$scope', 'Configuration', function(EditorService, $log, $scope, Configuration) {
       var el, scroll, setArrowTop;
       $scope.analysis = null;
       $scope.textAnnotation = null;

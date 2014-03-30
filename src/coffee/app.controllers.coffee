@@ -23,8 +23,8 @@ angular.module('wordlift.tinymce.plugin.controllers',
 
       filtered
   )
-.controller('EntitiesController', ['EditorService', 'EntityService', '$log', '$scope', 'Configuration',
-    (EditorService, EntityService, $log, $scope, Configuration) ->
+.controller('EntitiesController', ['EditorService', '$log', '$scope', 'Configuration',
+    (EditorService, $log, $scope, Configuration) ->
 
       # holds a reference to the current analysis results.
       $scope.analysis = null
