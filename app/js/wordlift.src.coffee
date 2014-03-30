@@ -182,7 +182,7 @@ angular.module('wordlift.tinymce.plugin.directives', ['wordlift.tinymce.plugin.c
       entityAnnotation: '='
       onSelect: '&'
     template: """
-      <div class="entity {{entityAnnotation.entity.type}}" ng-class="{selected: true==entityAnnotation.selected}" ng-click="onSelect()" ng-show="entityAnnotation.entity.label">
+      <div class="entity {{entityAnnotation.entity.css}}" ng-class="{selected: true==entityAnnotation.selected}" ng-click="onSelect()" ng-show="entityAnnotation.entity.label">
         <div class="thumbnail" ng-show="entityAnnotation.entity.thumbnail" title="{{entityAnnotation.entity.id}}" ng-attr-style="background-image: url({{entityAnnotation.entity.thumbnail}})"></div>
         <div class="thumbnail empty" ng-hide="entityAnnotation.entity.thumbnail" title="{{entityAnnotation.entity.id}}"></div>
         <div class="confidence" ng-bind="entityAnnotation.confidence"></div>
@@ -204,7 +204,9 @@ angular.module('wordlift.tinymce.plugin.directives', ['wordlift.tinymce.plugin.c
           <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][uri]' value='{{entityAnnotation.entity.id}}'>
           <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][label]' value='{{entityAnnotation.entity.label}}'>
           <textarea name='wl_entities[{{entityAnnotation.entity.id}}][description]'>{{entityAnnotation.entity.description}}</textarea>
-          <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][type]' value='{{entityAnnotation.entity.type}}'>
+
+          <input ng-repeat="type in entityAnnotation.entity.types" type='text'
+          	name='wl_entities[{{entityAnnotation.entity.id}}][type][]' value='{{type}}'>
 
           <input ng-repeat="image in entityAnnotation.entity.thumbnails" type='text'
             name='wl_entities[{{entityAnnotation.entity.id}}][image][]' value='{{image}}'>
@@ -244,12 +246,6 @@ angular.module('AnalysisService', [])
 
     ANALYSIS_EVENT = 'analysisReceived'
 
-    PERSON = 'person'
-    ORGANIZATION = 'organization'
-    PLACE = 'place'
-    EVENT = 'event'
-    MUSIC = 'music'
-
     RDFS = 'http://www.w3.org/2000/01/rdf-schema#'
     RDFS_LABEL = "#{RDFS}label"
     RDFS_COMMENT = "#{RDFS}comment"
@@ -273,6 +269,9 @@ angular.module('AnalysisService', [])
     DBPEDIA_ORG = "http://#{DBPEDIA}.org/"
 
     WGS84_POS = 'http://www.w3.org/2003/01/geo/wgs84_pos#'
+
+    # Set the known types as provided by the environment.
+    KNOWN_TYPES = if window.wordlift?.types? then window.wordlift.types else []
 
     # Find a text annotation in the provided collection which matches the start and end values.
     findTextAnnotation = (textAnnotations, start, end) ->
@@ -358,29 +357,36 @@ angular.module('AnalysisService', [])
         #  * person
         #  * organization
         #  * place
-        getKnownType = (types) ->
-          return 'thing' if not types?
+        getKnownTypes = (types) ->
 
-          typesArray = if angular.isArray types then types else [ types ]
-          return PERSON       for type in typesArray when "#{SCHEMA_ORG}Person" is expand(type)
-          return PERSON       for type in typesArray when "#{FREEBASE_NS}people.person" is expand(type)
-          return ORGANIZATION for type in typesArray when "#{SCHEMA_ORG}Organization" is expand(type)
-          return ORGANIZATION for type in typesArray when "#{FREEBASE_NS}government.government" is expand(type)
-          return ORGANIZATION for type in typesArray when "#{SCHEMA_ORG}Newspaper" is expand(type)
-          return PLACE        for type in typesArray when "#{SCHEMA_ORG}Place" is expand(type)
-          return PLACE        for type in typesArray when "#{FREEBASE_NS}location.location" is expand(type)
-          return EVENT        for type in typesArray when "#{SCHEMA_ORG}Event" is expand(type)
-          return EVENT        for type in typesArray when "#{DBPEDIA_ORG}ontology/Event" is expand(type)
-          return MUSIC        for type in typesArray when "#{FREEBASE_NS}music.artist" is expand(type)
-          return MUSIC        for type in typesArray when "#{SCHEMA_ORG}MusicAlbum" is expand(type)
-          return PLACE        for type in typesArray when 'http://www.opengis.net/gml/_Feature' is expand(type)
+          # Ensure the entity (this is now left to the caller).
+          # types = if angular.isArray types then types else [ types ]
 
-          'thing'
+          # An array with known types according to the specified types.
+          returnTypes = []
+          defaultType = undefined
+          for kt in KNOWN_TYPES
+            # Set the default type, identified by an asterisk (*) in the sameAs values.
+            defaultType = [ kt ] if '*' in kt.sameAs
+            # Get all the URIs associated to this known type.
+            uris = kt.sameAs.concat kt.uri
+            # If there is 1+ uri in common between the known types and the provided types, then add the known type.
+            returnTypes.push kt if 0 < (uri for uri in uris when containsOrEquals( uri, types )).length
+
+
+          # Return the defaul type if not known types have been found.
+          return defaultType if 0 is returnTypes.length
+
+          # Return the match types.
+          returnTypes
+
 
         # create an entity.
         createEntity = (item, language) ->
           id = get('@id', item)
+          # Get the types associated with the entity.
           types = get('@type', item)
+          types = if angular.isArray types then types else [ types ]
           sameAs = get('http://www.w3.org/2002/07/owl#sameAs', item)
           sameAs = if angular.isArray sameAs then sameAs else [ sameAs ]
 
@@ -405,12 +411,17 @@ angular.module('AnalysisService', [])
                 "https://usercontent.googleapis.com/#{FREEBASE}/v1/image/m/#{match[1]}?maxwidth=4096&maxheight=4096"
           )
 
+          # Get the known types.
+          knownTypes = getKnownTypes(types)
+          # Get the stylesheet classes.
+          css = (kt.css for kt in knownTypes).join ' '
+
           # create the entity model.
           entity =
             id: id
             thumbnail: if 0 < thumbnails.length then thumbnails[0] else null
             thumbnails: thumbnails
-            type: getKnownType(types)
+            css: css
             types: types
             label: getLanguage(RDFS_LABEL, item, language)
             labels: get(RDFS_LABEL, item)
@@ -444,6 +455,9 @@ angular.module('AnalysisService', [])
 
           entity.latitude = get "#{WGS84_POS}lat", item
           entity.longitude = get "#{WGS84_POS}long", item
+          if 0 is entity.latitude.length or 0 is entity.longitude.length
+            entity.latitude = ''
+            entity.longitude = ''
 
           # Check if thumbnails exists.
           #        if thumbnails? and angular.isArray thumbnails
@@ -781,7 +795,7 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
             entityAnnotation = AnalysisService.findEntityAnnotation textAnnotation.entityAnnotations, selected: true
             if entityAnnotation?
               entity = entityAnnotation.entity
-              element += " highlight #{entity.type}\" itemid=\"#{entity.id}"
+              element += " highlight #{entity.css}\" itemid=\"#{entity.id}"
 
             # Close the element.
             element += '">'
@@ -841,9 +855,9 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
         if args.ea?
           # Set a reference to the entity.
           entity = args.ea.entity
-          cls +=  " highlight #{entity.type}"
+          cls +=  " highlight #{entity.css}"
           itemscope = 'itemscope'
-          itemtype = entity.type
+          itemtype = entity.types.join ' '
           itemid = entity.id
         else
           itemscope = null

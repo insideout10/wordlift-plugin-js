@@ -28,41 +28,6 @@
   margin: 0 10px;
 }
 
-.tile(@type, @icon, @hover-color) {
-  border-color: @type;
-
-  .type {
-    color: @type;
-    &:before {
-      content: @icon;
-    }
-  }
-
-  &:hover {
-    div {
-      color: @hover-color;
-    }
-    background-color: @type;
-    .type {
-      color: @hover-color;
-    }
-  }
-
-  &.selected {
-    div {
-      color: @hover-color;
-    }
-    background-color: @type;
-    .type {
-      color: @hover-color;
-    }
-  }
-
-  .thumbnail {
-    background-color: @type;
-  }
-}
-
 // TinyMCE toolbar
 .mceIcon.mce_wordlift {
   background: data-uri('../img/wordlift-logo-20x20.png');
@@ -70,6 +35,24 @@
   &.running {
     background: data-uri('../img/spinner-20x20.gif');
   }
+}
+
+// Set a tile color background, foreground and icon.
+.tile(@color, @icon) {
+  border-color: @color;
+  color: black;
+
+  .type {
+    &:before {
+      content: @icon; }
+  }
+  &:hover, &.selected {
+    background-color: @color;
+    color: contrast(@color);
+  }
+  .thumbnail {
+    background-color: @color;
+    color: contrast(@color); }
 }
 
 .entity {
@@ -120,36 +103,19 @@
     font-family: FontAwesome;
     font-style: normal;
     font-weight: normal;
-    line-height: 22px;
+    line-height: 14px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    font-size: 22px;
+    font-size: 12px;
     padding: 2px 6px;
   }
 
-  &.place {
-    .tile(@place, @fa-var-map-marker, white);
-  }
-
-  &.person {
-    .tile(@person, @fa-var-user, white);
-  }
-
-  &.organization {
-    .tile(@organization, @fa-var-building-o, white);
-  }
-
-  &.event {
-    .tile(@event, @fa-var-calendar, white);
-  }
-
-  &.music {
-    .tile(@music, @fa-var-music, white);
-  }
-
-  &.thing {
-    .tile(@thing, @fa-var-square-o, black);
-  }
+  &.wl-creative-work { .tile(@wl-creative-work-color, @fa-var-lightbulb-o) }
+  &.wl-event { .tile(@wl-event-color, @fa-var-calendar) }
+  &.wl-organization { .tile(@wl-organization-color, @fa-var-building-o) }
+  &.wl-person { .tile(@wl-person-color, @fa-var-user) }
+  &.wl-place { .tile(@wl-place-color, @fa-var-map-marker) }
+  &.wl-thing { .tile(@wl-thing-color, @fa-var-circle-o) }
 
   .source {
     position: absolute;
@@ -316,10 +282,10 @@ body#tinymce {
     border-radius: @radius;
   }
 
-  .textannotation-decoration(@type, @icon, @color: black) {
-    border-bottom: 2px solid @type !important;
-    color: @color;
-    background-color: @type;
+  .highlight(@color) {
+    border: 0 !important;
+    color: contrast(@color);
+    background-color: @color;
     vertical-align: center;
   }
 
@@ -328,33 +294,12 @@ body#tinymce {
     padding: 2px;
     cursor: hand;
 
-    &.place {
-      .textannotation-decoration(@place, @fa-var-map-marker);
-    }
-
-    &.person {
-      .textannotation-decoration(@person, @fa-var-user);
-    }
-
-    &.organization {
-      .textannotation-decoration(@organization, @fa-var-building-o);
-    }
-
-    &.event {
-      .textannotation-decoration(@event, @fa-var-calendar, white);
-    }
-
-    &.music {
-      .textannotation-decoration(@music, @fa-var-music, white);
-    }
-
-    &.thing {
-      .textannotation-decoration(@thing, @fa-var-square-o);
-    }
-
-    &.creativework {
-      .textannotation-decoration(@creativework, @fa-var-square-o, white);
-    }
+    &.wl-creative-work { .highlight(@wl-creative-work-color) }
+    &.wl-event { .highlight(@wl-event-color) }
+    &.wl-organization { .highlight(@wl-organization-color) }
+    &.wl-person { .highlight(@wl-person-color) }
+    &.wl-place { .highlight(@wl-place-color) }
+    &.wl-thing { .highlight(@wl-thing-color) }
 
     .textannotation {
       border: 0;
@@ -365,3 +310,4 @@ body#tinymce {
     background-color: rgb(241, 241, 241);
   }
 }
+

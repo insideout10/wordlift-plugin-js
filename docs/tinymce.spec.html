@@ -1896,7 +1896,8 @@ describe <span class="hljs-string">'TinyMCE'</span>,<span class="hljs-function">
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    expect(Object.keys(analysis.entityAnnotations).length).toEqual <span class="hljs-number">22</span>
+            <div class="content"><div class='highlight'><pre>    expect(analysis.entityAnnotations).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
+    expect(Object.keys(analysis.entityAnnotations).length).toEqual <span class="hljs-number">22</span>
     <span class="hljs-keyword">for</span> entityAnnotationId, entityAnnotation <span class="hljs-keyword">of</span> analysis.entityAnnotations
       expect(entityAnnotation.selected).toBe (entityAnnotation.id <span class="hljs-keyword">in</span> selected)</pre></div></div>
             

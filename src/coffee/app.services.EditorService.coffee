@@ -65,7 +65,7 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
             entityAnnotation = AnalysisService.findEntityAnnotation textAnnotation.entityAnnotations, selected: true
             if entityAnnotation?
               entity = entityAnnotation.entity
-              element += " highlight #{entity.type}\" itemid=\"#{entity.id}"
+              element += " highlight #{entity.css}\" itemid=\"#{entity.id}"
 
             # Close the element.
             element += '">'
@@ -125,9 +125,9 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
         if args.ea?
           # Set a reference to the entity.
           entity = args.ea.entity
-          cls +=  " highlight #{entity.type}"
+          cls +=  " highlight #{entity.css}"
           itemscope = 'itemscope'
-          itemtype = entity.type
+          itemtype = entity.types.join ' '
           itemid = entity.id
         else
           itemscope = null

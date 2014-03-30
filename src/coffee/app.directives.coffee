@@ -41,7 +41,7 @@ angular.module('wordlift.tinymce.plugin.directives', ['wordlift.tinymce.plugin.c
       entityAnnotation: '='
       onSelect: '&'
     template: """
-      <div class="entity {{entityAnnotation.entity.type}}" ng-class="{selected: true==entityAnnotation.selected}" ng-click="onSelect()" ng-show="entityAnnotation.entity.label">
+      <div class="entity {{entityAnnotation.entity.css}}" ng-class="{selected: true==entityAnnotation.selected}" ng-click="onSelect()" ng-show="entityAnnotation.entity.label">
         <div class="thumbnail" ng-show="entityAnnotation.entity.thumbnail" title="{{entityAnnotation.entity.id}}" ng-attr-style="background-image: url({{entityAnnotation.entity.thumbnail}})"></div>
         <div class="thumbnail empty" ng-hide="entityAnnotation.entity.thumbnail" title="{{entityAnnotation.entity.id}}"></div>
         <div class="confidence" ng-bind="entityAnnotation.confidence"></div>
@@ -63,7 +63,9 @@ angular.module('wordlift.tinymce.plugin.directives', ['wordlift.tinymce.plugin.c
           <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][uri]' value='{{entityAnnotation.entity.id}}'>
           <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][label]' value='{{entityAnnotation.entity.label}}'>
           <textarea name='wl_entities[{{entityAnnotation.entity.id}}][description]'>{{entityAnnotation.entity.description}}</textarea>
-          <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][type]' value='{{entityAnnotation.entity.type}}'>
+
+          <input ng-repeat="type in entityAnnotation.entity.types" type='text'
+          	name='wl_entities[{{entityAnnotation.entity.id}}][type][]' value='{{type}}'>
 
           <input ng-repeat="image in entityAnnotation.entity.thumbnails" type='text'
             name='wl_entities[{{entityAnnotation.entity.id}}][image][]' value='{{image}}'>

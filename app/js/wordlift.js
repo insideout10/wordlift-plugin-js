@@ -147,7 +147,7 @@
         entityAnnotation: '=',
         onSelect: '&'
       },
-      template: "<div class=\"entity {{entityAnnotation.entity.type}}\" ng-class=\"{selected: true==entityAnnotation.selected}\" ng-click=\"onSelect()\" ng-show=\"entityAnnotation.entity.label\">\n  <div class=\"thumbnail\" ng-show=\"entityAnnotation.entity.thumbnail\" title=\"{{entityAnnotation.entity.id}}\" ng-attr-style=\"background-image: url({{entityAnnotation.entity.thumbnail}})\"></div>\n  <div class=\"thumbnail empty\" ng-hide=\"entityAnnotation.entity.thumbnail\" title=\"{{entityAnnotation.entity.id}}\"></div>\n  <div class=\"confidence\" ng-bind=\"entityAnnotation.confidence\"></div>\n  <div class=\"label\" ng-bind=\"entityAnnotation.entity.label\"></div>\n  <div class=\"type\"></div>\n  <div class=\"source\" ng-class=\"entityAnnotation.entity.source\" ng-bind=\"entityAnnotation.entity.source\"></div>\n</div>"
+      template: "<div class=\"entity {{entityAnnotation.entity.css}}\" ng-class=\"{selected: true==entityAnnotation.selected}\" ng-click=\"onSelect()\" ng-show=\"entityAnnotation.entity.label\">\n  <div class=\"thumbnail\" ng-show=\"entityAnnotation.entity.thumbnail\" title=\"{{entityAnnotation.entity.id}}\" ng-attr-style=\"background-image: url({{entityAnnotation.entity.thumbnail}})\"></div>\n  <div class=\"thumbnail empty\" ng-hide=\"entityAnnotation.entity.thumbnail\" title=\"{{entityAnnotation.entity.id}}\"></div>\n  <div class=\"confidence\" ng-bind=\"entityAnnotation.confidence\"></div>\n  <div class=\"label\" ng-bind=\"entityAnnotation.entity.label\"></div>\n  <div class=\"type\"></div>\n  <div class=\"source\" ng-class=\"entityAnnotation.entity.source\" ng-bind=\"entityAnnotation.entity.source\"></div>\n</div>"
     };
   }).directive('wlEntityInputBoxes', function() {
     return {
@@ -155,22 +155,17 @@
       scope: {
         textAnnotations: '='
       },
-      template: "<div class=\"wl-entity-input-boxes\" ng-repeat=\"textAnnotation in textAnnotations\">\n  <div ng-repeat=\"entityAnnotation in textAnnotation.entityAnnotations | filterObjectBy:'selected':true\">\n\n    <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][uri]' value='{{entityAnnotation.entity.id}}'>\n    <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][label]' value='{{entityAnnotation.entity.label}}'>\n    <textarea name='wl_entities[{{entityAnnotation.entity.id}}][description]'>{{entityAnnotation.entity.description}}</textarea>\n    <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][type]' value='{{entityAnnotation.entity.type}}'>\n\n    <input ng-repeat=\"image in entityAnnotation.entity.thumbnails\" type='text'\n      name='wl_entities[{{entityAnnotation.entity.id}}][image][]' value='{{image}}'>\n    <input ng-repeat=\"sameAs in entityAnnotation.entity.sameAs\" type='text'\n      name='wl_entities[{{entityAnnotation.entity.id}}][sameas][]' value='{{sameAs}}'>\n\n    <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][latitude]' value='{{entityAnnotation.entity.latitude}}'>\n    <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][longitude]' value='{{entityAnnotation.entity.longitude}}'>\n\n  </div>\n</div>"
+      template: "<div class=\"wl-entity-input-boxes\" ng-repeat=\"textAnnotation in textAnnotations\">\n  <div ng-repeat=\"entityAnnotation in textAnnotation.entityAnnotations | filterObjectBy:'selected':true\">\n\n    <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][uri]' value='{{entityAnnotation.entity.id}}'>\n    <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][label]' value='{{entityAnnotation.entity.label}}'>\n    <textarea name='wl_entities[{{entityAnnotation.entity.id}}][description]'>{{entityAnnotation.entity.description}}</textarea>\n\n    <input ng-repeat=\"type in entityAnnotation.entity.types\" type='text'\n    	name='wl_entities[{{entityAnnotation.entity.id}}][type][]' value='{{type}}'>\n\n    <input ng-repeat=\"image in entityAnnotation.entity.thumbnails\" type='text'\n      name='wl_entities[{{entityAnnotation.entity.id}}][image][]' value='{{image}}'>\n    <input ng-repeat=\"sameAs in entityAnnotation.entity.sameAs\" type='text'\n      name='wl_entities[{{entityAnnotation.entity.id}}][sameas][]' value='{{sameAs}}'>\n\n    <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][latitude]' value='{{entityAnnotation.entity.latitude}}'>\n    <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][longitude]' value='{{entityAnnotation.entity.longitude}}'>\n\n  </div>\n</div>"
     };
   });
 
   angular.module('AnalysisService', []).service('AnalysisService', [
     '$http', '$q', '$rootScope', function($http, $q, $rootScope) {
-      var ANALYSIS_EVENT, CONTEXT, DBPEDIA, DBPEDIA_ORG, DCTERMS, EVENT, FISE_ONT, FISE_ONT_CONFIDENCE, FISE_ONT_ENTITY_ANNOTATION, FISE_ONT_TEXT_ANNOTATION, FREEBASE, FREEBASE_COM, FREEBASE_NS, FREEBASE_NS_DESCRIPTION, GRAPH, MUSIC, ORGANIZATION, PERSON, PLACE, RDFS, RDFS_COMMENT, RDFS_LABEL, SCHEMA_ORG, SCHEMA_ORG_DESCRIPTION, VALUE, WGS84_POS, findTextAnnotation, service;
+      var ANALYSIS_EVENT, CONTEXT, DBPEDIA, DBPEDIA_ORG, DCTERMS, FISE_ONT, FISE_ONT_CONFIDENCE, FISE_ONT_ENTITY_ANNOTATION, FISE_ONT_TEXT_ANNOTATION, FREEBASE, FREEBASE_COM, FREEBASE_NS, FREEBASE_NS_DESCRIPTION, GRAPH, KNOWN_TYPES, RDFS, RDFS_COMMENT, RDFS_LABEL, SCHEMA_ORG, SCHEMA_ORG_DESCRIPTION, VALUE, WGS84_POS, findTextAnnotation, service, _ref;
       CONTEXT = '@context';
       GRAPH = '@graph';
       VALUE = '@value';
       ANALYSIS_EVENT = 'analysisReceived';
-      PERSON = 'person';
-      ORGANIZATION = 'organization';
-      PLACE = 'place';
-      EVENT = 'event';
-      MUSIC = 'music';
       RDFS = 'http://www.w3.org/2000/01/rdf-schema#';
       RDFS_LABEL = "" + RDFS + "label";
       RDFS_COMMENT = "" + RDFS + "comment";
@@ -188,6 +183,7 @@
       DBPEDIA = 'dbpedia';
       DBPEDIA_ORG = "http://" + DBPEDIA + ".org/";
       WGS84_POS = 'http://www.w3.org/2003/01/geo/wgs84_pos#';
+      KNOWN_TYPES = ((_ref = window.wordlift) != null ? _ref.types : void 0) != null ? window.wordlift.types : [];
       findTextAnnotation = function(textAnnotations, start, end) {
         var textAnnotation, textAnnotationId;
         for (textAnnotationId in textAnnotations) {
@@ -255,11 +251,11 @@
           });
         },
         findEntityAnnotation: function(entityAnnotations, filter) {
-          var entityAnnotation, entityAnnotationId, _ref;
+          var entityAnnotation, entityAnnotationId, _ref1;
           if (filter.uri != null) {
             for (entityAnnotationId in entityAnnotations) {
               entityAnnotation = entityAnnotations[entityAnnotationId];
-              if (filter.uri === entityAnnotation.entity.id || (_ref = filter.uri, __indexOf.call(entityAnnotation.entity.sameAs, _ref) >= 0)) {
+              if (filter.uri === entityAnnotation.entity.id || (_ref1 = filter.uri, __indexOf.call(entityAnnotation.entity.sameAs, _ref1) >= 0)) {
                 return entityAnnotation;
               }
             }
@@ -274,7 +270,7 @@
           }
         },
         parse: function(data, merge) {
-          var anotherEntityAnnotation, anotherId, containsOrEquals, context, createEntity, createEntityAnnotation, createLanguage, createTextAnnotation, dctype, entities, entity, entityAnnotation, entityAnnotations, expand, get, getA, getKnownType, getLanguage, graph, id, item, language, languages, mergeEntities, mergeUnique, textAnnotation, textAnnotationId, textAnnotations, types, _i, _len, _ref, _ref1;
+          var anotherEntityAnnotation, anotherId, containsOrEquals, context, createEntity, createEntityAnnotation, createLanguage, createTextAnnotation, dctype, entities, entity, entityAnnotation, entityAnnotations, expand, get, getA, getKnownTypes, getLanguage, graph, id, item, language, languages, mergeEntities, mergeUnique, textAnnotation, textAnnotationId, textAnnotations, types, _i, _len, _ref1, _ref2;
           if (merge == null) {
             merge = false;
           }
@@ -282,90 +278,40 @@
           textAnnotations = {};
           entityAnnotations = {};
           entities = {};
-          getKnownType = function(types) {
-            var type, typesArray, _i, _j, _k, _l, _len, _len1, _len10, _len11, _len2, _len3, _len4, _len5, _len6, _len7, _len8, _len9, _m, _n, _o, _p, _q, _r, _s, _t;
-            if (types == null) {
-              return 'thing';
-            }
-            typesArray = angular.isArray(types) ? types : [types];
-            for (_i = 0, _len = typesArray.length; _i < _len; _i++) {
-              type = typesArray[_i];
-              if (("" + SCHEMA_ORG + "Person") === expand(type)) {
-                return PERSON;
+          getKnownTypes = function(types) {
+            var defaultType, kt, returnTypes, uri, uris, _i, _len;
+            returnTypes = [];
+            defaultType = void 0;
+            for (_i = 0, _len = KNOWN_TYPES.length; _i < _len; _i++) {
+              kt = KNOWN_TYPES[_i];
+              if (__indexOf.call(kt.sameAs, '*') >= 0) {
+                defaultType = [kt];
+              }
+              uris = kt.sameAs.concat(kt.uri);
+              if (0 < ((function() {
+                var _j, _len1, _results;
+                _results = [];
+                for (_j = 0, _len1 = uris.length; _j < _len1; _j++) {
+                  uri = uris[_j];
+                  if (containsOrEquals(uri, types)) {
+                    _results.push(uri);
+                  }
+                }
+                return _results;
+              })()).length) {
+                returnTypes.push(kt);
               }
             }
-            for (_j = 0, _len1 = typesArray.length; _j < _len1; _j++) {
-              type = typesArray[_j];
-              if (("" + FREEBASE_NS + "people.person") === expand(type)) {
-                return PERSON;
-              }
+            if (0 === returnTypes.length) {
+              return defaultType;
             }
-            for (_k = 0, _len2 = typesArray.length; _k < _len2; _k++) {
-              type = typesArray[_k];
-              if (("" + SCHEMA_ORG + "Organization") === expand(type)) {
-                return ORGANIZATION;
-              }
-            }
-            for (_l = 0, _len3 = typesArray.length; _l < _len3; _l++) {
-              type = typesArray[_l];
-              if (("" + FREEBASE_NS + "government.government") === expand(type)) {
-                return ORGANIZATION;
-              }
-            }
-            for (_m = 0, _len4 = typesArray.length; _m < _len4; _m++) {
-              type = typesArray[_m];
-              if (("" + SCHEMA_ORG + "Newspaper") === expand(type)) {
-                return ORGANIZATION;
-              }
-            }
-            for (_n = 0, _len5 = typesArray.length; _n < _len5; _n++) {
-              type = typesArray[_n];
-              if (("" + SCHEMA_ORG + "Place") === expand(type)) {
-                return PLACE;
-              }
-            }
-            for (_o = 0, _len6 = typesArray.length; _o < _len6; _o++) {
-              type = typesArray[_o];
-              if (("" + FREEBASE_NS + "location.location") === expand(type)) {
-                return PLACE;
-              }
-            }
-            for (_p = 0, _len7 = typesArray.length; _p < _len7; _p++) {
-              type = typesArray[_p];
-              if (("" + SCHEMA_ORG + "Event") === expand(type)) {
-                return EVENT;
-              }
-            }
-            for (_q = 0, _len8 = typesArray.length; _q < _len8; _q++) {
-              type = typesArray[_q];
-              if (("" + DBPEDIA_ORG + "ontology/Event") === expand(type)) {
-                return EVENT;
-              }
-            }
-            for (_r = 0, _len9 = typesArray.length; _r < _len9; _r++) {
-              type = typesArray[_r];
-              if (("" + FREEBASE_NS + "music.artist") === expand(type)) {
-                return MUSIC;
-              }
-            }
-            for (_s = 0, _len10 = typesArray.length; _s < _len10; _s++) {
-              type = typesArray[_s];
-              if (("" + SCHEMA_ORG + "MusicAlbum") === expand(type)) {
-                return MUSIC;
-              }
-            }
-            for (_t = 0, _len11 = typesArray.length; _t < _len11; _t++) {
-              type = typesArray[_t];
-              if ('http://www.opengis.net/gml/_Feature' === expand(type)) {
-                return PLACE;
-              }
-            }
-            return 'thing';
+            return returnTypes;
           };
           createEntity = function(item, language) {
-            var entity, id, sameAs, thumbnails, types;
+            var css, entity, id, knownTypes, kt, sameAs, thumbnails, types;
             id = get('@id', item);
             types = get('@type', item);
+            types = angular.isArray(types) ? types : [types];
             sameAs = get('http://www.w3.org/2002/07/owl#sameAs', item);
             sameAs = angular.isArray(sameAs) ? sameAs : [sameAs];
             thumbnails = get(['http://xmlns.com/foaf/0.1/depiction', "" + FREEBASE_NS + "common.topic.image", "" + SCHEMA_ORG + "image"], item, function(values) {
@@ -383,11 +329,21 @@
               }
               return _results;
             });
+            knownTypes = getKnownTypes(types);
+            css = ((function() {
+              var _i, _len, _results;
+              _results = [];
+              for (_i = 0, _len = knownTypes.length; _i < _len; _i++) {
+                kt = knownTypes[_i];
+                _results.push(kt.css);
+              }
+              return _results;
+            })()).join(' ');
             entity = {
               id: id,
               thumbnail: 0 < thumbnails.length ? thumbnails[0] : null,
               thumbnails: thumbnails,
-              type: getKnownType(types),
+              css: css,
               types: types,
               label: getLanguage(RDFS_LABEL, item, language),
               labels: get(RDFS_LABEL, item),
@@ -402,6 +358,10 @@
             }
             entity.latitude = get("" + WGS84_POS + "lat", item);
             entity.longitude = get("" + WGS84_POS + "long", item);
+            if (0 === entity.latitude.length || 0 === entity.longitude.length) {
+              entity.latitude = '';
+              entity.longitude = '';
+            }
             return entity;
           };
           createEntityAnnotation = function(item) {
@@ -536,10 +496,10 @@
             return _results;
           };
           mergeEntities = function(entity, entities) {
-            var existing, sameAs, _i, _len, _ref;
-            _ref = entity.sameAs;
-            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-              sameAs = _ref[_i];
+            var existing, sameAs, _i, _len, _ref1;
+            _ref1 = entity.sameAs;
+            for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+              sameAs = _ref1[_i];
               if ((entities[sameAs] != null) && entities[sameAs] !== entity) {
                 existing = entities[sameAs];
                 mergeUnique(entity.sameAs, existing.sameAs);
@@ -628,12 +588,12 @@
           if (merge) {
             for (textAnnotationId in textAnnotations) {
               textAnnotation = textAnnotations[textAnnotationId];
-              _ref = textAnnotation.entityAnnotations;
-              for (id in _ref) {
-                entityAnnotation = _ref[id];
-                _ref1 = textAnnotation.entityAnnotations;
-                for (anotherId in _ref1) {
-                  anotherEntityAnnotation = _ref1[anotherId];
+              _ref1 = textAnnotation.entityAnnotations;
+              for (id in _ref1) {
+                entityAnnotation = _ref1[id];
+                _ref2 = textAnnotation.entityAnnotations;
+                for (anotherId in _ref2) {
+                  anotherEntityAnnotation = _ref2[anotherId];
                   if (id !== anotherId && entityAnnotation.entity === anotherEntityAnnotation.entity) {
                     delete textAnnotation.entityAnnotations[anotherId];
                   }
@@ -704,7 +664,7 @@
             });
             if (entityAnnotation != null) {
               entity = entityAnnotation.entity;
-              element += " highlight " + entity.type + "\" itemid=\"" + entity.id;
+              element += " highlight " + entity.css + "\" itemid=\"" + entity.id;
             }
             element += '">';
             traslator.insertHtml(element, {
@@ -743,9 +703,9 @@
         cls = TEXT_ANNOTATION;
         if (args.ea != null) {
           entity = args.ea.entity;
-          cls += " highlight " + entity.type;
+          cls += " highlight " + entity.css;
           itemscope = 'itemscope';
-          itemtype = entity.type;
+          itemtype = entity.types.join(' ');
           itemid = entity.id;
         } else {
           itemscope = null;

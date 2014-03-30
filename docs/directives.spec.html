@@ -2366,12 +2366,13 @@ scope.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>        fieldName = <span class="hljs-string">"wl_entities\\[<span class="hljs-subst">#{entityAnnotation.entity.id}</span>\\]"</span>
-        expect(element.find(<span class="hljs-string">'input'</span>).length).toEqual <span class="hljs-number">19</span>
+        expect(element.find(<span class="hljs-string">'input'</span>).length).toEqual <span class="hljs-number">18</span>
         expect(element.find(<span class="hljs-string">'textarea'</span>).length).toEqual <span class="hljs-number">1</span>
 
         expect(element.find(<span class="hljs-string">"input[name='<span class="hljs-subst">#{fieldName}</span>\\[uri\\]']"</span>)[<span class="hljs-number">0</span>].value).toEqual entityAnnotation.entity.id
         expect(element.find(<span class="hljs-string">"input[name='<span class="hljs-subst">#{fieldName}</span>\\[label\\]']"</span>)[<span class="hljs-number">0</span>].value).toEqual entityAnnotation.entity.label
-        expect(element.find(<span class="hljs-string">"input[name='<span class="hljs-subst">#{fieldName}</span>\\[type\\]']"</span>)[<span class="hljs-number">0</span>].value).toEqual entityAnnotation.entity.type
+        <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">0.</span>..entityAnnotation.entity.types.length]
+          expect(element.find(<span class="hljs-string">"input[name='<span class="hljs-subst">#{fieldName}</span>\\[type\\]\\[\\]']"</span>)[i].value).toEqual entityAnnotation.entity.types[i]
 
         <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">0.</span>..entityAnnotation.entity.thumbnails.length]
           expect(element.find(<span class="hljs-string">"input[name='<span class="hljs-subst">#{fieldName}</span>\\[image\\]\\[\\]']"</span>)[i].value).toEqual entityAnnotation.entity.thumbnails[i]

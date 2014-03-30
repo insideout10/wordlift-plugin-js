@@ -264,7 +264,7 @@ in the select attribute is called.</p>
       <span class="hljs-attribute">entityAnnotation</span>: <span class="hljs-string">'='</span>
       <span class="hljs-attribute">onSelect</span>: <span class="hljs-string">'&amp;'</span>
     <span class="hljs-attribute">template</span>: <span class="hljs-string">"""
-      &lt;div class="entity {{entityAnnotation.entity.type}}" ng-class="{selected: true==entityAnnotation.selected}" ng-click="onSelect()" ng-show="entityAnnotation.entity.label"&gt;
+      &lt;div class="entity {{entityAnnotation.entity.css}}" ng-class="{selected: true==entityAnnotation.selected}" ng-click="onSelect()" ng-show="entityAnnotation.entity.label"&gt;
         &lt;div class="thumbnail" ng-show="entityAnnotation.entity.thumbnail" title="{{entityAnnotation.entity.id}}" ng-attr-style="background-image: url({{entityAnnotation.entity.thumbnail}})"&gt;&lt;/div&gt;
         &lt;div class="thumbnail empty" ng-hide="entityAnnotation.entity.thumbnail" title="{{entityAnnotation.entity.id}}"&gt;&lt;/div&gt;
         &lt;div class="confidence" ng-bind="entityAnnotation.confidence"&gt;&lt;/div&gt;
@@ -299,7 +299,9 @@ in the select attribute is called.</p>
           &lt;input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][uri]' value='{{entityAnnotation.entity.id}}'&gt;
           &lt;input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][label]' value='{{entityAnnotation.entity.label}}'&gt;
           &lt;textarea name='wl_entities[{{entityAnnotation.entity.id}}][description]'&gt;{{entityAnnotation.entity.description}}&lt;/textarea&gt;
-          &lt;input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][type]' value='{{entityAnnotation.entity.type}}'&gt;
+
+          &lt;input ng-repeat="type in entityAnnotation.entity.types" type='text'
+          	name='wl_entities[{{entityAnnotation.entity.id}}][type][]' value='{{type}}'&gt;
 
           &lt;input ng-repeat="image in entityAnnotation.entity.thumbnails" type='text'
             name='wl_entities[{{entityAnnotation.entity.id}}][image][]' value='{{image}}'&gt;

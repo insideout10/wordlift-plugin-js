@@ -515,6 +515,7 @@ describe 'TinyMCE', ->
     ]
 
     # Check for selections.
+    expect(analysis.entityAnnotations).not.toBe undefined
     expect(Object.keys(analysis.entityAnnotations).length).toEqual 22
     for entityAnnotationId, entityAnnotation of analysis.entityAnnotations
       expect(entityAnnotation.selected).toBe (entityAnnotation.id in selected)

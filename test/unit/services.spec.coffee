@@ -162,6 +162,7 @@ describe 'services', ->
 
         # Set a reference to the entity.
         entity = entityAnnotation.entity
+        expect(entity).not.toBe undefined
         expect(entity.thumbnails.length).toEqual 9
         for i in [0...entity.thumbnails.length]
           expect(entity.thumbnails[i]).toEqual entity.thumbnails[i]

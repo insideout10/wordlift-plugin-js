@@ -366,7 +366,7 @@
             <div class="content"><div class='highlight'><pre>            entityAnnotation = AnalysisService.findEntityAnnotation textAnnotation.entityAnnotations, <span class="hljs-attribute">selected</span>: <span class="hljs-literal">true</span>
             <span class="hljs-keyword">if</span> entityAnnotation?
               entity = entityAnnotation.entity
-              element += <span class="hljs-string">" highlight <span class="hljs-subst">#{entity.type}</span>\" itemid=\"<span class="hljs-subst">#{entity.id}</span>"</span></pre></div></div>
+              element += <span class="hljs-string">" highlight <span class="hljs-subst">#{entity.css}</span>\" itemid=\"<span class="hljs-subst">#{entity.id}</span>"</span></pre></div></div>
             
         </li>
         
@@ -631,9 +631,9 @@ Send the provided content for analysis using the <a href="app.services.AnalysisS
             </div>
             
             <div class="content"><div class='highlight'><pre>          entity = args.ea.entity
-          cls +=  <span class="hljs-string">" highlight <span class="hljs-subst">#{entity.type}</span>"</span>
+          cls +=  <span class="hljs-string">" highlight <span class="hljs-subst">#{entity.css}</span>"</span>
           itemscope = <span class="hljs-string">'itemscope'</span>
-          itemtype = entity.type
+          itemtype = entity.types.join <span class="hljs-string">' '</span>
           itemid = entity.id
         <span class="hljs-keyword">else</span>
           itemscope = <span class="hljs-literal">null</span>
