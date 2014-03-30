@@ -45,6 +45,7 @@ t.push({
 window.wordlift = {} if not window.wordlift?
 
 window.wordlift.types = t;
+window.wordlift.entities = {}
 
 tinymce.init
 # General options

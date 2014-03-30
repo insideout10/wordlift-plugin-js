@@ -161,7 +161,7 @@
 
   angular.module('AnalysisService', []).service('AnalysisService', [
     '$http', '$q', '$rootScope', function($http, $q, $rootScope) {
-      var ANALYSIS_EVENT, CONTEXT, DBPEDIA, DBPEDIA_ORG, DCTERMS, FISE_ONT, FISE_ONT_CONFIDENCE, FISE_ONT_ENTITY_ANNOTATION, FISE_ONT_TEXT_ANNOTATION, FREEBASE, FREEBASE_COM, FREEBASE_NS, FREEBASE_NS_DESCRIPTION, GRAPH, KNOWN_TYPES, RDFS, RDFS_COMMENT, RDFS_LABEL, SCHEMA_ORG, SCHEMA_ORG_DESCRIPTION, VALUE, WGS84_POS, findTextAnnotation, service, _ref;
+      var ANALYSIS_EVENT, CONTEXT, DBPEDIA, DBPEDIA_ORG, DCTERMS, FISE_ONT, FISE_ONT_CONFIDENCE, FISE_ONT_ENTITY_ANNOTATION, FISE_ONT_TEXT_ANNOTATION, FREEBASE, FREEBASE_COM, FREEBASE_NS, FREEBASE_NS_DESCRIPTION, GRAPH, KNOWN_TYPES, RDFS, RDFS_COMMENT, RDFS_LABEL, SCHEMA_ORG, SCHEMA_ORG_DESCRIPTION, VALUE, WGS84_POS, findOrCreateTextAnnotation, findTextAnnotation, service, _ref;
       CONTEXT = '@context';
       GRAPH = '@graph';
       VALUE = '@value';
@@ -193,6 +193,25 @@
           }
         }
       };
+      findOrCreateTextAnnotation = function(analysis, textAnnotation) {
+        var ta;
+        ta = findTextAnnotation(analysis.textAnnotations, textAnnotation.start, textAnnotation.end);
+        if (null === ta) {
+          ta = {
+            id: 'wordlift-ta-' + textAnnotation.start + '-' + textAnnotation.end,
+            selectedText: textAnnotation.label,
+            selectionPrefix: '',
+            selectionSuffix: '',
+            start: textAnnotation.start,
+            end: textAnnotation.end,
+            confidence: null,
+            entityAnnotations: {},
+            _item: null
+          };
+          analysis.textAnnotations[ta.id] = ta;
+        }
+        return ta;
+      };
       service = {
         promise: void 0,
         isRunning: false,
@@ -202,22 +221,31 @@
           }
         },
         preselect: function(analysis, annotations) {
-          var annotation, entityAnnotation, textAnnotation, _i, _len, _results;
+          var annotation, ea, entityAnnotation, textAnnotation, _i, _len, _results;
           _results = [];
           for (_i = 0, _len = annotations.length; _i < _len; _i++) {
             annotation = annotations[_i];
-            textAnnotation = findTextAnnotation(analysis.textAnnotations, annotation.start, annotation.end);
-            if (textAnnotation != null) {
-              entityAnnotation = this.findEntityAnnotation(textAnnotation.entityAnnotations, {
-                uri: annotation.uri
-              });
-              if (entityAnnotation != null) {
-                _results.push(entityAnnotation.selected = true);
-              } else {
-                _results.push(void 0);
-              }
+            textAnnotation = findOrCreateTextAnnotation(analysis, annotation);
+            entityAnnotation = this.findEntityAnnotation(textAnnotation.entityAnnotations, {
+              uri: annotation.uri
+            });
+            if (entityAnnotation != null) {
+              _results.push(entityAnnotation.selected = true);
             } else {
-              _results.push(void 0);
+              if (!analysis.entities[annotation.uri]) {
+                analysis.entities[annotation.uri] = window.wordlift.entities[annotation.uri];
+              }
+              ea = {
+                id: 'wordlift-ea-from-' + textAnnotation.id,
+                label: annotation.label,
+                confidence: null,
+                entity: analysis.entities[annotation.uri],
+                relation: analysis.textAnnotations[textAnnotation.id],
+                _item: null,
+                selected: true
+              };
+              analysis.entityAnnotations[ea.id] = ea;
+              _results.push(textAnnotation.entityAnnotations[ea.id] = analysis.entityAnnotations[ea.id]);
             }
           }
           return _results;
@@ -783,25 +811,12 @@
       $(window).scroll(scroll);
       $('#content_ifr').contents().scroll(scroll);
       $scope.onEntitySelected = function(textAnnotation, entityAnnotation) {
-        return $scope.$emit('selectEntity', {
+        $scope.$emit('selectEntity', {
           ta: textAnnotation,
           ea: entityAnnotation
         });
+        return window.wordlift.entities[entityAnnotation.entity.id] = entityAnnotation.entity;
       };
-      $scope.$on('disambiguatedTextAnnotationDetected', function(event, textAnnotationId, entityId) {
-        var entityAnnotation, id, _ref, _results;
-        _ref = $scope.analysis.textAnnotations[textAnnotationId].entityAnnotations;
-        _results = [];
-        for (id in _ref) {
-          entityAnnotation = _ref[id];
-          if (entityAnnotation.entity.id === entityId) {
-            _results.push($scope.analysis.entityAnnotations[entityAnnotation.id].selected = true);
-          } else {
-            _results.push(void 0);
-          }
-        }
-        return _results;
-      });
       $scope.$on('analysisReceived', function(event, analysis) {
         return $scope.analysis = analysis;
       });

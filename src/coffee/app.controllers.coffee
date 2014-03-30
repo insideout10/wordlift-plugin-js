@@ -58,13 +58,8 @@ angular.module('wordlift.tinymce.plugin.controllers',
 
       $scope.onEntitySelected = (textAnnotation, entityAnnotation) ->
         $scope.$emit 'selectEntity', ta: textAnnotation, ea: entityAnnotation
-
-      # Receives notifications about disambiguated textAnnotations
-      # and flags selected entityAnnotations properly ... 
-      $scope.$on 'disambiguatedTextAnnotationDetected', (event, textAnnotationId, entityId) -> 
-        for id, entityAnnotation of $scope.analysis.textAnnotations[textAnnotationId].entityAnnotations
-          if entityAnnotation.entity.id == entityId
-            $scope.analysis.entityAnnotations[entityAnnotation.id].selected = true
+        # Add the selected entity to the entity storage
+        window.wordlift.entities[entityAnnotation.entity.id] = entityAnnotation.entity
 
       # Receive the analysis results and store them in the local scope.
       $scope.$on 'analysisReceived', (event, analysis) ->
