@@ -1035,9 +1035,9 @@ $(
   $('#wordlift-disambiguation-popover')
   .css(
       display: 'none'
-      height: $('body').height() - $('#wpadminbar').height() + 32
+      height: $('body').height() - $('#wpadminbar').height() + 12
       top: $('#wpadminbar').height() - 1
-      right: 0
+      right: 20
     )
   .draggable()
 
