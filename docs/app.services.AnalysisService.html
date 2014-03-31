@@ -386,9 +386,9 @@ Otherwise a new text annotation is created</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>            ea =
-              <span class="hljs-attribute">id</span>: <span class="hljs-string">'wordlift-ea-from-'</span> + textAnnotation.id
+              <span class="hljs-attribute">id</span>: <span class="hljs-string">"wordlift-ea-from-<span class="hljs-subst">#{textAnnotation.id}</span>"</span>
               <span class="hljs-attribute">label</span>: annotation.label
-              <span class="hljs-attribute">confidence</span>: <span class="hljs-literal">null</span>
+              <span class="hljs-attribute">confidence</span>: <span class="hljs-number">1</span>
               <span class="hljs-attribute">entity</span>: analysis.entities[annotation.uri]
               <span class="hljs-attribute">relation</span>: analysis.textAnnotations[textAnnotation.id]
               <span class="hljs-attribute">_item</span>: <span class="hljs-literal">null</span>

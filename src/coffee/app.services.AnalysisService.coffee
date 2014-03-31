@@ -99,9 +99,9 @@ angular.module('AnalysisService', [])
 
             # Create the new entityAssociation 
             ea =
-              id: 'wordlift-ea-from-' + textAnnotation.id
+              id: "wordlift-ea-from-#{textAnnotation.id}"
               label: annotation.label
-              confidence: null
+              confidence: 1
               entity: analysis.entities[annotation.uri]
               relation: analysis.textAnnotations[textAnnotation.id]
               _item: null
