@@ -52,25 +52,24 @@ angular.module('AnalysisService', [])
     # Find a text annotation in the provided collection which matches the start and end values.
     findTextAnnotation = (textAnnotations, start, end) ->
       return textAnnotation for textAnnotationId, textAnnotation of textAnnotations when textAnnotation.start is start and textAnnotation.end is end
+
     # Find a text annotation in the provided collection which matches the start and end values.
     # Otherwise a new text annotation is created
-    findOrCreateTextAnnotation = (analysis, textAnnotation) ->
-      ta = findTextAnnotation analysis.textAnnotations, textAnnotation.start, textAnnotation.end
-      if null is ta
+    findOrCreateTextAnnotation = (textAnnotations, textAnnotation) ->
+      ta = findTextAnnotation textAnnotations, textAnnotation.start, textAnnotation.end
+      if not ta?
         # A new textAnnotation is created if needed
-        ta = 
-          id: 'wordlift-ta-' + textAnnotation.start + '-' + textAnnotation.end
+        ta =
+          id: "wordlift-ta-#{textAnnotation.start}-#{textAnnotation.end}"
           selectedText: textAnnotation.label
-          selectionPrefix: ''
-          selectionSuffix: ''
           start: textAnnotation.start
           end: textAnnotation.end
-          confidence: null
+          confidence: 1
           entityAnnotations: {}
           _item: null
         # The new textAnnotation is added to the analysis 
-        analysis.textAnnotations[ta.id] = ta
-      ta         
+        textAnnotations[ta.id] = ta
+      ta
 
     service =
     # Holds the analysis promise, used to abort the analysis.
@@ -89,7 +88,7 @@ angular.module('AnalysisService', [])
 
         # Find the existing entities in the html
         for annotation in annotations
-          textAnnotation = findOrCreateTextAnnotation analysis, annotation
+          textAnnotation = findOrCreateTextAnnotation analysis.textAnnotations, annotation
           entityAnnotation = @findEntityAnnotation textAnnotation.entityAnnotations, uri: annotation.uri
           if entityAnnotation?
             entityAnnotation.selected = true
@@ -111,8 +110,8 @@ angular.module('AnalysisService', [])
             analysis.entityAnnotations[ea.id] = ea
             # Add a reference to the current textAssociation
             textAnnotation.entityAnnotations[ea.id] = analysis.entityAnnotations[ea.id]
-               
-          
+
+
     # TODO: if the entity is not found, it needs to be added.
 
     # <a name="analyze"></a>
@@ -179,11 +178,13 @@ angular.module('AnalysisService', [])
           defaultType = undefined
           for kt in KNOWN_TYPES
             # Set the default type, identified by an asterisk (*) in the sameAs values.
-            defaultType = [ { type: kt } ] if '*' in kt.sameAs
+            defaultType = [
+              { type: kt }
+            ] if '*' in kt.sameAs
             # Get all the URIs associated to this known type.
             uris = kt.sameAs.concat kt.uri
             # If there is 1+ uri in common between the known types and the provided types, then add the known type.
-            matches = (uri for uri in uris when containsOrEquals( uri, types ))
+            matches = (uri for uri in uris when containsOrEquals(uri, types))
             returnTypes.push { matches: matches, type: kt } if 0 < matches.length
 
 

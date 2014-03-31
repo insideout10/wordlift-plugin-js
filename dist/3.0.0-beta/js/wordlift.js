@@ -193,22 +193,20 @@
           }
         }
       };
-      findOrCreateTextAnnotation = function(analysis, textAnnotation) {
+      findOrCreateTextAnnotation = function(textAnnotations, textAnnotation) {
         var ta;
-        ta = findTextAnnotation(analysis.textAnnotations, textAnnotation.start, textAnnotation.end);
-        if (null === ta) {
+        ta = findTextAnnotation(textAnnotations, textAnnotation.start, textAnnotation.end);
+        if (ta == null) {
           ta = {
-            id: 'wordlift-ta-' + textAnnotation.start + '-' + textAnnotation.end,
+            id: "wordlift-ta-" + textAnnotation.start + "-" + textAnnotation.end,
             selectedText: textAnnotation.label,
-            selectionPrefix: '',
-            selectionSuffix: '',
             start: textAnnotation.start,
             end: textAnnotation.end,
-            confidence: null,
+            confidence: 1,
             entityAnnotations: {},
             _item: null
           };
-          analysis.textAnnotations[ta.id] = ta;
+          textAnnotations[ta.id] = ta;
         }
         return ta;
       };
@@ -225,7 +223,7 @@
           _results = [];
           for (_i = 0, _len = annotations.length; _i < _len; _i++) {
             annotation = annotations[_i];
-            textAnnotation = findOrCreateTextAnnotation(analysis, annotation);
+            textAnnotation = findOrCreateTextAnnotation(analysis.textAnnotations, annotation);
             entityAnnotation = this.findEntityAnnotation(textAnnotation.entityAnnotations, {
               uri: annotation.uri
             });

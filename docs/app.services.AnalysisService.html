@@ -217,9 +217,9 @@ Otherwise a new text annotation is created</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-function"><span class="hljs-title">findOrCreateTextAnnotation</span> = <span class="hljs-params">(analysis, textAnnotation)</span> -&gt;</span>
-      ta = findTextAnnotation analysis.textAnnotations, textAnnotation.start, textAnnotation.end
-      <span class="hljs-keyword">if</span> <span class="hljs-literal">null</span> <span class="hljs-keyword">is</span> ta</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-function"><span class="hljs-title">findOrCreateTextAnnotation</span> = <span class="hljs-params">(textAnnotations, textAnnotation)</span> -&gt;</span>
+      ta = findTextAnnotation textAnnotations, textAnnotation.start, textAnnotation.end
+      <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> ta?</pre></div></div>
             
         </li>
         
@@ -234,14 +234,12 @@ Otherwise a new text annotation is created</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        ta = 
-          <span class="hljs-attribute">id</span>: <span class="hljs-string">'wordlift-ta-'</span> + textAnnotation.start + <span class="hljs-string">'-'</span> + textAnnotation.end
+            <div class="content"><div class='highlight'><pre>        ta =
+          <span class="hljs-attribute">id</span>: <span class="hljs-string">"wordlift-ta-<span class="hljs-subst">#{textAnnotation.start}</span>-<span class="hljs-subst">#{textAnnotation.end}</span>"</span>
           <span class="hljs-attribute">selectedText</span>: textAnnotation.label
-          <span class="hljs-attribute">selectionPrefix</span>: <span class="hljs-string">''</span>
-          <span class="hljs-attribute">selectionSuffix</span>: <span class="hljs-string">''</span>
           <span class="hljs-attribute">start</span>: textAnnotation.start
           <span class="hljs-attribute">end</span>: textAnnotation.end
-          <span class="hljs-attribute">confidence</span>: <span class="hljs-literal">null</span>
+          <span class="hljs-attribute">confidence</span>: <span class="hljs-number">1</span>
           <span class="hljs-attribute">entityAnnotations</span>: {}
           <span class="hljs-attribute">_item</span>: <span class="hljs-literal">null</span></pre></div></div>
             
@@ -258,8 +256,8 @@ Otherwise a new text annotation is created</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        analysis.textAnnotations[ta.id] = ta
-      ta         
+            <div class="content"><div class='highlight'><pre>        textAnnotations[ta.id] = ta
+      ta
 
     service =</pre></div></div>
             
@@ -352,7 +350,7 @@ Otherwise a new text annotation is created</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">for</span> annotation <span class="hljs-keyword">in</span> annotations
-          textAnnotation = findOrCreateTextAnnotation analysis, annotation
+          textAnnotation = findOrCreateTextAnnotation analysis.textAnnotations, annotation
           entityAnnotation = <span class="hljs-property">@findEntityAnnotation</span> textAnnotation.entityAnnotations, <span class="hljs-attribute">uri</span>: annotation.uri
           <span class="hljs-keyword">if</span> entityAnnotation?
             entityAnnotation.selected = <span class="hljs-literal">true</span>
@@ -665,7 +663,9 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            defaultType = [ { <span class="hljs-attribute">type</span>: kt } ] <span class="hljs-keyword">if</span> <span class="hljs-string">'*'</span> <span class="hljs-keyword">in</span> kt.sameAs</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            defaultType = [
+              { <span class="hljs-attribute">type</span>: kt }
+            ] <span class="hljs-keyword">if</span> <span class="hljs-string">'*'</span> <span class="hljs-keyword">in</span> kt.sameAs</pre></div></div>
             
         </li>
         
@@ -695,7 +695,7 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            matches = (uri <span class="hljs-keyword">for</span> uri <span class="hljs-keyword">in</span> uris <span class="hljs-keyword">when</span> containsOrEquals( uri, types ))
+            <div class="content"><div class='highlight'><pre>            matches = (uri <span class="hljs-keyword">for</span> uri <span class="hljs-keyword">in</span> uris <span class="hljs-keyword">when</span> containsOrEquals(uri, types))
             returnTypes.push { <span class="hljs-attribute">matches</span>: matches, <span class="hljs-attribute">type</span>: kt } <span class="hljs-keyword">if</span> <span class="hljs-number">0</span> &lt; matches.length</pre></div></div>
             
         </li>
