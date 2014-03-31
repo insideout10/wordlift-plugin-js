@@ -6,8 +6,7 @@ describe 'services', ->
   beforeEach module('AnalysisService')
 
   # Test the wlEntity directive.
-  describe 'AnalysisService', ->
-
+  describe 'AnalysisService', ->    
     it 'parses analysis data', inject((AnalysisService, $httpBackend, $rootScope) ->
 
       pending()

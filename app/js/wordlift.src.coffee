@@ -278,6 +278,25 @@ angular.module('AnalysisService', [])
     # Find a text annotation in the provided collection which matches the start and end values.
     findTextAnnotation = (textAnnotations, start, end) ->
       return textAnnotation for textAnnotationId, textAnnotation of textAnnotations when textAnnotation.start is start and textAnnotation.end is end
+    # Find a text annotation in the provided collection which matches the start and end values.
+    # Otherwise a new text annotation is created
+    findOrCreateTextAnnotation = (analysis, textAnnotation) ->
+      ta = findTextAnnotation analysis.textAnnotations, textAnnotation.start, textAnnotation.end
+      if null is ta
+        # A new textAnnotation is created if needed
+        ta = 
+          id: 'wordlift-ta-' + textAnnotation.start + '-' + textAnnotation.end
+          selectedText: textAnnotation.label
+          selectionPrefix: ''
+          selectionSuffix: ''
+          start: textAnnotation.start
+          end: textAnnotation.end
+          confidence: null
+          entityAnnotations: {}
+          _item: null
+        # The new textAnnotation is added to the analysis 
+        analysis.textAnnotations[ta.id] = ta
+      ta         
 
     service =
     # Holds the analysis promise, used to abort the analysis.
@@ -296,10 +315,30 @@ angular.module('AnalysisService', [])
 
         # Find the existing entities in the html
         for annotation in annotations
-          textAnnotation = findTextAnnotation analysis.textAnnotations, annotation.start, annotation.end
-          if textAnnotation?
-            entityAnnotation = @findEntityAnnotation textAnnotation.entityAnnotations, uri: annotation.uri
-            entityAnnotation.selected = true if entityAnnotation?
+          textAnnotation = findOrCreateTextAnnotation analysis, annotation
+          entityAnnotation = @findEntityAnnotation textAnnotation.entityAnnotations, uri: annotation.uri
+          if entityAnnotation?
+            entityAnnotation.selected = true
+          else
+            # Retrieve entity from the entity storage if needed
+            unless analysis.entities[annotation.uri]
+              analysis.entities[annotation.uri] = window.wordlift.entities[annotation.uri]
+
+            # Create the new entityAssociation 
+            ea =
+              id: 'wordlift-ea-from-' + textAnnotation.id
+              label: annotation.label
+              confidence: null
+              entity: analysis.entities[annotation.uri]
+              relation: analysis.textAnnotations[textAnnotation.id]
+              _item: null
+              selected: true
+            # Add the new entity association to the analysis  
+            analysis.entityAnnotations[ea.id] = ea
+            # Add a reference to the current textAssociation
+            textAnnotation.entityAnnotations[ea.id] = analysis.entityAnnotations[ea.id]
+               
+          
     # TODO: if the entity is not found, it needs to be added.
 
     # <a name="analyze"></a>
@@ -955,13 +994,8 @@ angular.module('wordlift.tinymce.plugin.controllers',
 
       $scope.onEntitySelected = (textAnnotation, entityAnnotation) ->
         $scope.$emit 'selectEntity', ta: textAnnotation, ea: entityAnnotation
-
-      # Receives notifications about disambiguated textAnnotations
-      # and flags selected entityAnnotations properly ... 
-      $scope.$on 'disambiguatedTextAnnotationDetected', (event, textAnnotationId, entityId) -> 
-        for id, entityAnnotation of $scope.analysis.textAnnotations[textAnnotationId].entityAnnotations
-          if entityAnnotation.entity.id == entityId
-            $scope.analysis.entityAnnotations[entityAnnotation.id].selected = true
+        # Add the selected entity to the entity storage
+        window.wordlift.entities[entityAnnotation.entity.id] = entityAnnotation.entity
 
       # Receive the analysis results and store them in the local scope.
       $scope.$on 'analysisReceived', (event, analysis) ->
