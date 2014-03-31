@@ -633,11 +633,9 @@ Send the provided content for analysis using the <a href="app.services.AnalysisS
             <div class="content"><div class='highlight'><pre>          entity = args.ea.entity
           cls +=  <span class="hljs-string">" highlight <span class="hljs-subst">#{entity.css}</span>"</span>
           itemscope = <span class="hljs-string">'itemscope'</span>
-          itemtype = entity.types.join <span class="hljs-string">' '</span>
           itemid = entity.id
         <span class="hljs-keyword">else</span>
           itemscope = <span class="hljs-literal">null</span>
-          itemtype = <span class="hljs-literal">null</span>
           itemid = <span class="hljs-literal">null</span></pre></div></div>
             
         </li>
@@ -655,7 +653,6 @@ Send the provided content for analysis using the <a href="app.services.AnalysisS
             
             <div class="content"><div class='highlight'><pre>        dom.setAttrib id, <span class="hljs-string">'class'</span>, cls
         dom.setAttrib id, <span class="hljs-string">'itemscope'</span>, itemscope
-        dom.setAttrib id, <span class="hljs-string">'itemtype'</span>, itemtype
         dom.setAttrib id, <span class="hljs-string">'itemid'</span>, itemid</pre></div></div>
             
         </li>

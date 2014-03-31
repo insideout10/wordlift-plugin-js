@@ -898,17 +898,14 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
           entity = args.ea.entity
           cls +=  " highlight #{entity.css}"
           itemscope = 'itemscope'
-          itemtype = entity.types.join ' '
           itemid = entity.id
         else
           itemscope = null
-          itemtype = null
           itemid = null
 
         # Apply changes to the dom.
         dom.setAttrib id, 'class', cls
         dom.setAttrib id, 'itemscope', itemscope
-        dom.setAttrib id, 'itemtype', itemtype
         dom.setAttrib id, 'itemid', itemid
 
       # Receive annotations from the analysis (there is a mirror method in PHP for testing purposes, please try to keep

@@ -727,7 +727,7 @@
         }
       };
       $rootScope.$on('selectEntity', function(event, args) {
-        var cls, dom, entity, id, itemid, itemscope, itemtype;
+        var cls, dom, entity, id, itemid, itemscope;
         dom = editor().dom;
         id = args.ta.id;
         cls = TEXT_ANNOTATION;
@@ -735,16 +735,13 @@
           entity = args.ea.entity;
           cls += " highlight " + entity.css;
           itemscope = 'itemscope';
-          itemtype = entity.types.join(' ');
           itemid = entity.id;
         } else {
           itemscope = null;
-          itemtype = null;
           itemid = null;
         }
         dom.setAttrib(id, 'class', cls);
         dom.setAttrib(id, 'itemscope', itemscope);
-        dom.setAttrib(id, 'itemtype', itemtype);
         return dom.setAttrib(id, 'itemid', itemid);
       });
       $rootScope.$on('analysisReceived', function(event, analysis) {
