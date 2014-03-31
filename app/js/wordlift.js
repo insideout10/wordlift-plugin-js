@@ -155,12 +155,12 @@
       scope: {
         textAnnotations: '='
       },
-      template: "<div class=\"wl-entity-input-boxes\" ng-repeat=\"textAnnotation in textAnnotations\">\n  <div ng-repeat=\"entityAnnotation in textAnnotation.entityAnnotations | filterObjectBy:'selected':true\">\n\n    <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][uri]' value='{{entityAnnotation.entity.id}}'>\n    <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][label]' value='{{entityAnnotation.entity.label}}'>\n    <textarea name='wl_entities[{{entityAnnotation.entity.id}}][description]'>{{entityAnnotation.entity.description}}</textarea>\n\n    <input ng-repeat=\"type in entityAnnotation.entity.types\" type='text'\n    	name='wl_entities[{{entityAnnotation.entity.id}}][type][]' value='{{type}}'>\n\n    <input ng-repeat=\"image in entityAnnotation.entity.thumbnails\" type='text'\n      name='wl_entities[{{entityAnnotation.entity.id}}][image][]' value='{{image}}'>\n    <input ng-repeat=\"sameAs in entityAnnotation.entity.sameAs\" type='text'\n      name='wl_entities[{{entityAnnotation.entity.id}}][sameas][]' value='{{sameAs}}'>\n\n    <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][latitude]' value='{{entityAnnotation.entity.latitude}}'>\n    <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][longitude]' value='{{entityAnnotation.entity.longitude}}'>\n\n  </div>\n</div>"
+      template: "<div class=\"wl-entity-input-boxes\" ng-repeat=\"textAnnotation in textAnnotations\">\n  <div ng-repeat=\"entityAnnotation in textAnnotation.entityAnnotations | filterObjectBy:'selected':true\">\n\n    <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][uri]' value='{{entityAnnotation.entity.id}}'>\n    <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][label]' value='{{entityAnnotation.entity.label}}'>\n    <textarea name='wl_entities[{{entityAnnotation.entity.id}}][description]'>{{entityAnnotation.entity.description}}</textarea>\n\n    <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][main_type]' value='{{entityAnnotation.entity.type}}'>\n\n    <input ng-repeat=\"type in entityAnnotation.entity.types\" type='text'\n    	name='wl_entities[{{entityAnnotation.entity.id}}][type][]' value='{{type}}'>\n\n    <input ng-repeat=\"image in entityAnnotation.entity.thumbnails\" type='text'\n      name='wl_entities[{{entityAnnotation.entity.id}}][image][]' value='{{image}}'>\n    <input ng-repeat=\"sameAs in entityAnnotation.entity.sameAs\" type='text'\n      name='wl_entities[{{entityAnnotation.entity.id}}][sameas][]' value='{{sameAs}}'>\n\n    <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][latitude]' value='{{entityAnnotation.entity.latitude}}'>\n    <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][longitude]' value='{{entityAnnotation.entity.longitude}}'>\n\n  </div>\n</div>"
     };
   });
 
   angular.module('AnalysisService', []).service('AnalysisService', [
-    '$http', '$q', '$rootScope', function($http, $q, $rootScope) {
+    '$filter', '$http', '$q', '$rootScope', function($filter, $http, $q, $rootScope) {
       var ANALYSIS_EVENT, CONTEXT, DBPEDIA, DBPEDIA_ORG, DCTERMS, FISE_ONT, FISE_ONT_CONFIDENCE, FISE_ONT_ENTITY_ANNOTATION, FISE_ONT_TEXT_ANNOTATION, FREEBASE, FREEBASE_COM, FREEBASE_NS, FREEBASE_NS_DESCRIPTION, GRAPH, KNOWN_TYPES, RDFS, RDFS_COMMENT, RDFS_LABEL, SCHEMA_ORG, SCHEMA_ORG_DESCRIPTION, VALUE, WGS84_POS, findTextAnnotation, service, _ref;
       CONTEXT = '@context';
       GRAPH = '@graph';
@@ -279,16 +279,20 @@
           entityAnnotations = {};
           entities = {};
           getKnownTypes = function(types) {
-            var defaultType, kt, returnTypes, uri, uris, _i, _len;
+            var defaultType, kt, matches, returnTypes, uri, uris, _i, _len;
             returnTypes = [];
             defaultType = void 0;
             for (_i = 0, _len = KNOWN_TYPES.length; _i < _len; _i++) {
               kt = KNOWN_TYPES[_i];
               if (__indexOf.call(kt.sameAs, '*') >= 0) {
-                defaultType = [kt];
+                defaultType = [
+                  {
+                    type: kt
+                  }
+                ];
               }
               uris = kt.sameAs.concat(kt.uri);
-              if (0 < ((function() {
+              matches = (function() {
                 var _j, _len1, _results;
                 _results = [];
                 for (_j = 0, _len1 = uris.length; _j < _len1; _j++) {
@@ -298,17 +302,22 @@
                   }
                 }
                 return _results;
-              })()).length) {
-                returnTypes.push(kt);
+              })();
+              if (0 < matches.length) {
+                returnTypes.push({
+                  matches: matches,
+                  type: kt
+                });
               }
             }
             if (0 === returnTypes.length) {
               return defaultType;
             }
+            $filter('orderBy')(returnTypes, 'matches', true);
             return returnTypes;
           };
           createEntity = function(item, language) {
-            var css, entity, id, knownTypes, kt, sameAs, thumbnails, types;
+            var css, entity, id, knownTypes, sameAs, thumbnails, types;
             id = get('@id', item);
             types = get('@type', item);
             types = angular.isArray(types) ? types : [types];
@@ -330,20 +339,13 @@
               return _results;
             });
             knownTypes = getKnownTypes(types);
-            css = ((function() {
-              var _i, _len, _results;
-              _results = [];
-              for (_i = 0, _len = knownTypes.length; _i < _len; _i++) {
-                kt = knownTypes[_i];
-                _results.push(kt.css);
-              }
-              return _results;
-            })()).join(' ');
+            css = knownTypes[0].type.css;
             entity = {
               id: id,
               thumbnail: 0 < thumbnails.length ? thumbnails[0] : null,
               thumbnails: thumbnails,
               css: css,
+              type: knownTypes[0].type.uri,
               types: types,
               label: getLanguage(RDFS_LABEL, item, language),
               labels: get(RDFS_LABEL, item),

@@ -64,6 +64,8 @@ angular.module('wordlift.tinymce.plugin.directives', ['wordlift.tinymce.plugin.c
           <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][label]' value='{{entityAnnotation.entity.label}}'>
           <textarea name='wl_entities[{{entityAnnotation.entity.id}}][description]'>{{entityAnnotation.entity.description}}</textarea>
 
+          <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][main_type]' value='{{entityAnnotation.entity.type}}'>
+
           <input ng-repeat="type in entityAnnotation.entity.types" type='text'
           	name='wl_entities[{{entityAnnotation.entity.id}}][type][]' value='{{type}}'>
 

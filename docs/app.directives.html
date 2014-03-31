@@ -300,6 +300,8 @@ in the select attribute is called.</p>
           &lt;input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][label]' value='{{entityAnnotation.entity.label}}'&gt;
           &lt;textarea name='wl_entities[{{entityAnnotation.entity.id}}][description]'&gt;{{entityAnnotation.entity.description}}&lt;/textarea&gt;
 
+          &lt;input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][main_type]' value='{{entityAnnotation.entity.type}}'&gt;
+
           &lt;input ng-repeat="type in entityAnnotation.entity.types" type='text'
           	name='wl_entities[{{entityAnnotation.entity.id}}][type][]' value='{{type}}'&gt;
 

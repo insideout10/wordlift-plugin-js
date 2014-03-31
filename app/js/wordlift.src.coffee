@@ -205,6 +205,8 @@ angular.module('wordlift.tinymce.plugin.directives', ['wordlift.tinymce.plugin.c
           <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][label]' value='{{entityAnnotation.entity.label}}'>
           <textarea name='wl_entities[{{entityAnnotation.entity.id}}][description]'>{{entityAnnotation.entity.description}}</textarea>
 
+          <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][main_type]' value='{{entityAnnotation.entity.type}}'>
+
           <input ng-repeat="type in entityAnnotation.entity.types" type='text'
           	name='wl_entities[{{entityAnnotation.entity.id}}][type][]' value='{{type}}'>
 
@@ -237,7 +239,7 @@ angular.module('wordlift.tinymce.plugin.directives', ['wordlift.tinymce.plugin.c
 #     * thumbnails : URL to thumbnail images
 
 angular.module('AnalysisService', [])
-.service('AnalysisService', [ '$http', '$q', '$rootScope', ($http, $q, $rootScope) ->
+.service('AnalysisService', [ '$filter', '$http', '$q', '$rootScope', ($filter, $http, $q, $rootScope) ->
 
     # Constants
     CONTEXT = '@context'
@@ -359,25 +361,24 @@ angular.module('AnalysisService', [])
         #  * place
         getKnownTypes = (types) ->
 
-          # Ensure the entity (this is now left to the caller).
-          # types = if angular.isArray types then types else [ types ]
-
           # An array with known types according to the specified types.
           returnTypes = []
           defaultType = undefined
           for kt in KNOWN_TYPES
             # Set the default type, identified by an asterisk (*) in the sameAs values.
-            defaultType = [ kt ] if '*' in kt.sameAs
+            defaultType = [ { type: kt } ] if '*' in kt.sameAs
             # Get all the URIs associated to this known type.
             uris = kt.sameAs.concat kt.uri
             # If there is 1+ uri in common between the known types and the provided types, then add the known type.
-            returnTypes.push kt if 0 < (uri for uri in uris when containsOrEquals( uri, types )).length
+            matches = (uri for uri in uris when containsOrEquals( uri, types ))
+            returnTypes.push { matches: matches, type: kt } if 0 < matches.length
 
 
           # Return the defaul type if not known types have been found.
           return defaultType if 0 is returnTypes.length
 
-          # Return the match types.
+          # Sort and return the match types.
+          $filter('orderBy') returnTypes, 'matches', true
           returnTypes
 
 
@@ -414,7 +415,7 @@ angular.module('AnalysisService', [])
           # Get the known types.
           knownTypes = getKnownTypes(types)
           # Get the stylesheet classes.
-          css = (kt.css for kt in knownTypes).join ' '
+          css = knownTypes[0].type.css
 
           # create the entity model.
           entity =
@@ -422,6 +423,7 @@ angular.module('AnalysisService', [])
             thumbnail: if 0 < thumbnails.length then thumbnails[0] else null
             thumbnails: thumbnails
             css: css
+            type: knownTypes[0].type.uri # This is the main type for the entity.
             types: types
             label: getLanguage(RDFS_LABEL, item, language)
             labels: get(RDFS_LABEL, item)

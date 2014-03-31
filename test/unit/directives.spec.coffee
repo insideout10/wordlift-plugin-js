@@ -610,7 +610,7 @@ describe 'directives', ->
 
         # Check that there are no input boxes (no entities selected).
         fieldName = "wl_entities\\[#{entityAnnotation.entity.id}\\]"
-        expect(element.find('input').length).toEqual 18
+        expect(element.find('input').length).toEqual 19
         expect(element.find('textarea').length).toEqual 1
 
         expect(element.find("input[name='#{fieldName}\\[uri\\]']")[0].value).toEqual entityAnnotation.entity.id

@@ -125,7 +125,7 @@ The return is a structure like this:</p>
             
             <div class="content"><div class='highlight'><pre>
 angular.<span class="hljs-built_in">module</span>(<span class="hljs-string">'AnalysisService'</span>, [])
-.service<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'AnalysisService'</span>, [ <span class="hljs-string">'$http'</span>, <span class="hljs-string">'$q'</span>, <span class="hljs-string">'$rootScope'</span>, ($http, $q, $rootScope) -&gt;
+.service<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'AnalysisService'</span>, [ <span class="hljs-string">'$filter'</span>, <span class="hljs-string">'$http'</span>, <span class="hljs-string">'$q'</span>, <span class="hljs-string">'$rootScope'</span>, ($filter, $http, $q, $rootScope) -&gt;
 
 </span></span></pre></div></div>
             
@@ -517,20 +517,6 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
-              <p>Ensure the entity (this is now left to the caller).
-types = if angular.isArray types then types else [ types ]</p>
-
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-24">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-24">&#182;</a>
-              </div>
               <p>An array with known types according to the specified types.</p>
 
             </div>
@@ -542,26 +528,26 @@ types = if angular.isArray types then types else [ types ]</p>
         </li>
         
         
-        <li id="section-25">
+        <li id="section-24">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-25">&#182;</a>
+                <a class="pilcrow" href="#section-24">&#182;</a>
               </div>
               <p>Set the default type, identified by an asterisk (*) in the sameAs values.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            defaultType = [ kt ] <span class="hljs-keyword">if</span> <span class="hljs-string">'*'</span> <span class="hljs-keyword">in</span> kt.sameAs</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            defaultType = [ { <span class="hljs-attribute">type</span>: kt } ] <span class="hljs-keyword">if</span> <span class="hljs-string">'*'</span> <span class="hljs-keyword">in</span> kt.sameAs</pre></div></div>
             
         </li>
         
         
-        <li id="section-26">
+        <li id="section-25">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-26">&#182;</a>
+                <a class="pilcrow" href="#section-25">&#182;</a>
               </div>
               <p>Get all the URIs associated to this known type.</p>
 
@@ -572,26 +558,27 @@ types = if angular.isArray types then types else [ types ]</p>
         </li>
         
         
-        <li id="section-27">
+        <li id="section-26">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-27">&#182;</a>
+                <a class="pilcrow" href="#section-26">&#182;</a>
               </div>
               <p>If there is 1+ uri in common between the known types and the provided types, then add the known type.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            returnTypes.push kt <span class="hljs-keyword">if</span> <span class="hljs-number">0</span> &lt; (uri <span class="hljs-keyword">for</span> uri <span class="hljs-keyword">in</span> uris <span class="hljs-keyword">when</span> containsOrEquals( uri, types )).length</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            matches = (uri <span class="hljs-keyword">for</span> uri <span class="hljs-keyword">in</span> uris <span class="hljs-keyword">when</span> containsOrEquals( uri, types ))
+            returnTypes.push { <span class="hljs-attribute">matches</span>: matches, <span class="hljs-attribute">type</span>: kt } <span class="hljs-keyword">if</span> <span class="hljs-number">0</span> &lt; matches.length</pre></div></div>
             
         </li>
         
         
-        <li id="section-28">
+        <li id="section-27">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-28">&#182;</a>
+                <a class="pilcrow" href="#section-27">&#182;</a>
               </div>
               <p>Return the defaul type if not known types have been found.</p>
 
@@ -602,26 +589,27 @@ types = if angular.isArray types then types else [ types ]</p>
         </li>
         
         
+        <li id="section-28">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-28">&#182;</a>
+              </div>
+              <p>Sort and return the match types.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          $filter(<span class="hljs-string">'orderBy'</span>) returnTypes, <span class="hljs-string">'matches'</span>, <span class="hljs-literal">true</span>
+          returnTypes</pre></div></div>
+            
+        </li>
+        
+        
         <li id="section-29">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-29">&#182;</a>
-              </div>
-              <p>Return the match types.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>          returnTypes</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-30">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-30">&#182;</a>
               </div>
               <p>create an entity.</p>
 
@@ -633,11 +621,11 @@ types = if angular.isArray types then types else [ types ]</p>
         </li>
         
         
-        <li id="section-31">
+        <li id="section-30">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-31">&#182;</a>
+                <a class="pilcrow" href="#section-30">&#182;</a>
               </div>
               <p>Get the types associated with the entity.</p>
 
@@ -651,11 +639,11 @@ types = if angular.isArray types then types else [ types ]</p>
         </li>
         
         
-        <li id="section-32">
+        <li id="section-31">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-32">&#182;</a>
+                <a class="pilcrow" href="#section-31">&#182;</a>
               </div>
               <pre><code>   <span class="hljs-built_in">console</span>.log <span class="hljs-string">"createEntity [ id :: <span class="hljs-subst">#{id}</span> ][ language :: <span class="hljs-subst">#{language}</span> ][ types :: <span class="hljs-subst">#{types}</span> ][ sameAs :: <span class="hljs-subst">#{sameAs}</span> ]"</span>
 </code></pre>
@@ -664,11 +652,11 @@ types = if angular.isArray types then types else [ types ]</p>
         </li>
         
         
-        <li id="section-33">
+        <li id="section-32">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-33">&#182;</a>
+                <a class="pilcrow" href="#section-32">&#182;</a>
               </div>
               <p>Get all the thumbnails; for each thumbnail execute the provided function.</p>
 
@@ -692,11 +680,11 @@ types = if angular.isArray types then types else [ types ]</p>
         </li>
         
         
-        <li id="section-34">
+        <li id="section-33">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-34">&#182;</a>
+                <a class="pilcrow" href="#section-33">&#182;</a>
               </div>
               <p>If it’s a Freebase URL normalize the link to the image.</p>
 
@@ -708,11 +696,11 @@ types = if angular.isArray types then types else [ types ]</p>
         </li>
         
         
-        <li id="section-35">
+        <li id="section-34">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-35">&#182;</a>
+                <a class="pilcrow" href="#section-34">&#182;</a>
               </div>
               <p>Get the known types.</p>
 
@@ -723,26 +711,26 @@ types = if angular.isArray types then types else [ types ]</p>
         </li>
         
         
-        <li id="section-36">
+        <li id="section-35">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-36">&#182;</a>
+                <a class="pilcrow" href="#section-35">&#182;</a>
               </div>
               <p>Get the stylesheet classes.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          css = (kt.css <span class="hljs-keyword">for</span> kt <span class="hljs-keyword">in</span> knownTypes).join <span class="hljs-string">' '</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>          css = knownTypes[<span class="hljs-number">0</span>].type.css</pre></div></div>
             
         </li>
         
         
-        <li id="section-37">
+        <li id="section-36">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-37">&#182;</a>
+                <a class="pilcrow" href="#section-36">&#182;</a>
               </div>
               <p>create the entity model.</p>
 
@@ -753,6 +741,7 @@ types = if angular.isArray types then types else [ types ]</p>
             <span class="hljs-attribute">thumbnail</span>: <span class="hljs-keyword">if</span> <span class="hljs-number">0</span> &lt; thumbnails.length <span class="hljs-keyword">then</span> thumbnails[<span class="hljs-number">0</span>] <span class="hljs-keyword">else</span> <span class="hljs-literal">null</span>
             <span class="hljs-attribute">thumbnails</span>: thumbnails
             <span class="hljs-attribute">css</span>: css
+            <span class="hljs-attribute">type</span>: knownTypes[<span class="hljs-number">0</span>].type.uri <span class="hljs-comment"># This is the main type for the entity.</span>
             <span class="hljs-attribute">types</span>: types
             <span class="hljs-attribute">label</span>: getLanguage(RDFS_LABEL, item, language)
             <span class="hljs-attribute">labels</span>: get(RDFS_LABEL, item)
@@ -784,11 +773,11 @@ types = if angular.isArray types then types else [ types ]</p>
         </li>
         
         
-        <li id="section-38">
+        <li id="section-37">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-38">&#182;</a>
+                <a class="pilcrow" href="#section-37">&#182;</a>
               </div>
               <p>Avoid null in entity description.</p>
 
@@ -805,11 +794,11 @@ types = if angular.isArray types then types else [ types ]</p>
         </li>
         
         
-        <li id="section-39">
+        <li id="section-38">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-39">&#182;</a>
+                <a class="pilcrow" href="#section-38">&#182;</a>
               </div>
               <p>Check if thumbnails exists.
        if thumbnails? and angular.isArray thumbnails
@@ -826,11 +815,11 @@ types = if angular.isArray types then types else [ types ]</p>
         </li>
         
         
-        <li id="section-40">
+        <li id="section-39">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-40">&#182;</a>
+                <a class="pilcrow" href="#section-39">&#182;</a>
               </div>
               <p>return the entity.
        console.log “createEntity [ entity id :: #{entity.id} ][ language :: #{language} ][ types :: #{types} ][ sameAs :: #{sameAs} ]”</p>
@@ -846,11 +835,11 @@ types = if angular.isArray types then types else [ types ]</p>
         </li>
         
         
-        <li id="section-41">
+        <li id="section-40">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-41">&#182;</a>
+                <a class="pilcrow" href="#section-40">&#182;</a>
               </div>
               <pre><code>   <span class="hljs-built_in">console</span>.log <span class="hljs-string">"[ reference :: <span class="hljs-subst">#{reference}</span> ][ entity :: <span class="hljs-subst">#{entity}</span> ]"</span>
 </code></pre><p>If the referenced entity is not found, return null</p>
@@ -864,11 +853,11 @@ types = if angular.isArray types then types else [ types ]</p>
         </li>
         
         
-        <li id="section-42">
+        <li id="section-41">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-42">&#182;</a>
+                <a class="pilcrow" href="#section-41">&#182;</a>
               </div>
               <p>Get the text annotation id.</p>
 
@@ -879,11 +868,11 @@ types = if angular.isArray types then types else [ types ]</p>
         </li>
         
         
-        <li id="section-43">
+        <li id="section-42">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-43">&#182;</a>
+                <a class="pilcrow" href="#section-42">&#182;</a>
               </div>
               <p>get the related text annotation.</p>
 
@@ -894,11 +883,11 @@ types = if angular.isArray types then types else [ types ]</p>
         </li>
         
         
-        <li id="section-44">
+        <li id="section-43">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-44">&#182;</a>
+                <a class="pilcrow" href="#section-43">&#182;</a>
               </div>
               <p>Ensure we’re dealing with an array.</p>
 
@@ -909,11 +898,11 @@ types = if angular.isArray types then types else [ types ]</p>
         </li>
         
         
-        <li id="section-45">
+        <li id="section-44">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-45">&#182;</a>
+                <a class="pilcrow" href="#section-44">&#182;</a>
               </div>
               <p>For each text annotation bound to this entity annotation, create an entity annotation and add it to the text annotation.</p>
 
@@ -925,11 +914,11 @@ types = if angular.isArray types then types else [ types ]</p>
         </li>
         
         
-        <li id="section-46">
+        <li id="section-45">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-46">&#182;</a>
+                <a class="pilcrow" href="#section-45">&#182;</a>
               </div>
               <p>Create an entity annotation.</p>
 
@@ -948,11 +937,11 @@ types = if angular.isArray types then types else [ types ]</p>
         </li>
         
         
-        <li id="section-47">
+        <li id="section-46">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-47">&#182;</a>
+                <a class="pilcrow" href="#section-46">&#182;</a>
               </div>
               <pre><code>     <span class="hljs-built_in">console</span>.log <span class="hljs-string">"[ id :: <span class="hljs-subst">#{id}</span> ][ relation :: <span class="hljs-subst">#{relation}</span> ][ entity id :: <span class="hljs-subst">#{entity.id}</span> ][ text annotation :: <span class="hljs-subst">#{textAnnotation}</span> ]"</span>
 </code></pre>
@@ -961,11 +950,11 @@ types = if angular.isArray types then types else [ types ]</p>
         </li>
         
         
-        <li id="section-48">
+        <li id="section-47">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-48">&#182;</a>
+                <a class="pilcrow" href="#section-47">&#182;</a>
               </div>
               <p>Create a binding from the textannotation to the entity annotation.</p>
 
@@ -978,11 +967,11 @@ types = if angular.isArray types then types else [ types ]</p>
         </li>
         
         
-        <li id="section-49">
+        <li id="section-48">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-49">&#182;</a>
+                <a class="pilcrow" href="#section-48">&#182;</a>
               </div>
               <p>Return the annotations.</p>
 
@@ -1007,11 +996,11 @@ types = if angular.isArray types then types else [ types ]</p>
         </li>
         
         
-        <li id="section-50">
+        <li id="section-49">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-50">&#182;</a>
+                <a class="pilcrow" href="#section-49">&#182;</a>
               </div>
               <pre><code>     <span class="hljs-built_in">console</span>.log <span class="hljs-string">"createTextAnnotation [ start :: <span class="hljs-subst">#{textAnnotation.start}</span> ][ end :: <span class="hljs-subst">#{textAnnotation.end}</span> ][ text :: <span class="hljs-subst">#{textAnnotation.selectedText}</span> ]"</span>
 </code></pre>
@@ -1029,11 +1018,11 @@ types = if angular.isArray types then types else [ types ]</p>
         </li>
         
         
-        <li id="section-51">
+        <li id="section-50">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-51">&#182;</a>
+                <a class="pilcrow" href="#section-50">&#182;</a>
               </div>
               <p>Get the values associated with the specified key(s). Keys are expanded.</p>
 
@@ -1044,11 +1033,11 @@ types = if angular.isArray types then types else [ types ]</p>
         </li>
         
         
-        <li id="section-52">
+        <li id="section-51">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-52">&#182;</a>
+                <a class="pilcrow" href="#section-51">&#182;</a>
               </div>
               <p>If it’s a single key, call getA</p>
 
@@ -1059,11 +1048,11 @@ types = if angular.isArray types then types else [ types ]</p>
         </li>
         
         
-        <li id="section-53">
+        <li id="section-52">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-53">&#182;</a>
+                <a class="pilcrow" href="#section-52">&#182;</a>
               </div>
               <p>Prepare the return array.</p>
 
@@ -1074,11 +1063,11 @@ types = if angular.isArray types then types else [ types ]</p>
         </li>
         
         
-        <li id="section-54">
+        <li id="section-53">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-54">&#182;</a>
+                <a class="pilcrow" href="#section-53">&#182;</a>
               </div>
               <p>For each key, add the result.</p>
 
@@ -1090,11 +1079,11 @@ types = if angular.isArray types then types else [ types ]</p>
         </li>
         
         
-        <li id="section-55">
+        <li id="section-54">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-55">&#182;</a>
+                <a class="pilcrow" href="#section-54">&#182;</a>
               </div>
               <p>Ensure the result is an array.</p>
 
@@ -1105,11 +1094,11 @@ types = if angular.isArray types then types else [ types ]</p>
         </li>
         
         
-        <li id="section-56">
+        <li id="section-55">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-56">&#182;</a>
+                <a class="pilcrow" href="#section-55">&#182;</a>
               </div>
               <p>Merge unique the results.</p>
 
@@ -1120,11 +1109,11 @@ types = if angular.isArray types then types else [ types ]</p>
         </li>
         
         
-        <li id="section-57">
+        <li id="section-56">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-57">&#182;</a>
+                <a class="pilcrow" href="#section-56">&#182;</a>
               </div>
               <p>Return the result array.</p>
 
@@ -1135,11 +1124,11 @@ types = if angular.isArray types then types else [ types ]</p>
         </li>
         
         
-        <li id="section-58">
+        <li id="section-57">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-58">&#182;</a>
+                <a class="pilcrow" href="#section-57">&#182;</a>
               </div>
               <p>Get the values associated with the specified key. Keys are expanded.</p>
 
@@ -1151,11 +1140,11 @@ types = if angular.isArray types then types else [ types ]</p>
         </li>
         
         
-        <li id="section-59">
+        <li id="section-58">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-59">&#182;</a>
+                <a class="pilcrow" href="#section-58">&#182;</a>
               </div>
               <p>expand the what key.</p>
 
@@ -1166,11 +1155,11 @@ types = if angular.isArray types then types else [ types ]</p>
         </li>
         
         
-        <li id="section-60">
+        <li id="section-59">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-60">&#182;</a>
+                <a class="pilcrow" href="#section-59">&#182;</a>
               </div>
               <p>return the value bound to the specified key.
        console.log “[ what exp :: #{whatExp} ][ key :: #{expand key} ][ value :: #{value} ][ match :: #{whatExp is expand(key)} ]” for key, value of container</p>
@@ -1183,11 +1172,11 @@ types = if angular.isArray types then types else [ types ]</p>
         </li>
         
         
-        <li id="section-61">
+        <li id="section-60">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-61">&#182;</a>
+                <a class="pilcrow" href="#section-60">&#182;</a>
               </div>
               <p>get the value for specified property (what) in the provided container in the specified language.
 items must conform to {‘@language’:…, ‘@value’:…} format.</p>
@@ -1199,11 +1188,11 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
         </li>
         
         
-        <li id="section-62">
+        <li id="section-61">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-62">&#182;</a>
+                <a class="pilcrow" href="#section-61">&#182;</a>
               </div>
               <p>if there’s no item return null.</p>
 
@@ -1214,11 +1203,11 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
         </li>
         
         
-        <li id="section-63">
+        <li id="section-62">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-63">&#182;</a>
+                <a class="pilcrow" href="#section-62">&#182;</a>
               </div>
               <p>transform to an array if it’s not already.</p>
 
@@ -1229,11 +1218,11 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
         </li>
         
         
-        <li id="section-64">
+        <li id="section-63">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-64">&#182;</a>
+                <a class="pilcrow" href="#section-63">&#182;</a>
               </div>
               <p>cycle through the array.</p>
 
@@ -1244,11 +1233,11 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
         </li>
         
         
-        <li id="section-65">
+        <li id="section-64">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-65">&#182;</a>
+                <a class="pilcrow" href="#section-64">&#182;</a>
               </div>
               <p>if not found return null.</p>
 
@@ -1261,11 +1250,11 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
         </li>
         
         
-        <li id="section-66">
+        <li id="section-65">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-66">&#182;</a>
+                <a class="pilcrow" href="#section-65">&#182;</a>
               </div>
               <pre><code>   dump <span class="hljs-string">"containsOrEquals [ what :: <span class="hljs-subst">#{what}</span> ][ where :: <span class="hljs-subst">#{where}</span> ]"</span>
 </code></pre><p>if where is not defined return false.</p>
@@ -1277,11 +1266,11 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
         </li>
         
         
-        <li id="section-67">
+        <li id="section-66">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-67">&#182;</a>
+                <a class="pilcrow" href="#section-66">&#182;</a>
               </div>
               <p>ensure the where argument is an array.</p>
 
@@ -1292,11 +1281,11 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
         </li>
         
         
-        <li id="section-68">
+        <li id="section-67">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-68">&#182;</a>
+                <a class="pilcrow" href="#section-67">&#182;</a>
               </div>
               <p>expand the what string.</p>
 
@@ -1304,6 +1293,22 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
             
             <div class="content"><div class='highlight'><pre>          whatExp = expand(what)
           <span class="hljs-keyword">if</span> <span class="hljs-string">'@'</span> <span class="hljs-keyword">is</span> what.charAt(<span class="hljs-number">0</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-68">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-68">&#182;</a>
+              </div>
+              <p>return true if the string is found.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span> <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> whereArray <span class="hljs-keyword">when</span> whatExp <span class="hljs-keyword">is</span> expand(item)
+          <span class="hljs-keyword">else</span></pre></div></div>
             
         </li>
         
@@ -1318,8 +1323,7 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span> <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> whereArray <span class="hljs-keyword">when</span> whatExp <span class="hljs-keyword">is</span> expand(item)
-          <span class="hljs-keyword">else</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span> <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> whereArray <span class="hljs-keyword">when</span> whatExp <span class="hljs-keyword">is</span> expand(item)</pre></div></div>
             
         </li>
         
@@ -1329,21 +1333,6 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-70">&#182;</a>
-              </div>
-              <p>return true if the string is found.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span> <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> whereArray <span class="hljs-keyword">when</span> whatExp <span class="hljs-keyword">is</span> expand(item)</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-71">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-71">&#182;</a>
               </div>
               <p>otherwise false.</p>
 
@@ -1362,11 +1351,11 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
         </li>
         
         
-        <li id="section-72">
+        <li id="section-71">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-72">&#182;</a>
+                <a class="pilcrow" href="#section-71">&#182;</a>
               </div>
               <p>TODO: make concats unique.</p>
 
@@ -1379,11 +1368,11 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
         </li>
         
         
-        <li id="section-73">
+        <li id="section-72">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-73">&#182;</a>
+                <a class="pilcrow" href="#section-72">&#182;</a>
               </div>
               <p>Prefer the DBpedia description.
 TODO: have a user-set priority.</p>
@@ -1397,11 +1386,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-74">
+        <li id="section-73">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-74">&#182;</a>
+                <a class="pilcrow" href="#section-73">&#182;</a>
               </div>
               <p>Delete the sameAs entity from the index.</p>
 
@@ -1414,11 +1403,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-75">
+        <li id="section-74">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-75">&#182;</a>
+                <a class="pilcrow" href="#section-74">&#182;</a>
               </div>
               <p>expand a string to a full path if it contains a prefix.</p>
 
@@ -1429,11 +1418,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-76">
+        <li id="section-75">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-76">&#182;</a>
+                <a class="pilcrow" href="#section-75">&#182;</a>
               </div>
               <p>if there’s no prefix, return the original string.</p>
 
@@ -1447,11 +1436,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-77">
+        <li id="section-76">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-77">&#182;</a>
+                <a class="pilcrow" href="#section-76">&#182;</a>
               </div>
               <p>get the prefix and the path.</p>
 
@@ -1463,11 +1452,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-78">
+        <li id="section-77">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-78">&#182;</a>
+                <a class="pilcrow" href="#section-77">&#182;</a>
               </div>
               <p>if the prefix is unknown, leave it.</p>
 
@@ -1481,11 +1470,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-79">
+        <li id="section-78">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-79">&#182;</a>
+                <a class="pilcrow" href="#section-78">&#182;</a>
               </div>
               <p>return the full path.</p>
 
@@ -1496,11 +1485,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-80">
+        <li id="section-79">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-80">&#182;</a>
+                <a class="pilcrow" href="#section-79">&#182;</a>
               </div>
               <p>Check that the response is valid.</p>
 
@@ -1513,11 +1502,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-81">
+        <li id="section-80">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-81">&#182;</a>
+                <a class="pilcrow" href="#section-80">&#182;</a>
               </div>
               <p>data is split in a context and a graph.</p>
 
@@ -1532,11 +1521,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-82">
+        <li id="section-81">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-82">&#182;</a>
+                <a class="pilcrow" href="#section-81">&#182;</a>
               </div>
               <pre><code>   <span class="hljs-built_in">console</span>.log <span class="hljs-string">"[ id :: <span class="hljs-subst">#{id}</span> ]"</span>
 </code></pre>
@@ -1549,11 +1538,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-83">
+        <li id="section-82">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-83">&#182;</a>
+                <a class="pilcrow" href="#section-82">&#182;</a>
               </div>
               <pre><code>   <span class="hljs-built_in">console</span>.log <span class="hljs-string">"[ id :: <span class="hljs-subst">#{id}</span> ][ dc:type :: <span class="hljs-subst">#{dctype}</span> ]"</span>
 </code></pre>
@@ -1562,11 +1551,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-84">
+        <li id="section-83">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-84">&#182;</a>
+                <a class="pilcrow" href="#section-83">&#182;</a>
               </div>
               <p>TextAnnotation/LinguisticSystem</p>
 
@@ -1578,11 +1567,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-85">
+        <li id="section-84">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-85">&#182;</a>
+                <a class="pilcrow" href="#section-84">&#182;</a>
               </div>
               <pre><code>     dump <span class="hljs-string">"language [ id :: <span class="hljs-subst">#{id}</span> ][ dc:type :: <span class="hljs-subst">#{dctype}</span> ]"</span>
 </code></pre>
@@ -1593,11 +1582,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-86">
+        <li id="section-85">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-86">&#182;</a>
+                <a class="pilcrow" href="#section-85">&#182;</a>
               </div>
               <p>TextAnnotation</p>
 
@@ -1608,11 +1597,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-87">
+        <li id="section-86">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-87">&#182;</a>
+                <a class="pilcrow" href="#section-86">&#182;</a>
               </div>
               <pre><code>     $log.debug <span class="hljs-string">"TextAnnotation [ @id :: <span class="hljs-subst">#{id}</span> ][ types :: <span class="hljs-subst">#{types}</span> ]"</span>
 </code></pre>
@@ -1623,11 +1612,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-88">
+        <li id="section-87">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-88">&#182;</a>
+                <a class="pilcrow" href="#section-87">&#182;</a>
               </div>
               <p>EntityAnnotation</p>
 
@@ -1638,11 +1627,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-89">
+        <li id="section-88">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-89">&#182;</a>
+                <a class="pilcrow" href="#section-88">&#182;</a>
               </div>
               <pre><code>     $log.debug <span class="hljs-string">"EntityAnnotation [ @id :: <span class="hljs-subst">#{id}</span> ][ types :: <span class="hljs-subst">#{types}</span> ]"</span>
 </code></pre>
@@ -1653,11 +1642,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-90">
+        <li id="section-89">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-90">&#182;</a>
+                <a class="pilcrow" href="#section-89">&#182;</a>
               </div>
               <p>Entity</p>
 
@@ -1668,11 +1657,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-91">
+        <li id="section-90">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-91">&#182;</a>
+                <a class="pilcrow" href="#section-90">&#182;</a>
               </div>
               <pre><code>     $log.debug <span class="hljs-string">"Entity [ @id :: <span class="hljs-subst">#{id}</span> ][ types :: <span class="hljs-subst">#{types}</span> ]"</span>
 </code></pre>
@@ -1683,11 +1672,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-92">
+        <li id="section-91">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-92">&#182;</a>
+                <a class="pilcrow" href="#section-91">&#182;</a>
               </div>
               <p>sort the languages by confidence.</p>
 
@@ -1703,11 +1692,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-93">
+        <li id="section-92">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-93">&#182;</a>
+                <a class="pilcrow" href="#section-92">&#182;</a>
               </div>
               <p>create a reference to the default language.</p>
 
@@ -1718,11 +1707,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-94">
+        <li id="section-93">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-94">&#182;</a>
+                <a class="pilcrow" href="#section-93">&#182;</a>
               </div>
               <p>Create entities instances in the entities array.</p>
 
@@ -1733,11 +1722,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-95">
+        <li id="section-94">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-95">&#182;</a>
+                <a class="pilcrow" href="#section-94">&#182;</a>
               </div>
               <p>Cycle in every entity.</p>
 
@@ -1748,11 +1737,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-96">
+        <li id="section-95">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-96">&#182;</a>
+                <a class="pilcrow" href="#section-95">&#182;</a>
               </div>
               <p>Create text annotation instances.</p>
 
@@ -1763,11 +1752,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-97">
+        <li id="section-96">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-97">&#182;</a>
+                <a class="pilcrow" href="#section-96">&#182;</a>
               </div>
               <p>Create entity annotations instances.</p>
 
@@ -1778,11 +1767,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-98">
+        <li id="section-97">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-98">&#182;</a>
+                <a class="pilcrow" href="#section-97">&#182;</a>
               </div>
               <pre><code>   <span class="hljs-built_in">console</span>.log <span class="hljs-string">"[ id :: <span class="hljs-subst">#{id}</span> ]"</span>
 </code></pre>
@@ -1793,11 +1782,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-99">
+        <li id="section-98">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-99">&#182;</a>
+                <a class="pilcrow" href="#section-98">&#182;</a>
               </div>
               <p>For every text annotation delete entity annotations that refer to the same entity (after merging).</p>
 
@@ -1808,11 +1797,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-100">
+        <li id="section-99">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-100">&#182;</a>
+                <a class="pilcrow" href="#section-99">&#182;</a>
               </div>
               <p>Cycle in text annotations.</p>
 
@@ -1823,11 +1812,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-101">
+        <li id="section-100">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-101">&#182;</a>
+                <a class="pilcrow" href="#section-100">&#182;</a>
               </div>
               <p>Cycle in entity annotations.</p>
 
@@ -1838,11 +1827,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-102">
+        <li id="section-101">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-102">&#182;</a>
+                <a class="pilcrow" href="#section-101">&#182;</a>
               </div>
               <pre><code>       <span class="hljs-built_in">console</span>.log <span class="hljs-string">"[ text-annotation id :: <span class="hljs-subst">#{textAnnotationId}</span> ][ entity-annotation id :: <span class="hljs-subst">#{entityAnnotation.id}</span> ]"</span>
 </code></pre><p>Check if there are entity annotations referring to the same entity, and if so, delete it.</p>
@@ -1854,11 +1843,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-103">
+        <li id="section-102">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-103">&#182;</a>
+                <a class="pilcrow" href="#section-102">&#182;</a>
               </div>
               <pre><code>         <span class="hljs-built_in">console</span>.log <span class="hljs-string">"[ id :: <span class="hljs-subst">#{id}</span> ][ another id :: <span class="hljs-subst">#{anotherId}</span> ]"</span>
 </code></pre>
@@ -1869,11 +1858,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-104">
+        <li id="section-103">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-104">&#182;</a>
+                <a class="pilcrow" href="#section-103">&#182;</a>
               </div>
               <p>return the analysis result.</p>
 
@@ -1890,11 +1879,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-105">
+        <li id="section-104">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-105">&#182;</a>
+                <a class="pilcrow" href="#section-104">&#182;</a>
               </div>
               <p>Return the service instance</p>
 
