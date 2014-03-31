@@ -13,14 +13,17 @@ module.exports = (grunt) ->
           sourceMap: true
         files:
           'app/js/wordlift.js': [
-            'src/coffee/traslator.coffee',
-            'src/coffee/app.config.coffee',
-            'src/coffee/app.directives.coffee',
-            'src/coffee/app.services.AnalysisService.coffee',
-            'src/coffee/app.services.EditorService.coffee',
-            'src/coffee/app.services.EntityService.coffee',
-            'src/coffee/app.services.coffee',
-            'src/coffee/app.controllers.coffee',
+            'src/coffee/traslator.coffee'
+            'src/coffee/app.config.coffee'
+            'src/coffee/app.directives.coffee'
+            'src/coffee/app.services.AnalysisService.coffee'
+            'src/coffee/app.services.EditorService.coffee'
+            'src/coffee/app.services.EntityAnnotationService.coffee'
+            'src/coffee/app.services.EntityService.coffee'
+            'src/coffee/app.services.Helpers.coffee'
+            'src/coffee/app.services.TextAnnotationService.coffee'
+            'src/coffee/app.services.coffee'
+            'src/coffee/app.controllers.coffee'
             'src/coffee/app.coffee'
           ]
 

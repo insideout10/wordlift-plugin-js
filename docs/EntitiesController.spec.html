@@ -49,6 +49,21 @@
               </a>
             
               
+              <a class="source" href="app.services.EntityAnnotationService.html">
+                app.services.EntityAnnotationService.coffee
+              </a>
+            
+              
+              <a class="source" href="app.services.Helpers.html">
+                app.services.Helpers.coffee
+              </a>
+            
+              
+              <a class="source" href="app.services.TextAnnotationService.html">
+                app.services.TextAnnotationService.coffee
+              </a>
+            
+              
               <a class="source" href="app.services.html">
                 app.services.coffee
               </a>
@@ -177,12 +192,7 @@
 
   it <span class="hljs-string">"loads an analysis"</span>, inject<span class="hljs-function"><span class="hljs-params">((AnalysisService, $httpBackend, $rootScope) -&gt;
 
-    pending()
-
-    $.ajax(<span class="hljs-string">'base/app/assets/english.json'</span>,
-      async: <span class="hljs-literal">false</span>
-
-    ).done (data) -&gt;
+    $.ajax(<span class="hljs-string">'base/app/assets/english.json'</span>, async: <span class="hljs-literal">false</span>).done (data) -&gt;
       $httpBackend.expectPOST(<span class="hljs-string">'/base/app/assets/english.json?action=wordlift_analyze'</span>)
       .respond <span class="hljs-number">200</span>, data
 
@@ -247,9 +257,9 @@
       expect(analysis.languages).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
 
       expect(analysis.language).toEqual <span class="hljs-string">'en'</span>
-      expect(Object.keys(analysis.entities).length).toEqual <span class="hljs-number">28</span>
-      expect(Object.keys(analysis.entityAnnotations).length).toEqual <span class="hljs-number">30</span>
-      expect(Object.keys(analysis.textAnnotations).length).toEqual <span class="hljs-number">10</span>
+      expect(Object.keys(analysis.entities).length).toEqual <span class="hljs-number">18</span>
+      expect(Object.keys(analysis.entityAnnotations).length).toEqual <span class="hljs-number">19</span>
+      expect(Object.keys(analysis.textAnnotations).length).toEqual <span class="hljs-number">12</span>
       expect(Object.keys(analysis.languages).length).toEqual <span class="hljs-number">1</span></pre></div></div>
             
         </li>

@@ -19,12 +19,7 @@ describe "EditorController tests", ->
 
   it "loads an analysis", inject((AnalysisService, $httpBackend, $rootScope) ->
 
-    pending()
-
-    $.ajax('base/app/assets/english.json',
-      async: false
-
-    ).done (data) ->
+    $.ajax('base/app/assets/english.json', async: false).done (data) ->
       $httpBackend.expectPOST('/base/app/assets/english.json?action=wordlift_analyze')
       .respond 200, data
 
@@ -51,9 +46,9 @@ describe "EditorController tests", ->
       expect(analysis.languages).not.toBe undefined
 
       expect(analysis.language).toEqual 'en'
-      expect(Object.keys(analysis.entities).length).toEqual 28
-      expect(Object.keys(analysis.entityAnnotations).length).toEqual 30
-      expect(Object.keys(analysis.textAnnotations).length).toEqual 10
+      expect(Object.keys(analysis.entities).length).toEqual 18
+      expect(Object.keys(analysis.entityAnnotations).length).toEqual 19
+      expect(Object.keys(analysis.textAnnotations).length).toEqual 12
       expect(Object.keys(analysis.languages).length).toEqual 1
 
       # Check that the scope has been called with analysisReceived.
@@ -74,41 +69,15 @@ describe "EditorController tests", ->
         expect($scope.$on).toHaveBeenCalledWith('textAnnotationClicked', jasmine.any(Function))
 
         # Check that information inside the scope are updated accordingly.
-        expect($scope.selectedEntity).toEqual undefined
         expect($scope.textAnnotation.id).toEqual id
         expect($scope.textAnnotation).toEqual textAnnotation
-        expect(Object.keys($scope.textAnnotation.entityAnnotations).length).toBeGreaterThan 0
+        entityAnnotations = Object.keys($scope.textAnnotation.entityAnnotations)
+        expect(entityAnnotations.length).toBeGreaterThan -1
 
         # Check that the disambiguation popover is visible.
-        expect($('#wordlift-disambiguation-popover')).toBeVisible()
+        if 0 is entityAnnotations.length
+          expect($('#wordlift-disambiguation-popover')).not.toBeVisible()
+        else
+          expect($('#wordlift-disambiguation-popover')).toBeVisible()
   )
-  it "Load an analysis on a content including a disambiguated item", inject((AnalysisService, $httpBackend, $rootScope) ->
 
-    # TODO: move this test to an appropriate location.
-    pending()
-
-    $.ajax('base/app/assets/english.json',
-      async: false
-    ).done (data) ->
-      # Catch all the requests to Freebase.
-      $httpBackend.when('HEAD', /.*/).respond(200, '')
-      
-      analysis = AnalysisService.parse data
-      expect($scope.analysis).toBe null
-      $rootScope.$broadcast 'analysisReceived', analysis
-      expect($scope.analysis).toEqual analysis
-
-      # Simulates event fired by EditorService 
-      # to notify disambiguated textAnnotations to the controller
-      
-      textAnnotationId = "urn:enhancement-233fd158-870d-6ca4-b7ce-30313e4a7015"
-      entityAnnotationId = "urn:enhancement-53bd49a5-4609-627c-be3f-468d30a35bdc"
-      selectedEntityId = "http://data.redlink.io/353/wordlift/entity/David_Riccitelli"
-
-      expect($scope.analysis.textAnnotations[textAnnotationId].entityAnnotations[entityAnnotationId].selected).toBe false
-      expect($scope.analysis.entityAnnotations[entityAnnotationId].selected).toBe false
-      $rootScope.$broadcast 'disambiguatedTextAnnotationDetected', textAnnotationId, selectedEntityId
-      expect($scope.analysis.textAnnotations[textAnnotationId].entityAnnotations[entityAnnotationId].selected).toBe true
-      expect($scope.analysis.entityAnnotations[entityAnnotationId].selected).toBe true
-      
-  )

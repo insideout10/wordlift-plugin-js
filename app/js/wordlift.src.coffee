@@ -109,26 +109,26 @@ class Traslator
 
 window.Traslator = Traslator
 angular.module('wordlift.tinymce.plugin.config', [])
-	.constant 'Configuration', 
-		supportedTypes: [
-			'schema:Place'
-			'schema:Event'
-			'schema:CreativeWork'
-			'schema:Product'
-			'schema:Person'
-			'schema:Organization'
-		]
-		entityLabels:
-			'entityLabel': 'enhancer:entity-label'
-			'entityType': 'enhancer:entity-type'
-			'entityReference': 'enhancer:entity-reference'
-			'textAnnotation': 'enhancer:TextAnnotation'
-			'entityAnnotation': 'enhancer:EntityAnnotation'
-			'selectionPrefix': 'enhancer:selection-prefix'
-			'selectionSuffix': 'enhancer:selection-suffix'
-			'selectedText': 'enhancer:selected-text'
-			'confidence': 'enhancer:confidence'
-			'relation':	'dc:relation'
+#	.constant 'Configuration',
+#		supportedTypes: [
+#			'schema:Place'
+#			'schema:Event'
+#			'schema:CreativeWork'
+#			'schema:Product'
+#			'schema:Person'
+#			'schema:Organization'
+#		]
+#		entityLabels:
+#			'entityLabel': 'enhancer:entity-label'
+#			'entityType': 'enhancer:entity-type'
+#			'entityReference': 'enhancer:entity-reference'
+#			'textAnnotation': 'enhancer:TextAnnotation'
+#			'entityAnnotation': 'enhancer:EntityAnnotation'
+#			'selectionPrefix': 'enhancer:selection-prefix'
+#			'selectionSuffix': 'enhancer:selection-suffix'
+#			'selectedText': 'enhancer:selected-text'
+#			'confidence': 'enhancer:confidence'
+#			'relation':	'dc:relation'
 #      'entityLabel':      'entity-label'
 #      'entityType':       'entity-type'
 #      'entityReference':  'entity-reference'
@@ -239,540 +239,519 @@ angular.module('wordlift.tinymce.plugin.directives', ['wordlift.tinymce.plugin.c
 #     * thumbnails : URL to thumbnail images
 
 angular.module('AnalysisService', [])
-.service('AnalysisService', [ '$filter', '$http', '$q', '$rootScope', ($filter, $http, $q, $rootScope) ->
+.service('AnalysisService',
+    [ 'EntityAnnotationService', 'TextAnnotationService', '$filter', '$http', '$q', '$rootScope',
+      (EntityAnnotationService, TextAnnotationService, $filter, $http, $q, $rootScope) ->
 
-    # Constants
-    CONTEXT = '@context'
-    GRAPH = '@graph'
-    VALUE = '@value'
+        # Constants
+        CONTEXT = '@context'
+        GRAPH = '@graph'
+        VALUE = '@value'
 
-    ANALYSIS_EVENT = 'analysisReceived'
+        ANALYSIS_EVENT = 'analysisReceived'
 
-    RDFS = 'http://www.w3.org/2000/01/rdf-schema#'
-    RDFS_LABEL = "#{RDFS}label"
-    RDFS_COMMENT = "#{RDFS}comment"
+        RDFS = 'http://www.w3.org/2000/01/rdf-schema#'
+        RDFS_LABEL = "#{RDFS}label"
+        RDFS_COMMENT = "#{RDFS}comment"
 
-    FREEBASE = 'freebase'
-    FREEBASE_COM = "http://rdf.#{FREEBASE}.com/"
-    FREEBASE_NS = "#{FREEBASE_COM}ns/"
-    FREEBASE_NS_DESCRIPTION = "#{FREEBASE_NS}common.topic.description"
+        FREEBASE = 'freebase'
+        FREEBASE_COM = "http://rdf.#{FREEBASE}.com/"
+        FREEBASE_NS = "#{FREEBASE_COM}ns/"
+        FREEBASE_NS_DESCRIPTION = "#{FREEBASE_NS}common.topic.description"
 
-    SCHEMA_ORG = 'http://schema.org/'
-    SCHEMA_ORG_DESCRIPTION = "#{SCHEMA_ORG}description"
+        SCHEMA_ORG = 'http://schema.org/'
+        SCHEMA_ORG_DESCRIPTION = "#{SCHEMA_ORG}description"
 
-    FISE_ONT = 'http://fise.iks-project.eu/ontology/'
-    FISE_ONT_ENTITY_ANNOTATION = "#{FISE_ONT}EntityAnnotation"
-    FISE_ONT_TEXT_ANNOTATION = "#{FISE_ONT}TextAnnotation"
-    FISE_ONT_CONFIDENCE = "#{FISE_ONT}confidence"
+        FISE_ONT = 'http://fise.iks-project.eu/ontology/'
+        FISE_ONT_ENTITY_ANNOTATION = "#{FISE_ONT}EntityAnnotation"
+        FISE_ONT_TEXT_ANNOTATION = "#{FISE_ONT}TextAnnotation"
+        FISE_ONT_CONFIDENCE = "#{FISE_ONT}confidence"
 
-    DCTERMS = 'http://purl.org/dc/terms/'
+        DCTERMS = 'http://purl.org/dc/terms/'
 
-    DBPEDIA = 'dbpedia'
-    DBPEDIA_ORG = "http://#{DBPEDIA}.org/"
+        DBPEDIA = 'dbpedia'
+        DBPEDIA_ORG = "http://#{DBPEDIA}.org/"
 
-    WGS84_POS = 'http://www.w3.org/2003/01/geo/wgs84_pos#'
+        WGS84_POS = 'http://www.w3.org/2003/01/geo/wgs84_pos#'
 
-    # Set the known types as provided by the environment.
-    KNOWN_TYPES = if window.wordlift?.types? then window.wordlift.types else []
+        # Set the known types as provided by the environment.
+        KNOWN_TYPES = if window.wordlift?.types? then window.wordlift.types else []
 
-    # Find a text annotation in the provided collection which matches the start and end values.
-    findTextAnnotation = (textAnnotations, start, end) ->
-      return textAnnotation for textAnnotationId, textAnnotation of textAnnotations when textAnnotation.start is start and textAnnotation.end is end
+        # Find a text annotation in the provided collection which matches the start and end values.
+        # Otherwise a new text annotation is created
+        findOrCreateTextAnnotation = (textAnnotations, textAnnotation) ->
+          # Return the text annotation if existing.
+          ta = TextAnnotationService.find textAnnotations, textAnnotation.start, textAnnotation.end
+          return ta if ta?
 
-    # Find a text annotation in the provided collection which matches the start and end values.
-    # Otherwise a new text annotation is created
-    findOrCreateTextAnnotation = (textAnnotations, textAnnotation) ->
-      ta = findTextAnnotation textAnnotations, textAnnotation.start, textAnnotation.end
-      if not ta?
-        # A new textAnnotation is created if needed
-        ta =
-          id: "wordlift-ta-#{textAnnotation.start}-#{textAnnotation.end}"
-          selectedText: textAnnotation.label
-          start: textAnnotation.start
-          end: textAnnotation.end
-          confidence: 1
-          entityAnnotations: {}
-          _item: null
-        # The new textAnnotation is added to the analysis 
-        textAnnotations[ta.id] = ta
-      ta
+          # Create a new text annotation.
+          ta = TextAnnotationService.create
+            text: textAnnotation.label
+            start: textAnnotation.start
+            end: textAnnotation.end
+            confidence: 1.0
 
-    service =
-    # Holds the analysis promise, used to abort the analysis.
-      promise: undefined
+          textAnnotations[ta.id] = ta
+          ta
 
-    # If true, an analysis is running.
-      isRunning: false
+        service =
+        # Holds the analysis promise, used to abort the analysis.
+          promise: undefined
 
-    # Abort a running analysis.
-      abort: ->
-        # Abort the analysis if an analysis is running and there's a reference to its promise.
-        @promise.resolve() if @isRunning and @promise?
+        # If true, an analysis is running.
+          isRunning: false
 
-    # Preselect entity annotations in the provided analysis using the provided collection of annotations.
-      preselect: (analysis, annotations) ->
+        # Abort a running analysis.
+          abort: ->
+            # Abort the analysis if an analysis is running and there's a reference to its promise.
+            @promise.resolve() if @isRunning and @promise?
 
-        # Find the existing entities in the html
-        for annotation in annotations
-          textAnnotation = findOrCreateTextAnnotation analysis.textAnnotations, annotation
-          entityAnnotation = @findEntityAnnotation textAnnotation.entityAnnotations, uri: annotation.uri
-          if entityAnnotation?
-            entityAnnotation.selected = true
-          else
-            # Retrieve entity from the entity storage if needed
-            unless analysis.entities[annotation.uri]
-              analysis.entities[annotation.uri] = window.wordlift.entities[annotation.uri]
+        # Preselect entity annotations in the provided analysis using the provided collection of annotations.
+          preselect: (analysis, annotations) ->
 
-            # Create the new entityAssociation 
-            ea =
-              id: "wordlift-ea-from-#{textAnnotation.id}"
-              label: annotation.label
-              confidence: 1
-              entity: analysis.entities[annotation.uri]
-              relation: analysis.textAnnotations[textAnnotation.id]
-              _item: null
-              selected: true
-            # Add the new entity association to the analysis  
-            analysis.entityAnnotations[ea.id] = ea
-            # Add a reference to the current textAssociation
-            textAnnotation.entityAnnotations[ea.id] = analysis.entityAnnotations[ea.id]
-
-
-    # TODO: if the entity is not found, it needs to be added.
-
-    # <a name="analyze"></a>
-    # Analyze the provided content. Only one analysis at a time is run.
-    # The merge parameter is passed to the parse call and merges together entities related via sameAs.
-      analyze: (content, merge = false) ->
-        # Exit if an analysis is already running.
-        return if @isRunning
-
-        # Set that an analysis is running.
-        @isRunning = true
-
-        # Store the promise in the class to allow interrupting the request.
-        @promise = $q.defer()
-
-        that = @
-
-        $http(
-          method: 'post'
-          url: ajaxurl + '?action=wordlift_analyze'
-          data: content
-          timeout: @promise.promise
-        )
-        # If successful, broadcast an *analysisReceived* event.
-        .success (data) ->
-            $rootScope.$broadcast ANALYSIS_EVENT, that.parse(data, merge)
-            # Set that the analysis is complete.
-            that.isRunning = false
-
-        .error (data, status) ->
-            # Set that the analysis is complete.
-            that.isRunning = false
-            $rootScope.$broadcast ANALYSIS_EVENT, undefined
-
-            return if 0 is status # analysis aborted.
-            $rootScope.$broadcast 'error', 'An error occurred while requesting an analysis.'
-
-    # Find an entity annotation in the provided collection using the provided filter.
-      findEntityAnnotation: (entityAnnotations, filter) ->
-        if filter.uri?
-          return entityAnnotation for entityAnnotationId, entityAnnotation of entityAnnotations when filter.uri is entityAnnotation.entity.id or filter.uri in entityAnnotation.entity.sameAs
-
-        if filter.selected?
-          return entityAnnotation for entityAnnotationId, entityAnnotation of entityAnnotations when entityAnnotation.selected
-
-    # Parse the response data from the analysis request (Redlink).
-    # If *merge* is set to true, entity annotations and entities with matching sameAs will be merged.
-      parse: (data, merge = false) ->
-        languages = []
-        textAnnotations = {}
-        entityAnnotations = {}
-        entities = {}
-
-        # support functions:
-
-        # Get the known type given the specified types. Current supported types are:
-        #  * person
-        #  * organization
-        #  * place
-        getKnownTypes = (types) ->
-
-          # An array with known types according to the specified types.
-          returnTypes = []
-          defaultType = undefined
-          for kt in KNOWN_TYPES
-            # Set the default type, identified by an asterisk (*) in the sameAs values.
-            defaultType = [
-              { type: kt }
-            ] if '*' in kt.sameAs
-            # Get all the URIs associated to this known type.
-            uris = kt.sameAs.concat kt.uri
-            # If there is 1+ uri in common between the known types and the provided types, then add the known type.
-            matches = (uri for uri in uris when containsOrEquals(uri, types))
-            returnTypes.push { matches: matches, type: kt } if 0 < matches.length
+            # Find the existing entities in the html
+            for annotation in annotations
+              textAnnotation = findOrCreateTextAnnotation analysis.textAnnotations, annotation
+              entityAnnotations = EntityAnnotationService.find textAnnotation.entityAnnotations, uri: annotation.uri
+              if 0 < entityAnnotations.length
+                # We don't expect more than one entity annotation for an URI inside a text annotation.
+                entityAnnotations[0].selected = true
+# TODO: fix
+#              else
+#                # Retrieve entity from the entity storage if needed
+#                unless analysis.entities[annotation.uri]
+#                  analysis.entities[annotation.uri] = window.wordlift.entities[annotation.uri]
+#
+#                # Create the new entityAssociation
+#                ea =
+#                  id: "wordlift-ea-from-#{textAnnotation.id}"
+#                  label: annotation.label
+#                  confidence: 1
+#                  entity: analysis.entities[annotation.uri]
+#                  relation: analysis.textAnnotations[textAnnotation.id]
+#                  _item: null
+#                  selected: true
+#                # Add the new entity association to the analysis
+#                analysis.entityAnnotations[ea.id] = ea
+#                # Add a reference to the current textAssociation
+#                textAnnotation.entityAnnotations[ea.id] = analysis.entityAnnotations[ea.id]
 
 
-          # Return the defaul type if not known types have been found.
-          return defaultType if 0 is returnTypes.length
+        # TODO: if the entity is not found, it needs to be added.
 
-          # Sort and return the match types.
-          $filter('orderBy') returnTypes, 'matches', true
-          returnTypes
+        # <a name="analyze"></a>
+        # Analyze the provided content. Only one analysis at a time is run.
+        # The merge parameter is passed to the parse call and merges together entities related via sameAs.
+          analyze: (content, merge = false) ->
+            # Exit if an analysis is already running.
+            return if @isRunning
+
+            # Set that an analysis is running.
+            @isRunning = true
+
+            # Store the promise in the class to allow interrupting the request.
+            @promise = $q.defer()
+
+            that = @
+
+            $http(
+              method: 'post'
+              url: ajaxurl + '?action=wordlift_analyze'
+              data: content
+              timeout: @promise.promise
+            )
+            # If successful, broadcast an *analysisReceived* event.
+            .success (data) ->
+                $rootScope.$broadcast ANALYSIS_EVENT, that.parse(data, merge)
+                # Set that the analysis is complete.
+                that.isRunning = false
+
+            .error (data, status) ->
+                # Set that the analysis is complete.
+                that.isRunning = false
+                $rootScope.$broadcast ANALYSIS_EVENT, undefined
+
+                return if 0 is status # analysis aborted.
+                $rootScope.$broadcast 'error', 'An error occurred while requesting an analysis.'
+
+        # Parse the response data from the analysis request (Redlink).
+        # If *merge* is set to true, entity annotations and entities with matching sameAs will be merged.
+          parse: (data, merge = false) ->
+            languages = []
+            textAnnotations = {}
+            entityAnnotations = {}
+            entities = {}
+
+            # support functions:
+
+            # Get the known type given the specified types. Current supported types are:
+            #  * person
+            #  * organization
+            #  * place
+            getKnownTypes = (types) ->
+
+              # An array with known types according to the specified types.
+              returnTypes = []
+              defaultType = undefined
+              for kt in KNOWN_TYPES
+                # Set the default type, identified by an asterisk (*) in the sameAs values.
+                defaultType = [
+                  { type: kt }
+                ] if '*' in kt.sameAs
+                # Get all the URIs associated to this known type.
+                uris = kt.sameAs.concat kt.uri
+                # If there is 1+ uri in common between the known types and the provided types, then add the known type.
+                matches = (uri for uri in uris when containsOrEquals(uri, types))
+                returnTypes.push { matches: matches, type: kt } if 0 < matches.length
 
 
-        # create an entity.
-        createEntity = (item, language) ->
-          id = get('@id', item)
-          # Get the types associated with the entity.
-          types = get('@type', item)
-          types = if angular.isArray types then types else [ types ]
-          sameAs = get('http://www.w3.org/2002/07/owl#sameAs', item)
-          sameAs = if angular.isArray sameAs then sameAs else [ sameAs ]
+              # Return the defaul type if not known types have been found.
+              return defaultType if 0 is returnTypes.length
 
-          #        console.log "createEntity [ id :: #{id} ][ language :: #{language} ][ types :: #{types} ][ sameAs :: #{sameAs} ]"
+              # Sort and return the match types.
+              $filter('orderBy') returnTypes, 'matches', true
+              returnTypes
 
-          # Get all the thumbnails; for each thumbnail execute the provided function.
-          thumbnails = get(
-            [
-              'http://xmlns.com/foaf/0.1/depiction'
-              "#{FREEBASE_NS}common.topic.image"
-              "#{SCHEMA_ORG}image"
-            ],
-            item,
-          (values) ->
-            values = if angular.isArray values then values else [ values ]
-            for value in values
-              match = /m\.(.*)$/i.exec value
-              if null is match
-                value
-              else
-                # If it's a Freebase URL normalize the link to the image.
-                "https://usercontent.googleapis.com/#{FREEBASE}/v1/image/m/#{match[1]}?maxwidth=4096&maxheight=4096"
-          )
 
-          # Get the known types.
-          knownTypes = getKnownTypes(types)
-          # Get the stylesheet classes.
-          css = knownTypes[0].type.css
+            # create an entity.
+            createEntity = (item, language) ->
+              id = get('@id', item)
+              # Get the types associated with the entity.
+              types = get('@type', item)
+              types = if angular.isArray types then types else [ types ]
+              sameAs = get('http://www.w3.org/2002/07/owl#sameAs', item)
+              sameAs = if angular.isArray sameAs then sameAs else [ sameAs ]
 
-          # create the entity model.
-          entity =
-            id: id
-            thumbnail: if 0 < thumbnails.length then thumbnails[0] else null
-            thumbnails: thumbnails
-            css: css
-            type: knownTypes[0].type.uri # This is the main type for the entity.
-            types: types
-            label: getLanguage(RDFS_LABEL, item, language)
-            labels: get(RDFS_LABEL, item)
-            sameAs: sameAs
-            source: if id.match("^#{FREEBASE_COM}.*$")
-              FREEBASE
-            else if id.match("^#{DBPEDIA_ORG}.*$")
-              DBPEDIA
-            else
-              'wordlift'
-            _item: item
+              #        console.log "createEntity [ id :: #{id} ][ language :: #{language} ][ types :: #{types} ][ sameAs :: #{sameAs} ]"
 
-          entity.description = getLanguage(
-            [
-              RDFS_COMMENT
-              FREEBASE_NS_DESCRIPTION
-              SCHEMA_ORG_DESCRIPTION
-            ], item, language
-          )
-          entity.descriptions = get(
-            [
-              RDFS_COMMENT
-              FREEBASE_NS_DESCRIPTION
-              SCHEMA_ORG_DESCRIPTION
-            ],
-            item
-          )
+              # Get all the thumbnails; for each thumbnail execute the provided function.
+              thumbnails = get(
+                [
+                  'http://xmlns.com/foaf/0.1/depiction'
+                  "#{FREEBASE_NS}common.topic.image"
+                  "#{SCHEMA_ORG}image"
+                ],
+                item,
+              (values) ->
+                values = if angular.isArray values then values else [ values ]
+                for value in values
+                  match = /m\.(.*)$/i.exec value
+                  if null is match
+                    value
+                  else
+                    # If it's a Freebase URL normalize the link to the image.
+                    "https://usercontent.googleapis.com/#{FREEBASE}/v1/image/m/#{match[1]}?maxwidth=4096&maxheight=4096"
+              )
 
-          # Avoid null in entity description.
-          entity.description = '' if not entity.description?
+              # Get the known types.
+              knownTypes = getKnownTypes(types)
+              # Get the stylesheet classes.
+              css = knownTypes[0].type.css
 
-          entity.latitude = get "#{WGS84_POS}lat", item
-          entity.longitude = get "#{WGS84_POS}long", item
-          if 0 is entity.latitude.length or 0 is entity.longitude.length
-            entity.latitude = ''
-            entity.longitude = ''
+              # create the entity model.
+              entity =
+                id: id
+                thumbnail: if 0 < thumbnails.length then thumbnails[0] else null
+                thumbnails: thumbnails
+                css: css
+                type: knownTypes[0].type.uri # This is the main type for the entity.
+                types: types
+                label: getLanguage(RDFS_LABEL, item, language)
+                labels: get(RDFS_LABEL, item)
+                sameAs: sameAs
+                source: if id.match("^#{FREEBASE_COM}.*$")
+                  FREEBASE
+                else if id.match("^#{DBPEDIA_ORG}.*$")
+                  DBPEDIA
+                else
+                  'wordlift'
+                _item: item
 
-          # Check if thumbnails exists.
-          #        if thumbnails? and angular.isArray thumbnails
-          #          $q.all(($http.head thumbnail for thumbnail in thumbnails))
-          #            .then (results) ->
-          #              # Populate the thumbnails array only with existing images (those that return *status code* 200).
-          #              entity.thumbnails = (result.config.url for result in results when 200 is result.status)
-          #              # Set the main thumbnail as the first.
-          #              # TODO: use the lightest image as first.
-          #              entity.thumbnail  = entity.thumbnails[0] if 0 < entity.thumbnails.length'
+              entity.description = getLanguage(
+                [
+                  RDFS_COMMENT
+                  FREEBASE_NS_DESCRIPTION
+                  SCHEMA_ORG_DESCRIPTION
+                ], item, language
+              )
+              entity.descriptions = get(
+                [
+                  RDFS_COMMENT
+                  FREEBASE_NS_DESCRIPTION
+                  SCHEMA_ORG_DESCRIPTION
+                ],
+                item
+              )
 
-          # return the entity.
-          #        console.log "createEntity [ entity id :: #{entity.id} ][ language :: #{language} ][ types :: #{types} ][ sameAs :: #{sameAs} ]"
-          entity
+              # Avoid null in entity description.
+              entity.description = '' if not entity.description?
 
-        createEntityAnnotation = (item) ->
-          reference = get "#{FISE_ONT}entity-reference", item
-          entity = entities[reference]
+              entity.latitude = get "#{WGS84_POS}lat", item
+              entity.longitude = get "#{WGS84_POS}long", item
+              if 0 is entity.latitude.length or 0 is entity.longitude.length
+                entity.latitude = ''
+                entity.longitude = ''
 
-          #        console.log "[ reference :: #{reference} ][ entity :: #{entity} ]"
-          # If the referenced entity is not found, return null
-          return null if not entity?
+              # Check if thumbnails exists.
+              #        if thumbnails? and angular.isArray thumbnails
+              #          $q.all(($http.head thumbnail for thumbnail in thumbnails))
+              #            .then (results) ->
+              #              # Populate the thumbnails array only with existing images (those that return *status code* 200).
+              #              entity.thumbnails = (result.config.url for result in results when 200 is result.status)
+              #              # Set the main thumbnail as the first.
+              #              # TODO: use the lightest image as first.
+              #              entity.thumbnail  = entity.thumbnails[0] if 0 < entity.thumbnails.length'
 
-          annotations = []
+              # return the entity.
+              #        console.log "createEntity [ entity id :: #{entity.id} ][ language :: #{language} ][ types :: #{types} ][ sameAs :: #{sameAs} ]"
+              entity
 
-          # Get the text annotation id.
-          id = get('@id', item)
+            # Create an entity annotation. An entity annotation is created for each related text-annotation.
+            createEntityAnnotations = (item) ->
+              # Get the reference to the entity.
+              reference = get "#{FISE_ONT}entity-reference", item
+              # If the referenced entity is not found, return null
+              return [] if not entities[reference]?
 
-          # get the related text annotation.
-          relations = get "#{DCTERMS}relation", item
-          # Ensure we're dealing with an array.
-          relations = if angular.isArray relations then relations else [ relations ]
+              # Prepare the return array.
+              annotations = []
 
-          # For each text annotation bound to this entity annotation, create an entity annotation and add it to the text annotation.
-          for relation in relations
-            textAnnotation = textAnnotations[relation]
+              # get the related text annotation.
+              relations = get "#{DCTERMS}relation", item
+              # Ensure we're dealing with an array.
+              relations = if angular.isArray relations then relations else [ relations ]
 
-            # Create an entity annotation.
-            entityAnnotation = {
-              id: id
-              label: get "#{FISE_ONT}entity-label", item
+              # For each text annotation bound to this entity annotation, create an entity annotation and add it to the text annotation.
+              for relation in relations
+                textAnnotation = textAnnotations[relation]
+
+                # Create an entity annotation.
+                entityAnnotation = EntityAnnotationService.create
+                  id: get '@id', item
+                  label: get "#{FISE_ONT}entity-label", item
+                  confidence: get FISE_ONT_CONFIDENCE, item
+                  entity: entities[reference]
+                  relation: textAnnotation
+                  _item: item
+
+                # Create a binding from the textannotation to the entity annotation.
+                textAnnotation.entityAnnotations[entityAnnotation.id] = entityAnnotation if textAnnotation?
+
+                # Accumulate the annotations.
+                annotations.push entityAnnotation
+
+              # Return the  entity annotations.
+              annotations
+
+
+            createTextAnnotation = (item) ->
+              TextAnnotationService.create
+                id: get('@id', item)
+                text: get("#{FISE_ONT}selected-text", item)[VALUE]
+                start: get "#{FISE_ONT}start", item
+                end: get "#{FISE_ONT}end", item
+                confidence: get FISE_ONT_CONFIDENCE, item
+                entityAnnotations: {}
+                _item: item
+
+            createLanguage = (item) ->
+              {
+              code: get "#{DCTERMS}language", item
               confidence: get FISE_ONT_CONFIDENCE, item
-              entity: entity
-              relation: textAnnotation
               _item: item
-              selected: false
+              }
+
+            # Get the values associated with the specified key(s). Keys are expanded.
+            get = (what, container, filter) ->
+              # If it's a single key, call getA
+              return getA(what, container, filter) if not angular.isArray what
+
+              # Prepare the return array.
+              values = []
+
+              # For each key, add the result.
+              for key in what
+                add = getA(key, container, filter)
+                # Ensure the result is an array.
+                add = if angular.isArray add then add else [ add ]
+                # Merge unique the results.
+                mergeUnique values, add
+
+              # Return the result array.
+              values
+
+            # Get the values associated with the specified key. Keys are expanded.
+            getA = (what, container, filter = (a) ->
+              a) ->
+              # expand the what key.
+              whatExp = expand(what)
+              # return the value bound to the specified key.
+              #        console.log "[ what exp :: #{whatExp} ][ key :: #{expand key} ][ value :: #{value} ][ match :: #{whatExp is expand(key)} ]" for key, value of container
+              return filter(value) for key, value of container when whatExp is expand(key)
+              []
+
+            # get the value for specified property (what) in the provided container in the specified language.
+            # items must conform to {'@language':..., '@value':...} format.
+            getLanguage = (what, container, language) ->
+              # if there's no item return null.
+              return if null is items = get(what, container)
+              # transform to an array if it's not already.
+              items = if angular.isArray items then items else [ items ]
+              # cycle through the array.
+              return item[VALUE] for item in items when language is item['@language']
+              # if not found return null.
+              null
+
+            containsOrEquals = (what, where) ->
+              #        dump "containsOrEquals [ what :: #{what} ][ where :: #{where} ]"
+              # if where is not defined return false.
+              return false if not where?
+              # ensure the where argument is an array.
+              whereArray = if angular.isArray where then where else [ where ]
+              # expand the what string.
+              whatExp = expand(what)
+              if '@' is what.charAt(0)
+                # return true if the string is found.
+                return true for item in whereArray when whatExp is expand(item)
+              else
+                # return true if the string is found.
+                return true for item in whereArray when whatExp is expand(item)
+              # otherwise false.
+              false
+
+            mergeUnique = (array1, array2) ->
+              array1.push item for item in array2 when item not in array1
+
+            mergeEntities = (entity, entities) ->
+              for sameAs in entity.sameAs
+                if entities[sameAs]? and entities[sameAs] isnt entity
+                  existing = entities[sameAs]
+                  # TODO: make concats unique.
+                  mergeUnique(entity.sameAs, existing.sameAs)
+                  mergeUnique(entity.thumbnails, existing.thumbnails)
+                  entity.source += ", #{existing.source}"
+                  # Prefer the DBpedia description.
+                  # TODO: have a user-set priority.
+                  entity.description = existing.description if DBPEDIA is existing.source
+                  entity.longitude = existing.longitude if DBPEDIA is existing.source and existing.longitude?
+                  entity.latitude = existing.latitude if DBPEDIA is existing.source and existing.latitude?
+
+                  # Delete the sameAs entity from the index.
+                  entities[sameAs] = entity
+                  mergeEntities entity, entities
+              entity
+
+            # expand a string to a full path if it contains a prefix.
+            expand = (content) ->
+              # if there's no prefix, return the original string.
+              if null is matches = content.match(/([\w|\d]+):(.*)/)
+                prefix = content
+                path = ''
+              else
+                # get the prefix and the path.
+                prefix = matches[1]
+                path = matches[2]
+
+              # if the prefix is unknown, leave it.
+              if context[prefix]?
+                prepend = if angular.isString context[prefix] then context[prefix] else context[prefix]['@id']
+              else
+                prepend = prefix + ':'
+
+              # return the full path.
+              prepend + path
+
+            # Check that the response is valid.
+            if not ( data[CONTEXT]? and data[GRAPH]? )
+              $rootScope.$broadcast 'error', 'The analysis response is invalid. Please try again later.'
+              return false
+
+            # data is split in a context and a graph.
+            context = data[CONTEXT]
+            graph = data[GRAPH]
+
+            for item in graph
+              id = item['@id']
+              #        console.log "[ id :: #{id} ]"
+
+              types = item['@type']
+              dctype = get "#{DCTERMS}type", item
+
+              #        console.log "[ id :: #{id} ][ dc:type :: #{dctype} ]"
+
+              # TextAnnotation/LinguisticSystem
+              if containsOrEquals(FISE_ONT_TEXT_ANNOTATION,
+                types) and containsOrEquals("#{DCTERMS}LinguisticSystem", dctype)
+                #          dump "language [ id :: #{id} ][ dc:type :: #{dctype} ]"
+                languages.push createLanguage(item)
+
+                # TextAnnotation
+              else if containsOrEquals(FISE_ONT_TEXT_ANNOTATION, types)
+                #          $log.debug "TextAnnotation [ @id :: #{id} ][ types :: #{types} ]"
+                textAnnotations[id] = item
+
+                # EntityAnnotation
+              else if containsOrEquals(FISE_ONT_ENTITY_ANNOTATION, types)
+                #          $log.debug "EntityAnnotation [ @id :: #{id} ][ types :: #{types} ]"
+                entityAnnotations[id] = item
+
+                # Entity
+              else
+                #          $log.debug "Entity [ @id :: #{id} ][ types :: #{types} ]"
+                entities[id] = item
+
+            # sort the languages by confidence.
+            languages.sort (a, b) ->
+              if a.confidence < b.confidence
+                return -1
+              if a.confidence > b.confidence
+                return 1
+              0
+
+            # create a reference to the default language.
+            language = languages[0].code
+
+            # Create entities instances in the entities array.
+            entities[id] = createEntity(item, language) for id, item of entities
+
+            # Cycle in every entity.
+            mergeEntities(entity, entities) for id, entity of entities if merge
+
+            # Create text annotation instances.
+            textAnnotations[id] = createTextAnnotation(item) for id, item of textAnnotations
+
+            # Create entity annotations instances.
+            for id, item of entityAnnotations
+              entityAnnotations[entityAnnotation.id] = entityAnnotation for entityAnnotation in createEntityAnnotations(item)
+
+            # For every text annotation delete entity annotations that refer to the same entity (after merging).
+            if merge
+              # Cycle in text annotations.
+              for textAnnotationId, textAnnotation of textAnnotations
+                # Cycle in entity annotations.
+                for id, entityAnnotation of textAnnotation.entityAnnotations
+                  #            console.log "[ text-annotation id :: #{textAnnotationId} ][ entity-annotation id :: #{entityAnnotation.id} ]"
+                  # Check if there are entity annotations referring to the same entity, and if so, delete it.
+                  for anotherId, anotherEntityAnnotation of textAnnotation.entityAnnotations when id isnt anotherId and entityAnnotation.entity is anotherEntityAnnotation.entity
+                    #              console.log "[ id :: #{id} ][ another id :: #{anotherId} ]"
+                    delete textAnnotation.entityAnnotations[anotherId]
+
+            # return the analysis result.
+            {
+            language: language
+            entities: entities
+            entityAnnotations: entityAnnotations
+            textAnnotations: textAnnotations
+            languages: languages
             }
 
-            #          console.log "[ id :: #{id} ][ relation :: #{relation} ][ entity id :: #{entity.id} ][ text annotation :: #{textAnnotation} ]"
-
-            # Create a binding from the textannotation to the entity annotation.
-            textAnnotation.entityAnnotations[entityAnnotation.id] = entityAnnotation if textAnnotation?
-
-            annotations.push entityAnnotation
-
-          # Return the annotations.
-          annotations[0]
-
-
-        createTextAnnotation = (item) ->
-          textAnnotation = {
-            id: get('@id', item)
-            selectedText: get("#{FISE_ONT}selected-text", item)[VALUE]
-            selectionPrefix: get("#{FISE_ONT}selection-prefix", item)[VALUE]
-            selectionSuffix: get("#{FISE_ONT}selection-suffix", item)[VALUE]
-            start: get "#{FISE_ONT}start", item
-            end: get "#{FISE_ONT}end", item
-            confidence: get FISE_ONT_CONFIDENCE, item
-            entityAnnotations: {}
-            _item: item
-          }
-          #          console.log "createTextAnnotation [ start :: #{textAnnotation.start} ][ end :: #{textAnnotation.end} ][ text :: #{textAnnotation.selectedText} ]"
-          textAnnotation
-
-        createLanguage = (item) ->
-          {
-          code: get "#{DCTERMS}language", item
-          confidence: get FISE_ONT_CONFIDENCE, item
-          _item: item
-          }
-
-        # Get the values associated with the specified key(s). Keys are expanded.
-        get = (what, container, filter) ->
-          # If it's a single key, call getA
-          return getA(what, container, filter) if not angular.isArray what
-
-          # Prepare the return array.
-          values = []
-
-          # For each key, add the result.
-          for key in what
-            add = getA(key, container, filter)
-            # Ensure the result is an array.
-            add = if angular.isArray add then add else [ add ]
-            # Merge unique the results.
-            mergeUnique values, add
-
-          # Return the result array.
-          values
-
-        # Get the values associated with the specified key. Keys are expanded.
-        getA = (what, container, filter = (a) ->
-          a) ->
-          # expand the what key.
-          whatExp = expand(what)
-          # return the value bound to the specified key.
-          #        console.log "[ what exp :: #{whatExp} ][ key :: #{expand key} ][ value :: #{value} ][ match :: #{whatExp is expand(key)} ]" for key, value of container
-          return filter(value) for key, value of container when whatExp is expand(key)
-          []
-
-        # get the value for specified property (what) in the provided container in the specified language.
-        # items must conform to {'@language':..., '@value':...} format.
-        getLanguage = (what, container, language) ->
-          # if there's no item return null.
-          return if null is items = get(what, container)
-          # transform to an array if it's not already.
-          items = if angular.isArray items then items else [ items ]
-          # cycle through the array.
-          return item[VALUE] for item in items when language is item['@language']
-          # if not found return null.
-          null
-
-        containsOrEquals = (what, where) ->
-          #        dump "containsOrEquals [ what :: #{what} ][ where :: #{where} ]"
-          # if where is not defined return false.
-          return false if not where?
-          # ensure the where argument is an array.
-          whereArray = if angular.isArray where then where else [ where ]
-          # expand the what string.
-          whatExp = expand(what)
-          if '@' is what.charAt(0)
-            # return true if the string is found.
-            return true for item in whereArray when whatExp is expand(item)
-          else
-            # return true if the string is found.
-            return true for item in whereArray when whatExp is expand(item)
-          # otherwise false.
-          false
-
-        mergeUnique = (array1, array2) ->
-          array1.push item for item in array2 when item not in array1
-
-        mergeEntities = (entity, entities) ->
-          for sameAs in entity.sameAs
-            if entities[sameAs]? and entities[sameAs] isnt entity
-              existing = entities[sameAs]
-              # TODO: make concats unique.
-              mergeUnique(entity.sameAs, existing.sameAs)
-              mergeUnique(entity.thumbnails, existing.thumbnails)
-              entity.source += ", #{existing.source}"
-              # Prefer the DBpedia description.
-              # TODO: have a user-set priority.
-              entity.description = existing.description if DBPEDIA is existing.source
-              entity.longitude = existing.longitude if DBPEDIA is existing.source and existing.longitude?
-              entity.latitude = existing.latitude if DBPEDIA is existing.source and existing.latitude?
-
-              # Delete the sameAs entity from the index.
-              entities[sameAs] = entity
-              mergeEntities(entity, entities)
-          entity
-
-        # expand a string to a full path if it contains a prefix.
-        expand = (content) ->
-          # if there's no prefix, return the original string.
-          if null is matches = content.match(/([\w|\d]+):(.*)/)
-            prefix = content
-            path = ''
-          else
-            # get the prefix and the path.
-            prefix = matches[1]
-            path = matches[2]
-
-          # if the prefix is unknown, leave it.
-          if context[prefix]?
-            prepend = if angular.isString context[prefix] then context[prefix] else context[prefix]['@id']
-          else
-            prepend = prefix + ':'
-
-          # return the full path.
-          prepend + path
-
-        # Check that the response is valid.
-        if not ( data[CONTEXT]? and data[GRAPH]? )
-          $rootScope.$broadcast 'error', 'The analysis response is invalid. Please try again later.'
-          return false
-
-        # data is split in a context and a graph.
-        context = data[CONTEXT]
-        graph = data[GRAPH]
-
-        for item in graph
-          id = item['@id']
-          #        console.log "[ id :: #{id} ]"
-
-          types = item['@type']
-          dctype = get "#{DCTERMS}type", item
-
-          #        console.log "[ id :: #{id} ][ dc:type :: #{dctype} ]"
-
-          # TextAnnotation/LinguisticSystem
-          if containsOrEquals(FISE_ONT_TEXT_ANNOTATION,
-            types) and containsOrEquals("#{DCTERMS}LinguisticSystem", dctype)
-            #          dump "language [ id :: #{id} ][ dc:type :: #{dctype} ]"
-            languages.push createLanguage(item)
-
-            # TextAnnotation
-          else if containsOrEquals(FISE_ONT_TEXT_ANNOTATION, types)
-            #          $log.debug "TextAnnotation [ @id :: #{id} ][ types :: #{types} ]"
-            textAnnotations[id] = item
-
-            # EntityAnnotation
-          else if containsOrEquals(FISE_ONT_ENTITY_ANNOTATION, types)
-            #          $log.debug "EntityAnnotation [ @id :: #{id} ][ types :: #{types} ]"
-            entityAnnotations[id] = item
-
-            # Entity
-          else
-            #          $log.debug "Entity [ @id :: #{id} ][ types :: #{types} ]"
-            entities[id] = item
-
-        # sort the languages by confidence.
-        languages.sort (a, b) ->
-          if a.confidence < b.confidence
-            return -1
-          if a.confidence > b.confidence
-            return 1
-          0
-
-        # create a reference to the default language.
-        language = languages[0].code
-
-        # Create entities instances in the entities array.
-        entities[id] = createEntity(item, language) for id, item of entities
-
-        # Cycle in every entity.
-        mergeEntities(entity, entities) for id, entity of entities if merge
-
-        # Create text annotation instances.
-        textAnnotations[id] = createTextAnnotation(item) for id, item of textAnnotations
-
-        # Create entity annotations instances.
-        for id, item of entityAnnotations
-          #        console.log "[ id :: #{id} ]"
-          entityAnnotations[id] = createEntityAnnotation(item)
-
-        # For every text annotation delete entity annotations that refer to the same entity (after merging).
-        if merge
-          # Cycle in text annotations.
-          for textAnnotationId, textAnnotation of textAnnotations
-            # Cycle in entity annotations.
-            for id, entityAnnotation of textAnnotation.entityAnnotations
-              #            console.log "[ text-annotation id :: #{textAnnotationId} ][ entity-annotation id :: #{entityAnnotation.id} ]"
-              # Check if there are entity annotations referring to the same entity, and if so, delete it.
-              for anotherId, anotherEntityAnnotation of textAnnotation.entityAnnotations when id isnt anotherId and entityAnnotation.entity is anotherEntityAnnotation.entity
-                #              console.log "[ id :: #{id} ][ another id :: #{anotherId} ]"
-                delete textAnnotation.entityAnnotations[anotherId]
-
-        # return the analysis result.
-        {
-        language: language
-        entities: entities
-        entityAnnotations: entityAnnotations
-        textAnnotations: textAnnotations
-        languages: languages
-        }
-
-    # Return the service instance
-    service
-  ])
+        # Return the service instance
+        service
+    ])
 
 angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tinymce.plugin.config', 'AnalysisService'])
 .service('EditorService',
-    ['AnalysisService', '$rootScope', (AnalysisService, $rootScope) ->
+    ['AnalysisService', 'EntityAnnotationService', '$rootScope', (AnalysisService, EntityAnnotationService, $rootScope) ->
 
       # Define some constants for commonly used strings.
       EDITOR_ID = 'content'
@@ -834,9 +813,11 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
             element = "<span id=\"#{textAnnotationId}\" class=\"#{TEXT_ANNOTATION}"
 
             # Insert the Html fragments before and after the selected text.
-            entityAnnotation = AnalysisService.findEntityAnnotation textAnnotation.entityAnnotations, selected: true
-            if entityAnnotation?
-              entity = entityAnnotation.entity
+            entityAnnotations = EntityAnnotationService.find textAnnotation.entityAnnotations, selected: true
+            if 0 < entityAnnotations.length and entityAnnotations[0].entity?
+              # We deal only with the first entityAnnotation.
+              console.log entityAnnotations[0] if not entityAnnotations[0].entity
+              entity = entityAnnotations[0].entity
               element += " highlight #{entity.css}\" itemid=\"#{entity.id}"
 
             # Close the element.
@@ -926,9 +907,84 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
       service
     ])
 
+angular.module('wordlift.tinymce.plugin.services.EntityAnnotationService', [])
+.service('EntityAnnotationService', [ 'Helpers', (Helpers) ->
+
+    # Create an entity annotation using the provided params.
+    create: (params) ->
+      defaults =
+        id: 'uri:local-entity-annotation-' + Helpers.uniqueId(32)
+        label: ''
+        confidence: 0.0
+        entity: null
+        relation: null
+        selected: false
+        _item: null
+
+      # Merge the params with the default settings.
+      Helpers.merge defaults, params
+
+
+    # Find an entity annotation with the provided filters.
+    find: (entityAnnotations, filter) ->
+      if filter.uri?
+        return (entityAnnotation for entityAnnotationId, entityAnnotation of entityAnnotations when filter.uri is entityAnnotation.entity.id or filter.uri in entityAnnotation.entity.sameAs)
+
+      if filter.selected?
+        return (entityAnnotation for entityAnnotationId, entityAnnotation of entityAnnotations when entityAnnotation.selected is filter.selected)
+
+  ])
+angular.module('wordlift.tinymce.plugin.services.Helpers', [])
+.service('Helpers', [ ->
+
+    # Merges two objects by copying overrides param onto the options.
+    merge: (options, overrides) ->
+      @extend (@extend {}, options), overrides
+
+    extend: (object, properties) ->
+      for key, val of properties
+        object[key] = val
+      object
+
+    # Creates a unique ID of the specified length (default 8).
+    uniqueId: (length = 8) ->
+      id = ''
+      id += Math.random().toString(36).substr(2) while id.length < length
+      id.substr 0, length
+
+  ])
+angular.module('wordlift.tinymce.plugin.services.TextAnnotationService', [])
+.service('TextAnnotationService', [ 'Helpers', (Helpers)->
+
+    # Create a Text Annotation.
+    create: (params = {}) ->
+
+      # Set the defalut values.
+      defaults =
+        id: 'urn:local-text-annotation-' + Helpers.uniqueId 32
+        text: ''
+        start: 0
+        end: 0
+        confidence: 0.0
+        entityAnnotations: {}
+        _item: null
+
+      # Return the Text Annotation structure by merging the defaults with the provided params.
+      Helpers.merge defaults, params
+
+    # Find a text annotation in the provided collection given its start and end parameters.
+    find: (textAnnotations, start, end) ->
+      return textAnnotation for textAnnotationId, textAnnotation of textAnnotations when textAnnotation.start is start and textAnnotation.end is end
+
+  ])
+
+
 angular.module('wordlift.tinymce.plugin.services', [
     'wordlift.tinymce.plugin.config'
     'wordlift.tinymce.plugin.services.EditorService'
+    'wordlift.tinymce.plugin.services.EntityAnnotationService'
+    'wordlift.tinymce.plugin.services.TextAnnotationService'
+    'wordlift.tinymce.plugin.services.Helpers'
     'AnalysisService'
   ])
 
@@ -957,70 +1013,69 @@ angular.module('wordlift.tinymce.plugin.controllers',
 
       filtered
   )
-.controller('EntitiesController', ['EditorService', '$log', '$scope', 'Configuration',
-    (EditorService, $log, $scope, Configuration) ->
+.controller('EntitiesController', ['EditorService', '$log', '$scope', (EditorService, $log, $scope) ->
 
-      # holds a reference to the current analysis results.
-      $scope.analysis = null
+    # holds a reference to the current analysis results.
+    $scope.analysis = null
 
-      # holds a reference to the selected text annotation.
-      $scope.textAnnotation = null
-      # holds a reference to the selected text annotation span.
-      $scope.textAnnotationSpan = null
+    # holds a reference to the selected text annotation.
+    $scope.textAnnotation = null
+    # holds a reference to the selected text annotation span.
+    $scope.textAnnotationSpan = null
 
-      $scope.sortByConfidence = (entity) ->
-        entity[Configuration.entityLabels.confidence]
+    #      $scope.sortByConfidence = (entity) ->
+    #        entity[Configuration.entityLabels.confidence]
 
-      $scope.getLabelFor = (label) ->
-        Configuration.entityLabels[label]
+    #      $scope.getLabelFor = (label) ->
+    #        Configuration.entityLabels[label]
 
-      setArrowTop = (top) ->
-        $('head').append('<style>#wordlift-disambiguation-popover .postbox:before,#wordlift-disambiguation-popover .postbox:after{top:' + top + 'px;}</style>');
+    setArrowTop = (top) ->
+      $('head').append('<style>#wordlift-disambiguation-popover .postbox:before,#wordlift-disambiguation-popover .postbox:after{top:' + top + 'px;}</style>');
 
-      # a reference to the current text annotation span in the editor.
-      el = undefined
-      scroll = ->
-        return if not el?
+    # a reference to the current text annotation span in the editor.
+    el = undefined
+    scroll = ->
+      return if not el?
+      # get the position of the clicked element.
+      pos = EditorService.getWinPos(el)
+      # set the popover arrow to the element position.
+      setArrowTop(pos.top - 50)
+
+    # TODO: move these hooks on the popover, in order to hook/unhook the events.
+    $(window).scroll(scroll)
+    $('#content_ifr').contents().scroll(scroll)
+
+    $scope.onEntitySelected = (textAnnotation, entityAnnotation) ->
+      $scope.$emit 'selectEntity', ta: textAnnotation, ea: entityAnnotation
+      # Add the selected entity to the entity storage
+      window.wordlift.entities[entityAnnotation.entity.id] = entityAnnotation.entity
+
+    # Receive the analysis results and store them in the local scope.
+    $scope.$on 'analysisReceived', (event, analysis) ->
+      $scope.analysis = analysis
+
+    # When a text annotation is clicked, open the disambiguation popover.
+    $scope.$on 'textAnnotationClicked', (event, id, sourceElement) ->
+
+      # Get the text annotation with the provided id.
+#      $scope.textAnnotationSpan = angular.element sourceElement.target
+
+      # Set the current text annotation to the one specified.
+      $scope.textAnnotation = $scope.analysis.textAnnotations[id]
+
+      # hide the popover if there are no entities.
+      if not $scope.textAnnotation?.entityAnnotations? or 0 is Object.keys($scope.textAnnotation.entityAnnotations).length
+        $('#wordlift-disambiguation-popover').hide()
+        # show the popover.
+      else
+
         # get the position of the clicked element.
-        pos = EditorService.getWinPos(el)
+        pos = EditorService.getWinPos(sourceElement)
         # set the popover arrow to the element position.
         setArrowTop(pos.top - 50)
 
-      # TODO: move these hooks on the popover, in order to hook/unhook the events.
-      $(window).scroll(scroll)
-      $('#content_ifr').contents().scroll(scroll)
-
-      $scope.onEntitySelected = (textAnnotation, entityAnnotation) ->
-        $scope.$emit 'selectEntity', ta: textAnnotation, ea: entityAnnotation
-        # Add the selected entity to the entity storage
-        window.wordlift.entities[entityAnnotation.entity.id] = entityAnnotation.entity
-
-      # Receive the analysis results and store them in the local scope.
-      $scope.$on 'analysisReceived', (event, analysis) ->
-        $scope.analysis = analysis
-
-      # When a text annotation is clicked, open the disambiguation popover.
-      $scope.$on 'textAnnotationClicked', (event, id, sourceElement) ->
-
-        # Get the text annotation with the provided id.
-        $scope.textAnnotationSpan = angular.element sourceElement.target
-
-        # Set the current text annotation to the one specified.
-        $scope.textAnnotation = $scope.analysis.textAnnotations[id]
-
-        # hide the popover if there are no entities.
-        if not $scope.textAnnotation?.entityAnnotations? or 0 is Object.keys($scope.textAnnotation.entityAnnotations).length
-          $('#wordlift-disambiguation-popover').hide()
-          # show the popover.
-        else
-
-          # get the position of the clicked element.
-          pos = EditorService.getWinPos(sourceElement)
-          # set the popover arrow to the element position.
-          setArrowTop(pos.top - 50)
-
-          # show the popover.
-          $('#wordlift-disambiguation-popover').show()
+        # show the popover.
+        $('#wordlift-disambiguation-popover').show()
 
   ])
 .controller('ErrorController', ['$element', '$scope', '$log', ($element, $scope, $log) ->

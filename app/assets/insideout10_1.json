@@ -1,0 +1,964 @@
+{
+    "@context": {
+        "author": {
+            "@id": "http://schema.org/author",
+            "@type": "@id"
+        },
+        "BlogPosting": "http://schema.org/BlogPosting",
+        "comment": "http://www.w3.org/2000/01/rdf-schema#comment",
+        "confidence": {
+            "@id": "http://fise.iks-project.eu/ontology/confidence",
+            "@type": "http://www.w3.org/2001/XMLSchema#double"
+        },
+        "contributor": "http://purl.org/dc/terms/contributor",
+        "created": {
+            "@id": "http://purl.org/dc/terms/created",
+            "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+        },
+        "CreativeWork": "http://schema.org/CreativeWork",
+        "creator": {
+            "@id": "http://purl.org/dc/terms/creator",
+            "@type": "http://www.w3.org/2001/XMLSchema#string"
+        },
+        "dateModified": {
+            "@id": "http://schema.org/dateModified",
+            "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+        },
+        "datePublished": {
+            "@id": "http://schema.org/datePublished",
+            "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+        },
+        "depiction": {
+            "@id": "http://xmlns.com/foaf/0.1/depiction",
+            "@type": "@id"
+        },
+        "end": {
+            "@id": "http://fise.iks-project.eu/ontology/end",
+            "@type": "http://www.w3.org/2001/XMLSchema#int"
+        },
+        "Enhancement": "http://fise.iks-project.eu/ontology/Enhancement",
+        "entity-label": "http://fise.iks-project.eu/ontology/entity-label",
+        "entity-reference": {
+            "@id": "http://fise.iks-project.eu/ontology/entity-reference",
+            "@type": "@id"
+        },
+        "entity-type": {
+            "@id": "http://fise.iks-project.eu/ontology/entity-type",
+            "@type": "@id"
+        },
+        "EntityAnnotation": "http://fise.iks-project.eu/ontology/EntityAnnotation",
+        "extracted-from": {
+            "@id": "http://fise.iks-project.eu/ontology/extracted-from",
+            "@type": "@id"
+        },
+        "http://rdf.freebase.com/ns/common.topic.image": {
+            "@type": "@id"
+        },
+        "http://rdf.freebase.com/ns/common.topic.notable_for": {
+            "@type": "@id"
+        },
+        "http://rdf.freebase.com/ns/common.topic.notable_types": {
+            "@type": "@id"
+        },
+        "http://rdf.freebase.com/ns/common.topic.official_website": {
+            "@type": "@id"
+        },
+        "http://rdf.freebase.com/ns/organization.organization.date_founded": {
+            "@type": "http://www.w3.org/2001/XMLSchema#date"
+        },
+        "http://rdf.freebase.com/ns/people.person.date_of_birth": {
+            "@type": "http://www.w3.org/2001/XMLSchema#date"
+        },
+        "http://rdf.freebase.com/ns/people.person.gender": {
+            "@type": "@id"
+        },
+        "http://rdf.freebase.com/ns/people.person.nationality": {
+            "@type": "@id"
+        },
+        "http://rdf.freebase.com/ns/people.person.place_of_birth": {
+            "@type": "@id"
+        },
+        "http://rdf.freebase.com/ns/people.person.profession": {
+            "@type": "@id"
+        },
+        "interactionCount": "http://schema.org/interactionCount",
+        "label": "http://www.w3.org/2000/01/rdf-schema#label",
+        "language": "http://purl.org/dc/terms/language",
+        "lat": {
+            "@id": "http://www.w3.org/2003/01/geo/wgs84_pos#lat",
+            "@type": "http://www.w3.org/2001/XMLSchema#float"
+        },
+        "LinguisticSystem": "http://purl.org/dc/terms/LinguisticSystem",
+        "long": {
+            "@id": "http://www.w3.org/2003/01/geo/wgs84_pos#long",
+            "@type": "http://www.w3.org/2001/XMLSchema#float"
+        },
+        "Organisation": "http://dbpedia.org/ontology/Organisation",
+        "Person": "http://dbpedia.org/ontology/Person",
+        "Place": "http://dbpedia.org/ontology/Place",
+        "references": {
+            "@id": "http://purl.org/dc/terms/references",
+            "@type": "@id"
+        },
+        "relation": {
+            "@id": "http://purl.org/dc/terms/relation",
+            "@type": "@id"
+        },
+        "sameAs": {
+            "@id": "http://www.w3.org/2002/07/owl#sameAs",
+            "@type": "@id"
+        },
+        "selected-text": "http://fise.iks-project.eu/ontology/selected-text",
+        "selection-context": "http://fise.iks-project.eu/ontology/selection-context",
+        "selection-prefix": "http://fise.iks-project.eu/ontology/selection-prefix",
+        "selection-suffix": "http://fise.iks-project.eu/ontology/selection-suffix",
+        "Software": "http://dbpedia.org/ontology/Software",
+        "start": {
+            "@id": "http://fise.iks-project.eu/ontology/start",
+            "@type": "http://www.w3.org/2001/XMLSchema#int"
+        },
+        "subject": {
+            "@id": "http://purl.org/dc/terms/subject",
+            "@type": "@id"
+        },
+        "TextAnnotation": "http://fise.iks-project.eu/ontology/TextAnnotation",
+        "Thing": "http://www.w3.org/2002/07/owl#Thing",
+        "thumbnail": {
+            "@id": "http://dbpedia.org/ontology/thumbnail",
+            "@type": "@id"
+        },
+        "type": {
+            "@id": "http://purl.org/dc/terms/type",
+            "@type": "@id"
+        },
+        "url": {
+            "@id": "http://schema.org/url",
+            "@type": "@id"
+        },
+        "Work": "http://dbpedia.org/ontology/Work",
+        "xsd": "http://www.w3.org/2001/XMLSchema#"
+    },
+    "@graph": [
+        {
+            "@id": "http://data.redlink.io/353/wordlift/post/My_name_is_Andrea_Volpini_and_I_am_here_with_David_Riccitelli_",
+            "@type": "BlogPosting",
+            "author": "http://data.redlink.io/353/wordlift/user/1",
+            "dateModified": "2014-03-31T09:55:16Z",
+            "datePublished": "2014-03-28T15:57:28Z",
+            "interactionCount": "UserComments:0",
+            "label": {
+                "@language": "en",
+                "@value": "InsideOut10"
+            },
+            "references": [
+                "http://data.redlink.io/",
+                "http://data.redlink.io/353/wordlift/entity/Andrea_Volpini",
+                "http://data.redlink.io/353/wordlift/entity/Central_Archives_of_the_State_(Italy)",
+                "http://data.redlink.io/353/wordlift/entity/David_Riccitelli",
+                "http://data.redlink.io/353/wordlift/entity/WordPress"
+            ],
+            "url": "http://wordpress380.localhost/who-is-insideout10/"
+        },
+        {
+            "@id": "http://dbpedia.org/resource/Central_Archives_of_the_State_(Italy)",
+            "@type": [
+                "http://dbpedia.org/class/yago/Archive102735086",
+                "http://dbpedia.org/class/yago/Artifact100021939",
+                "http://dbpedia.org/class/yago/Depository103177349",
+                "http://dbpedia.org/class/yago/Facility103315023",
+                "http://dbpedia.org/class/yago/NationalArchives",
+                "http://dbpedia.org/class/yago/Object100002684",
+                "http://dbpedia.org/class/yago/PhysicalEntity100001930",
+                "http://dbpedia.org/class/yago/Whole100003553",
+                "http://dbpedia.org/class/yago/YagoGeoEntity",
+                "http://dbpedia.org/class/yago/YagoPermanentlyLocatedEntity",
+                "http://www.opengis.net/gml/_Feature"
+            ],
+            "comment": {
+                "@language": "en",
+                "@value": "The Central Archives of the State are the main national archives of Italy. They were created in 1875 under the name of Royal Archives. They took their present name in 1953. They are located in Rome and are put under the responsibility of the Ministry of Culture. However, each of the 103 Italian provinces has its own state archive, keeping the public documents created in that territory and, mainly, the state archives of the Italian historical states."
+            },
+            "label": {
+                "@language": "en",
+                "@value": "Central Archives of the State (Italy)"
+            },
+            "lat": 41.82861,
+            "long": 12.476666,
+            "sameAs": [
+                "http://rdf.freebase.com/ns/m.04jk__q",
+                "http://yago-knowledge.org/resource/Central_Archives_of_the_State_(Italy)"
+            ],
+            "subject": [
+                "http://dbpedia.org/resource/Category:1875_establishments_in_Italy",
+                "http://dbpedia.org/resource/Category:Italian_culture",
+                "http://dbpedia.org/resource/Category:National_archives",
+                "http://dbpedia.org/resource/Category:Organizations_established_in_1871"
+            ]
+        },
+        {
+            "@id": "http://dbpedia.org/resource/Linked_data",
+            "@type": [
+                "http://dbpedia.org/class/yago/Abstraction100002137",
+                "http://dbpedia.org/class/yago/CloudStandards",
+                "http://dbpedia.org/class/yago/Measure100033615",
+                "http://dbpedia.org/class/yago/Standard107260623",
+                "http://dbpedia.org/class/yago/SystemOfMeasurement113577171"
+            ],
+            "comment": {
+                "@language": "en",
+                "@value": "In computing, linked data describes a method of publishing structured data so that it can be interlinked and become more useful. It builds upon standard Web technologies such as HTTP and URIs, but rather than using them to serve web pages for human readers, it extends them to share information in a way that can be read automatically by computers. This enables data from different sources to be connected and queried."
+            },
+            "label": {
+                "@language": "en",
+                "@value": "Linked data"
+            },
+            "sameAs": [
+                "http://rdf.freebase.com/ns/m.02r2kb1",
+                "http://yago-knowledge.org/resource/Linked_data"
+            ],
+            "subject": [
+                "http://dbpedia.org/resource/Category:Cloud_standards",
+                "http://dbpedia.org/resource/Category:Computing_terminology",
+                "http://dbpedia.org/resource/Category:Data_management",
+                "http://dbpedia.org/resource/Category:Distributed_computing_architecture",
+                "http://dbpedia.org/resource/Category:Hypermedia",
+                "http://dbpedia.org/resource/Category:Internet",
+                "http://dbpedia.org/resource/Category:Internet_terminology",
+                "http://dbpedia.org/resource/Category:Knowledge_representation",
+                "http://dbpedia.org/resource/Category:Semantic_Web",
+                "http://dbpedia.org/resource/Category:World_Wide_Web"
+            ]
+        },
+        {
+            "@id": "http://dbpedia.org/resource/WordPress",
+            "@type": [
+                "CreativeWork",
+                "Software",
+                "Thing",
+                "Work",
+                "http://dbpedia.org/class/yago/Article100022903",
+                "http://dbpedia.org/class/yago/Artifact100021939",
+                "http://dbpedia.org/class/yago/ContentManagementSystems",
+                "http://dbpedia.org/class/yago/Cutlery103153375",
+                "http://dbpedia.org/class/yago/Fork103383948",
+                "http://dbpedia.org/class/yago/FreeContentManagementSystems",
+                "http://dbpedia.org/class/yago/Instrumentality103575240",
+                "http://dbpedia.org/class/yago/Object100002684",
+                "http://dbpedia.org/class/yago/PhysicalEntity100001930",
+                "http://dbpedia.org/class/yago/SoftwareForks",
+                "http://dbpedia.org/class/yago/System104377057",
+                "http://dbpedia.org/class/yago/Tableware104381994",
+                "http://dbpedia.org/class/yago/Ware104550840",
+                "http://dbpedia.org/class/yago/Whole100003553"
+            ],
+            "comment": {
+                "@language": "en",
+                "@value": "WordPress is a free and open source blogging tool and a content management system (CMS) based on PHP and MySQL. It has many features including a plug-in architecture and a template system. WordPress is used by over 14.7% of Alexa Internet's \"top 1 million\" websites and as of August 2011 manages 22% of all new websites. WordPress is currently the most popular blogging system in use on the Web, powering over 60 million websites worldwide."
+            },
+            "depiction": "http://upload.wikimedia.org/wikipedia/commons/2/20/WordPress_logo.svg",
+            "label": {
+                "@language": "en",
+                "@value": "WordPress"
+            },
+            "sameAs": [
+                "http://rdf.freebase.com/ns/m.02vtpl",
+                "http://yago-knowledge.org/resource/WordPress"
+            ],
+            "subject": [
+                "http://dbpedia.org/resource/Category:2003_software",
+                "http://dbpedia.org/resource/Category:Blog_software",
+                "http://dbpedia.org/resource/Category:Blogs",
+                "http://dbpedia.org/resource/Category:Computer_science",
+                "http://dbpedia.org/resource/Category:Content_management_systems",
+                "http://dbpedia.org/resource/Category:Free_content_management_systems",
+                "http://dbpedia.org/resource/Category:Free_software",
+                "http://dbpedia.org/resource/Category:Free_software_programmed_in_PHP",
+                "http://dbpedia.org/resource/Category:Internet",
+                "http://dbpedia.org/resource/Category:Internet_suites",
+                "http://dbpedia.org/resource/Category:Linux_software",
+                "http://dbpedia.org/resource/Category:PHP",
+                "http://dbpedia.org/resource/Category:PHP_programming_language",
+                "http://dbpedia.org/resource/Category:Software",
+                "http://dbpedia.org/resource/Category:Software_forks",
+                "http://dbpedia.org/resource/Category:Template_engines",
+                "http://dbpedia.org/resource/Category:Web_2.0",
+                "http://dbpedia.org/resource/Category:Web_applications",
+                "http://dbpedia.org/resource/Category:Web_development",
+                "http://dbpedia.org/resource/Category:Web_development_software",
+                "http://dbpedia.org/resource/Category:Web_services",
+                "http://dbpedia.org/resource/Category:Website_management",
+                "http://dbpedia.org/resource/Category:WordPress",
+                "http://dbpedia.org/resource/Category:World_Wide_Web"
+            ],
+            "thumbnail": "http://upload.wikimedia.org/wikipedia/commons/thumb/2/20/WordPress_logo.svg/200px-WordPress_logo.svg.png"
+        },
+        {
+            "@id": "http://rdf.freebase.com/ns/m.02vtpl",
+            "@type": [
+                "http://rdf.freebase.com/ns/base.services.topic",
+                "http://rdf.freebase.com/ns/base.services.web_applications",
+                "http://rdf.freebase.com/ns/base.services.web_development_platform",
+                "http://rdf.freebase.com/ns/common.topic",
+                "http://rdf.freebase.com/ns/computer.software",
+                "http://rdf.freebase.com/ns/freebase.task",
+                "http://rdf.freebase.com/ns/internet.api"
+            ],
+            "http://rdf.freebase.com/ns/common.topic.description": {
+                "@language": "en",
+                "@value": "WordPress is a free and open source blogging tool and a content-management system based on PHP and MySQL, which runs on a web hosting service. Features include a plug-in architecture and a template system. WordPress is used by more than 18.9% of the top 10 million websites as of August 2013. WordPress is the most popular blogging system in use on the Web, at more than 60 million websites.\r\nIt was first released on May 27, 2003, by its founders, Matt Mullenweg and Mike Little, as a fork of b2/cafelog. As of September 2013, version 3.6 had been downloaded more than 6 million times."
+            },
+            "http://rdf.freebase.com/ns/common.topic.notable_for": "http://rdf.freebase.com/ns/g.1258246cd",
+            "http://rdf.freebase.com/ns/common.topic.notable_types": "http://rdf.freebase.com/ns/m.01xrvrv",
+            "http://rdf.freebase.com/ns/common.topic.official_website": "http://www.wordpress.org/",
+            "label": {
+                "@language": "en",
+                "@value": "WordPress"
+            }
+        },
+        {
+            "@id": "http://rdf.freebase.com/ns/m.04jk__q",
+            "@type": [
+                "http://rdf.freebase.com/ns/common.topic",
+                "http://rdf.freebase.com/ns/government.government_agency",
+                "http://rdf.freebase.com/ns/organization.organization"
+            ],
+            "http://rdf.freebase.com/ns/common.topic.description": {
+                "@language": "en",
+                "@value": "The Central Archives of the State are the main national archives of Italy. They were created in 1875 under the name of Royal Archives. They took their present name in 1953. They are located in Rome and are put under the responsibility of the Ministry of Culture.\r\nHowever, each of the 103 Italian provinces has its own State Archive, keeping the public documents created in that territory and, mainly, the state archives of the Italian historical states."
+            },
+            "http://rdf.freebase.com/ns/common.topic.notable_for": "http://rdf.freebase.com/ns/g.1259lv6q5",
+            "http://rdf.freebase.com/ns/common.topic.notable_types": "http://rdf.freebase.com/ns/m.02hr9mp",
+            "label": {
+                "@language": "en",
+                "@value": "Central Archives of the State"
+            }
+        },
+        {
+            "@id": "http://rdf.freebase.com/ns/m.0j2h5nt",
+            "@type": [
+                "http://rdf.freebase.com/ns/base.linkedinbase.topic",
+                "http://rdf.freebase.com/ns/common.topic",
+                "http://rdf.freebase.com/ns/internet.social_network_user",
+                "http://rdf.freebase.com/ns/organization.organization_founder",
+                "http://rdf.freebase.com/ns/organization.organization_member",
+                "http://rdf.freebase.com/ns/people.person",
+                "http://rdf.freebase.com/ns/user.ngerakines.social_software.twitter_user"
+            ],
+            "http://rdf.freebase.com/ns/common.topic.alias": {
+                "@language": "en",
+                "@value": "ziodave"
+            },
+            "http://rdf.freebase.com/ns/common.topic.description": {
+                "@language": "en",
+                "@value": "David Riccitelli is co-founder of InSideOut10, with now almost 20 years of experience since he started his own BBS in the early nineties, deeply fascinated by the concept of emergent superorganism (Kevin Kelly), always active in bringing the human being at the core of his creations, he's managed and delivered a wide range of cross-media projects, from Content and Digital Asset Management, Online Media to Open Government solutions in Europe and North Africa. David is an Internet pioneer and technology enthusiast, in 2006 he was Italy's first Twitter, which few years later became one of the largest social media on the Planet. David started his first Internet start up (Flux IM) in 1996, later acquired by Interact SpA where, by defining the technical strategies and managing the company operations he enabled the company success and a tenfold growth. David has now started a new journey as co-founder of InSideOut10 (IO10) to leverage on the Social Mobile Local Revolution (SoLoMo), Semantic Web and Neural Networks."
+            },
+            "http://rdf.freebase.com/ns/common.topic.image": "http://rdf.freebase.com/ns/m.0p7qbkp",
+            "http://rdf.freebase.com/ns/common.topic.notable_for": "http://rdf.freebase.com/ns/g.1258x3dkp",
+            "http://rdf.freebase.com/ns/common.topic.notable_types": "http://rdf.freebase.com/ns/m.02_77lg",
+            "http://rdf.freebase.com/ns/people.person.date_of_birth": "1978-01-27",
+            "http://rdf.freebase.com/ns/people.person.gender": "http://rdf.freebase.com/ns/m.05zppz",
+            "http://rdf.freebase.com/ns/people.person.nationality": "http://rdf.freebase.com/ns/m.03rjj",
+            "http://rdf.freebase.com/ns/people.person.place_of_birth": "http://rdf.freebase.com/ns/m.06c62",
+            "http://rdf.freebase.com/ns/people.person.profession": "http://rdf.freebase.com/ns/m.02q54yj",
+            "label": {
+                "@language": "en",
+                "@value": "David Riccitelli"
+            }
+        },
+        {
+            "@id": "http://rdf.freebase.com/ns/m.0kybkd_",
+            "@type": [
+                "http://rdf.freebase.com/ns/business.employer",
+                "http://rdf.freebase.com/ns/common.topic",
+                "http://rdf.freebase.com/ns/organization.membership_organization",
+                "http://rdf.freebase.com/ns/organization.organization",
+                "http://rdf.freebase.com/ns/organization.organization_founder"
+            ],
+            "http://rdf.freebase.com/ns/common.topic.description": {
+                "@language": "en",
+                "@value": "At InsideOut10, we believe that the open exchange of ideas have a positive global impact. Every day we are inspired by stories of people using technologies to help make the world a better place in unexpected ways. \r\n\r\nWe want to be part of this community and share our enthusiasm and passion for a smarter planet. \r\n\r\nInsideOut10 is an incubator and it is currently main shareholder of Interact Egypt L.L.C. an Egyptian startup powering the Internet revolution in Middle East and Africa and co-founder of Redlink GmbH a commercial spin-off based in Austria and focused on Semantic Technologies and Free Open Source Software."
+            },
+            "http://rdf.freebase.com/ns/common.topic.image": [
+                "http://rdf.freebase.com/ns/m.0kybkyc",
+                "http://rdf.freebase.com/ns/m.0kybl3w",
+                "http://rdf.freebase.com/ns/m.0kyblb5",
+                "http://rdf.freebase.com/ns/m.0kyblkj"
+            ],
+            "http://rdf.freebase.com/ns/common.topic.notable_for": "http://rdf.freebase.com/ns/g.126sz3p77",
+            "http://rdf.freebase.com/ns/common.topic.notable_types": "http://rdf.freebase.com/ns/m.02_77lg",
+            "http://rdf.freebase.com/ns/common.topic.official_website": "http://www.insideout.io",
+            "http://rdf.freebase.com/ns/organization.organization.date_founded": "2011-03-29",
+            "label": {
+                "@language": "en",
+                "@value": "InSideOut10"
+            }
+        },
+        {
+            "@id": "urn:enhancement-1be291de-bc37-1af9-ab65-d93aa88f3d67",
+            "@type": [
+                "Enhancement",
+                "EntityAnnotation"
+            ],
+            "confidence": 1.0,
+            "created": "2014-03-31T11:22:03.456Z",
+            "creator": "org.apache.stanbol.enhancer.engines.lucenefstlinking.FstLinkingEngine",
+            "entity-label": {
+                "@language": "en",
+                "@value": "David Riccitelli"
+            },
+            "entity-reference": "http://rdf.freebase.com/ns/m.0j2h5nt",
+            "entity-type": [
+                "http://rdf.freebase.com/ns/base.linkedinbase.topic",
+                "http://rdf.freebase.com/ns/common.topic",
+                "http://rdf.freebase.com/ns/internet.social_network_user",
+                "http://rdf.freebase.com/ns/organization.organization_founder",
+                "http://rdf.freebase.com/ns/organization.organization_member",
+                "http://rdf.freebase.com/ns/people.person",
+                "http://rdf.freebase.com/ns/user.ngerakines.social_software.twitter_user"
+            ],
+            "extracted-from": "urn:content-item-sha1-c13d6cf8a59399eb19bbdd706445387b76e6db23",
+            "relation": "urn:enhancement-389db145-d2bd-f74e-16a3-aa884787fb33"
+        },
+        {
+            "@id": "urn:enhancement-20a74eeb-8d9d-581f-b8be-a221d0677970",
+            "@type": [
+                "Enhancement",
+                "TextAnnotation"
+            ],
+            "created": "2014-03-31T11:22:03.411Z",
+            "creator": "org.apache.stanbol.enhancer.engines.restful.nlp.impl.RestfulNlpAnalysisEngine",
+            "end": 30,
+            "extracted-from": "urn:content-item-sha1-c13d6cf8a59399eb19bbdd706445387b76e6db23",
+            "selected-text": {
+                "@language": "en",
+                "@value": "Andrea Volpini"
+            },
+            "selection-context": {
+                "@language": "en",
+                "@value": "My name is&nbsp;Andrea Volpini&nbsp;and I am here with&nbsp;David"
+            },
+            "selection-prefix": {
+                "@language": "en",
+                "@value": "e is&nbsp;"
+            },
+            "selection-suffix": {
+                "@language": "en",
+                "@value": "&nbsp;and "
+            },
+            "start": 16,
+            "type": "Person"
+        },
+        {
+            "@id": "urn:enhancement-2604ebd5-bcea-9bcc-50e2-05d021fb89d2",
+            "@type": [
+                "Enhancement",
+                "EntityAnnotation"
+            ],
+            "confidence": 1.0,
+            "created": "2014-03-31T11:22:03.459Z",
+            "creator": "org.apache.stanbol.enhancer.engines.lucenefstlinking.FstLinkingEngine",
+            "entity-label": {
+                "@language": "en",
+                "@value": "InsideOut10"
+            },
+            "entity-reference": "http://data.redlink.io/353/wordlift/post/My_name_is_Andrea_Volpini_and_I_am_here_with_David_Riccitelli_",
+            "entity-type": "BlogPosting",
+            "extracted-from": "urn:content-item-sha1-c13d6cf8a59399eb19bbdd706445387b76e6db23",
+            "relation": "urn:enhancement-5ac18ab6-1305-085b-ebf3-259f765758af"
+        },
+        {
+            "@id": "urn:enhancement-264264c7-8e77-972e-56a8-534273b35b78",
+            "@type": [
+                "Enhancement",
+                "EntityAnnotation"
+            ],
+            "confidence": 1.0,
+            "created": "2014-03-31T11:22:03.453Z",
+            "creator": "org.apache.stanbol.enhancer.engines.lucenefstlinking.FstLinkingEngine",
+            "entity-label": {
+                "@language": "en",
+                "@value": "WordPress"
+            },
+            "entity-reference": "http://dbpedia.org/resource/WordPress",
+            "entity-type": [
+                "Software",
+                "Work",
+                "CreativeWork",
+                "Thing"
+            ],
+            "extracted-from": "urn:content-item-sha1-c13d6cf8a59399eb19bbdd706445387b76e6db23",
+            "relation": "urn:enhancement-5be52566-4e4e-dce2-aa75-2f340903f546"
+        },
+        {
+            "@id": "urn:enhancement-389db145-d2bd-f74e-16a3-aa884787fb33",
+            "@type": [
+                "Enhancement",
+                "TextAnnotation"
+            ],
+            "contributor": "org.apache.stanbol.enhancer.engines.lucenefstlinking.FstLinkingEngine",
+            "created": "2014-03-31T11:22:03.411Z",
+            "creator": "org.apache.stanbol.enhancer.engines.restful.nlp.impl.RestfulNlpAnalysisEngine",
+            "end": 76,
+            "extracted-from": "urn:content-item-sha1-c13d6cf8a59399eb19bbdd706445387b76e6db23",
+            "selected-text": {
+                "@language": "en",
+                "@value": "David Riccitelli"
+            },
+            "selection-context": {
+                "@language": "en",
+                "@value": " Volpini&nbsp;and I am here with&nbsp;David Riccitelli.\n\nWe are the co-founders"
+            },
+            "selection-prefix": {
+                "@language": "en",
+                "@value": "with&nbsp;"
+            },
+            "selection-suffix": {
+                "@language": "en",
+                "@value": ".\n\nWe are "
+            },
+            "start": 60,
+            "type": "Person"
+        },
+        {
+            "@id": "urn:enhancement-3d0ea09c-f061-b675-26aa-d65cc1abf4a9",
+            "@type": [
+                "Enhancement",
+                "EntityAnnotation"
+            ],
+            "confidence": 1.0,
+            "created": "2014-03-31T11:22:03.456Z",
+            "creator": "org.apache.stanbol.enhancer.engines.lucenefstlinking.FstLinkingEngine",
+            "entity-label": {
+                "@language": "en",
+                "@value": "Central Archives of the State"
+            },
+            "entity-reference": "http://rdf.freebase.com/ns/m.04jk__q",
+            "entity-type": [
+                "http://rdf.freebase.com/ns/common.topic",
+                "http://rdf.freebase.com/ns/government.government_agency",
+                "http://rdf.freebase.com/ns/organization.organization"
+            ],
+            "extracted-from": "urn:content-item-sha1-c13d6cf8a59399eb19bbdd706445387b76e6db23",
+            "relation": "urn:enhancement-41e87dd5-62c3-6622-1323-0396a2337991"
+        },
+        {
+            "@id": "urn:enhancement-41e87dd5-62c3-6622-1323-0396a2337991",
+            "@type": [
+                "Enhancement",
+                "TextAnnotation"
+            ],
+            "confidence": 1.0,
+            "contributor": "org.apache.stanbol.enhancer.engines.lucenefstlinking.FstLinkingEngine",
+            "created": "2014-03-31T11:22:03.453Z",
+            "creator": "org.apache.stanbol.enhancer.engines.lucenefstlinking.FstLinkingEngine",
+            "end": 220,
+            "extracted-from": "urn:content-item-sha1-c13d6cf8a59399eb19bbdd706445387b76e6db23",
+            "selected-text": {
+                "@language": "en",
+                "@value": "Central Archives of the State"
+            },
+            "selection-context": {
+                "@language": "en",
+                "@value": " and we’re happy to present today at the&nbsp;Central Archives of the State&nbsp;in&nbsp;Rome&nbsp;for the&nbsp;Linked Open"
+            },
+            "selection-prefix": {
+                "@language": "en",
+                "@value": " the&nbsp;"
+            },
+            "selection-suffix": {
+                "@language": "en",
+                "@value": "&nbsp;in&n"
+            },
+            "start": 191,
+            "type": [
+                "Organisation",
+                "Place"
+            ]
+        },
+        {
+            "@id": "urn:enhancement-47b4adc8-7c42-424b-664a-ce85e09aff4c",
+            "@type": [
+                "Enhancement",
+                "EntityAnnotation"
+            ],
+            "confidence": 1.0,
+            "created": "2014-03-31T11:22:03.456Z",
+            "creator": "org.apache.stanbol.enhancer.engines.lucenefstlinking.FstLinkingEngine",
+            "entity-label": {
+                "@language": "en",
+                "@value": "WordPress"
+            },
+            "entity-reference": "http://rdf.freebase.com/ns/m.02vtpl",
+            "entity-type": [
+                "http://rdf.freebase.com/ns/base.services.topic",
+                "http://rdf.freebase.com/ns/base.services.web_applications",
+                "http://rdf.freebase.com/ns/base.services.web_development_platform",
+                "http://rdf.freebase.com/ns/common.topic",
+                "http://rdf.freebase.com/ns/computer.software",
+                "http://rdf.freebase.com/ns/freebase.task",
+                "http://rdf.freebase.com/ns/internet.api"
+            ],
+            "extracted-from": "urn:content-item-sha1-c13d6cf8a59399eb19bbdd706445387b76e6db23",
+            "relation": "urn:enhancement-5be52566-4e4e-dce2-aa75-2f340903f546"
+        },
+        {
+            "@id": "urn:enhancement-5ac18ab6-1305-085b-ebf3-259f765758af",
+            "@type": [
+                "Enhancement",
+                "TextAnnotation"
+            ],
+            "confidence": 0.8181818,
+            "contributor": "org.apache.stanbol.enhancer.engines.lucenefstlinking.FstLinkingEngine",
+            "created": "2014-03-31T11:22:03.456Z",
+            "creator": "org.apache.stanbol.enhancer.engines.lucenefstlinking.FstLinkingEngine",
+            "end": 121,
+            "extracted-from": "urn:content-item-sha1-c13d6cf8a59399eb19bbdd706445387b76e6db23",
+            "selected-text": {
+                "@language": "en",
+                "@value": "Insideout10"
+            },
+            "selection-context": {
+                "@language": "en",
+                "@value": " Riccitelli.\n\nWe are the co-founders of&nbsp;Insideout10&nbsp;an Italian Startup and we’re happy to"
+            },
+            "selection-prefix": {
+                "@language": "en",
+                "@value": "s of&nbsp;"
+            },
+            "selection-suffix": {
+                "@language": "en",
+                "@value": "&nbsp;an I"
+            },
+            "start": 110,
+            "type": "Organisation"
+        },
+        {
+            "@id": "urn:enhancement-5be52566-4e4e-dce2-aa75-2f340903f546",
+            "@type": [
+                "Enhancement",
+                "TextAnnotation"
+            ],
+            "confidence": 1.0,
+            "contributor": "org.apache.stanbol.enhancer.engines.lucenefstlinking.FstLinkingEngine",
+            "created": "2014-03-31T11:22:03.453Z",
+            "creator": "org.apache.stanbol.enhancer.engines.lucenefstlinking.FstLinkingEngine",
+            "end": 324,
+            "extracted-from": "urn:content-item-sha1-c13d6cf8a59399eb19bbdd706445387b76e6db23",
+            "selected-text": {
+                "@language": "en",
+                "@value": "WordPress"
+            },
+            "selection-context": {
+                "@language": "en",
+                "@value": " Data&nbsp;Event.\n\nWordLift is plugin for&nbsp;WordPress&nbsp;demonstrating how&nbsp;Semantic"
+            },
+            "selection-prefix": {
+                "@language": "en",
+                "@value": " for&nbsp;"
+            },
+            "selection-suffix": {
+                "@language": "en",
+                "@value": "&nbsp;demo"
+            },
+            "start": 315,
+            "type": "Work"
+        },
+        {
+            "@id": "urn:enhancement-6af2ef5b-65e4-d38d-7178-195a5463fa90",
+            "@type": [
+                "Enhancement",
+                "TextAnnotation"
+            ],
+            "created": "2014-03-31T11:22:03.411Z",
+            "creator": "org.apache.stanbol.enhancer.engines.restful.nlp.impl.RestfulNlpAnalysisEngine",
+            "end": 284,
+            "extracted-from": "urn:content-item-sha1-c13d6cf8a59399eb19bbdd706445387b76e6db23",
+            "selected-text": {
+                "@language": "en",
+                "@value": "Linked Open Data&nbsp;Event"
+            },
+            "selection-context": {
+                "@language": "en",
+                "@value": " of the State&nbsp;in&nbsp;Rome&nbsp;for the&nbsp;Linked Open Data&nbsp;Event.\n\nWordLift is plugin"
+            },
+            "selection-prefix": {
+                "@language": "en",
+                "@value": " the&nbsp;"
+            },
+            "selection-suffix": {
+                "@language": "en",
+                "@value": ".\n\nWordLif"
+            },
+            "start": 257
+        },
+        {
+            "@id": "urn:enhancement-82c059a1-ff15-fae9-4033-ecab507741ed",
+            "@type": [
+                "Enhancement",
+                "EntityAnnotation"
+            ],
+            "confidence": 0.8181818,
+            "created": "2014-03-31T11:22:03.456Z",
+            "creator": "org.apache.stanbol.enhancer.engines.lucenefstlinking.FstLinkingEngine",
+            "entity-label": {
+                "@language": "en",
+                "@value": "InSideOut10"
+            },
+            "entity-reference": "http://rdf.freebase.com/ns/m.0kybkd_",
+            "entity-type": [
+                "http://rdf.freebase.com/ns/business.employer",
+                "http://rdf.freebase.com/ns/common.topic",
+                "http://rdf.freebase.com/ns/organization.membership_organization",
+                "http://rdf.freebase.com/ns/organization.organization",
+                "http://rdf.freebase.com/ns/organization.organization_founder"
+            ],
+            "extracted-from": "urn:content-item-sha1-c13d6cf8a59399eb19bbdd706445387b76e6db23",
+            "relation": "urn:enhancement-5ac18ab6-1305-085b-ebf3-259f765758af"
+        },
+        {
+            "@id": "urn:enhancement-86a027fb-2bd2-c8fe-67c1-3d3eca8cbf0a",
+            "@type": [
+                "Enhancement",
+                "EntityAnnotation"
+            ],
+            "confidence": 1.0,
+            "created": "2014-03-31T11:22:03.453Z",
+            "creator": "org.apache.stanbol.enhancer.engines.lucenefstlinking.FstLinkingEngine",
+            "entity-label": {
+                "@language": "en",
+                "@value": "Central Archives of the State"
+            },
+            "entity-reference": "http://dbpedia.org/resource/Central_Archives_of_the_State_(Italy)",
+            "entity-type": "http://www.opengis.net/gml/_Feature",
+            "extracted-from": "urn:content-item-sha1-c13d6cf8a59399eb19bbdd706445387b76e6db23",
+            "relation": "urn:enhancement-41e87dd5-62c3-6622-1323-0396a2337991"
+        },
+        {
+            "@id": "urn:enhancement-89b1ec32-7f04-6a20-7d88-a40e111c3acb",
+            "@type": [
+                "Enhancement",
+                "TextAnnotation"
+            ],
+            "created": "2014-03-31T11:22:03.411Z",
+            "creator": "org.apache.stanbol.enhancer.engines.restful.nlp.impl.RestfulNlpAnalysisEngine",
+            "end": 238,
+            "extracted-from": "urn:content-item-sha1-c13d6cf8a59399eb19bbdd706445387b76e6db23",
+            "selected-text": {
+                "@language": "en",
+                "@value": "Rome"
+            },
+            "selection-context": {
+                "@language": "en",
+                "@value": " Archives of the State&nbsp;in&nbsp;Rome&nbsp;for the&nbsp;Linked Open"
+            },
+            "selection-prefix": {
+                "@language": "en",
+                "@value": "p;in&nbsp;"
+            },
+            "selection-suffix": {
+                "@language": "en",
+                "@value": "&nbsp;for "
+            },
+            "start": 234,
+            "type": "Place"
+        },
+        {
+            "@id": "urn:enhancement-aed58729-9e35-411b-ce3a-ea9134e5c3f7",
+            "@type": [
+                "Enhancement",
+                "EntityAnnotation"
+            ],
+            "confidence": 0.34,
+            "created": "2014-03-31T11:22:03.453Z",
+            "creator": "org.apache.stanbol.enhancer.engines.lucenefstlinking.FstLinkingEngine",
+            "entity-label": {
+                "@language": "en",
+                "@value": "Linked Open Data"
+            },
+            "entity-reference": "http://dbpedia.org/resource/Linked_data",
+            "extracted-from": "urn:content-item-sha1-c13d6cf8a59399eb19bbdd706445387b76e6db23",
+            "relation": "urn:enhancement-f64ee78c-d015-36a6-6d1d-7f22f0850148"
+        },
+        {
+            "@id": "urn:enhancement-af52cb4e-0b65-fcff-67c4-2b9a7a191168",
+            "@type": [
+                "Enhancement",
+                "TextAnnotation"
+            ],
+            "created": "2014-03-31T11:22:03.411Z",
+            "creator": "org.apache.stanbol.enhancer.engines.restful.nlp.impl.RestfulNlpAnalysisEngine",
+            "end": 145,
+            "extracted-from": "urn:content-item-sha1-c13d6cf8a59399eb19bbdd706445387b76e6db23",
+            "selected-text": {
+                "@language": "en",
+                "@value": "Italian Startup"
+            },
+            "selection-context": {
+                "@language": "en",
+                "@value": " are the co-founders of&nbsp;Insideout10&nbsp;an Italian Startup and we’re happy to present today at"
+            },
+            "selection-prefix": {
+                "@language": "en",
+                "@value": "0&nbsp;an "
+            },
+            "selection-suffix": {
+                "@language": "en",
+                "@value": " and we’re"
+            },
+            "start": 130
+        },
+        {
+            "@id": "urn:enhancement-c4142d62-283e-8c0c-3391-93c3cdc60ee3",
+            "@type": [
+                "Enhancement",
+                "TextAnnotation"
+            ],
+            "created": "2014-03-31T11:22:03.411Z",
+            "creator": "org.apache.stanbol.enhancer.engines.restful.nlp.impl.RestfulNlpAnalysisEngine",
+            "end": 178,
+            "extracted-from": "urn:content-item-sha1-c13d6cf8a59399eb19bbdd706445387b76e6db23",
+            "selected-text": {
+                "@language": "en",
+                "@value": "present today"
+            },
+            "selection-context": {
+                "@language": "en",
+                "@value": " Italian Startup and we’re happy to present today at the&nbsp;Central Archives of the"
+            },
+            "selection-prefix": {
+                "@language": "en",
+                "@value": " happy to "
+            },
+            "selection-suffix": {
+                "@language": "en",
+                "@value": " at the&nb"
+            },
+            "start": 165,
+            "type": "http://www.w3.org/2006/time#Instant"
+        },
+        {
+            "@id": "urn:enhancement-cabef4cb-bb52-4f91-e78c-c491e4add34d",
+            "@type": [
+                "Enhancement",
+                "EntityAnnotation"
+            ],
+            "confidence": 1.0,
+            "created": "2014-03-31T11:22:03.453Z",
+            "creator": "org.apache.stanbol.enhancer.engines.lucenefstlinking.FstLinkingEngine",
+            "entity-label": {
+                "@language": "en",
+                "@value": "Linked Open Data"
+            },
+            "entity-reference": "http://dbpedia.org/resource/Linked_data",
+            "extracted-from": "urn:content-item-sha1-c13d6cf8a59399eb19bbdd706445387b76e6db23",
+            "relation": "urn:enhancement-dc49ceb8-49e3-f5f2-d4df-4408fe094994"
+        },
+        {
+            "@id": "urn:enhancement-dc49ceb8-49e3-f5f2-d4df-4408fe094994",
+            "@type": [
+                "Enhancement",
+                "TextAnnotation"
+            ],
+            "confidence": 1.0,
+            "created": "2014-03-31T11:22:03.453Z",
+            "creator": "org.apache.stanbol.enhancer.engines.lucenefstlinking.FstLinkingEngine",
+            "end": 273,
+            "extracted-from": "urn:content-item-sha1-c13d6cf8a59399eb19bbdd706445387b76e6db23",
+            "selected-text": {
+                "@language": "en",
+                "@value": "Linked Open Data"
+            },
+            "selection-context": {
+                "@language": "en",
+                "@value": " of the State&nbsp;in&nbsp;Rome&nbsp;for the&nbsp;Linked Open Data&nbsp;Event.\n\nWordLift is plugin"
+            },
+            "selection-prefix": {
+                "@language": "en",
+                "@value": " the&nbsp;"
+            },
+            "selection-suffix": {
+                "@language": "en",
+                "@value": "&nbsp;Even"
+            },
+            "start": 257
+        },
+        {
+            "@id": "urn:enhancement-dfad0653-ebb3-385d-c0b2-25e8888e271c",
+            "@type": [
+                "Enhancement",
+                "TextAnnotation"
+            ],
+            "created": "2014-03-31T11:22:03.411Z",
+            "creator": "org.apache.stanbol.enhancer.engines.restful.nlp.impl.RestfulNlpAnalysisEngine",
+            "end": 365,
+            "extracted-from": "urn:content-item-sha1-c13d6cf8a59399eb19bbdd706445387b76e6db23",
+            "selected-text": {
+                "@language": "en",
+                "@value": "Semantic Web"
+            },
+            "selection-context": {
+                "@language": "en",
+                "@value": " for&nbsp;WordPress&nbsp;demonstrating how&nbsp;Semantic Web&nbsp;technologies and&nbsp;Linked Open Data, can"
+            },
+            "selection-prefix": {
+                "@language": "en",
+                "@value": " how&nbsp;"
+            },
+            "selection-suffix": {
+                "@language": "en",
+                "@value": "&nbsp;tech"
+            },
+            "start": 353
+        },
+        {
+            "@id": "urn:enhancement-e4e02bca-e13a-a0d4-4a62-998c8c28fae9",
+            "@type": [
+                "Enhancement",
+                "TextAnnotation"
+            ],
+            "confidence": 0.9999981,
+            "created": "2014-03-31T11:22:03.309Z",
+            "creator": "org.apache.stanbol.enhancer.engines.langdetect.LanguageDetectionEnhancementEngine",
+            "extracted-from": "urn:content-item-sha1-c13d6cf8a59399eb19bbdd706445387b76e6db23",
+            "language": "en",
+            "type": "LinguisticSystem"
+        },
+        {
+            "@id": "urn:enhancement-f64ee78c-d015-36a6-6d1d-7f22f0850148",
+            "@type": [
+                "Enhancement",
+                "TextAnnotation"
+            ],
+            "confidence": 1.0,
+            "contributor": [
+                "org.apache.stanbol.enhancer.engines.entitycomention.EntityCoMentionEngine",
+                "org.apache.stanbol.enhancer.engines.lucenefstlinking.FstLinkingEngine"
+            ],
+            "created": "2014-03-31T11:22:03.411Z",
+            "creator": "org.apache.stanbol.enhancer.engines.restful.nlp.impl.RestfulNlpAnalysisEngine",
+            "end": 409,
+            "extracted-from": "urn:content-item-sha1-c13d6cf8a59399eb19bbdd706445387b76e6db23",
+            "relation": [
+                "urn:enhancement-6af2ef5b-65e4-d38d-7178-195a5463fa90",
+                "urn:enhancement-dc49ceb8-49e3-f5f2-d4df-4408fe094994"
+            ],
+            "selected-text": {
+                "@language": "en",
+                "@value": "Linked Open Data"
+            },
+            "selection-context": {
+                "@language": "en",
+                "@value": " how&nbsp;Semantic Web&nbsp;technologies and&nbsp;Linked Open Data, can be used in practice to organise your online"
+            },
+            "selection-prefix": {
+                "@language": "en",
+                "@value": " and&nbsp;"
+            },
+            "selection-suffix": {
+                "@language": "en",
+                "@value": ", can be u"
+            },
+            "start": 393
+        }
+    ]
+}

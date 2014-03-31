@@ -101,21 +101,7 @@
 
   window.Traslator = Traslator;
 
-  angular.module('wordlift.tinymce.plugin.config', []).constant('Configuration', {
-    supportedTypes: ['schema:Place', 'schema:Event', 'schema:CreativeWork', 'schema:Product', 'schema:Person', 'schema:Organization'],
-    entityLabels: {
-      'entityLabel': 'enhancer:entity-label',
-      'entityType': 'enhancer:entity-type',
-      'entityReference': 'enhancer:entity-reference',
-      'textAnnotation': 'enhancer:TextAnnotation',
-      'entityAnnotation': 'enhancer:EntityAnnotation',
-      'selectionPrefix': 'enhancer:selection-prefix',
-      'selectionSuffix': 'enhancer:selection-suffix',
-      'selectedText': 'enhancer:selected-text',
-      'confidence': 'enhancer:confidence',
-      'relation': 'dc:relation'
-    }
-  });
+  angular.module('wordlift.tinymce.plugin.config', []);
 
   angular.module('wordlift.tinymce.plugin.directives', ['wordlift.tinymce.plugin.controllers']).directive('wlEntities', function() {
     return {
@@ -160,8 +146,8 @@
   });
 
   angular.module('AnalysisService', []).service('AnalysisService', [
-    '$filter', '$http', '$q', '$rootScope', function($filter, $http, $q, $rootScope) {
-      var ANALYSIS_EVENT, CONTEXT, DBPEDIA, DBPEDIA_ORG, DCTERMS, FISE_ONT, FISE_ONT_CONFIDENCE, FISE_ONT_ENTITY_ANNOTATION, FISE_ONT_TEXT_ANNOTATION, FREEBASE, FREEBASE_COM, FREEBASE_NS, FREEBASE_NS_DESCRIPTION, GRAPH, KNOWN_TYPES, RDFS, RDFS_COMMENT, RDFS_LABEL, SCHEMA_ORG, SCHEMA_ORG_DESCRIPTION, VALUE, WGS84_POS, findOrCreateTextAnnotation, findTextAnnotation, service, _ref;
+    'EntityAnnotationService', 'TextAnnotationService', '$filter', '$http', '$q', '$rootScope', function(EntityAnnotationService, TextAnnotationService, $filter, $http, $q, $rootScope) {
+      var ANALYSIS_EVENT, CONTEXT, DBPEDIA, DBPEDIA_ORG, DCTERMS, FISE_ONT, FISE_ONT_CONFIDENCE, FISE_ONT_ENTITY_ANNOTATION, FISE_ONT_TEXT_ANNOTATION, FREEBASE, FREEBASE_COM, FREEBASE_NS, FREEBASE_NS_DESCRIPTION, GRAPH, KNOWN_TYPES, RDFS, RDFS_COMMENT, RDFS_LABEL, SCHEMA_ORG, SCHEMA_ORG_DESCRIPTION, VALUE, WGS84_POS, findOrCreateTextAnnotation, service, _ref;
       CONTEXT = '@context';
       GRAPH = '@graph';
       VALUE = '@value';
@@ -184,30 +170,19 @@
       DBPEDIA_ORG = "http://" + DBPEDIA + ".org/";
       WGS84_POS = 'http://www.w3.org/2003/01/geo/wgs84_pos#';
       KNOWN_TYPES = ((_ref = window.wordlift) != null ? _ref.types : void 0) != null ? window.wordlift.types : [];
-      findTextAnnotation = function(textAnnotations, start, end) {
-        var textAnnotation, textAnnotationId;
-        for (textAnnotationId in textAnnotations) {
-          textAnnotation = textAnnotations[textAnnotationId];
-          if (textAnnotation.start === start && textAnnotation.end === end) {
-            return textAnnotation;
-          }
-        }
-      };
       findOrCreateTextAnnotation = function(textAnnotations, textAnnotation) {
         var ta;
-        ta = findTextAnnotation(textAnnotations, textAnnotation.start, textAnnotation.end);
-        if (ta == null) {
-          ta = {
-            id: "wordlift-ta-" + textAnnotation.start + "-" + textAnnotation.end,
-            selectedText: textAnnotation.label,
-            start: textAnnotation.start,
-            end: textAnnotation.end,
-            confidence: 1,
-            entityAnnotations: {},
-            _item: null
-          };
-          textAnnotations[ta.id] = ta;
+        ta = TextAnnotationService.find(textAnnotations, textAnnotation.start, textAnnotation.end);
+        if (ta != null) {
+          return ta;
         }
+        ta = TextAnnotationService.create({
+          text: textAnnotation.label,
+          start: textAnnotation.start,
+          end: textAnnotation.end,
+          confidence: 1.0
+        });
+        textAnnotations[ta.id] = ta;
         return ta;
       };
       service = {
@@ -219,31 +194,18 @@
           }
         },
         preselect: function(analysis, annotations) {
-          var annotation, ea, entityAnnotation, textAnnotation, _i, _len, _results;
+          var annotation, entityAnnotations, textAnnotation, _i, _len, _results;
           _results = [];
           for (_i = 0, _len = annotations.length; _i < _len; _i++) {
             annotation = annotations[_i];
             textAnnotation = findOrCreateTextAnnotation(analysis.textAnnotations, annotation);
-            entityAnnotation = this.findEntityAnnotation(textAnnotation.entityAnnotations, {
+            entityAnnotations = EntityAnnotationService.find(textAnnotation.entityAnnotations, {
               uri: annotation.uri
             });
-            if (entityAnnotation != null) {
-              _results.push(entityAnnotation.selected = true);
+            if (0 < entityAnnotations.length) {
+              _results.push(entityAnnotations[0].selected = true);
             } else {
-              if (!analysis.entities[annotation.uri]) {
-                analysis.entities[annotation.uri] = window.wordlift.entities[annotation.uri];
-              }
-              ea = {
-                id: "wordlift-ea-from-" + textAnnotation.id,
-                label: annotation.label,
-                confidence: 1,
-                entity: analysis.entities[annotation.uri],
-                relation: analysis.textAnnotations[textAnnotation.id],
-                _item: null,
-                selected: true
-              };
-              analysis.entityAnnotations[ea.id] = ea;
-              _results.push(textAnnotation.entityAnnotations[ea.id] = analysis.entityAnnotations[ea.id]);
+              _results.push(void 0);
             }
           }
           return _results;
@@ -276,27 +238,8 @@
             return $rootScope.$broadcast('error', 'An error occurred while requesting an analysis.');
           });
         },
-        findEntityAnnotation: function(entityAnnotations, filter) {
-          var entityAnnotation, entityAnnotationId, _ref1;
-          if (filter.uri != null) {
-            for (entityAnnotationId in entityAnnotations) {
-              entityAnnotation = entityAnnotations[entityAnnotationId];
-              if (filter.uri === entityAnnotation.entity.id || (_ref1 = filter.uri, __indexOf.call(entityAnnotation.entity.sameAs, _ref1) >= 0)) {
-                return entityAnnotation;
-              }
-            }
-          }
-          if (filter.selected != null) {
-            for (entityAnnotationId in entityAnnotations) {
-              entityAnnotation = entityAnnotations[entityAnnotationId];
-              if (entityAnnotation.selected) {
-                return entityAnnotation;
-              }
-            }
-          }
-        },
         parse: function(data, merge) {
-          var anotherEntityAnnotation, anotherId, containsOrEquals, context, createEntity, createEntityAnnotation, createLanguage, createTextAnnotation, dctype, entities, entity, entityAnnotation, entityAnnotations, expand, get, getA, getKnownTypes, getLanguage, graph, id, item, language, languages, mergeEntities, mergeUnique, textAnnotation, textAnnotationId, textAnnotations, types, _i, _len, _ref1, _ref2;
+          var anotherEntityAnnotation, anotherId, containsOrEquals, context, createEntity, createEntityAnnotations, createLanguage, createTextAnnotation, dctype, entities, entity, entityAnnotation, entityAnnotations, expand, get, getA, getKnownTypes, getLanguage, graph, id, item, language, languages, mergeEntities, mergeUnique, textAnnotation, textAnnotationId, textAnnotations, types, _i, _j, _len, _len1, _ref1, _ref2, _ref3;
           if (merge == null) {
             merge = false;
           }
@@ -392,50 +335,43 @@
             }
             return entity;
           };
-          createEntityAnnotation = function(item) {
-            var annotations, entity, entityAnnotation, id, reference, relation, relations, textAnnotation, _i, _len;
+          createEntityAnnotations = function(item) {
+            var annotations, entityAnnotation, reference, relation, relations, textAnnotation, _i, _len;
             reference = get("" + FISE_ONT + "entity-reference", item);
-            entity = entities[reference];
-            if (entity == null) {
-              return null;
+            if (entities[reference] == null) {
+              return [];
             }
             annotations = [];
-            id = get('@id', item);
             relations = get("" + DCTERMS + "relation", item);
             relations = angular.isArray(relations) ? relations : [relations];
             for (_i = 0, _len = relations.length; _i < _len; _i++) {
               relation = relations[_i];
               textAnnotation = textAnnotations[relation];
-              entityAnnotation = {
-                id: id,
+              entityAnnotation = EntityAnnotationService.create({
+                id: get('@id', item),
                 label: get("" + FISE_ONT + "entity-label", item),
                 confidence: get(FISE_ONT_CONFIDENCE, item),
-                entity: entity,
+                entity: entities[reference],
                 relation: textAnnotation,
-                _item: item,
-                selected: false
-              };
+                _item: item
+              });
               if (textAnnotation != null) {
                 textAnnotation.entityAnnotations[entityAnnotation.id] = entityAnnotation;
               }
               annotations.push(entityAnnotation);
             }
-            return annotations[0];
+            return annotations;
           };
           createTextAnnotation = function(item) {
-            var textAnnotation;
-            textAnnotation = {
+            return TextAnnotationService.create({
               id: get('@id', item),
-              selectedText: get("" + FISE_ONT + "selected-text", item)[VALUE],
-              selectionPrefix: get("" + FISE_ONT + "selection-prefix", item)[VALUE],
-              selectionSuffix: get("" + FISE_ONT + "selection-suffix", item)[VALUE],
+              text: get("" + FISE_ONT + "selected-text", item)[VALUE],
               start: get("" + FISE_ONT + "start", item),
               end: get("" + FISE_ONT + "end", item),
               confidence: get(FISE_ONT_CONFIDENCE, item),
               entityAnnotations: {},
               _item: item
-            };
-            return textAnnotation;
+            });
           };
           createLanguage = function(item) {
             return {
@@ -611,17 +547,21 @@
           }
           for (id in entityAnnotations) {
             item = entityAnnotations[id];
-            entityAnnotations[id] = createEntityAnnotation(item);
+            _ref1 = createEntityAnnotations(item);
+            for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+              entityAnnotation = _ref1[_j];
+              entityAnnotations[entityAnnotation.id] = entityAnnotation;
+            }
           }
           if (merge) {
             for (textAnnotationId in textAnnotations) {
               textAnnotation = textAnnotations[textAnnotationId];
-              _ref1 = textAnnotation.entityAnnotations;
-              for (id in _ref1) {
-                entityAnnotation = _ref1[id];
-                _ref2 = textAnnotation.entityAnnotations;
-                for (anotherId in _ref2) {
-                  anotherEntityAnnotation = _ref2[anotherId];
+              _ref2 = textAnnotation.entityAnnotations;
+              for (id in _ref2) {
+                entityAnnotation = _ref2[id];
+                _ref3 = textAnnotation.entityAnnotations;
+                for (anotherId in _ref3) {
+                  anotherEntityAnnotation = _ref3[anotherId];
                   if (id !== anotherId && entityAnnotation.entity === anotherEntityAnnotation.entity) {
                     delete textAnnotation.entityAnnotations[anotherId];
                   }
@@ -643,7 +583,7 @@
   ]);
 
   angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tinymce.plugin.config', 'AnalysisService']).service('EditorService', [
-    'AnalysisService', '$rootScope', function(AnalysisService, $rootScope) {
+    'AnalysisService', 'EntityAnnotationService', '$rootScope', function(AnalysisService, EntityAnnotationService, $rootScope) {
       var CONTENT_EDITABLE, CONTENT_IFRAME, EDITOR_ID, MCE_WORDLIFT, RUNNING_CLASS, TEXT_ANNOTATION, editor, findEntities, service;
       EDITOR_ID = 'content';
       TEXT_ANNOTATION = 'textannotation';
@@ -671,7 +611,7 @@
       };
       service = {
         embedAnalysis: function(analysis) {
-          var ed, element, entities, entity, entityAnnotation, html, isDirty, textAnnotation, textAnnotationId, traslator, _ref;
+          var ed, element, entities, entity, entityAnnotations, html, isDirty, textAnnotation, textAnnotationId, traslator, _ref;
           ed = editor();
           html = ed.getContent({
             format: 'raw'
@@ -687,11 +627,14 @@
               continue;
             }
             element = "<span id=\"" + textAnnotationId + "\" class=\"" + TEXT_ANNOTATION;
-            entityAnnotation = AnalysisService.findEntityAnnotation(textAnnotation.entityAnnotations, {
+            entityAnnotations = EntityAnnotationService.find(textAnnotation.entityAnnotations, {
               selected: true
             });
-            if (entityAnnotation != null) {
-              entity = entityAnnotation.entity;
+            if (0 < entityAnnotations.length && (entityAnnotations[0].entity != null)) {
+              if (!entityAnnotations[0].entity) {
+                console.log(entityAnnotations[0]);
+              }
+              entity = entityAnnotations[0].entity;
               element += " highlight " + entity.css + "\" itemid=\"" + entity.id;
             }
             element += '">';
@@ -753,7 +696,117 @@
     }
   ]);
 
-  angular.module('wordlift.tinymce.plugin.services', ['wordlift.tinymce.plugin.config', 'wordlift.tinymce.plugin.services.EditorService', 'AnalysisService']);
+  angular.module('wordlift.tinymce.plugin.services.EntityAnnotationService', []).service('EntityAnnotationService', [
+    'Helpers', function(Helpers) {
+      return {
+        create: function(params) {
+          var defaults;
+          defaults = {
+            id: 'uri:local-entity-annotation-' + Helpers.uniqueId(32),
+            label: '',
+            confidence: 0.0,
+            entity: null,
+            relation: null,
+            selected: false,
+            _item: null
+          };
+          return Helpers.merge(defaults, params);
+        },
+        find: function(entityAnnotations, filter) {
+          var entityAnnotation, entityAnnotationId;
+          if (filter.uri != null) {
+            return (function() {
+              var _ref, _results;
+              _results = [];
+              for (entityAnnotationId in entityAnnotations) {
+                entityAnnotation = entityAnnotations[entityAnnotationId];
+                if (filter.uri === entityAnnotation.entity.id || (_ref = filter.uri, __indexOf.call(entityAnnotation.entity.sameAs, _ref) >= 0)) {
+                  _results.push(entityAnnotation);
+                }
+              }
+              return _results;
+            })();
+          }
+          if (filter.selected != null) {
+            return (function() {
+              var _results;
+              _results = [];
+              for (entityAnnotationId in entityAnnotations) {
+                entityAnnotation = entityAnnotations[entityAnnotationId];
+                if (entityAnnotation.selected === filter.selected) {
+                  _results.push(entityAnnotation);
+                }
+              }
+              return _results;
+            })();
+          }
+        }
+      };
+    }
+  ]);
+
+  angular.module('wordlift.tinymce.plugin.services.Helpers', []).service('Helpers', [
+    function() {
+      return {
+        merge: function(options, overrides) {
+          return this.extend(this.extend({}, options), overrides);
+        },
+        extend: function(object, properties) {
+          var key, val;
+          for (key in properties) {
+            val = properties[key];
+            object[key] = val;
+          }
+          return object;
+        },
+        uniqueId: function(length) {
+          var id;
+          if (length == null) {
+            length = 8;
+          }
+          id = '';
+          while (id.length < length) {
+            id += Math.random().toString(36).substr(2);
+          }
+          return id.substr(0, length);
+        }
+      };
+    }
+  ]);
+
+  angular.module('wordlift.tinymce.plugin.services.TextAnnotationService', []).service('TextAnnotationService', [
+    'Helpers', function(Helpers) {
+      return {
+        create: function(params) {
+          var defaults;
+          if (params == null) {
+            params = {};
+          }
+          defaults = {
+            id: 'urn:local-text-annotation-' + Helpers.uniqueId(32),
+            text: '',
+            start: 0,
+            end: 0,
+            confidence: 0.0,
+            entityAnnotations: {},
+            _item: null
+          };
+          return Helpers.merge(defaults, params);
+        },
+        find: function(textAnnotations, start, end) {
+          var textAnnotation, textAnnotationId;
+          for (textAnnotationId in textAnnotations) {
+            textAnnotation = textAnnotations[textAnnotationId];
+            if (textAnnotation.start === start && textAnnotation.end === end) {
+              return textAnnotation;
+            }
+          }
+        }
+      };
+    }
+  ]);
+
+  angular.module('wordlift.tinymce.plugin.services', ['wordlift.tinymce.plugin.config', 'wordlift.tinymce.plugin.services.EditorService', 'wordlift.tinymce.plugin.services.EntityAnnotationService', 'wordlift.tinymce.plugin.services.TextAnnotationService', 'wordlift.tinymce.plugin.services.Helpers', 'AnalysisService']);
 
   angular.module('wordlift.tinymce.plugin.controllers', ['wordlift.tinymce.plugin.config', 'wordlift.tinymce.plugin.services']).filter('orderObjectBy', function() {
     return function(items, field, reverse) {
@@ -782,17 +835,11 @@
       return filtered;
     };
   }).controller('EntitiesController', [
-    'EditorService', '$log', '$scope', 'Configuration', function(EditorService, $log, $scope, Configuration) {
+    'EditorService', '$log', '$scope', function(EditorService, $log, $scope) {
       var el, scroll, setArrowTop;
       $scope.analysis = null;
       $scope.textAnnotation = null;
       $scope.textAnnotationSpan = null;
-      $scope.sortByConfidence = function(entity) {
-        return entity[Configuration.entityLabels.confidence];
-      };
-      $scope.getLabelFor = function(label) {
-        return Configuration.entityLabels[label];
-      };
       setArrowTop = function(top) {
         return $('head').append('<style>#wordlift-disambiguation-popover .postbox:before,#wordlift-disambiguation-popover .postbox:after{top:' + top + 'px;}</style>');
       };
@@ -819,7 +866,6 @@
       });
       return $scope.$on('textAnnotationClicked', function(event, id, sourceElement) {
         var pos, _ref;
-        $scope.textAnnotationSpan = angular.element(sourceElement.target);
         $scope.textAnnotation = $scope.analysis.textAnnotations[id];
         if ((((_ref = $scope.textAnnotation) != null ? _ref.entityAnnotations : void 0) == null) || 0 === Object.keys($scope.textAnnotation.entityAnnotations).length) {
           return $('#wordlift-disambiguation-popover').hide();

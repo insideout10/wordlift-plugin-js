@@ -1,6 +1,6 @@
 angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tinymce.plugin.config', 'AnalysisService'])
 .service('EditorService',
-    ['AnalysisService', '$rootScope', (AnalysisService, $rootScope) ->
+    ['AnalysisService', 'EntityAnnotationService', '$rootScope', (AnalysisService, EntityAnnotationService, $rootScope) ->
 
       # Define some constants for commonly used strings.
       EDITOR_ID = 'content'
@@ -62,9 +62,11 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
             element = "<span id=\"#{textAnnotationId}\" class=\"#{TEXT_ANNOTATION}"
 
             # Insert the Html fragments before and after the selected text.
-            entityAnnotation = AnalysisService.findEntityAnnotation textAnnotation.entityAnnotations, selected: true
-            if entityAnnotation?
-              entity = entityAnnotation.entity
+            entityAnnotations = EntityAnnotationService.find textAnnotation.entityAnnotations, selected: true
+            if 0 < entityAnnotations.length and entityAnnotations[0].entity?
+              # We deal only with the first entityAnnotation.
+              console.log entityAnnotations[0] if not entityAnnotations[0].entity
+              entity = entityAnnotations[0].entity
               element += " highlight #{entity.css}\" itemid=\"#{entity.id}"
 
             # Close the element.

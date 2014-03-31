@@ -49,6 +49,21 @@
               </a>
             
               
+              <a class="source" href="app.services.EntityAnnotationService.html">
+                app.services.EntityAnnotationService.coffee
+              </a>
+            
+              
+              <a class="source" href="app.services.Helpers.html">
+                app.services.Helpers.coffee
+              </a>
+            
+              
+              <a class="source" href="app.services.TextAnnotationService.html">
+                app.services.TextAnnotationService.coffee
+              </a>
+            
+              
               <a class="source" href="app.services.html">
                 app.services.coffee
               </a>
@@ -138,9 +153,8 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  describe <span class="hljs-string">'AnalysisService'</span>,<span class="hljs-function"> -&gt;</span>    
+            <div class="content"><div class='highlight'><pre>  describe <span class="hljs-string">'AnalysisService'</span>,<span class="hljs-function"> -&gt;</span>
     it <span class="hljs-string">'parses analysis data'</span>, inject<span class="hljs-function"><span class="hljs-params">((AnalysisService, $httpBackend, $rootScope) -&gt;
-
       pending()
 
 </span></span></pre></div></div>
@@ -252,7 +266,6 @@
     )
 
     it <span class="hljs-string">'parses and merges analysis data'</span>, inject<span class="hljs-function"><span class="hljs-params">((AnalysisService, $httpBackend, $rootScope) -&gt;
-
       pending()
 
 </span></span></pre></div></div>
@@ -867,9 +880,9 @@
             
             <div class="content"><div class='highlight'><pre>
         entityAnnotation1 = analysis.textAnnotations[<span class="hljs-string">'urn:enhancement-9de365a0-3312-4927-0cbd-8735d460901d'</span>]
-          .entityAnnotations[<span class="hljs-string">'urn:enhancement-1c03bb72-6cfe-3dfc-ad7f-3082a5ce086b'</span>]
+        .entityAnnotations[<span class="hljs-string">'urn:enhancement-1c03bb72-6cfe-3dfc-ad7f-3082a5ce086b'</span>]
         entityAnnotation2 = analysis.textAnnotations[<span class="hljs-string">'urn:enhancement-d791d926-23e9-61f9-7b67-6414586bc49e'</span>]
-          .entityAnnotations[<span class="hljs-string">'urn:enhancement-1c03bb72-6cfe-3dfc-ad7f-3082a5ce086b'</span>]
+        .entityAnnotations[<span class="hljs-string">'urn:enhancement-1c03bb72-6cfe-3dfc-ad7f-3082a5ce086b'</span>]
 
         expect(entityAnnotation1).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
         expect(entityAnnotation2).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
@@ -950,7 +963,7 @@
             <div class="content"><div class='highlight'><pre>        expect(result).toEqual <span class="hljs-literal">false</span>
     )
 
-    it <span class="hljs-string">"parses the geo-location data"</span>, inject<span class="hljs-function"><span class="hljs-params">( (AnalysisService, $httpBackend) -&gt;
+    it <span class="hljs-string">"parses the geo-location data"</span>, inject<span class="hljs-function"><span class="hljs-params">((AnalysisService, $httpBackend) -&gt;
 
 </span></span></pre></div></div>
             
@@ -1047,8 +1060,7 @@
     )
 
   describe <span class="hljs-string">'EditorService'</span>,<span class="hljs-function"> -&gt;</span>
-
-    it <span class="hljs-string">"embeds analysis results also when there are parentheses in the selected text"</span>, inject<span class="hljs-function"><span class="hljs-params">( (AnalysisService, EditorService, $httpBackend) -&gt;
+    it <span class="hljs-string">"embeds analysis results also when there are parentheses in the selected text"</span>, inject<span class="hljs-function"><span class="hljs-params">((AnalysisService, EditorService, $httpBackend) -&gt;
 
 </span></span></pre></div></div>
             
@@ -1116,6 +1128,514 @@
 
         EditorService.embedAnalysis analysis
 
+    )</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-54">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-54">&#182;</a>
+              </div>
+              <p>Test Helper functions.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  describe <span class="hljs-string">'Helpers'</span>,<span class="hljs-function"> -&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-55">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-55">&#182;</a>
+              </div>
+              <p>Test the uniqueId method.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    it <span class="hljs-string">'returns unique IDs using the uniqueId method'</span>, inject<span class="hljs-function"><span class="hljs-params">((Helpers) -&gt;
+      expect(Helpers.uniqueId().length).toEqual <span class="hljs-number">8</span>
+      expect(Helpers.uniqueId(<span class="hljs-number">16</span>).length).toEqual <span class="hljs-number">16</span>
+      expect(Helpers.uniqueId(<span class="hljs-number">32</span>).length).toEqual <span class="hljs-number">32</span>
+
+      expect(Helpers.uniqueId()).<span class="hljs-keyword">not</span>.toEqual Helpers.uniqueId()
+      expect(Helpers.uniqueId(<span class="hljs-number">16</span>)).<span class="hljs-keyword">not</span>.toEqual Helpers.uniqueId(<span class="hljs-number">16</span>)
+      expect(Helpers.uniqueId(<span class="hljs-number">32</span>)).<span class="hljs-keyword">not</span>.toEqual Helpers.uniqueId(<span class="hljs-number">32</span>)
+
+    )</span>
+
+</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-56">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-56">&#182;</a>
+              </div>
+              <p>Test object merging.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    it <span class="hljs-string">'merges some params with default params'</span>, inject<span class="hljs-function"><span class="hljs-params">((Helpers) -&gt;
+      defaults =
+        property_1: <span class="hljs-string">'default_1'</span>
+        property_2: <span class="hljs-string">'default_2'</span>
+        property_3: <span class="hljs-string">'default_3'</span>
+
+      params =
+        property_2: <span class="hljs-string">'custom_2'</span>
+        property_4: <span class="hljs-string">'custom_4'</span>
+
+      merged = Helpers.merge defaults, params
+
+      expect(merged.property_1).toEqual <span class="hljs-string">'default_1'</span>
+      expect(merged.property_2).toEqual <span class="hljs-string">'custom_2'</span>
+      expect(merged.property_3).toEqual <span class="hljs-string">'default_3'</span>
+      expect(merged.property_4).toEqual <span class="hljs-string">'custom_4'</span>
+
+    )</span>
+
+</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-57">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-57">&#182;</a>
+              </div>
+              <p>Test the TextAnnotationService</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  describe <span class="hljs-string">'TextAnnotationService'</span>,<span class="hljs-function"> -&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-58">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-58">&#182;</a>
+              </div>
+              <p>Test the creation of a Text Annotation using the defaults.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    it <span class="hljs-string">'creates a TextAnnotation using defaults'</span>, inject<span class="hljs-function"><span class="hljs-params">((TextAnnotationService) -&gt;
+
+</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-59">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-59">&#182;</a>
+              </div>
+              <p>Create a Text Annotation with default data.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      ta_1 = TextAnnotationService.create()
+      ta_2 = TextAnnotationService.create()
+
+      expect(ta_1).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
+      expect(ta_2).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
+
+      expect(ta_1.id).<span class="hljs-keyword">not</span>.toEqual ta_2.id
+    )</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-60">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-60">&#182;</a>
+              </div>
+              <p>Test the creation of a Text Annotation using the defaults.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    it <span class="hljs-string">'creates a TextAnnotation using custom params'</span>, inject<span class="hljs-function"><span class="hljs-params">((TextAnnotationService) -&gt;
+
+</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-61">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-61">&#182;</a>
+              </div>
+              <p>Create a Text Annotation with default data.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      ta_1 = TextAnnotationService.create <span class="hljs-attribute">text</span>: <span class="hljs-string">'David Riccitelli'</span>, <span class="hljs-attribute">start</span>: <span class="hljs-number">10</span>, <span class="hljs-attribute">end</span>: <span class="hljs-number">26</span>, <span class="hljs-attribute">confidence</span>: <span class="hljs-number">0.75</span>
+
+      expect(ta_1).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
+      expect(ta_1.id).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
+      expect(ta_1.text).toEqual <span class="hljs-string">'David Riccitelli'</span>
+      expect(ta_1.start).toEqual <span class="hljs-number">10</span>
+      expect(ta_1.end).toEqual <span class="hljs-number">26</span>
+      expect(ta_1.confidence).toEqual <span class="hljs-number">0.75</span>
+      expect(ta_1.entityAnnotations).toEqual {}
+      expect(ta_1._item).toBe <span class="hljs-literal">null</span>
+    )
+
+    it <span class="hljs-string">'finds a TextAnnotation in the provided collection'</span>, inject<span class="hljs-function"><span class="hljs-params">((AnalysisService, TextAnnotationService) -&gt;
+      json = <span class="hljs-literal">undefined</span>
+
+</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-62">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-62">&#182;</a>
+              </div>
+              <p>Get the mock-up analysis.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      $.ajax<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'base/app/assets/tim_berners-lee_2.json'</span>, async: <span class="hljs-literal">false</span>)</span>.<span class="hljs-title">done</span> <span class="hljs-params">(data)</span> -&gt;</span>
+        json = data</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-63">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-63">&#182;</a>
+              </div>
+              <p>Simulate event broadcasted by AnalysisService</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      analysis = AnalysisService.parse json, <span class="hljs-literal">true</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-64">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-64">&#182;</a>
+              </div>
+              <p>Expected annotations.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      annotations = [
+        { <span class="hljs-attribute">start</span>: <span class="hljs-number">44</span>, <span class="hljs-attribute">end</span>: <span class="hljs-number">69</span>, <span class="hljs-attribute">id</span>: <span class="hljs-string">'urn:enhancement-088ad932-6102-ce55-d7e4-bd817d0982e1'</span>, <span class="hljs-attribute">text</span>: <span class="hljs-string">'World Wide Web Consortium'</span>, <span class="hljs-attribute">confidence</span>: <span class="hljs-number">1</span> },
+        { <span class="hljs-attribute">start</span>: <span class="hljs-number">249</span>, <span class="hljs-attribute">end</span>: <span class="hljs-number">315</span>, <span class="hljs-attribute">id</span>: <span class="hljs-string">'urn:enhancement-0dbbb1b6-0c74-6571-77eb-69098ee7719e'</span>, <span class="hljs-attribute">text</span>: <span class="hljs-string">'MIT Computer Science and Artificial Intelligence Laboratory (CSAIL'</span>, <span class="hljs-attribute">confidence</span>: <span class="hljs-number">0.98507464</span> },
+        { <span class="hljs-attribute">start</span>: <span class="hljs-number">343</span>, <span class="hljs-attribute">end</span>: <span class="hljs-number">374</span>, <span class="hljs-attribute">id</span>: <span class="hljs-string">'urn:enhancement-1532e941-6e97-409a-3d3a-a8e7b10f9b06'</span>, <span class="hljs-attribute">text</span>: <span class="hljs-string">'Web Science Research Initiative'</span>, <span class="hljs-attribute">confidence</span>: <span class="hljs-number">1</span> },
+        { <span class="hljs-attribute">start</span>: <span class="hljs-number">92</span>, <span class="hljs-attribute">end</span>: <span class="hljs-number">101</span>, <span class="hljs-attribute">id</span>: <span class="hljs-string">'urn:enhancement-4c0466cd-7156-c2ce-be65-bb1a8fd7639e'</span>, <span class="hljs-attribute">text</span>: <span class="hljs-string">'the Web\'s'</span>, <span class="hljs-attribute">confidence</span>: <span class="hljs-number">0.7777778</span> },
+        { <span class="hljs-attribute">start</span>: <span class="hljs-number">249</span>, <span class="hljs-attribute">end</span>: <span class="hljs-number">308</span>, <span class="hljs-attribute">id</span>: <span class="hljs-string">'urn:enhancement-5bd990a1-a68d-e5b9-eeb6-74205293965a'</span>, <span class="hljs-attribute">text</span>: <span class="hljs-string">'MIT Computer Science and Artificial Intelligence Laboratory'</span>, <span class="hljs-attribute">confidence</span>: <span class="hljs-number">1</span> },
+        { <span class="hljs-attribute">start</span>: <span class="hljs-number">92</span>, <span class="hljs-attribute">end</span>: <span class="hljs-number">99</span>, <span class="hljs-attribute">id</span>: <span class="hljs-string">'urn:enhancement-6e889961-1509-3108-c90e-20e414387b37'</span>, <span class="hljs-attribute">text</span>: <span class="hljs-string">'the Web'</span>, <span class="hljs-attribute">confidence</span>: <span class="hljs-number">0.85714287</span> },
+        { <span class="hljs-attribute">start</span>: <span class="hljs-number">155</span>, <span class="hljs-attribute">end</span>: <span class="hljs-number">180</span>, <span class="hljs-attribute">id</span>: <span class="hljs-string">'urn:enhancement-6fb63cde-06fe-ea7c-665f-a1eac3ceb2e7'</span>, <span class="hljs-attribute">text</span>: <span class="hljs-string">'World Wide Web Foundation'</span>, <span class="hljs-attribute">confidence</span>: <span class="hljs-number">1</span> },
+        { <span class="hljs-attribute">start</span>: <span class="hljs-number">347</span>, <span class="hljs-attribute">end</span>: <span class="hljs-number">363</span>, <span class="hljs-attribute">id</span>: <span class="hljs-string">'urn:enhancement-974f1919-5e6a-41ad-ea62-412329bb26d6'</span>, <span class="hljs-attribute">text</span>: <span class="hljs-string">'Science Research'</span>, <span class="hljs-attribute">confidence</span>: <span class="hljs-number">0.9375</span> },
+        { <span class="hljs-attribute">start</span>: <span class="hljs-number">425</span>, <span class="hljs-attribute">end</span>: <span class="hljs-number">463</span>, <span class="hljs-attribute">id</span>: <span class="hljs-string">'urn:enhancement-d9dc798a-5e41-7d8d-5b3e-177bbed7a810'</span>, <span class="hljs-attribute">text</span>: <span class="hljs-string">'MIT Center for Collective Intelligence'</span>, <span class="hljs-attribute">confidence</span>: <span class="hljs-number">1</span> }
+      ]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-65">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-65">&#182;</a>
+              </div>
+              <p>Check that each text annotation exists.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">for</span> annotation <span class="hljs-keyword">in</span> annotations
+        textAnnotation = TextAnnotationService.find analysis.textAnnotations, annotation.start, annotation.end
+        expect(textAnnotation).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
+        expect(textAnnotation.id).toEqual annotation.id
+        expect(textAnnotation.start).toEqual annotation.start
+        expect(textAnnotation.end).toEqual annotation.end
+        expect(textAnnotation.text).toEqual annotation.text
+        expect(textAnnotation.confidence).toEqual annotation.confidence
+        expect(textAnnotation.entityAnnotations).toEqual jasmine.any(Object)
+        expect(textAnnotation._item).toEqual jasmine.any(Object)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-66">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-66">&#182;</a>
+              </div>
+              <p>Test for a bogus annotation.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      textAnnotation = TextAnnotationService.find analysis.textAnnotations, <span class="hljs-number">0</span>, <span class="hljs-number">100</span>
+      expect(textAnnotation).toBe <span class="hljs-literal">undefined</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-67">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-67">&#182;</a>
+              </div>
+              <pre><code> <span class="hljs-keyword">for</span> textAnnotationId, textAnnotation <span class="hljs-keyword">of</span> analysis.textAnnotations
+   dump <span class="hljs-string">"[ textAnnotation :: "</span>
+   dump textAnnotation
+   dump <span class="hljs-string">" ]"</span>
+   dump <span class="hljs-string">"[ start :: <span class="hljs-subst">#{textAnnotation.start}</span> ][ end :: <span class="hljs-subst">#{textAnnotation.end}</span> ][ id :: <span class="hljs-subst">#{textAnnotation.id}</span> ][ text :: <span class="hljs-subst">#{textAnnotation.text}</span> ][ confidence :: <span class="hljs-subst">#{textAnnotation.confidence}</span> ]"</span>
+</code></pre>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+    )</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-68">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-68">&#182;</a>
+              </div>
+              <p>Test the EntityAnnotationService</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  describe <span class="hljs-string">'EntityAnnotationService'</span>,<span class="hljs-function"> -&gt;</span>
+
+    it <span class="hljs-string">'finds an EntityAnnotation in the provided collection using the selected switch'</span>, inject<span class="hljs-function"><span class="hljs-params">((AnalysisService, EntityAnnotationService) -&gt;
+      json = <span class="hljs-literal">undefined</span>
+
+</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-69">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-69">&#182;</a>
+              </div>
+              <p>Get the mock-up analysis.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      $.ajax<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'base/app/assets/tim_berners-lee_2.json'</span>, async: <span class="hljs-literal">false</span>)</span>.<span class="hljs-title">done</span> <span class="hljs-params">(data)</span> -&gt;</span>
+        json = data</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-70">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-70">&#182;</a>
+              </div>
+              <p>Simulate event broadcasted by AnalysisService</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      analysis = AnalysisService.parse json, <span class="hljs-literal">true</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-71">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-71">&#182;</a>
+              </div>
+              <p>Check that there are no selected entities and 16 non-selected entities.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      expect(EntityAnnotationService.find analysis.entityAnnotations, <span class="hljs-attribute">selected</span>: <span class="hljs-literal">true</span>).toEqual []
+      expect((EntityAnnotationService.find analysis.entityAnnotations, <span class="hljs-attribute">selected</span>: <span class="hljs-literal">false</span>).length).toEqual <span class="hljs-number">16</span>
+    )
+
+    it <span class="hljs-string">'finds an EntityAnnotation in the provided collection using the uri switch'</span>, inject<span class="hljs-function"><span class="hljs-params">((AnalysisService, EntityAnnotationService) -&gt;
+      json = <span class="hljs-literal">undefined</span>
+
+</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-72">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-72">&#182;</a>
+              </div>
+              <p>Get the mock-up analysis.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      $.ajax<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'base/app/assets/tim_berners-lee_2.json'</span>, async: <span class="hljs-literal">false</span>)</span>.<span class="hljs-title">done</span> <span class="hljs-params">(data)</span> -&gt;</span>
+        json = data</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-73">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-73">&#182;</a>
+              </div>
+              <p>Simulate event broadcasted by AnalysisService</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      analysis = AnalysisService.parse json, <span class="hljs-literal">true</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-74">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-74">&#182;</a>
+              </div>
+              <p>Expected annotations.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      annotations = [
+        { <span class="hljs-attribute">id</span>: <span class="hljs-string">'urn:enhancement-0058ab06-872e-87c2-b842-a31c1cc709ea'</span>, <span class="hljs-attribute">taId</span>: <span class="hljs-string">'urn:enhancement-d9dc798a-5e41-7d8d-5b3e-177bbed7a810'</span>, <span class="hljs-attribute">uri</span>: <span class="hljs-string">'http://dbpedia.org/resource/MIT_Center_for_Collective_Intelligence'</span> },
+        { <span class="hljs-attribute">id</span>: <span class="hljs-string">'urn:enhancement-0f4452cc-865f-a826-9643-a3c14cbce17d'</span>, <span class="hljs-attribute">taId</span>: <span class="hljs-string">'urn:enhancement-088ad932-6102-ce55-d7e4-bd817d0982e1'</span>, <span class="hljs-attribute">uri</span>: <span class="hljs-string">'http://rdf.freebase.com/ns/m.05vsnz4'</span> },
+        { <span class="hljs-attribute">id</span>: <span class="hljs-string">'urn:enhancement-10f38ec8-5a67-7679-3208-9785138c38ff'</span>, <span class="hljs-attribute">taId</span>: <span class="hljs-string">'urn:enhancement-974f1919-5e6a-41ad-ea62-412329bb26d6'</span>, <span class="hljs-attribute">uri</span>: <span class="hljs-string">'http://rdf.freebase.com/ns/m.03qbp5p'</span> },
+        { <span class="hljs-attribute">id</span>: <span class="hljs-string">'urn:enhancement-17b7acd9-5a0e-4148-4a2b-d04194644759'</span>, <span class="hljs-attribute">taId</span>: <span class="hljs-string">'urn:enhancement-6e889961-1509-3108-c90e-20e414387b37'</span>, <span class="hljs-attribute">uri</span>: <span class="hljs-string">'http://dbpedia.org/resource/World_Wide_Web'</span> },
+        { <span class="hljs-attribute">id</span>: <span class="hljs-string">'urn:enhancement-2be1807b-40ee-6234-86a5-616e57a6f65e'</span>, <span class="hljs-attribute">taId</span>: <span class="hljs-string">'urn:enhancement-088ad932-6102-ce55-d7e4-bd817d0982e1'</span>, <span class="hljs-attribute">uri</span>: <span class="hljs-string">'http://dbpedia.org/resource/World_Wide_Web_Consortium'</span> },
+        { <span class="hljs-attribute">id</span>: <span class="hljs-string">'urn:enhancement-2f8adc47-8682-a6b8-60f9-e48d82cb2f6c'</span>, <span class="hljs-attribute">taId</span>: <span class="hljs-string">'urn:enhancement-6e889961-1509-3108-c90e-20e414387b37'</span>, <span class="hljs-attribute">uri</span>: <span class="hljs-string">'http://dbpedia.org/resource/The_Web_(film)'</span> },
+        { <span class="hljs-attribute">id</span>: <span class="hljs-string">'urn:enhancement-34c8b63f-eb73-f66d-12c6-980d5647ff73'</span>, <span class="hljs-attribute">taId</span>: <span class="hljs-string">'urn:enhancement-5bd990a1-a68d-e5b9-eeb6-74205293965a'</span>, <span class="hljs-attribute">uri</span>: <span class="hljs-string">'http://dbpedia.org/resource/MIT_Computer_Science_and_Artificial_Intelligence_Laboratory'</span> },
+        { <span class="hljs-attribute">id</span>: <span class="hljs-string">'urn:enhancement-966a3108-71e5-a2c4-9aa8-4ed8612bbcf0'</span>, <span class="hljs-attribute">taId</span>: <span class="hljs-string">'urn:enhancement-6fb63cde-06fe-ea7c-665f-a1eac3ceb2e7'</span>, <span class="hljs-attribute">uri</span>: <span class="hljs-string">'http://dbpedia.org/resource/World_Wide_Web_Foundation'</span> },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-75">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-75">&#182;</a>
+              </div>
+              <pre><code>   { <span class="hljs-attribute">id</span>: <span class="hljs-string">'urn:enhancement-a4a46550-d539-31af-4c75-38974004d522'</span>, <span class="hljs-attribute">taId</span>: <span class="hljs-string">'urn:enhancement-088ad932-6102-ce55-d7e4-bd817d0982e1'</span>, <span class="hljs-attribute">uri</span>: <span class="hljs-string">'http://dbpedia.org/resource/World_Wide_Web_Consortium'</span> },
+</code></pre>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        { <span class="hljs-attribute">id</span>: <span class="hljs-string">'urn:enhancement-af9b08a7-6113-6a53-585f-d42616f7a7e9'</span>, <span class="hljs-attribute">taId</span>: <span class="hljs-string">'urn:enhancement-4c0466cd-7156-c2ce-be65-bb1a8fd7639e'</span>, <span class="hljs-attribute">uri</span>: <span class="hljs-string">'http://rdf.freebase.com/ns/m.01w4jzb'</span> },
+        { <span class="hljs-attribute">id</span>: <span class="hljs-string">'urn:enhancement-b18dfa64-5315-de60-adf5-a39c4bb02065'</span>, <span class="hljs-attribute">taId</span>: <span class="hljs-string">'urn:enhancement-4c0466cd-7156-c2ce-be65-bb1a8fd7639e'</span>, <span class="hljs-attribute">uri</span>: <span class="hljs-string">'http://rdf.freebase.com/ns/m.01wf0c1'</span> },
+        { <span class="hljs-attribute">id</span>: <span class="hljs-string">'urn:enhancement-d670437e-e622-4be2-4ee1-01b617859fe0'</span>, <span class="hljs-attribute">taId</span>: <span class="hljs-string">'urn:enhancement-0dbbb1b6-0c74-6571-77eb-69098ee7719e'</span>, <span class="hljs-attribute">uri</span>: <span class="hljs-string">'http://dbpedia.org/resource/MIT_Computer_Science_and_Artificial_Intelligence_Laboratory'</span> },
+        { <span class="hljs-attribute">id</span>: <span class="hljs-string">'urn:enhancement-d7509c9e-c583-2059-3994-8e6ce1920225'</span>, <span class="hljs-attribute">taId</span>: <span class="hljs-string">'urn:enhancement-1532e941-6e97-409a-3d3a-a8e7b10f9b06'</span>, <span class="hljs-attribute">uri</span>: <span class="hljs-string">'http://dbpedia.org/resource/Web_Science_Trust'</span> },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-76">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-76">&#182;</a>
+              </div>
+              <pre><code>   { <span class="hljs-attribute">id</span>: <span class="hljs-string">'urn:enhancement-f0f4f413-32a1-4dfb-57ef-de5f5b42af94'</span>, <span class="hljs-attribute">taId</span>: <span class="hljs-string">'urn:enhancement-6fb63cde-06fe-ea7c-665f-a1eac3ceb2e7'</span>, <span class="hljs-attribute">uri</span>: <span class="hljs-string">'http://dbpedia.org/resource/World_Wide_Web_Foundation'</span> },
+</code></pre>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        { <span class="hljs-attribute">id</span>: <span class="hljs-string">'urn:enhancement-f4283ac3-1f2c-f252-071a-5087c911ba88'</span>, <span class="hljs-attribute">taId</span>: <span class="hljs-string">'urn:enhancement-4c0466cd-7156-c2ce-be65-bb1a8fd7639e'</span>, <span class="hljs-attribute">uri</span>: <span class="hljs-string">'http://dbpedia.org/resource/The_Web_(TV_series)'</span> },
+        { <span class="hljs-attribute">id</span>: <span class="hljs-string">'urn:enhancement-f8b9e18c-e8a1-5bb1-877d-0c33f53e8e50'</span>, <span class="hljs-attribute">taId</span>: <span class="hljs-string">'urn:enhancement-6e889961-1509-3108-c90e-20e414387b37'</span>, <span class="hljs-attribute">uri</span>: <span class="hljs-string">'http://dbpedia.org/resource/The_Web_(TV_series)'</span> }
+      ]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-77">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-77">&#182;</a>
+              </div>
+              <p>Check that each entity annotation matches.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">for</span> annotation <span class="hljs-keyword">in</span> annotations
+        entityAnnotations = EntityAnnotationService.find analysis.textAnnotations[annotation.taId].entityAnnotations, <span class="hljs-attribute">uri</span>: annotation.uri
+        expect(entityAnnotations.length).toEqual <span class="hljs-number">1</span>
+        expect(entityAnnotations[<span class="hljs-number">0</span>].id).toEqual annotation.id</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-78">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-78">&#182;</a>
+              </div>
+              <p>Test for a bogus annotation.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      entityAnnotation = EntityAnnotationService.find analysis.entityAnnotations, <span class="hljs-attribute">uri</span>: <span class="hljs-string">'http://example.org/bogus'</span>
+      expect(entityAnnotation).toEqual []</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-79">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-79">&#182;</a>
+              </div>
+              <pre><code> <span class="hljs-keyword">for</span> entityAnnotationId, entityAnnotation <span class="hljs-keyword">of</span> analysis.entityAnnotations
+   dump <span class="hljs-string">"[ entityAnnotation :: "</span>
+   dump entityAnnotation
+   dump <span class="hljs-string">" ]"</span>
+   dump <span class="hljs-string">"[ id :: <span class="hljs-subst">#{entityAnnotation.id}</span> ][ entity id :: <span class="hljs-subst">#{entityAnnotation.entity.id}</span> ][ relation id :: <span class="hljs-subst">#{entityAnnotation.relation.id}</span> ][ selected :: <span class="hljs-subst">#{entityAnnotation.selected}</span> ]"</span>
+</code></pre>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
     )</pre></div></div>
             
         </li>

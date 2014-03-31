@@ -23,70 +23,69 @@ angular.module('wordlift.tinymce.plugin.controllers',
 
       filtered
   )
-.controller('EntitiesController', ['EditorService', '$log', '$scope', 'Configuration',
-    (EditorService, $log, $scope, Configuration) ->
+.controller('EntitiesController', ['EditorService', '$log', '$scope', (EditorService, $log, $scope) ->
 
-      # holds a reference to the current analysis results.
-      $scope.analysis = null
+    # holds a reference to the current analysis results.
+    $scope.analysis = null
 
-      # holds a reference to the selected text annotation.
-      $scope.textAnnotation = null
-      # holds a reference to the selected text annotation span.
-      $scope.textAnnotationSpan = null
+    # holds a reference to the selected text annotation.
+    $scope.textAnnotation = null
+    # holds a reference to the selected text annotation span.
+    $scope.textAnnotationSpan = null
 
-      $scope.sortByConfidence = (entity) ->
-        entity[Configuration.entityLabels.confidence]
+    #      $scope.sortByConfidence = (entity) ->
+    #        entity[Configuration.entityLabels.confidence]
 
-      $scope.getLabelFor = (label) ->
-        Configuration.entityLabels[label]
+    #      $scope.getLabelFor = (label) ->
+    #        Configuration.entityLabels[label]
 
-      setArrowTop = (top) ->
-        $('head').append('<style>#wordlift-disambiguation-popover .postbox:before,#wordlift-disambiguation-popover .postbox:after{top:' + top + 'px;}</style>');
+    setArrowTop = (top) ->
+      $('head').append('<style>#wordlift-disambiguation-popover .postbox:before,#wordlift-disambiguation-popover .postbox:after{top:' + top + 'px;}</style>');
 
-      # a reference to the current text annotation span in the editor.
-      el = undefined
-      scroll = ->
-        return if not el?
+    # a reference to the current text annotation span in the editor.
+    el = undefined
+    scroll = ->
+      return if not el?
+      # get the position of the clicked element.
+      pos = EditorService.getWinPos(el)
+      # set the popover arrow to the element position.
+      setArrowTop(pos.top - 50)
+
+    # TODO: move these hooks on the popover, in order to hook/unhook the events.
+    $(window).scroll(scroll)
+    $('#content_ifr').contents().scroll(scroll)
+
+    $scope.onEntitySelected = (textAnnotation, entityAnnotation) ->
+      $scope.$emit 'selectEntity', ta: textAnnotation, ea: entityAnnotation
+      # Add the selected entity to the entity storage
+      window.wordlift.entities[entityAnnotation.entity.id] = entityAnnotation.entity
+
+    # Receive the analysis results and store them in the local scope.
+    $scope.$on 'analysisReceived', (event, analysis) ->
+      $scope.analysis = analysis
+
+    # When a text annotation is clicked, open the disambiguation popover.
+    $scope.$on 'textAnnotationClicked', (event, id, sourceElement) ->
+
+      # Get the text annotation with the provided id.
+#      $scope.textAnnotationSpan = angular.element sourceElement.target
+
+      # Set the current text annotation to the one specified.
+      $scope.textAnnotation = $scope.analysis.textAnnotations[id]
+
+      # hide the popover if there are no entities.
+      if not $scope.textAnnotation?.entityAnnotations? or 0 is Object.keys($scope.textAnnotation.entityAnnotations).length
+        $('#wordlift-disambiguation-popover').hide()
+        # show the popover.
+      else
+
         # get the position of the clicked element.
-        pos = EditorService.getWinPos(el)
+        pos = EditorService.getWinPos(sourceElement)
         # set the popover arrow to the element position.
         setArrowTop(pos.top - 50)
 
-      # TODO: move these hooks on the popover, in order to hook/unhook the events.
-      $(window).scroll(scroll)
-      $('#content_ifr').contents().scroll(scroll)
-
-      $scope.onEntitySelected = (textAnnotation, entityAnnotation) ->
-        $scope.$emit 'selectEntity', ta: textAnnotation, ea: entityAnnotation
-        # Add the selected entity to the entity storage
-        window.wordlift.entities[entityAnnotation.entity.id] = entityAnnotation.entity
-
-      # Receive the analysis results and store them in the local scope.
-      $scope.$on 'analysisReceived', (event, analysis) ->
-        $scope.analysis = analysis
-
-      # When a text annotation is clicked, open the disambiguation popover.
-      $scope.$on 'textAnnotationClicked', (event, id, sourceElement) ->
-
-        # Get the text annotation with the provided id.
-        $scope.textAnnotationSpan = angular.element sourceElement.target
-
-        # Set the current text annotation to the one specified.
-        $scope.textAnnotation = $scope.analysis.textAnnotations[id]
-
-        # hide the popover if there are no entities.
-        if not $scope.textAnnotation?.entityAnnotations? or 0 is Object.keys($scope.textAnnotation.entityAnnotations).length
-          $('#wordlift-disambiguation-popover').hide()
-          # show the popover.
-        else
-
-          # get the position of the clicked element.
-          pos = EditorService.getWinPos(sourceElement)
-          # set the popover arrow to the element position.
-          setArrowTop(pos.top - 50)
-
-          # show the popover.
-          $('#wordlift-disambiguation-popover').show()
+        # show the popover.
+        $('#wordlift-disambiguation-popover').show()
 
   ])
 .controller('ErrorController', ['$element', '$scope', '$log', ($element, $scope, $log) ->

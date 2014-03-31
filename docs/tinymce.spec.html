@@ -49,6 +49,21 @@
               </a>
             
               
+              <a class="source" href="app.services.EntityAnnotationService.html">
+                app.services.EntityAnnotationService.coffee
+              </a>
+            
+              
+              <a class="source" href="app.services.Helpers.html">
+                app.services.Helpers.coffee
+              </a>
+            
+              
+              <a class="source" href="app.services.TextAnnotationService.html">
+                app.services.TextAnnotationService.coffee
+              </a>
+            
+              
               <a class="source" href="app.services.html">
                 app.services.coffee
               </a>
@@ -1035,7 +1050,7 @@ and disambiguated item is preserved</p>
             <div class="content"><div class='highlight'><pre>        id = match[<span class="hljs-number">1</span>]
         text = match[<span class="hljs-number">2</span>]
         expect(textAnnotations[id]).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">null</span>
-        expect(textAnnotations[id].selectedText).toEqual text
+        expect(textAnnotations[id].text).toEqual text
 
 
 describe <span class="hljs-string">"TinceMCE editor : analysis abort"</span>,<span class="hljs-function"> -&gt;</span>
@@ -1909,6 +1924,203 @@ describe <span class="hljs-string">'TinyMCE'</span>,<span class="hljs-function">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-107">&#182;</a>
+              </div>
+              <p>   for textAnnotationId, textAnnotation of analysis.textAnnotations
+     for entityAnnotationId, entityAnnotation of textAnnotation.entityAnnotations
+       entity = entityAnnotation.entity
+       dump “[ entityAnnotationId :: #{entityAnnotationId} ][ selected :: #{entityAnnotation.selected} ][ entity id :: #{entity.id} ]”</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+
+  )
+
+  it <span class="hljs-string">'features entities preselections in the analysis results (2)'</span>, inject<span class="hljs-function"><span class="hljs-params">( (AnalysisService, EditorService) -&gt;
+
+</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-108">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-108">&#182;</a>
+              </div>
+              <p>The html content.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    html = <span class="hljs-string">''</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-109">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-109">&#182;</a>
+              </div>
+              <p>The analysis results.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    json = <span class="hljs-string">''</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-110">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-110">&#182;</a>
+              </div>
+              <p>Load the sample text in the editor.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    $.ajax<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'base/app/assets/insideout10_1.html'</span>, async: <span class="hljs-literal">false</span>)</span>.<span class="hljs-title">done</span> <span class="hljs-params">(data)</span> -&gt;</span>
+      html = data</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-111">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-111">&#182;</a>
+              </div>
+              <p>Load the sample analysis results.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    $.ajax<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'base/app/assets/insideout10_1.json'</span>, async: <span class="hljs-literal">false</span>)</span>.<span class="hljs-title">done</span> <span class="hljs-params">(data)</span> -&gt;</span>
+      json = data</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-112">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-112">&#182;</a>
+              </div>
+              <p>Set the textual content in the editor.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    ed.setContent html, <span class="hljs-attribute">format</span>: <span class="hljs-string">'raw'</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-113">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-113">&#182;</a>
+              </div>
+              <p>Get the analysis instance, by parsing the json and merging the results.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    analysis = AnalysisService.parse json, <span class="hljs-literal">true</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-114">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-114">&#182;</a>
+              </div>
+              <p>Embed the analysis results.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    EditorService.embedAnalysis analysis</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-115">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-115">&#182;</a>
+              </div>
+              <p>We expect these entity annotations to be already selected.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    selected = [
+      <span class="hljs-string">'urn:enhancement-49b1cf1e-b260-4033-403e-4e494039d241'</span>
+      <span class="hljs-string">'urn:enhancement-33ff847c-da6a-d889-9f1e-b347f17d6d7a'</span>
+      <span class="hljs-string">'urn:enhancement-15a22024-9c09-771d-535a-3b00c929717b'</span>
+    ]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-116">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-116">&#182;</a>
+              </div>
+              <p>Check for selections.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    expect(analysis.entityAnnotations).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
+    expect(Object.keys(analysis.entityAnnotations).length).toEqual <span class="hljs-number">9</span>
+    <span class="hljs-keyword">for</span> entityAnnotationId, entityAnnotation <span class="hljs-keyword">of</span> analysis.entityAnnotations</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-117">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-117">&#182;</a>
+              </div>
+              <pre><code> dump <span class="hljs-string">"[ entity annotation id :: <span class="hljs-subst">#{entityAnnotationId}</span> ][ entity :: <span class="hljs-subst">#{entityAnnotation.entity}</span> ][ relation :: <span class="hljs-subst">#{entityAnnotation.relation.id}</span> ]"</span>
+</code></pre>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      expect(entityAnnotation.entity).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-118">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-118">&#182;</a>
+              </div>
+              <pre><code> dump <span class="hljs-string">"[ entity id :: <span class="hljs-subst">#{entityAnnotation.entity.id}</span> ][  ]"</span>
+</code></pre>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      expect(entityAnnotation.selected).toBe (entityAnnotation.id <span class="hljs-keyword">in</span> selected)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-119">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-119">&#182;</a>
               </div>
               <p>   for textAnnotationId, textAnnotation of analysis.textAnnotations
      for entityAnnotationId, entityAnnotation of textAnnotation.entityAnnotations

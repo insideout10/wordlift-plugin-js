@@ -39,100 +39,8 @@ describe "TinyMCE tests", ->
 
   it "embeds the analysis results", inject (AnalysisService, EditorService, $httpBackend) ->
 
-    pending()
-
     # Check that the editor content is empty.
     expect(ed.getContent().length).toEqual 0
-
-    # Load the sample text in the editor.
-    $.ajax('base/app/assets/english.txt',
-      async: false
-    ).done (source) ->
-      # Set the editor content
-      ed.setContent source
-      # Check editor content is set properly
-      expect(ed.getContent({format: 'raw'})).toEqual(source)
-
-      # Load the sample response.
-      $.ajax('base/app/assets/english.json',
-        async: false
-      ).done (data) ->
-        analysis = AnalysisService.parse data, true
-        # Catch all the requests to Freebase.
-        $httpBackend.when('HEAD', /.*/).respond(200, '')
-
-        dump "======================================================="
-        EditorService.embedAnalysis analysis
-
-        dump ed.getContent({format: 'raw'})
-        # Check that text annotation spans clean up works properly
-#        expect(ed.getContent({format: 'raw'})).toEqual(source)
-
-
-  it "perform analysis on analyzed content", inject (AnalysisService, EditorService, $httpBackend) ->
-    pending()
-
-    # Check that the editor content is empty.
-    expect(ed.getContent().length).toEqual 0
-
-    # Load the sample text in the editor.
-    $.ajax('base/app/assets/english_analyzed.txt',
-      async: false
-    ).done (source) ->
-      # Set the editor content
-      ed.setContent source
-      # Check editor content is set properly
-      expect(ed.getContent({format: 'raw'})).toEqual(source)
-
-      # Load the sample response.
-      $.ajax('base/app/assets/english.json',
-        async: false
-      ).done (data) ->
-        analysis = AnalysisService.parse data
-        # Catch all the requests to Freebase.
-        $httpBackend.when('HEAD', /.*/).respond(200, '')
-        EditorService.embedAnalysis analysis
-
-        dump ed.getContent({format: 'raw'})
-        # Check that text annotation spans clean up works properly
-        expect(ed.getContent({format: 'raw'})).toEqual(source)
-
-  it "perform analysis on analyzed content with a disambiguated item", inject (AnalysisService, EditorService, $httpBackend, $rootScope) ->
-
-    pending()
-
-    # Spy on the root scope.
-    spyOn($rootScope, '$broadcast').and.callThrough()
-
-    # Check that the editor content is empty.
-    expect(ed.getContent().length).toEqual 0
-
-    # Load the sample text in the editor.
-    $.ajax('base/app/assets/english_disambiguated.txt',
-      async: false
-    ).done (source) ->
-      # Set the editor content
-      ed.setContent source
-      # Check editor content is set properly
-      expect(ed.getContent({format: 'raw'})).toEqual(source)
-
-      # Load the sample response.
-      $.ajax('base/app/assets/english.json',
-        async: false
-      ).done (data) ->
-        analysis = AnalysisService.parse data
-        # Catch all the requests to Freebase.
-        $httpBackend.when('HEAD', /.*/).respond(200, '')
-        EditorService.embedAnalysis analysis
-        # Check that text annotation spans clean up works properly
-        # and disambiguated item is preserved
-        expect(ed.getContent({format: 'raw'})).toEqual(source)
-
-        # Check if disambiguated text annotations are properly
-        textAnnotationId = "urn:enhancement-233fd158-870d-6ca4-b7ce-30313e4a7015"
-        selectedEntityId = "http://data.redlink.io/353/wordlift/entity/David_Riccitelli"
-        expect($rootScope.$broadcast).toHaveBeenCalledWith('disambiguatedTextAnnotationDetected', textAnnotationId,
-          selectedEntityId)
 
 
   it "doesn't run an analysis when an analysis is already running", inject (AnalysisService, EditorService) ->
@@ -150,14 +58,13 @@ describe "TinyMCE tests", ->
     expect(AnalysisService.isRunning).toEqual true
 
     # Call the analyze method of the editor.
-    EditorService.analyze ed.getContent { format: 'text' }
+    EditorService.analyze ed.getContent format: 'text'
 
     # The analysis service shouldn't have been called
     expect(AnalysisService.analyze).not.toHaveBeenCalled()
 
 
   it "runs an analysis when an analysis is not running", inject (AnalysisService, EditorService, $httpBackend, $rootScope) ->
-    pending()
 
     # Spy on the analyze method of the AnalysisService
     spyOn(AnalysisService, 'analyze').and.callThrough()
@@ -172,15 +79,11 @@ describe "TinyMCE tests", ->
     expect(AnalysisService.isRunning).toEqual false
 
     # Load the sample response.
-    $.ajax('base/app/assets/english.json',
-      async: false
-
-    ).done (data) ->
-      $httpBackend.expectPOST('/base/app/assets/english.json?action=wordlift_analyze')
-      .respond 200, data
-
+    $.ajax('base/app/assets/english.json', async: false ).done (data) ->
+      $httpBackend.expectPOST('/base/app/assets/english.json?action=wordlift_analyze').respond 200, data
+#
       # Call the analyze method of the editor.
-      EditorService.analyze ed.getContent { format: 'text' }
+      EditorService.analyze ed.getContent(format: 'text')
 
       # The analysis service shouldn't have been called with the merge parameter set to true.
       expect(AnalysisService.analyze).toHaveBeenCalledWith(jasmine.any(String), true)
@@ -209,36 +112,10 @@ describe "TinyMCE tests", ->
       expect(analysis.textAnnotations).not.toBe undefined
       expect(analysis.languages).not.toBe undefined
       expect(analysis.language).toEqual 'en'
-      expect(Object.keys(analysis.entities).length).toEqual 28
-      expect(Object.keys(analysis.entityAnnotations).length).toEqual 30
-      expect(Object.keys(analysis.textAnnotations).length).toEqual 10
+      expect(Object.keys(analysis.entities).length).toEqual 18
+      expect(Object.keys(analysis.entityAnnotations).length).toEqual 19
+      expect(Object.keys(analysis.textAnnotations).length).toEqual 12
       expect(Object.keys(analysis.languages).length).toEqual 1
-
-    # Check that the text annotations have been embedded in the content.
-    it "embeds the analysis results in the editor contents", inject (EditorService, $rootScope) ->
-
-#      pending()
-
-      # Get the editor raw content
-      content = ed.getContent { format: 'raw' }
-
-      expect(content.length).toBeGreaterThan 0
-
-      # Get a reference to the argument passed with the event.
-      args = $rootScope.$broadcast.calls.argsFor 0
-      # Get a reference to the analysis structure.
-      analysis = args[1]
-      # Get the text annotations.
-      textAnnotations = analysis.textAnnotations
-
-      # Look for SPANs in the content.
-      regex = new RegExp(/<span id="([^"]+)" class="textannotation">([^<]+)<\/span>/g)
-      while match = regex.exec content
-        # Check that every span matches a text annotation.
-        id = match[1]
-        text = match[2]
-        expect(textAnnotations[id]).not.toBe null
-        expect(textAnnotations[id].selectedText).toEqual text
 
 
 describe "TinceMCE editor : analysis abort", ->
@@ -518,6 +395,55 @@ describe 'TinyMCE', ->
     expect(analysis.entityAnnotations).not.toBe undefined
     expect(Object.keys(analysis.entityAnnotations).length).toEqual 22
     for entityAnnotationId, entityAnnotation of analysis.entityAnnotations
+      expect(entityAnnotation.selected).toBe (entityAnnotation.id in selected)
+
+#    for textAnnotationId, textAnnotation of analysis.textAnnotations
+#      for entityAnnotationId, entityAnnotation of textAnnotation.entityAnnotations
+#        entity = entityAnnotation.entity
+#        dump "[ entityAnnotationId :: #{entityAnnotationId} ][ selected :: #{entityAnnotation.selected} ][ entity id :: #{entity.id} ]"
+
+
+  )
+
+  it 'features entities preselections in the analysis results (2)', inject( (AnalysisService, EditorService) ->
+
+    # The html content.
+    html = ''
+
+    # The analysis results.
+    json = ''
+
+    # Load the sample text in the editor.
+    $.ajax('base/app/assets/insideout10_1.html', async: false).done (data) ->
+      html = data
+
+    # Load the sample analysis results.
+    $.ajax('base/app/assets/insideout10_1.json', async: false).done (data) ->
+      json = data
+
+    # Set the textual content in the editor.
+    ed.setContent html, format: 'raw'
+
+    # Get the analysis instance, by parsing the json and merging the results.
+    analysis = AnalysisService.parse json, true
+
+    # Embed the analysis results.
+    EditorService.embedAnalysis analysis
+
+    # We expect these entity annotations to be already selected.
+    selected = [
+      'urn:enhancement-49b1cf1e-b260-4033-403e-4e494039d241'
+      'urn:enhancement-33ff847c-da6a-d889-9f1e-b347f17d6d7a'
+      'urn:enhancement-15a22024-9c09-771d-535a-3b00c929717b'
+    ]
+
+    # Check for selections.
+    expect(analysis.entityAnnotations).not.toBe undefined
+    expect(Object.keys(analysis.entityAnnotations).length).toEqual 9
+    for entityAnnotationId, entityAnnotation of analysis.entityAnnotations
+#      dump "[ entity annotation id :: #{entityAnnotationId} ][ entity :: #{entityAnnotation.entity} ][ relation :: #{entityAnnotation.relation.id} ]"
+      expect(entityAnnotation.entity).not.toBe undefined
+#      dump "[ entity id :: #{entityAnnotation.entity.id} ][  ]"
       expect(entityAnnotation.selected).toBe (entityAnnotation.id in selected)
 
 #    for textAnnotationId, textAnnotation of analysis.textAnnotations
