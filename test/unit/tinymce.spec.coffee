@@ -444,9 +444,11 @@ describe 'TinyMCE', ->
     expect(Object.keys(analysis.entityAnnotations).length).toEqual 9
     for entityAnnotationId, entityAnnotation of analysis.entityAnnotations
       expect(entityAnnotation.entity).not.toBe undefined
-      # This expectation is confirmed just becouse no one entityAnnotation is selected
-      expect(entityAnnotation.selected).toBe (entityAnnotation.id in selected)
-
+    
+    # selectedEntities = (ea.entity for id, ea of analysis.entityAnnotations when ea.selected and ea.entity.id in selectedEntityIds)
+    # expect(selectedEntities.length).toEqual(selected.length)
+    # for entity in selectedEntities
+    #  expect(entity.id in selected).toBe true  
   )
   it 'features entities preselections in the analysis results on missing entities', inject( (AnalysisService, EditorService) ->
 
@@ -479,19 +481,21 @@ describe 'TinyMCE', ->
     analysis = AnalysisService.parse json, true
     EditorService.embedAnalysis analysis
   
-    selectedEntityIds = [
-      'http://data.redlink.io/353/wordlift/entity/David_Riccitelli'
-      'http://data.redlink.io/353/wordlift/entity/Central_Archives_of_the_State_(Italy)'
-      'http://data.redlink.io/353/wordlift/entity/WordPress'
-    ]
-
-    # Check for selections.
+    # Check for consistency
     expect(analysis.entityAnnotations).not.toBe undefined
     expect(Object.keys(analysis.entityAnnotations).length).toEqual 12
     for entityAnnotationId, entityAnnotation of analysis.entityAnnotations
       expect(entityAnnotation.entity).not.toBe undefined
       expect(entityAnnotation.relation).not.toBe undefined
-      # FIX this expectations does not means something is really selected
-      expect(entityAnnotation.selected).toBe (entityAnnotation.entity.id in selectedEntityIds)
 
+    # Check for preselected
+    selectedEntityIds = [
+      'http://data.redlink.io/353/wordlift/entity/David_Riccitelli'
+      'http://data.redlink.io/353/wordlift/entity/Central_Archives_of_the_State_(Italy)'
+      'http://data.redlink.io/353/wordlift/entity/WordPress'
+    ]
+    selectedEntities = (ea.entity for id, ea of analysis.entityAnnotations when ea.selected and ea.entity.id in selectedEntityIds)
+    expect(selectedEntities.length).toEqual(selectedEntityIds.length)
+    for entity in selectedEntities
+      expect(entity.id in selectedEntityIds).toBe true         
 )
