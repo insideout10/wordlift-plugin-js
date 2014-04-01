@@ -108,6 +108,45 @@ class Traslator
     @_text
 
 window.Traslator = Traslator
+# Constants
+CONTEXT = '@context'
+GRAPH = '@graph'
+VALUE = '@value'
+
+ANALYSIS_EVENT = 'analysisReceived'
+
+RDFS = 'http://www.w3.org/2000/01/rdf-schema#'
+RDFS_LABEL = "#{RDFS}label"
+RDFS_COMMENT = "#{RDFS}comment"
+
+FREEBASE = 'freebase'
+FREEBASE_COM = "http://rdf.#{FREEBASE}.com/"
+FREEBASE_NS = "#{FREEBASE_COM}ns/"
+FREEBASE_NS_DESCRIPTION = "#{FREEBASE_NS}common.topic.description"
+
+SCHEMA_ORG = 'http://schema.org/'
+SCHEMA_ORG_DESCRIPTION = "#{SCHEMA_ORG}description"
+
+FISE_ONT = 'http://fise.iks-project.eu/ontology/'
+FISE_ONT_ENTITY_ANNOTATION = "#{FISE_ONT}EntityAnnotation"
+FISE_ONT_TEXT_ANNOTATION = "#{FISE_ONT}TextAnnotation"
+FISE_ONT_CONFIDENCE = "#{FISE_ONT}confidence"
+
+DCTERMS = 'http://purl.org/dc/terms/'
+
+DBPEDIA = 'dbpedia'
+DBPEDIA_ORG = "http://#{DBPEDIA}.org/"
+
+WGS84_POS = 'http://www.w3.org/2003/01/geo/wgs84_pos#'
+
+# Define some constants for commonly used strings.
+EDITOR_ID = 'content'
+TEXT_ANNOTATION = 'textannotation'
+CONTENT_IFRAME = '#content_ifr'
+RUNNING_CLASS = 'running'
+MCE_WORDLIFT = '.mce_wordlift'
+CONTENT_EDITABLE = 'contenteditable'
+
 angular.module('wordlift.tinymce.plugin.config', [])
 #	.constant 'Configuration',
 #		supportedTypes: [
@@ -243,39 +282,8 @@ angular.module('AnalysisService', [])
     [ 'EntityAnnotationService', 'TextAnnotationService', '$filter', '$http', '$q', '$rootScope',
       (EntityAnnotationService, TextAnnotationService, $filter, $http, $q, $rootScope) ->
 
-        # Constants
-        CONTEXT = '@context'
-        GRAPH = '@graph'
-        VALUE = '@value'
-
-        ANALYSIS_EVENT = 'analysisReceived'
-
-        RDFS = 'http://www.w3.org/2000/01/rdf-schema#'
-        RDFS_LABEL = "#{RDFS}label"
-        RDFS_COMMENT = "#{RDFS}comment"
-
-        FREEBASE = 'freebase'
-        FREEBASE_COM = "http://rdf.#{FREEBASE}.com/"
-        FREEBASE_NS = "#{FREEBASE_COM}ns/"
-        FREEBASE_NS_DESCRIPTION = "#{FREEBASE_NS}common.topic.description"
-
-        SCHEMA_ORG = 'http://schema.org/'
-        SCHEMA_ORG_DESCRIPTION = "#{SCHEMA_ORG}description"
-
-        FISE_ONT = 'http://fise.iks-project.eu/ontology/'
-        FISE_ONT_ENTITY_ANNOTATION = "#{FISE_ONT}EntityAnnotation"
-        FISE_ONT_TEXT_ANNOTATION = "#{FISE_ONT}TextAnnotation"
-        FISE_ONT_CONFIDENCE = "#{FISE_ONT}confidence"
-
-        DCTERMS = 'http://purl.org/dc/terms/'
-
-        DBPEDIA = 'dbpedia'
-        DBPEDIA_ORG = "http://#{DBPEDIA}.org/"
-
-        WGS84_POS = 'http://www.w3.org/2003/01/geo/wgs84_pos#'
-
         # Set the known types as provided by the environment.
-        KNOWN_TYPES = if window.wordlift?.types? then window.wordlift.types else []
+        KNOWN_TYPES = [] # if window.wordlift?.types? then window.wordlift.types else []
 
         # Find a text annotation in the provided collection which matches the start and end values.
         # Otherwise a new text annotation is created
@@ -295,6 +303,10 @@ angular.module('AnalysisService', [])
           ta
 
         service =
+          setKnownTypes: (types) => @_knownTypes = types
+
+          _knownTypes: []
+
         # Holds the analysis promise, used to abort the analysis.
           promise: undefined
 
@@ -376,7 +388,7 @@ angular.module('AnalysisService', [])
 
         # Parse the response data from the analysis request (Redlink).
         # If *merge* is set to true, entity annotations and entities with matching sameAs will be merged.
-          parse: (data, merge = false) ->
+          parse: (data, merge = false) =>
             languages = []
             textAnnotations = {}
             entityAnnotations = {}
@@ -388,12 +400,12 @@ angular.module('AnalysisService', [])
             #  * person
             #  * organization
             #  * place
-            getKnownTypes = (types) ->
+            getKnownTypes = (types) =>
 
               # An array with known types according to the specified types.
               returnTypes = []
               defaultType = undefined
-              for kt in KNOWN_TYPES
+              for kt in @_knownTypes
                 # Set the default type, identified by an asterisk (*) in the sameAs values.
                 defaultType = [
                   { type: kt }
@@ -752,14 +764,6 @@ angular.module('AnalysisService', [])
 angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tinymce.plugin.config', 'AnalysisService'])
 .service('EditorService',
     ['AnalysisService', 'EntityAnnotationService', '$rootScope', (AnalysisService, EntityAnnotationService, $rootScope) ->
-
-      # Define some constants for commonly used strings.
-      EDITOR_ID = 'content'
-      TEXT_ANNOTATION = 'textannotation'
-      CONTENT_IFRAME = '#content_ifr'
-      RUNNING_CLASS = 'running'
-      MCE_WORDLIFT = '.mce_wordlift'
-      CONTENT_EDITABLE = 'contenteditable'
 
       editor = ->
         tinyMCE.get(EDITOR_ID)
@@ -1173,6 +1177,9 @@ $(
 
   # Declare the whole document as bootstrap scope.
   injector = angular.bootstrap $('#wl-app'), ['wordlift.tinymce.plugin']
+  injector.invoke ['AnalysisService', (AnalysisService) ->
+    AnalysisService.setKnownTypes window.wordlift.types
+  ]
 
   # Add WordLift as a plugin of the TinyMCE editor.
   tinymce.PluginManager.add 'wordlift', (editor, url) ->

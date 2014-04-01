@@ -29,6 +29,11 @@
               </a>
             
               
+              <a class="source" href="app.constants.html">
+                app.constants.coffee
+              </a>
+            
+              
               <a class="source" href="app.controllers.html">
                 app.controllers.coffee
               </a>
@@ -155,7 +160,6 @@
             
             <div class="content"><div class='highlight'><pre>  describe <span class="hljs-string">'AnalysisService'</span>,<span class="hljs-function"> -&gt;</span>
     it <span class="hljs-string">'parses analysis data'</span>, inject<span class="hljs-function"><span class="hljs-params">((AnalysisService, $httpBackend, $rootScope) -&gt;
-      pending()
 
 </span></span></pre></div></div>
             
@@ -172,9 +176,7 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      $.ajax(<span class="hljs-string">'base/app/assets/english.json'</span>,
-        <span class="hljs-attribute">async</span>: <span class="hljs-literal">false</span>
-      ).done <span class="hljs-function"><span class="hljs-params">(data)</span> -&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>      $.ajax<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'base/app/assets/english.json'</span>, async: <span class="hljs-literal">false</span>)</span>.<span class="hljs-title">done</span> <span class="hljs-params">(data)</span> -&gt;</span></pre></div></div>
             
         </li>
         
@@ -226,9 +228,9 @@
         expect(analysis.textAnnotations).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
         expect(analysis.languages).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
         expect(analysis.language).toEqual <span class="hljs-string">'en'</span>
-        expect(Object.keys(analysis.entities).length).toEqual <span class="hljs-number">28</span>
-        expect(Object.keys(analysis.entityAnnotations).length).toEqual <span class="hljs-number">30</span>
-        expect(Object.keys(analysis.textAnnotations).length).toEqual <span class="hljs-number">10</span>
+        expect(Object.keys(analysis.entities).length).toEqual <span class="hljs-number">18</span>
+        expect(Object.keys(analysis.entityAnnotations).length).toEqual <span class="hljs-number">19</span>
+        expect(Object.keys(analysis.textAnnotations).length).toEqual <span class="hljs-number">12</span>
         expect(Object.keys(analysis.languages).length).toEqual <span class="hljs-number">1</span></pre></div></div>
             
         </li>
@@ -244,10 +246,10 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        textAnnotationId = <span class="hljs-string">'urn:enhancement-1a452dcd-b97f-6d9c-8de5-b4cec57ec020'</span>
-        entityAnnotation1Id = <span class="hljs-string">'urn:enhancement-509b6609-e7d6-4c08-e627-afcfd637c42f'</span>
-        entityAnnotation2Id = <span class="hljs-string">'urn:enhancement-ec266952-de23-ef06-896f-02f9434e99b0'</span>
-        entityAnnotation3Id = <span class="hljs-string">'urn:enhancement-3366ede4-c449-f43b-e3cf-297fb41a619d'</span>
+            <div class="content"><div class='highlight'><pre>        textAnnotationId = <span class="hljs-string">'urn:enhancement-5adbf3ee-54d0-2445-6fdc-c09fec19c76f'</span>
+        entityAnnotation1Id = <span class="hljs-string">'urn:enhancement-916d5d56-42b5-fc61-eae9-c282233d8b5f'</span>
+        entityAnnotation2Id = <span class="hljs-string">'urn:enhancement-9430a584-c692-d419-b19f-c2bcbacba678'</span>
+        entityAnnotation3Id = <span class="hljs-string">'urn:enhancement-9e5931fc-7a09-567d-65ff-05d34638b8e5'</span>
 
         textAnnotation = analysis.textAnnotations[textAnnotationId]
         expect(textAnnotation).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
@@ -266,7 +268,6 @@
     )
 
     it <span class="hljs-string">'parses and merges analysis data'</span>, inject<span class="hljs-function"><span class="hljs-params">((AnalysisService, $httpBackend, $rootScope) -&gt;
-      pending()
 
 </span></span></pre></div></div>
             
@@ -283,9 +284,7 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      $.ajax(<span class="hljs-string">'base/app/assets/english.json'</span>,
-        <span class="hljs-attribute">async</span>: <span class="hljs-literal">false</span>
-      ).done <span class="hljs-function"><span class="hljs-params">(data)</span> -&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>      $.ajax<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'base/app/assets/english.json'</span>, async: <span class="hljs-literal">false</span>)</span>.<span class="hljs-title">done</span> <span class="hljs-params">(data)</span> -&gt;</span></pre></div></div>
             
         </li>
         
@@ -337,9 +336,9 @@
         expect(analysis.textAnnotations).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
         expect(analysis.languages).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
         expect(analysis.language).toEqual <span class="hljs-string">'en'</span>
-        expect(Object.keys(analysis.entities).length).toEqual <span class="hljs-number">28</span>
-        expect(Object.keys(analysis.entityAnnotations).length).toEqual <span class="hljs-number">30</span>
-        expect(Object.keys(analysis.textAnnotations).length).toEqual <span class="hljs-number">10</span>
+        expect(Object.keys(analysis.entities).length).toEqual <span class="hljs-number">18</span>
+        expect(Object.keys(analysis.entityAnnotations).length).toEqual <span class="hljs-number">19</span>
+        expect(Object.keys(analysis.textAnnotations).length).toEqual <span class="hljs-number">12</span>
         expect(Object.keys(analysis.languages).length).toEqual <span class="hljs-number">1</span></pre></div></div>
             
         </li>
@@ -355,8 +354,8 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        textAnnotationId = <span class="hljs-string">'urn:enhancement-1a452dcd-b97f-6d9c-8de5-b4cec57ec020'</span>
-        entityAnnotationId = <span class="hljs-string">'urn:enhancement-3366ede4-c449-f43b-e3cf-297fb41a619d'</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>        textAnnotationId = <span class="hljs-string">'urn:enhancement-5adbf3ee-54d0-2445-6fdc-c09fec19c76f'</span>
+        entityAnnotationId = <span class="hljs-string">'urn:enhancement-2b7ce8df-2bce-cdb8-faa8-f8b7d785b807'</span></pre></div></div>
             
         </li>
         
@@ -372,7 +371,12 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>        textAnnotation = analysis.textAnnotations[textAnnotationId]
-        expect(textAnnotation).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span></pre></div></div>
+        expect(textAnnotation).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
+
+        entityAnnotation = textAnnotation.entityAnnotations[entityAnnotationId]
+        expect(entityAnnotation).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
+        expect(entityAnnotation.entity).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
+        expect(entityAnnotation.entity.sameAs).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span></pre></div></div>
             
         </li>
         
@@ -383,14 +387,13 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
-              <p>Set a reference to the entity annotation.</p>
+              <p>Set a reference to the entity.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        entityAnnotation = textAnnotation.entityAnnotations[entityAnnotationId]
-        expect(entityAnnotation).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
-        expect(entityAnnotation.entity).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
-        expect(entityAnnotation.entity.sameAs).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>        entity = entityAnnotation.entity
+        expect(entity.thumbnails.length).toEqual <span class="hljs-number">1</span>
+        expect(entity.thumbnails[<span class="hljs-number">0</span>]).toEqual <span class="hljs-string">'https://usercontent.googleapis.com/freebase/v1/image/m/05thd8b?maxwidth=4096&amp;maxheight=4096'</span></pre></div></div>
             
         </li>
         
@@ -401,19 +404,14 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
-              <p>Set a reference to the entity.</p>
-
+              <pre><code>   expect(entity.thumbnails[<span class="hljs-number">1</span>]).toEqual <span class="hljs-string">'https://usercontent.googleapis.com/freebase/v1/image/m/04js6kc?maxwidth=4096&amp;maxheight=4096'</span>
+   expect(entity.thumbnails[<span class="hljs-number">2</span>]).toEqual <span class="hljs-string">'https://usercontent.googleapis.com/freebase/v1/image/m/04js6kq?maxwidth=4096&amp;maxheight=4096'</span>
+   expect(entity.thumbnails[<span class="hljs-number">3</span>]).toEqual <span class="hljs-string">'https://usercontent.googleapis.com/freebase/v1/image/m/04mn0b4?maxwidth=4096&amp;maxheight=4096'</span>
+   expect(entity.thumbnails[<span class="hljs-number">4</span>]).toEqual <span class="hljs-string">'https://usercontent.googleapis.com/freebase/v1/image/m/04mn0bt?maxwidth=4096&amp;maxheight=4096'</span>
+</code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>        entity = entityAnnotation.entity
-        expect(entity.thumbnails.length).toEqual <span class="hljs-number">5</span>
-        expect(entity.thumbnails[<span class="hljs-number">0</span>]).toEqual <span class="hljs-string">'http://upload.wikimedia.org/wikipedia/commons/a/a6/Flag_of_Rome.svg'</span>
-        expect(entity.thumbnails[<span class="hljs-number">1</span>]).toEqual <span class="hljs-string">'https://usercontent.googleapis.com/freebase/v1/image/m/04js6kc?maxwidth=4096&amp;maxheight=4096'</span>
-        expect(entity.thumbnails[<span class="hljs-number">2</span>]).toEqual <span class="hljs-string">'https://usercontent.googleapis.com/freebase/v1/image/m/04js6kq?maxwidth=4096&amp;maxheight=4096'</span>
-        expect(entity.thumbnails[<span class="hljs-number">3</span>]).toEqual <span class="hljs-string">'https://usercontent.googleapis.com/freebase/v1/image/m/04mn0b4?maxwidth=4096&amp;maxheight=4096'</span>
-        expect(entity.thumbnails[<span class="hljs-number">4</span>]).toEqual <span class="hljs-string">'https://usercontent.googleapis.com/freebase/v1/image/m/04mn0bt?maxwidth=4096&amp;maxheight=4096'</span>
-
-        expect(entityAnnotation.entity).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span> <span class="hljs-keyword">for</span> id, entityAnnotation <span class="hljs-keyword">of</span> analysis.entityAnnotations
+            <div class="content"><div class='highlight'><pre>        expect(entityAnnotation.entity).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span> <span class="hljs-keyword">for</span> id, entityAnnotation <span class="hljs-keyword">of</span> analysis.entityAnnotations
 
         <span class="hljs-keyword">for</span> id, textAnnotation <span class="hljs-keyword">of</span> analysis.textAnnotations
           <span class="hljs-keyword">for</span> id, entityAnnotation <span class="hljs-keyword">of</span> textAnnotation.entityAnnotations

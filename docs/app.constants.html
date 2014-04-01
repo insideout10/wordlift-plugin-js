@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>app.services.Helpers.coffee</title>
+  <title>app.constants.coffee</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="docco.css" />
@@ -111,7 +111,7 @@
         
           <li id="title">
               <div class="annotation">
-                  <h1>app.services.Helpers.coffee</h1>
+                  <h1>app.constants.coffee</h1>
               </div>
           </li>
         
@@ -123,11 +123,39 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
-              
+              <p>Constants</p>
+
             </div>
             
-            <div class="content"><div class='highlight'><pre>angular.<span class="hljs-built_in">module</span>(<span class="hljs-string">'wordlift.tinymce.plugin.services.Helpers'</span>, [])
-.service(<span class="hljs-string">'Helpers'</span>, [<span class="hljs-function"> -&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>CONTEXT = <span class="hljs-string">'@context'</span>
+GRAPH = <span class="hljs-string">'@graph'</span>
+VALUE = <span class="hljs-string">'@value'</span>
+
+ANALYSIS_EVENT = <span class="hljs-string">'analysisReceived'</span>
+
+RDFS = <span class="hljs-string">'http://www.w3.org/2000/01/rdf-schema#'</span>
+RDFS_LABEL = <span class="hljs-string">"<span class="hljs-subst">#{RDFS}</span>label"</span>
+RDFS_COMMENT = <span class="hljs-string">"<span class="hljs-subst">#{RDFS}</span>comment"</span>
+
+FREEBASE = <span class="hljs-string">'freebase'</span>
+FREEBASE_COM = <span class="hljs-string">"http://rdf.<span class="hljs-subst">#{FREEBASE}</span>.com/"</span>
+FREEBASE_NS = <span class="hljs-string">"<span class="hljs-subst">#{FREEBASE_COM}</span>ns/"</span>
+FREEBASE_NS_DESCRIPTION = <span class="hljs-string">"<span class="hljs-subst">#{FREEBASE_NS}</span>common.topic.description"</span>
+
+SCHEMA_ORG = <span class="hljs-string">'http://schema.org/'</span>
+SCHEMA_ORG_DESCRIPTION = <span class="hljs-string">"<span class="hljs-subst">#{SCHEMA_ORG}</span>description"</span>
+
+FISE_ONT = <span class="hljs-string">'http://fise.iks-project.eu/ontology/'</span>
+FISE_ONT_ENTITY_ANNOTATION = <span class="hljs-string">"<span class="hljs-subst">#{FISE_ONT}</span>EntityAnnotation"</span>
+FISE_ONT_TEXT_ANNOTATION = <span class="hljs-string">"<span class="hljs-subst">#{FISE_ONT}</span>TextAnnotation"</span>
+FISE_ONT_CONFIDENCE = <span class="hljs-string">"<span class="hljs-subst">#{FISE_ONT}</span>confidence"</span>
+
+DCTERMS = <span class="hljs-string">'http://purl.org/dc/terms/'</span>
+
+DBPEDIA = <span class="hljs-string">'dbpedia'</span>
+DBPEDIA_ORG = <span class="hljs-string">"http://<span class="hljs-subst">#{DBPEDIA}</span>.org/"</span>
+
+WGS84_POS = <span class="hljs-string">'http://www.w3.org/2003/01/geo/wgs84_pos#'</span></pre></div></div>
             
         </li>
         
@@ -138,37 +166,16 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
-              <p>Merges two objects by copying overrides param onto the options.</p>
+              <p>Define some constants for commonly used strings.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">merge</span>: <span class="hljs-function"><span class="hljs-params">(options, overrides)</span> -&gt;</span>
-      <span class="hljs-property">@extend</span> (<span class="hljs-property">@extend</span> {}, options), overrides
-
-    <span class="hljs-attribute">extend</span>: <span class="hljs-function"><span class="hljs-params">(object, properties)</span> -&gt;</span>
-      <span class="hljs-keyword">for</span> key, val <span class="hljs-keyword">of</span> properties
-        object[key] = val
-      object</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-3">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-3">&#182;</a>
-              </div>
-              <p>Creates a unique ID of the specified length (default 8).</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">uniqueId</span>: <span class="hljs-function"><span class="hljs-params">(length = <span class="hljs-number">8</span>)</span> -&gt;</span>
-      id = <span class="hljs-string">''</span>
-      id += Math.random().toString(<span class="hljs-number">36</span>).substr(<span class="hljs-number">2</span>) <span class="hljs-keyword">while</span> id.length &lt; length
-      id.substr <span class="hljs-number">0</span>, length
-
-  ])</pre></div></div>
+            <div class="content"><div class='highlight'><pre>EDITOR_ID = <span class="hljs-string">'content'</span>
+TEXT_ANNOTATION = <span class="hljs-string">'textannotation'</span>
+CONTENT_IFRAME = <span class="hljs-string">'#content_ifr'</span>
+RUNNING_CLASS = <span class="hljs-string">'running'</span>
+MCE_WORDLIFT = <span class="hljs-string">'.mce_wordlift'</span>
+CONTENT_EDITABLE = <span class="hljs-string">'contenteditable'</span></pre></div></div>
             
         </li>
         

@@ -5,6 +5,10 @@ describe 'services', ->
   beforeEach module('wordlift.tinymce.plugin.services')
   beforeEach module('AnalysisService')
 
+  beforeEach inject( (AnalysisService) ->
+    AnalysisService.setKnownTypes window.wordlift.types
+  )
+
   # Test the wlEntity directive.
   describe 'AnalysisService', ->
     it 'parses analysis data', inject((AnalysisService, $httpBackend, $rootScope) ->

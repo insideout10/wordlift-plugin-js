@@ -6,8 +6,10 @@ describe "TinyMCE tests", ->
   ed = undefined
 
   # Tests set-up.
-  beforeEach ->
+  beforeEach inject( (AnalysisService) ->
     ed = tinyMCE.get('content')
+    AnalysisService.setKnownTypes window.wordlift.types
+  )
 
   afterEach inject ($httpBackend) ->
     $httpBackend.verifyNoOutstandingExpectation()
@@ -286,10 +288,10 @@ describe 'TinyMCE', ->
   # A reference to the TinyMCE editor.
   ed = undefined
 
-  # Tests set-up.
-  beforeEach ->
-    # Set the reference to the TinyMCE editor.
+  beforeEach inject( (AnalysisService) ->
     ed = tinyMCE.get('content')
+    AnalysisService.setKnownTypes window.wordlift.types
+  )
 
   it 'features embedded annotations', inject( (AnalysisService, EditorService) ->
 

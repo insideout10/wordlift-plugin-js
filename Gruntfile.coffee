@@ -14,6 +14,7 @@ module.exports = (grunt) ->
         files:
           'app/js/wordlift.js': [
             'src/coffee/traslator.coffee'
+            'src/coffee/app.constants.coffee'
             'src/coffee/app.config.coffee'
             'src/coffee/app.directives.coffee'
             'src/coffee/app.services.AnalysisService.coffee'
