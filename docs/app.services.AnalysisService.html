@@ -211,6 +211,24 @@ angular.<span class="hljs-built_in">module</span>(<span class="hljs-string">'Ana
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
+              <p>Find an entity in the analysis 
+or within window.wordlift.entities storage if needed</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-function"><span class="hljs-title">findEntityByUriWithScope</span> = <span class="hljs-params">(scope, uri)</span>-&gt;</span>
+          <span class="hljs-keyword">for</span> entityId, entity <span class="hljs-keyword">of</span> scope
+            <span class="hljs-keyword">return</span> entity <span class="hljs-keyword">if</span> uri <span class="hljs-keyword">is</span> entity?.id <span class="hljs-keyword">or</span> uri <span class="hljs-keyword">in</span> entity?.sameAs</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
               <p>Find a text annotation in the provided collection which matches the start and end values.
 Otherwise a new text annotation is created</p>
 
@@ -221,11 +239,11 @@ Otherwise a new text annotation is created</p>
         </li>
         
         
-        <li id="section-5">
+        <li id="section-6">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-5">&#182;</a>
+                <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
               <p>Return the text annotation if existing.</p>
 
@@ -237,11 +255,11 @@ Otherwise a new text annotation is created</p>
         </li>
         
         
-        <li id="section-6">
+        <li id="section-7">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-6">&#182;</a>
+                <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
               <p>Create a new text annotation.</p>
 
@@ -261,11 +279,11 @@ Otherwise a new text annotation is created</p>
         </li>
         
         
-        <li id="section-7">
+        <li id="section-8">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-7">&#182;</a>
+                <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
               <p>Holds the analysis promise, used to abort the analysis.</p>
 
@@ -276,11 +294,11 @@ Otherwise a new text annotation is created</p>
         </li>
         
         
-        <li id="section-8">
+        <li id="section-9">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-8">&#182;</a>
+                <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
               <p>If true, an analysis is running.</p>
 
@@ -291,11 +309,11 @@ Otherwise a new text annotation is created</p>
         </li>
         
         
-        <li id="section-9">
+        <li id="section-10">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-9">&#182;</a>
+                <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
               <p>Abort a running analysis.</p>
 
@@ -306,11 +324,11 @@ Otherwise a new text annotation is created</p>
         </li>
         
         
-        <li id="section-10">
+        <li id="section-11">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-10">&#182;</a>
+                <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
               <p>Abort the analysis if an analysis is running and there’s a reference to its promise.</p>
 
@@ -321,11 +339,11 @@ Otherwise a new text annotation is created</p>
         </li>
         
         
-        <li id="section-11">
+        <li id="section-12">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-11">&#182;</a>
+                <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
               <p>Preselect entity annotations in the provided analysis using the provided collection of annotations.</p>
 
@@ -336,11 +354,11 @@ Otherwise a new text annotation is created</p>
         </li>
         
         
-        <li id="section-12">
+        <li id="section-13">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-12">&#182;</a>
+                <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
               <p>Find the existing entities in the html</p>
 
@@ -354,48 +372,18 @@ Otherwise a new text annotation is created</p>
         </li>
         
         
-        <li id="section-13">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-13">&#182;</a>
-              </div>
-              <p>We don’t expect more than one entity annotation for an URI inside a text annotation.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>                entityAnnotations[<span class="hljs-number">0</span>].selected = <span class="hljs-literal">true</span></pre></div></div>
-            
-        </li>
-        
-        
         <li id="section-14">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
-              <p>TODO: fix
-             else</p>
-<pre><code>           <span class="hljs-comment"># Retrieve entity from the entity storage if needed</span>
-           <span class="hljs-keyword">unless</span> analysis.entities[annotation.uri]
-             analysis.entities[annotation.uri] = <span class="hljs-built_in">window</span>.wordlift.entities[annotation.uri]
+              <p>We don’t expect more than one entity annotation for an URI inside a text annotation.</p>
 
-           <span class="hljs-comment"># Create the new entityAssociation</span>
-           ea =
-             <span class="hljs-attribute">id</span>: <span class="hljs-string">"wordlift-ea-from-<span class="hljs-subst">#{textAnnotation.id}</span>"</span>
-             <span class="hljs-attribute">label</span>: annotation.label
-             <span class="hljs-attribute">confidence</span>: <span class="hljs-number">1</span>
-             <span class="hljs-attribute">entity</span>: analysis.entities[annotation.uri]
-             <span class="hljs-attribute">relation</span>: analysis.textAnnotations[textAnnotation.id]
-             <span class="hljs-attribute">_item</span>: <span class="hljs-literal">null</span>
-             <span class="hljs-attribute">selected</span>: <span class="hljs-literal">true</span>
-           <span class="hljs-comment"># Add the new entity association to the analysis</span>
-           analysis.entityAnnotations[ea.id] = ea
-           <span class="hljs-comment"># Add a reference to the current textAssociation</span>
-           textAnnotation.entityAnnotations[ea.id] = analysis.entityAnnotations[ea.id]
-</code></pre>
             </div>
+            
+            <div class="content"><div class='highlight'><pre>                entityAnnotations[<span class="hljs-number">0</span>].selected = <span class="hljs-literal">true</span> 
+              <span class="hljs-keyword">else</span></pre></div></div>
             
         </li>
         
@@ -406,9 +394,12 @@ Otherwise a new text annotation is created</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
-              <p>TODO: if the entity is not found, it needs to be added.</p>
+              <p>Retrieve entity from analysis or from the entity storage if needed</p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre>                entity = findEntityByUriWithScope(analysis.entities, annotation.uri)
+                entity = findEntityByUriWithScope(<span class="hljs-built_in">window</span>.wordlift.entities, annotation.uri) <span class="hljs-keyword">unless</span> entity</pre></div></div>
             
         </li>
         
@@ -418,6 +409,60 @@ Otherwise a new text annotation is created</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <p>If the entity is missing raise an excpetion!</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                <span class="hljs-keyword">throw</span> <span class="hljs-string">"Missing entity in window.wordlift.entities collection!"</span> <span class="hljs-keyword">unless</span> entity
+          
+                analysis.entities[annotation.uri] = entity</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-17">&#182;</a>
+              </div>
+              <p>Create the new entityAssociation</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                ea = EntityAnnotationService.create
+                  <span class="hljs-attribute">label</span>: annotation.label
+                  <span class="hljs-attribute">confidence</span>: <span class="hljs-number">1</span>
+                  <span class="hljs-attribute">entity</span>: analysis.entities[annotation.uri]
+                  <span class="hljs-attribute">relation</span>: analysis.textAnnotations[textAnnotation.id]
+                  <span class="hljs-attribute">selected</span>: <span class="hljs-literal">true</span>
+
+                analysis.entityAnnotations[ea.id] = ea</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-18">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-18">&#182;</a>
+              </div>
+              <p>Add a reference to the current textAssociation</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                textAnnotation.entityAnnotations[ea.id] = analysis.entityAnnotations[ea.id]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
               <p><a name="analyze"></a>
 Analyze the provided content. Only one analysis at a time is run.
@@ -430,11 +475,11 @@ The merge parameter is passed to the parse call and merges together entities rel
         </li>
         
         
-        <li id="section-17">
+        <li id="section-20">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-17">&#182;</a>
+                <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
               <p>Exit if an analysis is already running.</p>
 
@@ -445,11 +490,11 @@ The merge parameter is passed to the parse call and merges together entities rel
         </li>
         
         
-        <li id="section-18">
+        <li id="section-21">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-18">&#182;</a>
+                <a class="pilcrow" href="#section-21">&#182;</a>
               </div>
               <p>Set that an analysis is running.</p>
 
@@ -460,11 +505,11 @@ The merge parameter is passed to the parse call and merges together entities rel
         </li>
         
         
-        <li id="section-19">
+        <li id="section-22">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-19">&#182;</a>
+                <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
               <p>Store the promise in the class to allow interrupting the request.</p>
 
@@ -484,11 +529,11 @@ The merge parameter is passed to the parse call and merges together entities rel
         </li>
         
         
-        <li id="section-20">
+        <li id="section-23">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-20">&#182;</a>
+                <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
               <p>If successful, broadcast an <em>analysisReceived</em> event.</p>
 
@@ -500,11 +545,11 @@ The merge parameter is passed to the parse call and merges together entities rel
         </li>
         
         
-        <li id="section-21">
+        <li id="section-24">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-21">&#182;</a>
+                <a class="pilcrow" href="#section-24">&#182;</a>
               </div>
               <p>Set that the analysis is complete.</p>
 
@@ -517,11 +562,11 @@ The merge parameter is passed to the parse call and merges together entities rel
         </li>
         
         
-        <li id="section-22">
+        <li id="section-25">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-22">&#182;</a>
+                <a class="pilcrow" href="#section-25">&#182;</a>
               </div>
               <p>Set that the analysis is complete.</p>
 
@@ -536,11 +581,11 @@ The merge parameter is passed to the parse call and merges together entities rel
         </li>
         
         
-        <li id="section-23">
+        <li id="section-26">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-23">&#182;</a>
+                <a class="pilcrow" href="#section-26">&#182;</a>
               </div>
               <p>Parse the response data from the analysis request (Redlink).
 If <em>merge</em> is set to true, entity annotations and entities with matching sameAs will be merged.</p>
@@ -556,11 +601,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-24">
+        <li id="section-27">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-24">&#182;</a>
+                <a class="pilcrow" href="#section-27">&#182;</a>
               </div>
               <p>support functions:</p>
 
@@ -569,11 +614,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-25">
+        <li id="section-28">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-25">&#182;</a>
+                <a class="pilcrow" href="#section-28">&#182;</a>
               </div>
               <p>Get the known type given the specified types. Current supported types are:</p>
 <ul>
@@ -589,11 +634,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-26">
+        <li id="section-29">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-26">&#182;</a>
+                <a class="pilcrow" href="#section-29">&#182;</a>
               </div>
               <p>An array with known types according to the specified types.</p>
 
@@ -606,11 +651,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-27">
+        <li id="section-30">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-27">&#182;</a>
+                <a class="pilcrow" href="#section-30">&#182;</a>
               </div>
               <p>Set the default type, identified by an asterisk (*) in the sameAs values.</p>
 
@@ -623,11 +668,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-28">
+        <li id="section-31">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-28">&#182;</a>
+                <a class="pilcrow" href="#section-31">&#182;</a>
               </div>
               <p>Get all the URIs associated to this known type.</p>
 
@@ -638,11 +683,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-29">
+        <li id="section-32">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-29">&#182;</a>
+                <a class="pilcrow" href="#section-32">&#182;</a>
               </div>
               <p>If there is 1+ uri in common between the known types and the provided types, then add the known type.</p>
 
@@ -654,11 +699,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-30">
+        <li id="section-33">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-30">&#182;</a>
+                <a class="pilcrow" href="#section-33">&#182;</a>
               </div>
               <p>Return the defaul type if not known types have been found.</p>
 
@@ -669,11 +714,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-31">
+        <li id="section-34">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-31">&#182;</a>
+                <a class="pilcrow" href="#section-34">&#182;</a>
               </div>
               <p>Sort and return the match types.</p>
 
@@ -685,11 +730,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-32">
+        <li id="section-35">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-32">&#182;</a>
+                <a class="pilcrow" href="#section-35">&#182;</a>
               </div>
               <p>create an entity.</p>
 
@@ -701,11 +746,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-33">
+        <li id="section-36">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-33">&#182;</a>
+                <a class="pilcrow" href="#section-36">&#182;</a>
               </div>
               <p>Get the types associated with the entity.</p>
 
@@ -719,11 +764,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-34">
+        <li id="section-37">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-34">&#182;</a>
+                <a class="pilcrow" href="#section-37">&#182;</a>
               </div>
               <pre><code>   <span class="hljs-built_in">console</span>.log <span class="hljs-string">"createEntity [ id :: <span class="hljs-subst">#{id}</span> ][ language :: <span class="hljs-subst">#{language}</span> ][ types :: <span class="hljs-subst">#{types}</span> ][ sameAs :: <span class="hljs-subst">#{sameAs}</span> ]"</span>
 </code></pre>
@@ -732,11 +777,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-35">
+        <li id="section-38">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-35">&#182;</a>
+                <a class="pilcrow" href="#section-38">&#182;</a>
               </div>
               <p>Get all the thumbnails; for each thumbnail execute the provided function.</p>
 
@@ -760,11 +805,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-36">
+        <li id="section-39">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-36">&#182;</a>
+                <a class="pilcrow" href="#section-39">&#182;</a>
               </div>
               <p>If it’s a Freebase URL normalize the link to the image.</p>
 
@@ -776,11 +821,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-37">
+        <li id="section-40">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-37">&#182;</a>
+                <a class="pilcrow" href="#section-40">&#182;</a>
               </div>
               <p>Get the known types.</p>
 
@@ -791,11 +836,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-38">
+        <li id="section-41">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-38">&#182;</a>
+                <a class="pilcrow" href="#section-41">&#182;</a>
               </div>
               <p>Get the stylesheet classes.</p>
 
@@ -806,11 +851,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-39">
+        <li id="section-42">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-39">&#182;</a>
+                <a class="pilcrow" href="#section-42">&#182;</a>
               </div>
               <p>create the entity model.</p>
 
@@ -853,11 +898,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-40">
+        <li id="section-43">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-40">&#182;</a>
+                <a class="pilcrow" href="#section-43">&#182;</a>
               </div>
               <p>Avoid null in entity description.</p>
 
@@ -874,11 +919,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-41">
+        <li id="section-44">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-41">&#182;</a>
+                <a class="pilcrow" href="#section-44">&#182;</a>
               </div>
               <p>Check if thumbnails exists.
        if thumbnails? and angular.isArray thumbnails
@@ -895,11 +940,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-42">
+        <li id="section-45">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-42">&#182;</a>
+                <a class="pilcrow" href="#section-45">&#182;</a>
               </div>
               <p>return the entity.
        console.log “createEntity [ entity id :: #{entity.id} ][ language :: #{language} ][ types :: #{types} ][ sameAs :: #{sameAs} ]”</p>
@@ -911,11 +956,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-43">
+        <li id="section-46">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-43">&#182;</a>
+                <a class="pilcrow" href="#section-46">&#182;</a>
               </div>
               <p>Create an entity annotation. An entity annotation is created for each related text-annotation.</p>
 
@@ -926,11 +971,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-44">
+        <li id="section-47">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-44">&#182;</a>
+                <a class="pilcrow" href="#section-47">&#182;</a>
               </div>
               <p>Get the reference to the entity.</p>
 
@@ -941,11 +986,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-45">
+        <li id="section-48">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-45">&#182;</a>
+                <a class="pilcrow" href="#section-48">&#182;</a>
               </div>
               <p>If the referenced entity is not found, return null</p>
 
@@ -956,11 +1001,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-46">
+        <li id="section-49">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-46">&#182;</a>
+                <a class="pilcrow" href="#section-49">&#182;</a>
               </div>
               <p>Prepare the return array.</p>
 
@@ -971,11 +1016,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-47">
+        <li id="section-50">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-47">&#182;</a>
+                <a class="pilcrow" href="#section-50">&#182;</a>
               </div>
               <p>get the related text annotation.</p>
 
@@ -986,11 +1031,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-48">
+        <li id="section-51">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-48">&#182;</a>
+                <a class="pilcrow" href="#section-51">&#182;</a>
               </div>
               <p>Ensure we’re dealing with an array.</p>
 
@@ -1001,11 +1046,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-49">
+        <li id="section-52">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-49">&#182;</a>
+                <a class="pilcrow" href="#section-52">&#182;</a>
               </div>
               <p>For each text annotation bound to this entity annotation, create an entity annotation and add it to the text annotation.</p>
 
@@ -1017,11 +1062,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-50">
+        <li id="section-53">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-50">&#182;</a>
+                <a class="pilcrow" href="#section-53">&#182;</a>
               </div>
               <p>Create an entity annotation.</p>
 
@@ -1038,11 +1083,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-51">
+        <li id="section-54">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-51">&#182;</a>
+                <a class="pilcrow" href="#section-54">&#182;</a>
               </div>
               <p>Create a binding from the textannotation to the entity annotation.</p>
 
@@ -1053,11 +1098,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-52">
+        <li id="section-55">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-52">&#182;</a>
+                <a class="pilcrow" href="#section-55">&#182;</a>
               </div>
               <p>Accumulate the annotations.</p>
 
@@ -1068,11 +1113,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-53">
+        <li id="section-56">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-53">&#182;</a>
+                <a class="pilcrow" href="#section-56">&#182;</a>
               </div>
               <p>Return the  entity annotations.</p>
 
@@ -1101,11 +1146,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-54">
+        <li id="section-57">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-54">&#182;</a>
+                <a class="pilcrow" href="#section-57">&#182;</a>
               </div>
               <p>Get the values associated with the specified key(s). Keys are expanded.</p>
 
@@ -1116,11 +1161,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-55">
+        <li id="section-58">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-55">&#182;</a>
+                <a class="pilcrow" href="#section-58">&#182;</a>
               </div>
               <p>If it’s a single key, call getA</p>
 
@@ -1131,11 +1176,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-56">
+        <li id="section-59">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-56">&#182;</a>
+                <a class="pilcrow" href="#section-59">&#182;</a>
               </div>
               <p>Prepare the return array.</p>
 
@@ -1146,11 +1191,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-57">
+        <li id="section-60">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-57">&#182;</a>
+                <a class="pilcrow" href="#section-60">&#182;</a>
               </div>
               <p>For each key, add the result.</p>
 
@@ -1162,11 +1207,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-58">
+        <li id="section-61">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-58">&#182;</a>
+                <a class="pilcrow" href="#section-61">&#182;</a>
               </div>
               <p>Ensure the result is an array.</p>
 
@@ -1177,11 +1222,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-59">
+        <li id="section-62">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-59">&#182;</a>
+                <a class="pilcrow" href="#section-62">&#182;</a>
               </div>
               <p>Merge unique the results.</p>
 
@@ -1192,11 +1237,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-60">
+        <li id="section-63">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-60">&#182;</a>
+                <a class="pilcrow" href="#section-63">&#182;</a>
               </div>
               <p>Return the result array.</p>
 
@@ -1207,11 +1252,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-61">
+        <li id="section-64">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-61">&#182;</a>
+                <a class="pilcrow" href="#section-64">&#182;</a>
               </div>
               <p>Get the values associated with the specified key. Keys are expanded.</p>
 
@@ -1223,11 +1268,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-62">
+        <li id="section-65">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-62">&#182;</a>
+                <a class="pilcrow" href="#section-65">&#182;</a>
               </div>
               <p>expand the what key.</p>
 
@@ -1238,11 +1283,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-63">
+        <li id="section-66">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-63">&#182;</a>
+                <a class="pilcrow" href="#section-66">&#182;</a>
               </div>
               <p>return the value bound to the specified key.
        console.log “[ what exp :: #{whatExp} ][ key :: #{expand key} ][ value :: #{value} ][ match :: #{whatExp is expand(key)} ]” for key, value of container</p>
@@ -1255,11 +1300,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-64">
+        <li id="section-67">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-64">&#182;</a>
+                <a class="pilcrow" href="#section-67">&#182;</a>
               </div>
               <p>get the value for specified property (what) in the provided container in the specified language.
 items must conform to {‘@language’:…, ‘@value’:…} format.</p>
@@ -1271,11 +1316,11 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
         </li>
         
         
-        <li id="section-65">
+        <li id="section-68">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-65">&#182;</a>
+                <a class="pilcrow" href="#section-68">&#182;</a>
               </div>
               <p>if there’s no item return null.</p>
 
@@ -1286,11 +1331,11 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
         </li>
         
         
-        <li id="section-66">
+        <li id="section-69">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-66">&#182;</a>
+                <a class="pilcrow" href="#section-69">&#182;</a>
               </div>
               <p>transform to an array if it’s not already.</p>
 
@@ -1301,11 +1346,11 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
         </li>
         
         
-        <li id="section-67">
+        <li id="section-70">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-67">&#182;</a>
+                <a class="pilcrow" href="#section-70">&#182;</a>
               </div>
               <p>cycle through the array.</p>
 
@@ -1316,11 +1361,11 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
         </li>
         
         
-        <li id="section-68">
+        <li id="section-71">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-68">&#182;</a>
+                <a class="pilcrow" href="#section-71">&#182;</a>
               </div>
               <p>if not found return null.</p>
 
@@ -1333,11 +1378,11 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
         </li>
         
         
-        <li id="section-69">
+        <li id="section-72">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-69">&#182;</a>
+                <a class="pilcrow" href="#section-72">&#182;</a>
               </div>
               <pre><code>   dump <span class="hljs-string">"containsOrEquals [ what :: <span class="hljs-subst">#{what}</span> ][ where :: <span class="hljs-subst">#{where}</span> ]"</span>
 </code></pre><p>if where is not defined return false.</p>
@@ -1349,11 +1394,11 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
         </li>
         
         
-        <li id="section-70">
+        <li id="section-73">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-70">&#182;</a>
+                <a class="pilcrow" href="#section-73">&#182;</a>
               </div>
               <p>ensure the where argument is an array.</p>
 
@@ -1364,11 +1409,11 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
         </li>
         
         
-        <li id="section-71">
+        <li id="section-74">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-71">&#182;</a>
+                <a class="pilcrow" href="#section-74">&#182;</a>
               </div>
               <p>expand the what string.</p>
 
@@ -1380,11 +1425,11 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
         </li>
         
         
-        <li id="section-72">
+        <li id="section-75">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-72">&#182;</a>
+                <a class="pilcrow" href="#section-75">&#182;</a>
               </div>
               <p>return true if the string is found.</p>
 
@@ -1396,11 +1441,11 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
         </li>
         
         
-        <li id="section-73">
+        <li id="section-76">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-73">&#182;</a>
+                <a class="pilcrow" href="#section-76">&#182;</a>
               </div>
               <p>return true if the string is found.</p>
 
@@ -1411,11 +1456,11 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
         </li>
         
         
-        <li id="section-74">
+        <li id="section-77">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-74">&#182;</a>
+                <a class="pilcrow" href="#section-77">&#182;</a>
               </div>
               <p>otherwise false.</p>
 
@@ -1434,11 +1479,11 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
         </li>
         
         
-        <li id="section-75">
+        <li id="section-78">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-75">&#182;</a>
+                <a class="pilcrow" href="#section-78">&#182;</a>
               </div>
               <p>TODO: make concats unique.</p>
 
@@ -1451,11 +1496,11 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
         </li>
         
         
-        <li id="section-76">
+        <li id="section-79">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-76">&#182;</a>
+                <a class="pilcrow" href="#section-79">&#182;</a>
               </div>
               <p>Prefer the DBpedia description.
 TODO: have a user-set priority.</p>
@@ -1469,11 +1514,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-77">
+        <li id="section-80">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-77">&#182;</a>
+                <a class="pilcrow" href="#section-80">&#182;</a>
               </div>
               <p>Delete the sameAs entity from the index.</p>
 
@@ -1486,11 +1531,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-78">
+        <li id="section-81">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-78">&#182;</a>
+                <a class="pilcrow" href="#section-81">&#182;</a>
               </div>
               <p>expand a string to a full path if it contains a prefix.</p>
 
@@ -1501,11 +1546,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-79">
+        <li id="section-82">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-79">&#182;</a>
+                <a class="pilcrow" href="#section-82">&#182;</a>
               </div>
               <p>if there’s no prefix, return the original string.</p>
 
@@ -1519,11 +1564,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-80">
+        <li id="section-83">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-80">&#182;</a>
+                <a class="pilcrow" href="#section-83">&#182;</a>
               </div>
               <p>get the prefix and the path.</p>
 
@@ -1535,11 +1580,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-81">
+        <li id="section-84">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-81">&#182;</a>
+                <a class="pilcrow" href="#section-84">&#182;</a>
               </div>
               <p>if the prefix is unknown, leave it.</p>
 
@@ -1553,11 +1598,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-82">
+        <li id="section-85">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-82">&#182;</a>
+                <a class="pilcrow" href="#section-85">&#182;</a>
               </div>
               <p>return the full path.</p>
 
@@ -1568,11 +1613,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-83">
+        <li id="section-86">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-83">&#182;</a>
+                <a class="pilcrow" href="#section-86">&#182;</a>
               </div>
               <p>Check that the response is valid.</p>
 
@@ -1585,11 +1630,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-84">
+        <li id="section-87">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-84">&#182;</a>
+                <a class="pilcrow" href="#section-87">&#182;</a>
               </div>
               <p>data is split in a context and a graph.</p>
 
@@ -1604,11 +1649,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-85">
+        <li id="section-88">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-85">&#182;</a>
+                <a class="pilcrow" href="#section-88">&#182;</a>
               </div>
               <pre><code>   <span class="hljs-built_in">console</span>.log <span class="hljs-string">"[ id :: <span class="hljs-subst">#{id}</span> ]"</span>
 </code></pre>
@@ -1621,11 +1666,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-86">
+        <li id="section-89">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-86">&#182;</a>
+                <a class="pilcrow" href="#section-89">&#182;</a>
               </div>
               <pre><code>   <span class="hljs-built_in">console</span>.log <span class="hljs-string">"[ id :: <span class="hljs-subst">#{id}</span> ][ dc:type :: <span class="hljs-subst">#{dctype}</span> ]"</span>
 </code></pre>
@@ -1634,11 +1679,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-87">
+        <li id="section-90">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-87">&#182;</a>
+                <a class="pilcrow" href="#section-90">&#182;</a>
               </div>
               <p>TextAnnotation/LinguisticSystem</p>
 
@@ -1650,11 +1695,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-88">
+        <li id="section-91">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-88">&#182;</a>
+                <a class="pilcrow" href="#section-91">&#182;</a>
               </div>
               <pre><code>     dump <span class="hljs-string">"language [ id :: <span class="hljs-subst">#{id}</span> ][ dc:type :: <span class="hljs-subst">#{dctype}</span> ]"</span>
 </code></pre>
@@ -1665,11 +1710,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-89">
+        <li id="section-92">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-89">&#182;</a>
+                <a class="pilcrow" href="#section-92">&#182;</a>
               </div>
               <p>TextAnnotation</p>
 
@@ -1680,11 +1725,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-90">
+        <li id="section-93">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-90">&#182;</a>
+                <a class="pilcrow" href="#section-93">&#182;</a>
               </div>
               <pre><code>     $log.debug <span class="hljs-string">"TextAnnotation [ @id :: <span class="hljs-subst">#{id}</span> ][ types :: <span class="hljs-subst">#{types}</span> ]"</span>
 </code></pre>
@@ -1695,11 +1740,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-91">
+        <li id="section-94">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-91">&#182;</a>
+                <a class="pilcrow" href="#section-94">&#182;</a>
               </div>
               <p>EntityAnnotation</p>
 
@@ -1710,11 +1755,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-92">
+        <li id="section-95">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-92">&#182;</a>
+                <a class="pilcrow" href="#section-95">&#182;</a>
               </div>
               <pre><code>     $log.debug <span class="hljs-string">"EntityAnnotation [ @id :: <span class="hljs-subst">#{id}</span> ][ types :: <span class="hljs-subst">#{types}</span> ]"</span>
 </code></pre>
@@ -1725,11 +1770,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-93">
+        <li id="section-96">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-93">&#182;</a>
+                <a class="pilcrow" href="#section-96">&#182;</a>
               </div>
               <p>Entity</p>
 
@@ -1740,11 +1785,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-94">
+        <li id="section-97">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-94">&#182;</a>
+                <a class="pilcrow" href="#section-97">&#182;</a>
               </div>
               <pre><code>     $log.debug <span class="hljs-string">"Entity [ @id :: <span class="hljs-subst">#{id}</span> ][ types :: <span class="hljs-subst">#{types}</span> ]"</span>
 </code></pre>
@@ -1755,11 +1800,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-95">
+        <li id="section-98">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-95">&#182;</a>
+                <a class="pilcrow" href="#section-98">&#182;</a>
               </div>
               <p>sort the languages by confidence.</p>
 
@@ -1775,11 +1820,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-96">
+        <li id="section-99">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-96">&#182;</a>
+                <a class="pilcrow" href="#section-99">&#182;</a>
               </div>
               <p>create a reference to the default language.</p>
 
@@ -1790,11 +1835,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-97">
+        <li id="section-100">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-97">&#182;</a>
+                <a class="pilcrow" href="#section-100">&#182;</a>
               </div>
               <p>Create entities instances in the entities array.</p>
 
@@ -1805,11 +1850,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-98">
+        <li id="section-101">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-98">&#182;</a>
+                <a class="pilcrow" href="#section-101">&#182;</a>
               </div>
               <p>Cycle in every entity.</p>
 
@@ -1820,11 +1865,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-99">
+        <li id="section-102">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-99">&#182;</a>
+                <a class="pilcrow" href="#section-102">&#182;</a>
               </div>
               <p>Create text annotation instances.</p>
 
@@ -1835,11 +1880,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-100">
+        <li id="section-103">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-100">&#182;</a>
+                <a class="pilcrow" href="#section-103">&#182;</a>
               </div>
               <p>Create entity annotations instances.</p>
 
@@ -1851,11 +1896,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-101">
+        <li id="section-104">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-101">&#182;</a>
+                <a class="pilcrow" href="#section-104">&#182;</a>
               </div>
               <p>For every text annotation delete entity annotations that refer to the same entity (after merging).</p>
 
@@ -1866,11 +1911,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-102">
+        <li id="section-105">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-102">&#182;</a>
+                <a class="pilcrow" href="#section-105">&#182;</a>
               </div>
               <p>Cycle in text annotations.</p>
 
@@ -1881,11 +1926,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-103">
+        <li id="section-106">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-103">&#182;</a>
+                <a class="pilcrow" href="#section-106">&#182;</a>
               </div>
               <p>Cycle in entity annotations.</p>
 
@@ -1896,11 +1941,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-104">
+        <li id="section-107">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-104">&#182;</a>
+                <a class="pilcrow" href="#section-107">&#182;</a>
               </div>
               <pre><code>       <span class="hljs-built_in">console</span>.log <span class="hljs-string">"[ text-annotation id :: <span class="hljs-subst">#{textAnnotationId}</span> ][ entity-annotation id :: <span class="hljs-subst">#{entityAnnotation.id}</span> ]"</span>
 </code></pre><p>Check if there are entity annotations referring to the same entity, and if so, delete it.</p>
@@ -1912,11 +1957,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-105">
+        <li id="section-108">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-105">&#182;</a>
+                <a class="pilcrow" href="#section-108">&#182;</a>
               </div>
               <pre><code>         <span class="hljs-built_in">console</span>.log <span class="hljs-string">"[ id :: <span class="hljs-subst">#{id}</span> ][ another id :: <span class="hljs-subst">#{anotherId}</span> ]"</span>
 </code></pre>
@@ -1927,11 +1972,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-106">
+        <li id="section-109">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-106">&#182;</a>
+                <a class="pilcrow" href="#section-109">&#182;</a>
               </div>
               <p>return the analysis result.</p>
 
@@ -1948,11 +1993,11 @@ TODO: have a user-set priority.</p>
         </li>
         
         
-        <li id="section-107">
+        <li id="section-110">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-107">&#182;</a>
+                <a class="pilcrow" href="#section-110">&#182;</a>
               </div>
               <p>Return the service instance</p>
 

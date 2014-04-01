@@ -147,7 +147,7 @@
 
   angular.module('AnalysisService', []).service('AnalysisService', [
     'EntityAnnotationService', 'TextAnnotationService', '$filter', '$http', '$q', '$rootScope', function(EntityAnnotationService, TextAnnotationService, $filter, $http, $q, $rootScope) {
-      var ANALYSIS_EVENT, CONTEXT, DBPEDIA, DBPEDIA_ORG, DCTERMS, FISE_ONT, FISE_ONT_CONFIDENCE, FISE_ONT_ENTITY_ANNOTATION, FISE_ONT_TEXT_ANNOTATION, FREEBASE, FREEBASE_COM, FREEBASE_NS, FREEBASE_NS_DESCRIPTION, GRAPH, KNOWN_TYPES, RDFS, RDFS_COMMENT, RDFS_LABEL, SCHEMA_ORG, SCHEMA_ORG_DESCRIPTION, VALUE, WGS84_POS, findOrCreateTextAnnotation, service, _ref;
+      var ANALYSIS_EVENT, CONTEXT, DBPEDIA, DBPEDIA_ORG, DCTERMS, FISE_ONT, FISE_ONT_CONFIDENCE, FISE_ONT_ENTITY_ANNOTATION, FISE_ONT_TEXT_ANNOTATION, FREEBASE, FREEBASE_COM, FREEBASE_NS, FREEBASE_NS_DESCRIPTION, GRAPH, KNOWN_TYPES, RDFS, RDFS_COMMENT, RDFS_LABEL, SCHEMA_ORG, SCHEMA_ORG_DESCRIPTION, VALUE, WGS84_POS, findEntityByUriWithScope, findOrCreateTextAnnotation, service, _ref;
       CONTEXT = '@context';
       GRAPH = '@graph';
       VALUE = '@value';
@@ -170,6 +170,15 @@
       DBPEDIA_ORG = "http://" + DBPEDIA + ".org/";
       WGS84_POS = 'http://www.w3.org/2003/01/geo/wgs84_pos#';
       KNOWN_TYPES = ((_ref = window.wordlift) != null ? _ref.types : void 0) != null ? window.wordlift.types : [];
+      findEntityByUriWithScope = function(scope, uri) {
+        var entity, entityId;
+        for (entityId in scope) {
+          entity = scope[entityId];
+          if (uri === (entity != null ? entity.id : void 0) || __indexOf.call(entity != null ? entity.sameAs : void 0, uri) >= 0) {
+            return entity;
+          }
+        }
+      };
       findOrCreateTextAnnotation = function(textAnnotations, textAnnotation) {
         var ta;
         ta = TextAnnotationService.find(textAnnotations, textAnnotation.start, textAnnotation.end);
@@ -194,7 +203,7 @@
           }
         },
         preselect: function(analysis, annotations) {
-          var annotation, entityAnnotations, textAnnotation, _i, _len, _results;
+          var annotation, ea, entity, entityAnnotations, textAnnotation, _i, _len, _results;
           _results = [];
           for (_i = 0, _len = annotations.length; _i < _len; _i++) {
             annotation = annotations[_i];
@@ -205,7 +214,23 @@
             if (0 < entityAnnotations.length) {
               _results.push(entityAnnotations[0].selected = true);
             } else {
-              _results.push(void 0);
+              entity = findEntityByUriWithScope(analysis.entities, annotation.uri);
+              if (!entity) {
+                entity = findEntityByUriWithScope(window.wordlift.entities, annotation.uri);
+              }
+              if (!entity) {
+                throw "Missing entity in window.wordlift.entities collection!";
+              }
+              analysis.entities[annotation.uri] = entity;
+              ea = EntityAnnotationService.create({
+                label: annotation.label,
+                confidence: 1,
+                entity: analysis.entities[annotation.uri],
+                relation: analysis.textAnnotations[textAnnotation.id],
+                selected: true
+              });
+              analysis.entityAnnotations[ea.id] = ea;
+              _results.push(textAnnotation.entityAnnotations[ea.id] = analysis.entityAnnotations[ea.id]);
             }
           }
           return _results;

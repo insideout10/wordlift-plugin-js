@@ -277,6 +277,12 @@ angular.module('AnalysisService', [])
         # Set the known types as provided by the environment.
         KNOWN_TYPES = if window.wordlift?.types? then window.wordlift.types else []
 
+        # Find an entity in the analysis 
+        # or within window.wordlift.entities storage if needed
+        findEntityByUriWithScope = (scope, uri)->
+          for entityId, entity of scope
+            return entity if uri is entity?.id or uri in entity?.sameAs
+ 
         # Find a text annotation in the provided collection which matches the start and end values.
         # Otherwise a new text annotation is created
         findOrCreateTextAnnotation = (textAnnotations, textAnnotation) ->
@@ -315,30 +321,27 @@ angular.module('AnalysisService', [])
               entityAnnotations = EntityAnnotationService.find textAnnotation.entityAnnotations, uri: annotation.uri
               if 0 < entityAnnotations.length
                 # We don't expect more than one entity annotation for an URI inside a text annotation.
-                entityAnnotations[0].selected = true
-# TODO: fix
-#              else
-#                # Retrieve entity from the entity storage if needed
-#                unless analysis.entities[annotation.uri]
-#                  analysis.entities[annotation.uri] = window.wordlift.entities[annotation.uri]
-#
-#                # Create the new entityAssociation
-#                ea =
-#                  id: "wordlift-ea-from-#{textAnnotation.id}"
-#                  label: annotation.label
-#                  confidence: 1
-#                  entity: analysis.entities[annotation.uri]
-#                  relation: analysis.textAnnotations[textAnnotation.id]
-#                  _item: null
-#                  selected: true
-#                # Add the new entity association to the analysis
-#                analysis.entityAnnotations[ea.id] = ea
-#                # Add a reference to the current textAssociation
-#                textAnnotation.entityAnnotations[ea.id] = analysis.entityAnnotations[ea.id]
+                entityAnnotations[0].selected = true 
+              else   
+                # Retrieve entity from analysis or from the entity storage if needed
+                entity = findEntityByUriWithScope(analysis.entities, annotation.uri)
+                entity = findEntityByUriWithScope(window.wordlift.entities, annotation.uri) unless entity
+                # If the entity is missing raise an excpetion!
+                throw "Missing entity in window.wordlift.entities collection!" unless entity
+          
+                analysis.entities[annotation.uri] = entity
+                # Create the new entityAssociation
+                ea = EntityAnnotationService.create
+                  label: annotation.label
+                  confidence: 1
+                  entity: analysis.entities[annotation.uri]
+                  relation: analysis.textAnnotations[textAnnotation.id]
+                  selected: true
 
-
-        # TODO: if the entity is not found, it needs to be added.
-
+                analysis.entityAnnotations[ea.id] = ea
+                # Add a reference to the current textAssociation
+                textAnnotation.entityAnnotations[ea.id] = analysis.entityAnnotations[ea.id]
+        
         # <a name="analyze"></a>
         # Analyze the provided content. Only one analysis at a time is run.
         # The merge parameter is passed to the parse call and merges together entities related via sameAs.
@@ -713,7 +716,7 @@ angular.module('AnalysisService', [])
 
             # Create entities instances in the entities array.
             entities[id] = createEntity(item, language) for id, item of entities
-
+            
             # Cycle in every entity.
             mergeEntities(entity, entities) for id, entity of entities if merge
 

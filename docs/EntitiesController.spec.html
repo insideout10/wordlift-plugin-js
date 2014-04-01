@@ -352,10 +352,10 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        expect($scope.selectedEntity).toEqual <span class="hljs-literal">undefined</span>
-        expect($scope.textAnnotation.id).toEqual id
+            <div class="content"><div class='highlight'><pre>        expect($scope.textAnnotation.id).toEqual id
         expect($scope.textAnnotation).toEqual textAnnotation
-        expect(Object.keys($scope.textAnnotation.entityAnnotations).length).toBeGreaterThan <span class="hljs-number">0</span></pre></div></div>
+        entityAnnotations = Object.keys($scope.textAnnotation.entityAnnotations)
+        expect(entityAnnotations.length).toBeGreaterThan -<span class="hljs-number">1</span></pre></div></div>
             
         </li>
         
@@ -370,76 +370,10 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        expect($(<span class="hljs-string">'#wordlift-disambiguation-popover'</span>)).toBeVisible()
-  )
-  it <span class="hljs-string">"Load an analysis on a content including a disambiguated item"</span>, inject<span class="hljs-function"><span class="hljs-params">((AnalysisService, $httpBackend, $rootScope) -&gt;
-
-</span></span></pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-16">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-16">&#182;</a>
-              </div>
-              <p>TODO: move this test to an appropriate location.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    pending()
-
-    $.ajax(<span class="hljs-string">'base/app/assets/english.json'</span>,
-      <span class="hljs-attribute">async</span>: <span class="hljs-literal">false</span>
-    ).done <span class="hljs-function"><span class="hljs-params">(data)</span> -&gt;</span></pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-17">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-17">&#182;</a>
-              </div>
-              <p>Catch all the requests to Freebase.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>      $httpBackend.<span class="hljs-keyword">when</span>(<span class="hljs-string">'HEAD'</span>, <span class="hljs-regexp">/.*/</span>).respond(<span class="hljs-number">200</span>, <span class="hljs-string">''</span>)
-      
-      analysis = AnalysisService.parse data
-      expect($scope.analysis).toBe <span class="hljs-literal">null</span>
-      $rootScope.$broadcast <span class="hljs-string">'analysisReceived'</span>, analysis
-      expect($scope.analysis).toEqual analysis</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-18">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-18">&#182;</a>
-              </div>
-              <p>Simulates event fired by EditorService 
-to notify disambiguated textAnnotations to the controller</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>      
-      textAnnotationId = <span class="hljs-string">"urn:enhancement-233fd158-870d-6ca4-b7ce-30313e4a7015"</span>
-      entityAnnotationId = <span class="hljs-string">"urn:enhancement-53bd49a5-4609-627c-be3f-468d30a35bdc"</span>
-      selectedEntityId = <span class="hljs-string">"http://data.redlink.io/353/wordlift/entity/David_Riccitelli"</span>
-
-      expect($scope.analysis.textAnnotations[textAnnotationId].entityAnnotations[entityAnnotationId].selected).toBe <span class="hljs-literal">false</span>
-      expect($scope.analysis.entityAnnotations[entityAnnotationId].selected).toBe <span class="hljs-literal">false</span>
-      $rootScope.$broadcast <span class="hljs-string">'disambiguatedTextAnnotationDetected'</span>, textAnnotationId, selectedEntityId
-      expect($scope.analysis.textAnnotations[textAnnotationId].entityAnnotations[entityAnnotationId].selected).toBe <span class="hljs-literal">true</span>
-      expect($scope.analysis.entityAnnotations[entityAnnotationId].selected).toBe <span class="hljs-literal">true</span>
-      
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> <span class="hljs-number">0</span> <span class="hljs-keyword">is</span> entityAnnotations.length
+          expect($(<span class="hljs-string">'#wordlift-disambiguation-popover'</span>)).<span class="hljs-keyword">not</span>.toBeVisible()
+        <span class="hljs-keyword">else</span>
+          expect($(<span class="hljs-string">'#wordlift-disambiguation-popover'</span>)).toBeVisible()
   )</pre></div></div>
             
         </li>

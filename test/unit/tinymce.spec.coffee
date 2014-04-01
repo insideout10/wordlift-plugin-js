@@ -428,8 +428,8 @@ describe 'TinyMCE', ->
     analysis = AnalysisService.parse json, true
 
     # Embed the analysis results.
-    EditorService.embedAnalysis analysis
-
+    expect(-> EditorService.embedAnalysis analysis).toThrow 'Missing entity in window.wordlift.entities collection!'
+  
     # We expect these entity annotations to be already selected.
     selected = [
       'urn:enhancement-49b1cf1e-b260-4033-403e-4e494039d241'
@@ -441,15 +441,55 @@ describe 'TinyMCE', ->
     expect(analysis.entityAnnotations).not.toBe undefined
     expect(Object.keys(analysis.entityAnnotations).length).toEqual 9
     for entityAnnotationId, entityAnnotation of analysis.entityAnnotations
-#      dump "[ entity annotation id :: #{entityAnnotationId} ][ entity :: #{entityAnnotation.entity} ][ relation :: #{entityAnnotation.relation.id} ]"
       expect(entityAnnotation.entity).not.toBe undefined
-#      dump "[ entity id :: #{entityAnnotation.entity.id} ][  ]"
+      # This expectation is confirmed just becouse no one entityAnnotation is selected
       expect(entityAnnotation.selected).toBe (entityAnnotation.id in selected)
 
-#    for textAnnotationId, textAnnotation of analysis.textAnnotations
-#      for entityAnnotationId, entityAnnotation of textAnnotation.entityAnnotations
-#        entity = entityAnnotation.entity
-#        dump "[ entityAnnotationId :: #{entityAnnotationId} ][ selected :: #{entityAnnotation.selected} ][ entity id :: #{entity.id} ]"
-
-
   )
+  it 'features entities preselections in the analysis results on missing entities', inject( (AnalysisService, EditorService) ->
+
+    # The html content.
+    html = ''
+    # The analysis results.
+    json = ''
+
+    # Load the sample text in the editor.
+    $.ajax('base/app/assets/insideout10_1.html', async: false).done (data) ->
+      html = data
+    # Load the sample analysis results.
+    $.ajax('base/app/assets/insideout10_1.json', async: false).done (data) ->
+      json = data
+
+    # Set the textual content in the editor.
+    ed.setContent html, format: 'raw'
+
+    # If window.wordlift.entities is empty, the preselect raises an exception
+    # Get the analysis instance, by parsing the json and merging the results.
+    analysis = AnalysisService.parse json, true
+    expect(window.wordlift.entities).toEqual {}
+    # Try to embed the analysis results.
+    expect(-> EditorService.embedAnalysis analysis).toThrow 'Missing entity in window.wordlift.entities collection!'
+    
+    # Loads fake entities and populate window.wordlift.entities
+    $.ajax('base/app/assets/wordlift_entities_0.json', async: false).done (data) ->
+      window.wordlift.entities = data
+    
+    analysis = AnalysisService.parse json, true
+    EditorService.embedAnalysis analysis
+  
+    selectedEntityIds = [
+      'http://data.redlink.io/353/wordlift/entity/David_Riccitelli'
+      'http://data.redlink.io/353/wordlift/entity/Central_Archives_of_the_State_(Italy)'
+      'http://data.redlink.io/353/wordlift/entity/WordPress'
+    ]
+
+    # Check for selections.
+    expect(analysis.entityAnnotations).not.toBe undefined
+    expect(Object.keys(analysis.entityAnnotations).length).toEqual 12
+    for entityAnnotationId, entityAnnotation of analysis.entityAnnotations
+      expect(entityAnnotation.entity).not.toBe undefined
+      expect(entityAnnotation.relation).not.toBe undefined
+      # FIX this expectations does not means something is really selected
+      expect(entityAnnotation.selected).toBe (entityAnnotation.entity.id in selectedEntityIds)
+
+)
