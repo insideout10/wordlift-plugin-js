@@ -5,6 +5,10 @@ describe 'directives', ->
   beforeEach module('wordlift.tinymce.plugin.directives')
   beforeEach module('AnalysisService')
 
+  beforeEach inject( (AnalysisService) ->
+    AnalysisService.setKnownTypes window.wordlift.types
+  )
+
   # Test the wlEntity directive.
   describe 'wlEntity', ->
     scope = undefined

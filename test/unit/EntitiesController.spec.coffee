@@ -17,6 +17,10 @@ describe "EditorController tests", ->
     EntitiesController = $controller 'EntitiesController', {$scope: $scope}
   )
 
+  beforeEach inject( (AnalysisService) ->
+    AnalysisService.setKnownTypes window.wordlift.types
+  )
+
   it "loads an analysis", inject((AnalysisService, $httpBackend, $rootScope) ->
 
     $.ajax('base/app/assets/english.json', async: false).done (data) ->

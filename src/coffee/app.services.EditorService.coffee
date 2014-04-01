@@ -2,14 +2,6 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
 .service('EditorService',
     ['AnalysisService', 'EntityAnnotationService', '$rootScope', (AnalysisService, EntityAnnotationService, $rootScope) ->
 
-      # Define some constants for commonly used strings.
-      EDITOR_ID = 'content'
-      TEXT_ANNOTATION = 'textannotation'
-      CONTENT_IFRAME = '#content_ifr'
-      RUNNING_CLASS = 'running'
-      MCE_WORDLIFT = '.mce_wordlift'
-      CONTENT_EDITABLE = 'contenteditable'
-
       editor = ->
         tinyMCE.get(EDITOR_ID)
 

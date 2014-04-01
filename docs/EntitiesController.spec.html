@@ -29,6 +29,11 @@
               </a>
             
               
+              <a class="source" href="app.constants.html">
+                app.constants.coffee
+              </a>
+            
+              
               <a class="source" href="app.controllers.html">
                 app.controllers.coffee
               </a>
@@ -190,7 +195,11 @@
             <div class="content"><div class='highlight'><pre>    EntitiesController = $controller <span class="hljs-string">'EntitiesController'</span>, {<span class="hljs-attribute">$scope</span>: $scope}
   )
 
-  it <span class="hljs-string">"loads an analysis"</span>, inject<span class="hljs-function"><span class="hljs-params">((AnalysisService, $httpBackend, $rootScope) -&gt;
+  beforeEach inject<span class="hljs-function"><span class="hljs-params">( (AnalysisService) -&gt;
+    AnalysisService.setKnownTypes <span class="hljs-built_in">window</span>.wordlift.types
+  )</span>
+
+  <span class="hljs-title">it</span> "<span class="hljs-title">loads</span> <span class="hljs-title">an</span> <span class="hljs-title">analysis</span>", <span class="hljs-title">inject</span><span class="hljs-params">((AnalysisService, $httpBackend, $rootScope) -&gt;
 
     $.ajax(<span class="hljs-string">'base/app/assets/english.json'</span>, async: <span class="hljs-literal">false</span>).done (data) -&gt;
       $httpBackend.expectPOST(<span class="hljs-string">'/base/app/assets/english.json?action=wordlift_analyze'</span>)

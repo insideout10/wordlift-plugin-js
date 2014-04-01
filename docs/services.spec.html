@@ -29,6 +29,11 @@
               </a>
             
               
+              <a class="source" href="app.constants.html">
+                app.constants.coffee
+              </a>
+            
+              
               <a class="source" href="app.controllers.html">
                 app.controllers.coffee
               </a>
@@ -138,7 +143,13 @@
             
             <div class="content"><div class='highlight'><pre>describe <span class="hljs-string">'services'</span>,<span class="hljs-function"> -&gt;</span>
   beforeEach <span class="hljs-built_in">module</span>(<span class="hljs-string">'wordlift.tinymce.plugin.services'</span>)
-  beforeEach <span class="hljs-built_in">module</span>(<span class="hljs-string">'AnalysisService'</span>)</pre></div></div>
+  beforeEach <span class="hljs-built_in">module</span>(<span class="hljs-string">'AnalysisService'</span>)
+
+  beforeEach inject<span class="hljs-function"><span class="hljs-params">( (AnalysisService) -&gt;
+    AnalysisService.setKnownTypes <span class="hljs-built_in">window</span>.wordlift.types
+  )</span>
+
+</span></pre></div></div>
             
         </li>
         
