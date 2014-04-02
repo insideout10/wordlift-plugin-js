@@ -27,7 +27,7 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
       # Define the EditorService.
       service =
       # Embed the provided analysis in the editor.
-        embedAnalysis: (analysis) ->
+        embedAnalysis: (analysis) =>
 
           # A reference to the editor.
           ed = editor()

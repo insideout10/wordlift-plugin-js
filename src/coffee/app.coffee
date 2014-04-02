@@ -74,7 +74,9 @@ $(
   # Declare the whole document as bootstrap scope.
   injector = angular.bootstrap $('#wl-app'), ['wordlift.tinymce.plugin']
   injector.invoke ['AnalysisService', (AnalysisService) ->
-    AnalysisService.setKnownTypes window.wordlift.types
+    if window.wordlift?
+      AnalysisService.setKnownTypes window.wordlift.types
+      AnalysisService.setEntities   window.wordlift.entities
   ]
 
   # Add WordLift as a plugin of the TinyMCE editor.
@@ -90,7 +92,7 @@ $(
         injector.invoke(['EditorService', '$rootScope', (EditorService, $rootScope) ->
           $rootScope.$apply( ->
             # Get the html content of the editor.
-            html = tinyMCE.activeEditor.getContent({format: 'raw'})
+            html = tinyMCE.activeEditor.getContent format: 'raw'
 
             # Get the text content from the Html.
             text = Traslator.create(html).getText()

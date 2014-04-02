@@ -22,6 +22,10 @@ class Traslator
     @_textPositions = []
     @_text = ''
 
+    # TODO: the pattern should consider that HTML has also HTML entities.
+    # Remove non-breaking spaces.
+    @_html = @_html.replace /&nbsp;/gim, ' '
+
     pattern = /([^<]*)(<[^>]*>)([^<]*)/gim
 
     textLength = 0

@@ -291,6 +291,7 @@ describe 'TinyMCE', ->
   beforeEach inject( (AnalysisService) ->
     ed = tinyMCE.get('content')
     AnalysisService.setKnownTypes window.wordlift.types
+    AnalysisService.setEntities window.wordlift.entities
   )
 
   it 'features embedded annotations', inject( (AnalysisService, EditorService) ->
@@ -441,7 +442,7 @@ describe 'TinyMCE', ->
 
     # Check for selections.
     expect(analysis.entityAnnotations).not.toBe undefined
-    expect(Object.keys(analysis.entityAnnotations).length).toEqual 9
+    expect(Object.keys(analysis.entityAnnotations).length).toEqual 25
     for entityAnnotationId, entityAnnotation of analysis.entityAnnotations
       expect(entityAnnotation.entity).not.toBe undefined
     
@@ -472,18 +473,20 @@ describe 'TinyMCE', ->
     analysis = AnalysisService.parse json, true
     expect(window.wordlift.entities).toEqual {}
     # Try to embed the analysis results.
+
+#    EditorService.embedAnalysis analysis
     expect(-> EditorService.embedAnalysis analysis).toThrow 'Missing entity in window.wordlift.entities collection!'
-    
+#
     # Loads fake entities and populate window.wordlift.entities
     $.ajax('base/app/assets/wordlift_entities_0.json', async: false).done (data) ->
-      window.wordlift.entities = data
-    
+      AnalysisService.setEntities data
+
     analysis = AnalysisService.parse json, true
     EditorService.embedAnalysis analysis
-  
+
     # Check for consistency
     expect(analysis.entityAnnotations).not.toBe undefined
-    expect(Object.keys(analysis.entityAnnotations).length).toEqual 12
+    expect(Object.keys(analysis.entityAnnotations).length).toEqual 27
     for entityAnnotationId, entityAnnotation of analysis.entityAnnotations
       expect(entityAnnotation.entity).not.toBe undefined
       expect(entityAnnotation.relation).not.toBe undefined
@@ -491,11 +494,11 @@ describe 'TinyMCE', ->
     # Check for preselected
     selectedEntityIds = [
       'http://data.redlink.io/353/wordlift/entity/David_Riccitelli'
-      'http://data.redlink.io/353/wordlift/entity/Central_Archives_of_the_State_(Italy)'
+#      'http://data.redlink.io/353/wordlift/entity/Central_Archives_of_the_State_(Italy)'
       'http://data.redlink.io/353/wordlift/entity/WordPress'
     ]
     selectedEntities = (ea.entity for id, ea of analysis.entityAnnotations when ea.selected and ea.entity.id in selectedEntityIds)
-    expect(selectedEntities.length).toEqual(selectedEntityIds.length)
+    expect(selectedEntities.length).toEqual selectedEntityIds.length
     for entity in selectedEntities
-      expect(entity.id in selectedEntityIds).toBe true         
+      expect(entity.id in selectedEntityIds).toBe true
 )

@@ -57,6 +57,7 @@ angular.module('wordlift.tinymce.plugin.controllers',
 
     $scope.onEntitySelected = (textAnnotation, entityAnnotation) ->
       $scope.$emit 'selectEntity', ta: textAnnotation, ea: entityAnnotation
+      # TODO: the app should not refer to window.wordlift. This should be wrapped somewhere.
       # Add the selected entity to the entity storage
       window.wordlift.entities[entityAnnotation.entity.id] = entityAnnotation.entity
 

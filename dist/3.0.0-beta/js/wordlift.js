@@ -27,6 +27,7 @@
       this._htmlPositions = [];
       this._textPositions = [];
       this._text = '';
+      this._html = this._html.replace(/&nbsp;/gim, ' ');
       pattern = /([^<]*)(<[^>]*>)([^<]*)/gim;
       textLength = 0;
       htmlLength = 0;
@@ -199,7 +200,7 @@
     };
   });
 
-  angular.module('AnalysisService', ['wordlift.tinymce.plugin.services.Helpers']).service('AnalysisService', [
+  angular.module('AnalysisService', ['wordlift.tinymce.plugin.services.EntityService', 'wordlift.tinymce.plugin.services.Helpers']).service('AnalysisService', [
     'EntityAnnotationService', 'EntityService', 'Helpers', 'TextAnnotationService', '$filter', '$http', '$q', '$rootScope', function(EntityAnnotationService, EntityService, Helpers, TextAnnotationService, $filter, $http, $q, $rootScope) {
       var findOrCreateTextAnnotation, service;
       findOrCreateTextAnnotation = function(textAnnotations, textAnnotation) {
@@ -219,6 +220,12 @@
       };
       service = {
         _knownTypes: [],
+        _entities: {},
+        setEntities: (function(_this) {
+          return function(entities) {
+            return _this._entities = entities;
+          };
+        })(this),
         setKnownTypes: (function(_this) {
           return function(types) {
             return _this._knownTypes = types;
@@ -231,39 +238,40 @@
             return this.promise.resolve();
           }
         },
-        preselect: function(analysis, annotations) {
-          var annotation, ea, entities, entity, entityAnnotations, textAnnotation, _i, _len, _results;
-          _results = [];
-          for (_i = 0, _len = annotations.length; _i < _len; _i++) {
-            annotation = annotations[_i];
-            textAnnotation = findOrCreateTextAnnotation(analysis.textAnnotations, annotation);
-            entityAnnotations = EntityAnnotationService.find(textAnnotation.entityAnnotations, {
-              uri: annotation.uri
-            });
-            if (0 < entityAnnotations.length) {
-              _results.push(entityAnnotations[0].selected = true);
-            } else {
-              entities = EntityService.find(Helpers.merge(analysis.entities, window.wordlift.entities), {
+        preselect: (function(_this) {
+          return function(analysis, annotations) {
+            var annotation, ea, entities, entityAnnotations, textAnnotation, _i, _len, _results;
+            _results = [];
+            for (_i = 0, _len = annotations.length; _i < _len; _i++) {
+              annotation = annotations[_i];
+              textAnnotation = findOrCreateTextAnnotation(analysis.textAnnotations, annotation);
+              entityAnnotations = EntityAnnotationService.find(textAnnotation.entityAnnotations, {
                 uri: annotation.uri
               });
-              if (0 === entities.length) {
-                throw "Missing entity in window.wordlift.entities collection!";
+              if (0 < entityAnnotations.length) {
+                _results.push(entityAnnotations[0].selected = true);
+              } else {
+                entities = EntityService.find(Helpers.merge(analysis.entities, _this._entities), {
+                  uri: annotation.uri
+                });
+                if (0 === entities.length) {
+                  throw "Missing entity in window.wordlift.entities collection!";
+                }
+                analysis.entities[annotation.uri] = entities[0];
+                ea = EntityAnnotationService.create({
+                  label: annotation.label,
+                  confidence: 1,
+                  entity: analysis.entities[annotation.uri],
+                  relation: analysis.textAnnotations[textAnnotation.id],
+                  selected: true
+                });
+                analysis.entityAnnotations[ea.id] = ea;
+                _results.push(textAnnotation.entityAnnotations[ea.id] = analysis.entityAnnotations[ea.id]);
               }
-              entity = entities[0];
-              analysis.entities[annotation.uri] = entity;
-              ea = EntityAnnotationService.create({
-                label: annotation.label,
-                confidence: 1,
-                entity: analysis.entities[annotation.uri],
-                relation: analysis.textAnnotations[textAnnotation.id],
-                selected: true
-              });
-              analysis.entityAnnotations[ea.id] = ea;
-              _results.push(textAnnotation.entityAnnotations[ea.id] = analysis.entityAnnotations[ea.id]);
             }
-          }
-          return _results;
-        },
+            return _results;
+          };
+        })(this),
         analyze: function(content, merge) {
           var that;
           if (merge == null) {
@@ -661,45 +669,47 @@
         return _results;
       };
       service = {
-        embedAnalysis: function(analysis) {
-          var ed, element, entities, entity, entityAnnotations, html, isDirty, textAnnotation, textAnnotationId, traslator, _ref;
-          ed = editor();
-          html = ed.getContent({
-            format: 'raw'
-          });
-          entities = findEntities(html);
-          AnalysisService.preselect(analysis, entities);
-          html = html.replace(/<(\w+)[^>]*\sclass="textannotation[^"]*"[^>]*>([^<]+)<\/\1>/gim, '$2');
-          traslator = Traslator.create(html);
-          _ref = analysis.textAnnotations;
-          for (textAnnotationId in _ref) {
-            textAnnotation = _ref[textAnnotationId];
-            if (!(0 < Object.keys(textAnnotation.entityAnnotations).length)) {
-              continue;
-            }
-            element = "<span id=\"" + textAnnotationId + "\" class=\"" + TEXT_ANNOTATION;
-            entityAnnotations = EntityAnnotationService.find(textAnnotation.entityAnnotations, {
-              selected: true
+        embedAnalysis: (function(_this) {
+          return function(analysis) {
+            var ed, element, entities, entity, entityAnnotations, html, isDirty, textAnnotation, textAnnotationId, traslator, _ref;
+            ed = editor();
+            html = ed.getContent({
+              format: 'raw'
             });
-            if (0 < entityAnnotations.length && (entityAnnotations[0].entity != null)) {
-              if (!entityAnnotations[0].entity) {
-                console.log(entityAnnotations[0]);
+            entities = findEntities(html);
+            AnalysisService.preselect(analysis, entities);
+            html = html.replace(/<(\w+)[^>]*\sclass="textannotation[^"]*"[^>]*>([^<]+)<\/\1>/gim, '$2');
+            traslator = Traslator.create(html);
+            _ref = analysis.textAnnotations;
+            for (textAnnotationId in _ref) {
+              textAnnotation = _ref[textAnnotationId];
+              if (!(0 < Object.keys(textAnnotation.entityAnnotations).length)) {
+                continue;
               }
-              entity = entityAnnotations[0].entity;
-              element += " highlight " + entity.css + "\" itemid=\"" + entity.id;
+              element = "<span id=\"" + textAnnotationId + "\" class=\"" + TEXT_ANNOTATION;
+              entityAnnotations = EntityAnnotationService.find(textAnnotation.entityAnnotations, {
+                selected: true
+              });
+              if (0 < entityAnnotations.length && (entityAnnotations[0].entity != null)) {
+                if (!entityAnnotations[0].entity) {
+                  console.log(entityAnnotations[0]);
+                }
+                entity = entityAnnotations[0].entity;
+                element += " highlight " + entity.css + "\" itemid=\"" + entity.id;
+              }
+              element += '">';
+              traslator.insertHtml(element, {
+                text: textAnnotation.start
+              });
+              traslator.insertHtml('</span>', {
+                text: textAnnotation.end
+              });
             }
-            element += '">';
-            traslator.insertHtml(element, {
-              text: textAnnotation.start
-            });
-            traslator.insertHtml('</span>', {
-              text: textAnnotation.end
-            });
-          }
-          isDirty = ed.isDirty();
-          ed.setContent(traslator.getHtml());
-          return ed.isNotDirty = !isDirty;
-        },
+            isDirty = ed.isDirty();
+            ed.setContent(traslator.getHtml());
+            return ed.isNotDirty = !isDirty;
+          };
+        })(this),
         analyze: function(content) {
           if (AnalysisService.isRunning) {
             return AnalysisService.abort();
@@ -995,7 +1005,10 @@
     return $('#wordlift-disambiguation-popover').hide();
   }), injector = angular.bootstrap($('#wl-app'), ['wordlift.tinymce.plugin']), injector.invoke([
     'AnalysisService', function(AnalysisService) {
-      return AnalysisService.setKnownTypes(window.wordlift.types);
+      if (window.wordlift != null) {
+        AnalysisService.setKnownTypes(window.wordlift.types);
+        return AnalysisService.setEntities(window.wordlift.entities);
+      }
     }
   ]), tinymce.PluginManager.add('wordlift', function(editor, url) {
     editor.addButton('wordlift', {

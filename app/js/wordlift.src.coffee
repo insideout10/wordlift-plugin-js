@@ -22,6 +22,10 @@ class Traslator
     @_textPositions = []
     @_text = ''
 
+    # TODO: the pattern should consider that HTML has also HTML entities.
+    # Remove non-breaking spaces.
+    @_html = @_html.replace /&nbsp;/gim, ' '
+
     pattern = /([^<]*)(<[^>]*>)([^<]*)/gim
 
     textLength = 0
@@ -277,9 +281,11 @@ angular.module('wordlift.tinymce.plugin.directives', ['wordlift.tinymce.plugin.c
 #     * types      : a list of types as provided by the entity
 #     * thumbnails : URL to thumbnail images
 
-angular.module('AnalysisService', ['wordlift.tinymce.plugin.services.Helpers'])
+angular.module('AnalysisService',
+  ['wordlift.tinymce.plugin.services.EntityService', 'wordlift.tinymce.plugin.services.Helpers'])
 .service('AnalysisService',
-    [ 'EntityAnnotationService', 'EntityService', 'Helpers', 'TextAnnotationService', '$filter', '$http', '$q', '$rootScope',
+    [ 'EntityAnnotationService', 'EntityService', 'Helpers', 'TextAnnotationService', '$filter', '$http', '$q',
+      '$rootScope',
       (EntityAnnotationService, EntityService, Helpers, TextAnnotationService, $filter, $http, $q, $rootScope) ->
 
         # Find an entity in the analysis
@@ -307,6 +313,10 @@ angular.module('AnalysisService', ['wordlift.tinymce.plugin.services.Helpers'])
 
         service =
           _knownTypes: []
+          _entities: {}
+
+          setEntities: (entities) =>
+            @_entities = entities
 
           setKnownTypes: (types) =>
             @_knownTypes = types
@@ -323,7 +333,7 @@ angular.module('AnalysisService', ['wordlift.tinymce.plugin.services.Helpers'])
             @promise.resolve() if @isRunning and @promise?
 
         # Preselect entity annotations in the provided analysis using the provided collection of annotations.
-          preselect: (analysis, annotations) ->
+          preselect: (analysis, annotations) =>
 
             # Find the existing entities in the html
             for annotation in annotations
@@ -334,15 +344,16 @@ angular.module('AnalysisService', ['wordlift.tinymce.plugin.services.Helpers'])
                 entityAnnotations[0].selected = true
               else
                 # Retrieve entity from analysis or from the entity storage if needed
-                entities = EntityService.find Helpers.merge(analysis.entities, window.wordlift.entities), uri: annotation.uri
-                #                entity = find(window.wordlift.entities, uri: annotation.uri) unless entity
+                entities = EntityService.find Helpers.merge(analysis.entities, @_entities), uri: annotation.uri
+
                 # If the entity is missing raise an excpetion!
-                throw "Missing entity in window.wordlift.entities collection!" if 0 is entities.length
+                if 0 is entities.length
+                  throw "Missing entity in window.wordlift.entities collection!"
+                  # TODO: wouldn't it be better to continue here instead of throwing an exception?
+                  # continue
 
                 # Use the first found entity
-                entity = entities[0]
-
-                analysis.entities[annotation.uri] = entity
+                analysis.entities[annotation.uri] = entities[0]
                 # Create the new entityAssociation
                 ea = EntityAnnotationService.create
                   label: annotation.label
@@ -794,7 +805,7 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
       # Define the EditorService.
       service =
       # Embed the provided analysis in the editor.
-        embedAnalysis: (analysis) ->
+        embedAnalysis: (analysis) =>
 
           # A reference to the editor.
           ed = editor()
@@ -947,6 +958,11 @@ angular.module('wordlift.tinymce.plugin.services.EntityService', [])
 
     # Find an entity in the provided entities collection using the provided filters.
     find: (entities, filter) ->
+#      dump (entity for entityId, entity of entities when filter.uri is entity?.id or filter.uri in entity?.sameAs)
+#      return (entity for entityId, entity of entities when filter.uri is entity?.id or filter.uri in entity?.sameAs)
+#      for entityId, entity of entities
+#        console.log "[ filter.uri :: #{filter.uri }][ found :: #{filter.uri is entity?.id or filter.uri in entity?.sameAs} ][ entity.id :: #{entity.id} ][ entity.sameAs :: #{entity?.sameAs} ]"
+
       if filter.uri?
         return (entity for entityId, entity of entities when filter.uri is entity?.id or filter.uri in entity?.sameAs)
 
@@ -1066,6 +1082,7 @@ angular.module('wordlift.tinymce.plugin.controllers',
 
     $scope.onEntitySelected = (textAnnotation, entityAnnotation) ->
       $scope.$emit 'selectEntity', ta: textAnnotation, ea: entityAnnotation
+      # TODO: the app should not refer to window.wordlift. This should be wrapped somewhere.
       # Add the selected entity to the entity storage
       window.wordlift.entities[entityAnnotation.entity.id] = entityAnnotation.entity
 
@@ -1193,7 +1210,9 @@ $(
   # Declare the whole document as bootstrap scope.
   injector = angular.bootstrap $('#wl-app'), ['wordlift.tinymce.plugin']
   injector.invoke ['AnalysisService', (AnalysisService) ->
-    AnalysisService.setKnownTypes window.wordlift.types
+    if window.wordlift?
+      AnalysisService.setKnownTypes window.wordlift.types
+      AnalysisService.setEntities   window.wordlift.entities
   ]
 
   # Add WordLift as a plugin of the TinyMCE editor.
@@ -1209,7 +1228,7 @@ $(
         injector.invoke(['EditorService', '$rootScope', (EditorService, $rootScope) ->
           $rootScope.$apply( ->
             # Get the html content of the editor.
-            html = tinyMCE.activeEditor.getContent({format: 'raw'})
+            html = tinyMCE.activeEditor.getContent format: 'raw'
 
             # Get the text content from the Html.
             text = Traslator.create(html).getText()

@@ -255,7 +255,9 @@
             
             <div class="content"><div class='highlight'><pre>  injector = angular.bootstrap $(<span class="hljs-string">'#wl-app'</span>), [<span class="hljs-string">'wordlift.tinymce.plugin'</span>]
   injector.invoke [<span class="hljs-string">'AnalysisService'</span>, <span class="hljs-function"><span class="hljs-params">(AnalysisService)</span> -&gt;</span>
-    AnalysisService.setKnownTypes <span class="hljs-built_in">window</span>.wordlift.types
+    <span class="hljs-keyword">if</span> <span class="hljs-built_in">window</span>.wordlift?
+      AnalysisService.setKnownTypes <span class="hljs-built_in">window</span>.wordlift.types
+      AnalysisService.setEntities   <span class="hljs-built_in">window</span>.wordlift.entities
   ]</pre></div></div>
             
         </li>
@@ -321,7 +323,7 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            html = tinyMCE.activeEditor.getContent({<span class="hljs-attribute">format</span>: <span class="hljs-string">'raw'</span>})</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            html = tinyMCE.activeEditor.getContent <span class="hljs-attribute">format</span>: <span class="hljs-string">'raw'</span></pre></div></div>
             
         </li>
         

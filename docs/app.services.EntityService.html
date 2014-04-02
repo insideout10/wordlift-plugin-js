@@ -147,7 +147,25 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">find</span>: <span class="hljs-function"><span class="hljs-params">(entities, filter)</span> -&gt;</span>
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">find</span>: <span class="hljs-function"><span class="hljs-params">(entities, filter)</span> -&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <pre><code> dump (entity <span class="hljs-keyword">for</span> entityId, entity <span class="hljs-keyword">of</span> entities <span class="hljs-keyword">when</span> filter.uri <span class="hljs-keyword">is</span> entity?.id <span class="hljs-keyword">or</span> filter.uri <span class="hljs-keyword">in</span> entity?.sameAs)
+ <span class="hljs-keyword">return</span> (entity <span class="hljs-keyword">for</span> entityId, entity <span class="hljs-keyword">of</span> entities <span class="hljs-keyword">when</span> filter.uri <span class="hljs-keyword">is</span> entity?.id <span class="hljs-keyword">or</span> filter.uri <span class="hljs-keyword">in</span> entity?.sameAs)
+ <span class="hljs-keyword">for</span> entityId, entity <span class="hljs-keyword">of</span> entities
+   <span class="hljs-built_in">console</span>.log <span class="hljs-string">"[ filter.uri :: <span class="hljs-subst">#{filter.uri }</span>][ found :: <span class="hljs-subst">#{filter.uri <span class="hljs-keyword">is</span> entity?.id <span class="hljs-keyword">or</span> filter.uri <span class="hljs-keyword">in</span> entity?.sameAs}</span> ][ entity.id :: <span class="hljs-subst">#{entity.id}</span> ][ entity.sameAs :: <span class="hljs-subst">#{entity?.sameAs}</span> ]"</span>
+</code></pre>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
       <span class="hljs-keyword">if</span> filter.uri?
         <span class="hljs-keyword">return</span> (entity <span class="hljs-keyword">for</span> entityId, entity <span class="hljs-keyword">of</span> entities <span class="hljs-keyword">when</span> filter.uri <span class="hljs-keyword">is</span> entity?.id <span class="hljs-keyword">or</span> filter.uri <span class="hljs-keyword">in</span> entity?.sameAs)
 

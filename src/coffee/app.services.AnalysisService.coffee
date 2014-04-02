@@ -12,9 +12,11 @@
 #     * types      : a list of types as provided by the entity
 #     * thumbnails : URL to thumbnail images
 
-angular.module('AnalysisService', ['wordlift.tinymce.plugin.services.Helpers'])
+angular.module('AnalysisService',
+  ['wordlift.tinymce.plugin.services.EntityService', 'wordlift.tinymce.plugin.services.Helpers'])
 .service('AnalysisService',
-    [ 'EntityAnnotationService', 'EntityService', 'Helpers', 'TextAnnotationService', '$filter', '$http', '$q', '$rootScope',
+    [ 'EntityAnnotationService', 'EntityService', 'Helpers', 'TextAnnotationService', '$filter', '$http', '$q',
+      '$rootScope',
       (EntityAnnotationService, EntityService, Helpers, TextAnnotationService, $filter, $http, $q, $rootScope) ->
 
         # Find an entity in the analysis
@@ -42,6 +44,10 @@ angular.module('AnalysisService', ['wordlift.tinymce.plugin.services.Helpers'])
 
         service =
           _knownTypes: []
+          _entities: {}
+
+          setEntities: (entities) =>
+            @_entities = entities
 
           setKnownTypes: (types) =>
             @_knownTypes = types
@@ -58,7 +64,7 @@ angular.module('AnalysisService', ['wordlift.tinymce.plugin.services.Helpers'])
             @promise.resolve() if @isRunning and @promise?
 
         # Preselect entity annotations in the provided analysis using the provided collection of annotations.
-          preselect: (analysis, annotations) ->
+          preselect: (analysis, annotations) =>
 
             # Find the existing entities in the html
             for annotation in annotations
@@ -69,15 +75,16 @@ angular.module('AnalysisService', ['wordlift.tinymce.plugin.services.Helpers'])
                 entityAnnotations[0].selected = true
               else
                 # Retrieve entity from analysis or from the entity storage if needed
-                entities = EntityService.find Helpers.merge(analysis.entities, window.wordlift.entities), uri: annotation.uri
-                #                entity = find(window.wordlift.entities, uri: annotation.uri) unless entity
+                entities = EntityService.find Helpers.merge(analysis.entities, @_entities), uri: annotation.uri
+
                 # If the entity is missing raise an excpetion!
-                throw "Missing entity in window.wordlift.entities collection!" if 0 is entities.length
+                if 0 is entities.length
+                  throw "Missing entity in window.wordlift.entities collection!"
+                  # TODO: wouldn't it be better to continue here instead of throwing an exception?
+                  # continue
 
                 # Use the first found entity
-                entity = entities[0]
-
-                analysis.entities[annotation.uri] = entity
+                analysis.entities[annotation.uri] = entities[0]
                 # Create the new entityAssociation
                 ea = EntityAnnotationService.create
                   label: annotation.label
