@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>app.services.coffee</title>
+  <title>app.services.EntityService.coffee</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="docco.css" />
@@ -116,7 +116,7 @@
         
           <li id="title">
               <div class="annotation">
-                  <h1>app.services.coffee</h1>
+                  <h1>app.services.EntityService.coffee</h1>
               </div>
           </li>
         
@@ -131,15 +131,27 @@
               
             </div>
             
-            <div class="content"><div class='highlight'><pre>angular.<span class="hljs-built_in">module</span>(<span class="hljs-string">'wordlift.tinymce.plugin.services'</span>, [
-  <span class="hljs-string">'wordlift.tinymce.plugin.config'</span>
-  <span class="hljs-string">'wordlift.tinymce.plugin.services.EditorService'</span>
-  <span class="hljs-string">'wordlift.tinymce.plugin.services.EntityService'</span>
-  <span class="hljs-string">'wordlift.tinymce.plugin.services.EntityAnnotationService'</span>
-  <span class="hljs-string">'wordlift.tinymce.plugin.services.TextAnnotationService'</span>
-  <span class="hljs-string">'wordlift.tinymce.plugin.services.Helpers'</span>
-  <span class="hljs-string">'AnalysisService'</span>
-])</pre></div></div>
+            <div class="content"><div class='highlight'><pre>angular.<span class="hljs-built_in">module</span>(<span class="hljs-string">'wordlift.tinymce.plugin.services.EntityService'</span>, [])
+.service(<span class="hljs-string">'EntityService'</span>, [<span class="hljs-function"> -&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>Find an entity in the provided entities collection using the provided filters.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">find</span>: <span class="hljs-function"><span class="hljs-params">(entities, filter)</span> -&gt;</span>
+      <span class="hljs-keyword">if</span> filter.uri?
+        <span class="hljs-keyword">return</span> (entity <span class="hljs-keyword">for</span> entityId, entity <span class="hljs-keyword">of</span> entities <span class="hljs-keyword">when</span> filter.uri <span class="hljs-keyword">is</span> entity?.id <span class="hljs-keyword">or</span> filter.uri <span class="hljs-keyword">in</span> entity?.sameAs)
+
+  ])</pre></div></div>
             
         </li>
         

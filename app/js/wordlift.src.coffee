@@ -277,17 +277,17 @@ angular.module('wordlift.tinymce.plugin.directives', ['wordlift.tinymce.plugin.c
 #     * types      : a list of types as provided by the entity
 #     * thumbnails : URL to thumbnail images
 
-angular.module('AnalysisService', [])
+angular.module('AnalysisService', ['wordlift.tinymce.plugin.services.Helpers'])
 .service('AnalysisService',
-    [ 'EntityAnnotationService', 'TextAnnotationService', '$filter', '$http', '$q', '$rootScope',
-      (EntityAnnotationService, TextAnnotationService, $filter, $http, $q, $rootScope) ->
+    [ 'EntityAnnotationService', 'EntityService', 'Helpers', 'TextAnnotationService', '$filter', '$http', '$q', '$rootScope',
+      (EntityAnnotationService, EntityService, Helpers, TextAnnotationService, $filter, $http, $q, $rootScope) ->
 
         # Find an entity in the analysis
         # or within window.wordlift.entities storage if needed
-        findEntityByUriWithScope = (scope, uri)->
-          for entityId, entity of scope
-            return entity if uri is entity?.id or uri in entity?.sameAs
- 
+#        findEntityByUriWithScope = (scope, uri)->
+#          for entityId, entity of scope
+#            return entity if uri is entity?.id or uri in entity?.sameAs
+
         # Find a text annotation in the provided collection which matches the start and end values.
         # Otherwise a new text annotation is created
         findOrCreateTextAnnotation = (textAnnotations, textAnnotation) ->
@@ -306,9 +306,10 @@ angular.module('AnalysisService', [])
           ta
 
         service =
-          setKnownTypes: (types) => @_knownTypes = types
-
           _knownTypes: []
+
+          setKnownTypes: (types) =>
+            @_knownTypes = types
 
         # Holds the analysis promise, used to abort the analysis.
           promise: undefined
@@ -330,14 +331,17 @@ angular.module('AnalysisService', [])
               entityAnnotations = EntityAnnotationService.find textAnnotation.entityAnnotations, uri: annotation.uri
               if 0 < entityAnnotations.length
                 # We don't expect more than one entity annotation for an URI inside a text annotation.
-                entityAnnotations[0].selected = true 
-              else   
+                entityAnnotations[0].selected = true
+              else
                 # Retrieve entity from analysis or from the entity storage if needed
-                entity = findEntityByUriWithScope(analysis.entities, annotation.uri)
-                entity = findEntityByUriWithScope(window.wordlift.entities, annotation.uri) unless entity
+                entities = EntityService.find Helpers.merge(analysis.entities, window.wordlift.entities), uri: annotation.uri
+                #                entity = find(window.wordlift.entities, uri: annotation.uri) unless entity
                 # If the entity is missing raise an excpetion!
-                throw "Missing entity in window.wordlift.entities collection!" unless entity
-          
+                throw "Missing entity in window.wordlift.entities collection!" if 0 is entities.length
+
+                # Use the first found entity
+                entity = entities[0]
+
                 analysis.entities[annotation.uri] = entity
                 # Create the new entityAssociation
                 ea = EntityAnnotationService.create
@@ -350,7 +354,7 @@ angular.module('AnalysisService', [])
                 analysis.entityAnnotations[ea.id] = ea
                 # Add a reference to the current textAssociation
                 textAnnotation.entityAnnotations[ea.id] = analysis.entityAnnotations[ea.id]
-        
+
         # <a name="analyze"></a>
         # Analyze the provided content. Only one analysis at a time is run.
         # The merge parameter is passed to the parse call and merges together entities related via sameAs.
@@ -725,7 +729,7 @@ angular.module('AnalysisService', [])
 
             # Create entities instances in the entities array.
             entities[id] = createEntity(item, language) for id, item of entities
-            
+
             # Cycle in every entity.
             mergeEntities(entity, entities) for id, entity of entities if merge
 
@@ -938,6 +942,16 @@ angular.module('wordlift.tinymce.plugin.services.EntityAnnotationService', [])
         return (entityAnnotation for entityAnnotationId, entityAnnotation of entityAnnotations when entityAnnotation.selected is filter.selected)
 
   ])
+angular.module('wordlift.tinymce.plugin.services.EntityService', [])
+.service('EntityService', [ ->
+
+    # Find an entity in the provided entities collection using the provided filters.
+    find: (entities, filter) ->
+      if filter.uri?
+        return (entity for entityId, entity of entities when filter.uri is entity?.id or filter.uri in entity?.sameAs)
+
+  ])
+
 angular.module('wordlift.tinymce.plugin.services.Helpers', [])
 .service('Helpers', [ ->
 
@@ -984,13 +998,14 @@ angular.module('wordlift.tinymce.plugin.services.TextAnnotationService', [])
 
 
 angular.module('wordlift.tinymce.plugin.services', [
-    'wordlift.tinymce.plugin.config'
-    'wordlift.tinymce.plugin.services.EditorService'
-    'wordlift.tinymce.plugin.services.EntityAnnotationService'
-    'wordlift.tinymce.plugin.services.TextAnnotationService'
-    'wordlift.tinymce.plugin.services.Helpers'
-    'AnalysisService'
-  ])
+  'wordlift.tinymce.plugin.config'
+  'wordlift.tinymce.plugin.services.EditorService'
+  'wordlift.tinymce.plugin.services.EntityService'
+  'wordlift.tinymce.plugin.services.EntityAnnotationService'
+  'wordlift.tinymce.plugin.services.TextAnnotationService'
+  'wordlift.tinymce.plugin.services.Helpers'
+  'AnalysisService'
+])
 
 angular.module('wordlift.tinymce.plugin.controllers',
   [ 'wordlift.tinymce.plugin.config', 'wordlift.tinymce.plugin.services' ])

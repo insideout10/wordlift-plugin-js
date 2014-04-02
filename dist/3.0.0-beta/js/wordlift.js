@@ -199,18 +199,9 @@
     };
   });
 
-  angular.module('AnalysisService', []).service('AnalysisService', [
-    'EntityAnnotationService', 'TextAnnotationService', '$filter', '$http', '$q', '$rootScope', function(EntityAnnotationService, TextAnnotationService, $filter, $http, $q, $rootScope) {
-      var findEntityByUriWithScope, findOrCreateTextAnnotation, service;
-      findEntityByUriWithScope = function(scope, uri) {
-        var entity, entityId;
-        for (entityId in scope) {
-          entity = scope[entityId];
-          if (uri === (entity != null ? entity.id : void 0) || __indexOf.call(entity != null ? entity.sameAs : void 0, uri) >= 0) {
-            return entity;
-          }
-        }
-      };
+  angular.module('AnalysisService', ['wordlift.tinymce.plugin.services.Helpers']).service('AnalysisService', [
+    'EntityAnnotationService', 'EntityService', 'Helpers', 'TextAnnotationService', '$filter', '$http', '$q', '$rootScope', function(EntityAnnotationService, EntityService, Helpers, TextAnnotationService, $filter, $http, $q, $rootScope) {
+      var findOrCreateTextAnnotation, service;
       findOrCreateTextAnnotation = function(textAnnotations, textAnnotation) {
         var ta;
         ta = TextAnnotationService.find(textAnnotations, textAnnotation.start, textAnnotation.end);
@@ -227,12 +218,12 @@
         return ta;
       };
       service = {
+        _knownTypes: [],
         setKnownTypes: (function(_this) {
           return function(types) {
             return _this._knownTypes = types;
           };
         })(this),
-        _knownTypes: [],
         promise: void 0,
         isRunning: false,
         abort: function() {
@@ -241,7 +232,7 @@
           }
         },
         preselect: function(analysis, annotations) {
-          var annotation, ea, entity, entityAnnotations, textAnnotation, _i, _len, _results;
+          var annotation, ea, entities, entity, entityAnnotations, textAnnotation, _i, _len, _results;
           _results = [];
           for (_i = 0, _len = annotations.length; _i < _len; _i++) {
             annotation = annotations[_i];
@@ -252,13 +243,13 @@
             if (0 < entityAnnotations.length) {
               _results.push(entityAnnotations[0].selected = true);
             } else {
-              entity = findEntityByUriWithScope(analysis.entities, annotation.uri);
-              if (!entity) {
-                entity = findEntityByUriWithScope(window.wordlift.entities, annotation.uri);
-              }
-              if (!entity) {
+              entities = EntityService.find(Helpers.merge(analysis.entities, window.wordlift.entities), {
+                uri: annotation.uri
+              });
+              if (0 === entities.length) {
                 throw "Missing entity in window.wordlift.entities collection!";
               }
+              entity = entities[0];
               analysis.entities[annotation.uri] = entity;
               ea = EntityAnnotationService.create({
                 label: annotation.label,
@@ -805,6 +796,29 @@
     }
   ]);
 
+  angular.module('wordlift.tinymce.plugin.services.EntityService', []).service('EntityService', [
+    function() {
+      return {
+        find: function(entities, filter) {
+          var entity, entityId;
+          if (filter.uri != null) {
+            return (function() {
+              var _ref, _results;
+              _results = [];
+              for (entityId in entities) {
+                entity = entities[entityId];
+                if (filter.uri === (entity != null ? entity.id : void 0) || (_ref = filter.uri, __indexOf.call(entity != null ? entity.sameAs : void 0, _ref) >= 0)) {
+                  _results.push(entity);
+                }
+              }
+              return _results;
+            })();
+          }
+        }
+      };
+    }
+  ]);
+
   angular.module('wordlift.tinymce.plugin.services.Helpers', []).service('Helpers', [
     function() {
       return {
@@ -866,7 +880,7 @@
     }
   ]);
 
-  angular.module('wordlift.tinymce.plugin.services', ['wordlift.tinymce.plugin.config', 'wordlift.tinymce.plugin.services.EditorService', 'wordlift.tinymce.plugin.services.EntityAnnotationService', 'wordlift.tinymce.plugin.services.TextAnnotationService', 'wordlift.tinymce.plugin.services.Helpers', 'AnalysisService']);
+  angular.module('wordlift.tinymce.plugin.services', ['wordlift.tinymce.plugin.config', 'wordlift.tinymce.plugin.services.EditorService', 'wordlift.tinymce.plugin.services.EntityService', 'wordlift.tinymce.plugin.services.EntityAnnotationService', 'wordlift.tinymce.plugin.services.TextAnnotationService', 'wordlift.tinymce.plugin.services.Helpers', 'AnalysisService']);
 
   angular.module('wordlift.tinymce.plugin.controllers', ['wordlift.tinymce.plugin.config', 'wordlift.tinymce.plugin.services']).filter('orderObjectBy', function() {
     return function(items, field, reverse) {
