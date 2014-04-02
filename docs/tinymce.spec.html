@@ -1578,13 +1578,14 @@ describe <span class="hljs-string">'TinyMCE'</span>,<span class="hljs-function">
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-85">&#182;</a>
               </div>
-              <p>This expectation is confirmed just becouse no one entityAnnotation is selected</p>
+              <p>selectedEntities = (ea.entity for id, ea of analysis.entityAnnotations when ea.selected and ea.entity.id in selectedEntityIds)
+expect(selectedEntities.length).toEqual(selected.length)
+for entity in selectedEntities
+ expect(entity.id in selected).toBe true  </p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      expect(entityAnnotation.selected).toBe (entityAnnotation.id <span class="hljs-keyword">in</span> selected)
-
-  )
+            <div class="content"><div class='highlight'><pre>  )
   it <span class="hljs-string">'features entities preselections in the analysis results on missing entities'</span>, inject<span class="hljs-function"><span class="hljs-params">( (AnalysisService, EditorService) -&gt;
 
 </span></span></pre></div></div>
@@ -1715,13 +1716,7 @@ Get the analysis instance, by parsing the json and merging the results.</p>
       <span class="hljs-built_in">window</span>.wordlift.entities = data
     
     analysis = AnalysisService.parse json, <span class="hljs-literal">true</span>
-    EditorService.embedAnalysis analysis
-  
-    selectedEntityIds = [
-      <span class="hljs-string">'http://data.redlink.io/353/wordlift/entity/David_Riccitelli'</span>
-      <span class="hljs-string">'http://data.redlink.io/353/wordlift/entity/Central_Archives_of_the_State_(Italy)'</span>
-      <span class="hljs-string">'http://data.redlink.io/353/wordlift/entity/WordPress'</span>
-    ]</pre></div></div>
+    EditorService.embedAnalysis analysis</pre></div></div>
             
         </li>
         
@@ -1732,7 +1727,7 @@ Get the analysis instance, by parsing the json and merging the results.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-94">&#182;</a>
               </div>
-              <p>Check for selections.</p>
+              <p>Check for consistency</p>
 
             </div>
             
@@ -1751,12 +1746,19 @@ Get the analysis instance, by parsing the json and merging the results.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-95">&#182;</a>
               </div>
-              <p>FIX this expectations does not means something is really selected</p>
+              <p>Check for preselected</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      expect(entityAnnotation.selected).toBe (entityAnnotation.entity.id <span class="hljs-keyword">in</span> selectedEntityIds)
-
+            <div class="content"><div class='highlight'><pre>    selectedEntityIds = [
+      <span class="hljs-string">'http://data.redlink.io/353/wordlift/entity/David_Riccitelli'</span>
+      <span class="hljs-string">'http://data.redlink.io/353/wordlift/entity/Central_Archives_of_the_State_(Italy)'</span>
+      <span class="hljs-string">'http://data.redlink.io/353/wordlift/entity/WordPress'</span>
+    ]
+    selectedEntities = (ea.entity <span class="hljs-keyword">for</span> id, ea <span class="hljs-keyword">of</span> analysis.entityAnnotations <span class="hljs-keyword">when</span> ea.selected <span class="hljs-keyword">and</span> ea.entity.id <span class="hljs-keyword">in</span> selectedEntityIds)
+    expect(selectedEntities.length).toEqual(selectedEntityIds.length)
+    <span class="hljs-keyword">for</span> entity <span class="hljs-keyword">in</span> selectedEntities
+      expect(entity.id <span class="hljs-keyword">in</span> selectedEntityIds).toBe <span class="hljs-literal">true</span>         
 )</pre></div></div>
             
         </li>

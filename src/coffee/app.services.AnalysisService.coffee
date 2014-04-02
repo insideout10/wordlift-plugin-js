@@ -17,10 +17,7 @@ angular.module('AnalysisService', [])
     [ 'EntityAnnotationService', 'TextAnnotationService', '$filter', '$http', '$q', '$rootScope',
       (EntityAnnotationService, TextAnnotationService, $filter, $http, $q, $rootScope) ->
 
-        # Set the known types as provided by the environment.
-        KNOWN_TYPES = [] # if window.wordlift?.types? then window.wordlift.types else []
-
-        # Find an entity in the analysis 
+        # Find an entity in the analysis
         # or within window.wordlift.entities storage if needed
         findEntityByUriWithScope = (scope, uri)->
           for entityId, entity of scope

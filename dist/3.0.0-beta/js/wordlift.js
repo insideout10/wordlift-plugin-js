@@ -201,8 +201,7 @@
 
   angular.module('AnalysisService', []).service('AnalysisService', [
     'EntityAnnotationService', 'TextAnnotationService', '$filter', '$http', '$q', '$rootScope', function(EntityAnnotationService, TextAnnotationService, $filter, $http, $q, $rootScope) {
-      var KNOWN_TYPES, findEntityByUriWithScope, findOrCreateTextAnnotation, service;
-      KNOWN_TYPES = [];
+      var findEntityByUriWithScope, findOrCreateTextAnnotation, service;
       findEntityByUriWithScope = function(scope, uri) {
         var entity, entityId;
         for (entityId in scope) {
