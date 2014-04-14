@@ -168,11 +168,11 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-3">&#182;</a>
               </div>
-              <p>Merge the params with the default settings.</p>
+              <p>Copy over the label from the entity annotation if the label is not set on the entity.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      Helpers.merge defaults, params</pre></div></div>
+            <div class="content"><div class='highlight'><pre>      params.entity.label = params.label <span class="hljs-keyword">if</span> params.entity? <span class="hljs-keyword">and</span> <span class="hljs-keyword">not</span> params.entity.label?</pre></div></div>
             
         </li>
         
@@ -182,6 +182,21 @@
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>Merge the params with the default settings.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      Helpers.merge defaults, params</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
               <p>Find an entity annotation with the provided filters.</p>
 

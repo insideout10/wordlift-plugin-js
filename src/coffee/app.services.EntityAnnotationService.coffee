@@ -12,6 +12,9 @@ angular.module('wordlift.tinymce.plugin.services.EntityAnnotationService', [])
         selected: false
         _item: null
 
+      # Copy over the label from the entity annotation if the label is not set on the entity.
+      params.entity.label = params.label if params.entity? and not params.entity.label?
+
       # Merge the params with the default settings.
       Helpers.merge defaults, params
 

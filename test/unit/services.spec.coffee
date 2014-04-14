@@ -5,7 +5,7 @@ describe 'services', ->
   beforeEach module('wordlift.tinymce.plugin.services')
   beforeEach module('AnalysisService')
 
-  beforeEach inject( (AnalysisService) ->
+  beforeEach inject((AnalysisService) ->
     AnalysisService.setKnownTypes window.wordlift.types
   )
 
@@ -98,11 +98,11 @@ describe 'services', ->
         entity = entityAnnotation.entity
         expect(entity.thumbnails.length).toEqual 1
         expect(entity.thumbnails[0]).toEqual 'https://usercontent.googleapis.com/freebase/v1/image/m/05thd8b?maxwidth=4096&maxheight=4096'
-#        expect(entity.thumbnails[1]).toEqual 'https://usercontent.googleapis.com/freebase/v1/image/m/04js6kc?maxwidth=4096&maxheight=4096'
-#        expect(entity.thumbnails[2]).toEqual 'https://usercontent.googleapis.com/freebase/v1/image/m/04js6kq?maxwidth=4096&maxheight=4096'
-#        expect(entity.thumbnails[3]).toEqual 'https://usercontent.googleapis.com/freebase/v1/image/m/04mn0b4?maxwidth=4096&maxheight=4096'
-#        expect(entity.thumbnails[4]).toEqual 'https://usercontent.googleapis.com/freebase/v1/image/m/04mn0bt?maxwidth=4096&maxheight=4096'
-#
+        #        expect(entity.thumbnails[1]).toEqual 'https://usercontent.googleapis.com/freebase/v1/image/m/04js6kc?maxwidth=4096&maxheight=4096'
+        #        expect(entity.thumbnails[2]).toEqual 'https://usercontent.googleapis.com/freebase/v1/image/m/04js6kq?maxwidth=4096&maxheight=4096'
+        #        expect(entity.thumbnails[3]).toEqual 'https://usercontent.googleapis.com/freebase/v1/image/m/04mn0b4?maxwidth=4096&maxheight=4096'
+        #        expect(entity.thumbnails[4]).toEqual 'https://usercontent.googleapis.com/freebase/v1/image/m/04mn0bt?maxwidth=4096&maxheight=4096'
+        #
         expect(entityAnnotation.entity).not.toBe undefined for id, entityAnnotation of analysis.entityAnnotations
 
         for id, textAnnotation of analysis.textAnnotations
@@ -338,6 +338,30 @@ describe 'services', ->
         expect(entity1).toBe entity2
     )
 
+
+    it 'uses the text annotation selected text when an entity is missing a label', inject((AnalysisService) ->
+
+      # The entity under testing.
+      id = 'http://rdf.freebase.com/ns/m.0g4zp0c'
+
+      # Will hold the analysis results.
+      analysis = ''
+
+      # Get the mock-up analysis.
+      $.ajax('base/app/assets/kim_renberg.json', async: false).done (data) ->
+        # Parse the analysis results and merge the results.
+        analysis = AnalysisService.parse data, true
+
+
+      # Get a reference to the entity.
+      entity = analysis.entities[id]
+
+      expect(entity).not.toBe undefined
+
+      expect(entity.label).toBe 'Kim Renberg'
+    )
+
+
   describe 'EditorService', ->
     it "embeds analysis results also when there are parentheses in the selected text", inject((AnalysisService, EditorService, $httpBackend) ->
 
@@ -474,7 +498,6 @@ describe 'services', ->
 
   # Test the EntityAnnotationService
   describe 'EntityAnnotationService', ->
-
     it 'finds an EntityAnnotation in the provided collection using the selected switch', inject((AnalysisService, EntityAnnotationService) ->
       json = undefined
 

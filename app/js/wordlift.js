@@ -399,7 +399,7 @@
               }
               return entity;
             };
-            createEntityAnnotations = function(item) {
+            createEntityAnnotations = function(item, language) {
               var annotations, entityAnnotation, reference, relation, relations, textAnnotation, _i, _len;
               reference = get("" + FISE_ONT + "entity-reference", item);
               if (entities[reference] == null) {
@@ -413,7 +413,7 @@
                 textAnnotation = textAnnotations[relation];
                 entityAnnotation = EntityAnnotationService.create({
                   id: get('@id', item),
-                  label: get("" + FISE_ONT + "entity-label", item),
+                  label: getLanguage("" + FISE_ONT + "entity-label", item, language),
                   confidence: get(FISE_ONT_CONFIDENCE, item),
                   entity: entities[reference],
                   relation: textAnnotation,
@@ -475,7 +475,7 @@
               return [];
             };
             getLanguage = function(what, container, language) {
-              var item, items, _i, _len;
+              var item, items, _i, _j, _len, _len1;
               if (null === (items = get(what, container))) {
                 return;
               }
@@ -486,7 +486,12 @@
                   return item[VALUE];
                 }
               }
-              return null;
+              for (_j = 0, _len1 = items.length; _j < _len1; _j++) {
+                item = items[_j];
+                if ('en' === item['@language']) {
+                  return item[VALUE];
+                }
+              }
             };
             containsOrEquals = function(what, where) {
               var item, whatExp, whereArray, _i, _j, _len, _len1;
@@ -611,7 +616,7 @@
             }
             for (id in entityAnnotations) {
               item = entityAnnotations[id];
-              _ref = createEntityAnnotations(item);
+              _ref = createEntityAnnotations(item, language);
               for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
                 entityAnnotation = _ref[_j];
                 entityAnnotations[entityAnnotation.id] = entityAnnotation;
@@ -771,6 +776,9 @@
             selected: false,
             _item: null
           };
+          if ((params.entity != null) && (params.entity.label == null)) {
+            params.entity.label = params.label;
+          }
           return Helpers.merge(defaults, params);
         },
         find: function(entityAnnotations, filter) {

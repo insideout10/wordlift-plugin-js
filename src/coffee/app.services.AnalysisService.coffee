@@ -265,7 +265,7 @@ angular.module('AnalysisService',
               entity
 
             # Create an entity annotation. An entity annotation is created for each related text-annotation.
-            createEntityAnnotations = (item) ->
+            createEntityAnnotations = (item, language) ->
               # Get the reference to the entity.
               reference = get "#{FISE_ONT}entity-reference", item
               # If the referenced entity is not found, return null
@@ -286,7 +286,7 @@ angular.module('AnalysisService',
                 # Create an entity annotation.
                 entityAnnotation = EntityAnnotationService.create
                   id: get '@id', item
-                  label: get "#{FISE_ONT}entity-label", item
+                  label: getLanguage "#{FISE_ONT}entity-label", item, language
                   confidence: get FISE_ONT_CONFIDENCE, item
                   entity: entities[reference]
                   relation: textAnnotation
@@ -357,8 +357,8 @@ angular.module('AnalysisService',
               items = if angular.isArray items then items else [ items ]
               # cycle through the array.
               return item[VALUE] for item in items when language is item['@language']
-              # if not found return null.
-              null
+              # if not found return the english value.
+              return item[VALUE] for item in items when 'en' is item['@language']
 
             containsOrEquals = (what, where) ->
               #        dump "containsOrEquals [ what :: #{what} ][ where :: #{where} ]"
@@ -480,7 +480,7 @@ angular.module('AnalysisService',
 
             # Create entity annotations instances.
             for id, item of entityAnnotations
-              entityAnnotations[entityAnnotation.id] = entityAnnotation for entityAnnotation in createEntityAnnotations(item)
+              entityAnnotations[entityAnnotation.id] = entityAnnotation for entityAnnotation in createEntityAnnotations(item, language)
 
             # For every text annotation delete entity annotations that refer to the same entity (after merging).
             if merge
