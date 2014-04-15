@@ -104,6 +104,11 @@
               </a>
             
               
+              <a class="source" href="tinymce.questa_volta_parliamo_di_seo.spec.html">
+                tinymce.questa_volta_parliamo_di_seo.spec.coffee
+              </a>
+            
+              
               <a class="source" href="tinymce.spec.html">
                 tinymce.spec.coffee
               </a>
@@ -133,7 +138,7 @@
             
             <div class="content"><div class='highlight'><pre>angular.<span class="hljs-built_in">module</span>(<span class="hljs-string">'wordlift.tinymce.plugin.services.EditorService'</span>, [<span class="hljs-string">'wordlift.tinymce.plugin.config'</span>, <span class="hljs-string">'AnalysisService'</span>])
 .service(<span class="hljs-string">'EditorService'</span>,
-    [<span class="hljs-string">'AnalysisService'</span>, <span class="hljs-string">'EntityAnnotationService'</span>, <span class="hljs-string">'$rootScope'</span>, <span class="hljs-function"><span class="hljs-params">(AnalysisService, EntityAnnotationService, $rootScope)</span> -&gt;</span>
+    [<span class="hljs-string">'AnalysisService'</span>, <span class="hljs-string">'EntityAnnotationService'</span>, <span class="hljs-string">'$rootScope'</span>, <span class="hljs-string">'$log'</span>, <span class="hljs-function"><span class="hljs-params">(AnalysisService, EntityAnnotationService, $rootScope, $log)</span> -&gt;</span>
 
       <span class="hljs-function"><span class="hljs-title">editor</span> = -&gt;</span>
         tinyMCE.get(EDITOR_ID)</pre></div></div>
@@ -196,14 +201,7 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        (<span class="hljs-keyword">while</span> match = pattern.exec html
-          {
-            <span class="hljs-attribute">start</span>: traslator.html2text match.index
-            <span class="hljs-attribute">end</span>: traslator.html2text (match.index + match[<span class="hljs-number">0</span>].length)
-            <span class="hljs-attribute">uri</span>: match[<span class="hljs-number">2</span>]
-            <span class="hljs-attribute">label</span>: match[<span class="hljs-number">3</span>]
-          }
-        )</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        (<span class="hljs-keyword">while</span> match = pattern.exec html</pre></div></div>
             
         </li>
         
@@ -214,11 +212,17 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
-              <p>Define the EditorService.</p>
-
+              <pre><code>     <span class="hljs-built_in">console</span>.log <span class="hljs-string">"findEntities [ html index :: <span class="hljs-subst">#{match.index}</span> ][ text index :: <span class="hljs-subst">#{traslator.html2text match.index}</span> ]"</span>
+</code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>      service =</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          {
+            <span class="hljs-attribute">start</span>: traslator.html2text match.index
+            <span class="hljs-attribute">end</span>: traslator.html2text (match.index + match[<span class="hljs-number">0</span>].length)
+            <span class="hljs-attribute">uri</span>: match[<span class="hljs-number">2</span>]
+            <span class="hljs-attribute">label</span>: match[<span class="hljs-number">3</span>]
+          }
+        )</pre></div></div>
             
         </li>
         
@@ -229,11 +233,11 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
-              <p>Embed the provided analysis in the editor.</p>
+              <p>Define the EditorService.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-attribute">embedAnalysis</span>: <span class="hljs-function"><span class="hljs-params">(analysis)</span> =&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>      service =</pre></div></div>
             
         </li>
         
@@ -244,11 +248,11 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
-              <p>A reference to the editor.</p>
+              <p>Embed the provided analysis in the editor.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          ed = editor()</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-attribute">embedAnalysis</span>: <span class="hljs-function"><span class="hljs-params">(analysis)</span> =&gt;</span></pre></div></div>
             
         </li>
         
@@ -259,11 +263,11 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
-              <p>Get the TinyMCE editor html content.</p>
+              <p>A reference to the editor.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          html = ed.getContent <span class="hljs-attribute">format</span>: <span class="hljs-string">'raw'</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>          ed = editor()</pre></div></div>
             
         </li>
         
@@ -274,11 +278,11 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
-              <p>Find existing entities.</p>
+              <p>Get the TinyMCE editor html content.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          entities = findEntities html</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          html = ed.getContent <span class="hljs-attribute">format</span>: <span class="hljs-string">'raw'</span></pre></div></div>
             
         </li>
         
@@ -289,11 +293,11 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
-              <p>Preselect entities found in html.</p>
+              <p>Find existing entities.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          AnalysisService.preselect analysis, entities</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          entities = findEntities html</pre></div></div>
             
         </li>
         
@@ -304,11 +308,11 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
-              <p>Remove existing text annotations.</p>
+              <p>Preselect entities found in html.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          html = html.replace(<span class="hljs-regexp">/&lt;(\w+)[^&gt;]*\sclass="textannotation[^"]*"[^&gt;]*&gt;([^&lt;]+)&lt;\/\1&gt;/gim</span>, <span class="hljs-string">'$2'</span>)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          AnalysisService.preselect analysis, entities</pre></div></div>
             
         </li>
         
@@ -319,11 +323,12 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
-              <p>Prepare a traslator instance that will traslate Html and Text positions.</p>
+              <p>Remove existing text annotations (the while-match is necessary to remove nested spans).</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          traslator = Traslator.create html</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">while</span> html.match(<span class="hljs-regexp">/&lt;(\w+)[^&gt;]*\sclass="textannotation[^"]*"[^&gt;]*&gt;([^&lt;]+)&lt;\/\1&gt;/gim</span>, <span class="hljs-string">'$2'</span>)
+            html = html.replace(<span class="hljs-regexp">/&lt;(\w+)[^&gt;]*\sclass="textannotation[^"]*"[^&gt;]*&gt;([^&lt;]+)&lt;\/\1&gt;/gim</span>, <span class="hljs-string">'$2'</span>)</pre></div></div>
             
         </li>
         
@@ -334,11 +339,11 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
-              <p>Add text annotations to the html (skip those text annotations that don’t have entity annotations).</p>
+              <p>Prepare a traslator instance that will traslate Html and Text positions.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">for</span> textAnnotationId, textAnnotation <span class="hljs-keyword">of</span> analysis.textAnnotations <span class="hljs-keyword">when</span> <span class="hljs-number">0</span> &lt; Object.keys(textAnnotation.entityAnnotations).length</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          traslator = Traslator.create html</pre></div></div>
             
         </li>
         
@@ -349,11 +354,11 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
-              <p>Start the element.</p>
+              <p>Add text annotations to the html (skip those text annotations that don’t have entity annotations).</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            element = <span class="hljs-string">"&lt;span id=\"<span class="hljs-subst">#{textAnnotationId}</span>\" class=\"<span class="hljs-subst">#{TEXT_ANNOTATION}</span>"</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">for</span> textAnnotationId, textAnnotation <span class="hljs-keyword">of</span> analysis.textAnnotations <span class="hljs-keyword">when</span> <span class="hljs-number">0</span> &lt; Object.keys(textAnnotation.entityAnnotations).length</pre></div></div>
             
         </li>
         
@@ -363,6 +368,21 @@
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <p>Start the element.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            element = <span class="hljs-string">"&lt;span id=\"<span class="hljs-subst">#{textAnnotationId}</span>\" class=\"<span class="hljs-subst">#{TEXT_ANNOTATION}</span>"</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
               <p>Insert the Html fragments before and after the selected text.</p>
 
@@ -374,34 +394,19 @@
         </li>
         
         
-        <li id="section-17">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-17">&#182;</a>
-              </div>
-              <p>We deal only with the first entityAnnotation.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>              <span class="hljs-built_in">console</span>.log entityAnnotations[<span class="hljs-number">0</span>] <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> entityAnnotations[<span class="hljs-number">0</span>].entity
-              entity = entityAnnotations[<span class="hljs-number">0</span>].entity
-              element += <span class="hljs-string">" highlight <span class="hljs-subst">#{entity.css}</span>\" itemid=\"<span class="hljs-subst">#{entity.id}</span>"</span></pre></div></div>
-            
-        </li>
-        
-        
         <li id="section-18">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
-              <p>Close the element.</p>
+              <p>We deal only with the first entityAnnotation.
+             console.log entityAnnotations[0] if not entityAnnotations[0].entity</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            element += <span class="hljs-string">'"&gt;'</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>              entity = entityAnnotations[<span class="hljs-number">0</span>].entity
+              element += <span class="hljs-string">" highlight <span class="hljs-subst">#{entity.css}</span>\" itemid=\"<span class="hljs-subst">#{entity.id}</span>"</span></pre></div></div>
             
         </li>
         
@@ -412,12 +417,11 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
-              <p>Finally insert the HTML code.</p>
+              <p>Close the element.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            traslator.insertHtml element, <span class="hljs-attribute">text</span>: textAnnotation.start
-            traslator.insertHtml <span class="hljs-string">'&lt;/span&gt;'</span>, <span class="hljs-attribute">text</span>: textAnnotation.end</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            element += <span class="hljs-string">'"&gt;'</span></pre></div></div>
             
         </li>
         
@@ -428,13 +432,13 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
-              <p>Update the editor Html code.</p>
+              <p>Finally insert the HTML code.
+           console.log textAnnotation</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          isDirty = ed.isDirty()
-          ed.setContent traslator.getHtml()
-          ed.isNotDirty = <span class="hljs-keyword">not</span> isDirty</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            traslator.insertHtml element, <span class="hljs-attribute">text</span>: textAnnotation.start
+            traslator.insertHtml <span class="hljs-string">'&lt;/span&gt;'</span>, <span class="hljs-attribute">text</span>: textAnnotation.end</pre></div></div>
             
         </li>
         
@@ -444,6 +448,36 @@
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-21">&#182;</a>
+              </div>
+              <pre><code>     $log.info <span class="hljs-string">"embedAnalysis\n[ pre html :: <span class="hljs-subst">#{html}</span> ]\n[ post html :: <span class="hljs-subst">#{traslator.getHtml()}</span> ]\n[ text :: <span class="hljs-subst">#{traslator.getText()}</span> ]"</span>
+</code></pre>
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-22">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-22">&#182;</a>
+              </div>
+              <p>Update the editor Html code.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          isDirty = ed.isDirty()
+          ed.setContent traslator.getHtml(), <span class="hljs-attribute">format</span>: <span class="hljs-string">'raw'</span>
+          ed.isNotDirty = <span class="hljs-keyword">not</span> isDirty</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-23">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
               <p><a name="analyze"></a>
 Send the provided content for analysis using the <a href="app.services.AnalysisService.html#analyze">AnalysisService.analyze</a> method.</p>
@@ -455,11 +489,11 @@ Send the provided content for analysis using the <a href="app.services.AnalysisS
         </li>
         
         
-        <li id="section-22">
+        <li id="section-24">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-22">&#182;</a>
+                <a class="pilcrow" href="#section-24">&#182;</a>
               </div>
               <p>If the service is running abort the current request.</p>
 
@@ -470,11 +504,11 @@ Send the provided content for analysis using the <a href="app.services.AnalysisS
         </li>
         
         
-        <li id="section-23">
+        <li id="section-25">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-23">&#182;</a>
+                <a class="pilcrow" href="#section-25">&#182;</a>
               </div>
               <p>Disable the button and set the spinner while analysis is running.</p>
 
@@ -485,11 +519,11 @@ Send the provided content for analysis using the <a href="app.services.AnalysisS
         </li>
         
         
-        <li id="section-24">
+        <li id="section-26">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-24">&#182;</a>
+                <a class="pilcrow" href="#section-26">&#182;</a>
               </div>
               <p>Make the editor read-obly.</p>
 
@@ -500,11 +534,11 @@ Send the provided content for analysis using the <a href="app.services.AnalysisS
         </li>
         
         
-        <li id="section-25">
+        <li id="section-27">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-25">&#182;</a>
+                <a class="pilcrow" href="#section-27">&#182;</a>
               </div>
               <p>Call the <a href="AnalysisService.html">AnalysisService</a> to analyze the provided content, asking to merge sameAs related entities.</p>
 
@@ -515,11 +549,11 @@ Send the provided content for analysis using the <a href="app.services.AnalysisS
         </li>
         
         
-        <li id="section-26">
+        <li id="section-28">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-26">&#182;</a>
+                <a class="pilcrow" href="#section-28">&#182;</a>
               </div>
               <p>get the window position of an element inside the editor.
 @param element elem The element.</p>
@@ -531,11 +565,11 @@ Send the provided content for analysis using the <a href="app.services.AnalysisS
         </li>
         
         
-        <li id="section-27">
+        <li id="section-29">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-27">&#182;</a>
+                <a class="pilcrow" href="#section-29">&#182;</a>
               </div>
               <p>get a reference to the editor and its body</p>
 
@@ -547,11 +581,11 @@ Send the provided content for analysis using the <a href="app.services.AnalysisS
         </li>
         
         
-        <li id="section-28">
+        <li id="section-30">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-28">&#182;</a>
+                <a class="pilcrow" href="#section-30">&#182;</a>
               </div>
               <p>Return the coordinates.</p>
 
@@ -565,11 +599,11 @@ Send the provided content for analysis using the <a href="app.services.AnalysisS
         </li>
         
         
-        <li id="section-29">
+        <li id="section-31">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-29">&#182;</a>
+                <a class="pilcrow" href="#section-31">&#182;</a>
               </div>
               <p>Hook the service to the events. This event is captured when an entity is selected in the disambiguation popover.</p>
 
@@ -580,11 +614,11 @@ Send the provided content for analysis using the <a href="app.services.AnalysisS
         </li>
         
         
-        <li id="section-30">
+        <li id="section-32">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-30">&#182;</a>
+                <a class="pilcrow" href="#section-32">&#182;</a>
               </div>
               <p>create a reference to the TinyMCE editor dom.</p>
 
@@ -595,11 +629,11 @@ Send the provided content for analysis using the <a href="app.services.AnalysisS
         </li>
         
         
-        <li id="section-31">
+        <li id="section-33">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-31">&#182;</a>
+                <a class="pilcrow" href="#section-33">&#182;</a>
               </div>
               <p>the element id containing the attributes for the text annotation.</p>
 
@@ -610,11 +644,11 @@ Send the provided content for analysis using the <a href="app.services.AnalysisS
         </li>
         
         
-        <li id="section-32">
+        <li id="section-34">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-32">&#182;</a>
+                <a class="pilcrow" href="#section-34">&#182;</a>
               </div>
               <p>Preset the stylesheet class.</p>
 
@@ -625,11 +659,11 @@ Send the provided content for analysis using the <a href="app.services.AnalysisS
         </li>
         
         
-        <li id="section-33">
+        <li id="section-35">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-33">&#182;</a>
+                <a class="pilcrow" href="#section-35">&#182;</a>
               </div>
               <p>If an entity annotation is selected then prepare the values, otherwise set them null (i.e. remove).</p>
 
@@ -640,11 +674,11 @@ Send the provided content for analysis using the <a href="app.services.AnalysisS
         </li>
         
         
-        <li id="section-34">
+        <li id="section-36">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-34">&#182;</a>
+                <a class="pilcrow" href="#section-36">&#182;</a>
               </div>
               <p>Set a reference to the entity.</p>
 
@@ -653,19 +687,35 @@ Send the provided content for analysis using the <a href="app.services.AnalysisS
             <div class="content"><div class='highlight'><pre>          entity = args.ea.entity
           cls +=  <span class="hljs-string">" highlight <span class="hljs-subst">#{entity.css}</span>"</span>
           itemscope = <span class="hljs-string">'itemscope'</span>
-          itemid = entity.id
-        <span class="hljs-keyword">else</span>
-          itemscope = <span class="hljs-literal">null</span>
-          itemid = <span class="hljs-literal">null</span></pre></div></div>
+          itemid = entity.id</pre></div></div>
             
         </li>
         
         
-        <li id="section-35">
+        <li id="section-37">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-35">&#182;</a>
+                <a class="pilcrow" href="#section-37">&#182;</a>
+              </div>
+              <p>Add the selected entity to the Analysis Service stored entities.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          AnalysisService.addEntity entity
+
+        <span class="hljs-keyword">else</span>
+            itemscope = <span class="hljs-literal">null</span>
+            itemid = <span class="hljs-literal">null</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-38">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-38">&#182;</a>
               </div>
               <p>Apply changes to the dom.</p>
 
@@ -678,11 +728,11 @@ Send the provided content for analysis using the <a href="app.services.AnalysisS
         </li>
         
         
-        <li id="section-36">
+        <li id="section-39">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-36">&#182;</a>
+                <a class="pilcrow" href="#section-39">&#182;</a>
               </div>
               <p>Receive annotations from the analysis (there is a mirror method in PHP for testing purposes, please try to keep
 the two aligned - tests/functions.php <em>wl_embed_analysis</em> )
@@ -691,17 +741,17 @@ When an analysis is completed, remove the <em>running</em> class from the WordLi
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      $rootScope.$<span class="hljs-literal">on</span> <span class="hljs-string">'analysisReceived'</span>, <span class="hljs-function"><span class="hljs-params">(event, analysis)</span> -&gt;</span>
+            <div class="content"><div class='highlight'><pre>      $rootScope.$<span class="hljs-literal">on</span> ANALYSIS_EVENT, <span class="hljs-function"><span class="hljs-params">(event, analysis)</span> -&gt;</span>
         service.embedAnalysis analysis <span class="hljs-keyword">if</span> analysis? <span class="hljs-keyword">and</span> analysis.textAnnotations?</pre></div></div>
             
         </li>
         
         
-        <li id="section-37">
+        <li id="section-40">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-37">&#182;</a>
+                <a class="pilcrow" href="#section-40">&#182;</a>
               </div>
               <p>Remove the <em>running</em> class.</p>
 
@@ -712,11 +762,11 @@ When an analysis is completed, remove the <em>running</em> class from the WordLi
         </li>
         
         
-        <li id="section-38">
+        <li id="section-41">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-38">&#182;</a>
+                <a class="pilcrow" href="#section-41">&#182;</a>
               </div>
               <p>Make the editor read/write.</p>
 
@@ -727,11 +777,11 @@ When an analysis is completed, remove the <em>running</em> class from the WordLi
         </li>
         
         
-        <li id="section-39">
+        <li id="section-42">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-39">&#182;</a>
+                <a class="pilcrow" href="#section-42">&#182;</a>
               </div>
               <p>Return the service definition.</p>
 

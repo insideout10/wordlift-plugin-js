@@ -89,13 +89,15 @@ $(
 
     # When the editor is clicked, the [EditorService.analyze](app.services.EditorService.html#analyze) method is invoked.
       onclick: ->
-        injector.invoke(['EditorService', '$rootScope', (EditorService, $rootScope) ->
+        injector.invoke(['EditorService', '$rootScope', '$log', (EditorService, $rootScope, $log) ->
           $rootScope.$apply( ->
             # Get the html content of the editor.
             html = tinyMCE.activeEditor.getContent format: 'raw'
 
             # Get the text content from the Html.
             text = Traslator.create(html).getText()
+
+#            $log.info "onclick [ html :: #{html} ][ text :: #{text} ]"
 
             # Send the text content for analysis.
             EditorService.analyze text

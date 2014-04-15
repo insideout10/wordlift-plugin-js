@@ -1,12 +1,12 @@
 describe "TinyMCE tests", ->
   beforeEach module('wordlift.tinymce.plugin.services')
-  beforeEach module('AnalysisService')
+#  beforeEach module('AnalysisService')
 
   # Global references
   ed = undefined
 
   # Tests set-up.
-  beforeEach inject( (AnalysisService) ->
+  beforeEach inject((AnalysisService) ->
     ed = tinyMCE.get('content')
     AnalysisService.setKnownTypes window.wordlift.types
   )
@@ -38,11 +38,6 @@ describe "TinyMCE tests", ->
       ed.setContent data
       # Check for the editor content not to be empty.
       expect(ed.getContent().length).toBeGreaterThan 0
-
-  it "embeds the analysis results", inject (AnalysisService, EditorService, $httpBackend) ->
-
-    # Check that the editor content is empty.
-    expect(ed.getContent().length).toEqual 0
 
 
   it "doesn't run an analysis when an analysis is already running", inject (AnalysisService, EditorService) ->
@@ -81,9 +76,9 @@ describe "TinyMCE tests", ->
     expect(AnalysisService.isRunning).toEqual false
 
     # Load the sample response.
-    $.ajax('base/app/assets/english.json', async: false ).done (data) ->
+    $.ajax('base/app/assets/english.json', async: false).done (data) ->
       $httpBackend.expectPOST('/base/app/assets/english.json?action=wordlift_analyze').respond 200, data
-#
+      #
       # Call the analyze method of the editor.
       EditorService.analyze ed.getContent(format: 'text')
 
@@ -92,13 +87,13 @@ describe "TinyMCE tests", ->
 
       $httpBackend.flush()
 
-      expect($rootScope.$broadcast).toHaveBeenCalledWith('analysisReceived', jasmine.any(Object))
+      expect($rootScope.$broadcast).toHaveBeenCalledWith 'analysisReceived', jasmine.any(Object)
 
       # The analysis service shouldn't have been called
-      expect(EditorService.embedAnalysis).toHaveBeenCalledWith(jasmine.any(Object))
+      expect(EditorService.embedAnalysis).toHaveBeenCalledWith jasmine.any(Object)
 
 
-    it "sends the analysis results", inject (AnalysisService, EditorService, $httpBackend, $rootScope) ->
+    it 'sends the analysis results', inject( (AnalysisService, EditorService, $httpBackend, $rootScope) ->
 
       # Get a reference to the argument passed with the event.
       args = $rootScope.$broadcast.calls.argsFor 0
@@ -118,11 +113,11 @@ describe "TinyMCE tests", ->
       expect(Object.keys(analysis.entityAnnotations).length).toEqual 19
       expect(Object.keys(analysis.textAnnotations).length).toEqual 12
       expect(Object.keys(analysis.languages).length).toEqual 1
-
+    )
 
 describe "TinceMCE editor : analysis abort", ->
   beforeEach module('wordlift.tinymce.plugin.services')
-  beforeEach module('AnalysisService')
+#  beforeEach module('AnalysisService')
 
   # Global references
   ed = undefined
@@ -182,7 +177,7 @@ describe "TinceMCE editor : analysis abort", ->
 
 describe "TinceMCE editor : running an analysis on an already analyzed content", ->
   beforeEach module('wordlift.tinymce.plugin.services')
-  beforeEach module('AnalysisService')
+#  beforeEach module('AnalysisService')
 
   # Global references
   ed = undefined
@@ -192,8 +187,6 @@ describe "TinceMCE editor : running an analysis on an already analyzed content",
     ed = tinyMCE.get('content')
 
   it 'analyses a content which has already been analysed', inject((AnalysisService, EditorService, $httpBackend, $rootScope) ->
-
-
     html1 = "<span>this is html 1</span>"
     html2 = "<div>this is html 2</div>"
 
@@ -201,7 +194,7 @@ describe "TinceMCE editor : running an analysis on an already analyzed content",
     t2 = Traslator.create(html2)
 
     expect(t1.getHtml()).not.toEqual t2.getHtml()
-#    dump "[ t1 html :: #{t1.getHtml()} ][ t2 html :: #{t2.getHtml()} ]"
+    #    dump "[ t1 html :: #{t1.getHtml()} ][ t2 html :: #{t2.getHtml()} ]"
 
 
     html = undefined
@@ -209,17 +202,17 @@ describe "TinceMCE editor : running an analysis on an already analyzed content",
     # Load the sample text in the editor.
     $.ajax('base/app/assets/meet_redlink_at_enterprise_search_europe_2014.txt', { async: false }).done (data) ->
       html = data
-#
-#    # Create a Traslator object and check that total lengths match.
-##    dump "create class"
+    #
+    #    # Create a Traslator object and check that total lengths match.
+    ##    dump "create class"
     traslator = Traslator.create(html)
-##    dump "get text"
+    ##    dump "get text"
     text = traslator.getText()
-#
-#    dump "[ html length :: #{html.length} ][ text length :: #{text.length} ]"
-#
-#    dump text
-#
+    #
+    #    dump "[ html length :: #{html.length} ][ text length :: #{text.length} ]"
+    #
+    #    dump text
+    #
     expect(traslator.text2html(text.length)).toEqual html.length
     expect(traslator.html2text(html.length)).toEqual text.length
 
@@ -283,18 +276,18 @@ describe "TinceMCE editor : running an analysis on an already analyzed content",
 
 describe 'TinyMCE', ->
   beforeEach module('wordlift.tinymce.plugin.services')
-  beforeEach module('AnalysisService')
+#  beforeEach module('AnalysisService')
 
   # A reference to the TinyMCE editor.
   ed = undefined
 
-  beforeEach inject( (AnalysisService) ->
+  beforeEach inject((AnalysisService) ->
     ed = tinyMCE.get('content')
     AnalysisService.setKnownTypes window.wordlift.types
     AnalysisService.setEntities window.wordlift.entities
   )
 
-  it 'features embedded annotations', inject( (AnalysisService, EditorService) ->
+  it 'features embedded annotations', inject((AnalysisService, EditorService) ->
 
     # The textual content.
     text = ''
@@ -362,7 +355,7 @@ describe 'TinyMCE', ->
 #    dump ed.getContent(format: 'raw')
   )
 
-  it 'features entities preselections in the analysis results', inject( (AnalysisService, EditorService) ->
+  it 'features entities preselections in the analysis results', inject((AnalysisService, EditorService) ->
 
     # The html content.
     html = ''
@@ -408,7 +401,7 @@ describe 'TinyMCE', ->
 
   )
 
-  it 'features entities preselections in the analysis results (2)', inject( (AnalysisService, EditorService) ->
+  it 'features entities preselections in the analysis results (2)', inject((AnalysisService, EditorService) ->
 
     # The html content.
     html = ''
@@ -431,8 +424,9 @@ describe 'TinyMCE', ->
     analysis = AnalysisService.parse json, true
 
     # Embed the analysis results.
-    expect(-> EditorService.embedAnalysis analysis).toThrow 'Missing entity in window.wordlift.entities collection!'
-  
+    expect(->
+      EditorService.embedAnalysis analysis).toThrow 'Missing entity in window.wordlift.entities collection!'
+
     # We expect these entity annotations to be already selected.
     selected = [
       'urn:enhancement-49b1cf1e-b260-4033-403e-4e494039d241'
@@ -445,13 +439,15 @@ describe 'TinyMCE', ->
     expect(Object.keys(analysis.entityAnnotations).length).toEqual 25
     for entityAnnotationId, entityAnnotation of analysis.entityAnnotations
       expect(entityAnnotation.entity).not.toBe undefined
-    
+
     # selectedEntities = (ea.entity for id, ea of analysis.entityAnnotations when ea.selected and ea.entity.id in selectedEntityIds)
     # expect(selectedEntities.length).toEqual(selected.length)
     # for entity in selectedEntities
     #  expect(entity.id in selected).toBe true  
   )
-  it 'features entities preselections in the analysis results on missing entities', inject( (AnalysisService, EditorService) ->
+
+
+  it 'features entities preselections in the analysis results on missing entities', inject((AnalysisService, EditorService) ->
 
     # The html content.
     html = ''
@@ -474,9 +470,10 @@ describe 'TinyMCE', ->
     expect(window.wordlift.entities).toEqual {}
     # Try to embed the analysis results.
 
-#    EditorService.embedAnalysis analysis
-    expect(-> EditorService.embedAnalysis analysis).toThrow 'Missing entity in window.wordlift.entities collection!'
-#
+    #    EditorService.embedAnalysis analysis
+    expect(->
+      EditorService.embedAnalysis analysis).toThrow 'Missing entity in window.wordlift.entities collection!'
+    #
     # Loads fake entities and populate window.wordlift.entities
     $.ajax('base/app/assets/wordlift_entities_0.json', async: false).done (data) ->
       AnalysisService.setEntities data
@@ -501,4 +498,4 @@ describe 'TinyMCE', ->
     expect(selectedEntities.length).toEqual selectedEntityIds.length
     for entity in selectedEntities
       expect(entity.id in selectedEntityIds).toBe true
-)
+  )

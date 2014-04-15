@@ -46,9 +46,15 @@ angular.module('AnalysisService',
           _knownTypes: []
           _entities: {}
 
+          # Add an entity to the local collection of entities.
+          addEntity: (entity) ->
+            @_entities[entity.id] = entity
+
+          # Set the local entity collection.
           setEntities: (entities) =>
             @_entities = entities
 
+          # Set the known types.
           setKnownTypes: (types) =>
             @_knownTypes = types
 
@@ -101,6 +107,7 @@ angular.module('AnalysisService',
         # Analyze the provided content. Only one analysis at a time is run.
         # The merge parameter is passed to the parse call and merges together entities related via sameAs.
           analyze: (content, merge = false) ->
+#            dump "AnalysisService.analyze [ content :: #{content} ][ is running :: #{@isRunning} ][ merge :: #{merge} ]"
             # Exit if an analysis is already running.
             return if @isRunning
 
@@ -120,6 +127,7 @@ angular.module('AnalysisService',
             )
             # If successful, broadcast an *analysisReceived* event.
             .success (data) ->
+#                dump "AnalysisService.analyze [ success ]"
                 $rootScope.$broadcast ANALYSIS_EVENT, that.parse(data, merge)
                 # Set that the analysis is complete.
                 that.isRunning = false

@@ -104,6 +104,11 @@
               </a>
             
               
+              <a class="source" href="tinymce.questa_volta_parliamo_di_seo.spec.html">
+                tinymce.questa_volta_parliamo_di_seo.spec.coffee
+              </a>
+            
+              
               <a class="source" href="tinymce.spec.html">
                 tinymce.spec.coffee
               </a>
@@ -691,9 +696,7 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      $.ajax(<span class="hljs-string">'base/app/assets/eight_players_joined.json'</span>,
-        <span class="hljs-attribute">async</span>: <span class="hljs-literal">false</span>
-      ).done <span class="hljs-function"><span class="hljs-params">(data)</span> -&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>      $.ajax<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'base/app/assets/eight_players_joined.json'</span>, async: <span class="hljs-literal">false</span> )</span>.<span class="hljs-title">done</span> <span class="hljs-params">(data)</span> -&gt;</span></pre></div></div>
             
         </li>
         
@@ -1150,10 +1153,7 @@
 
       expect(entity).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
 
-      dump entity.label
-
-      dump <span class="hljs-string">"[ id :: <span class="hljs-subst">#{id}</span> ][ entity label :: <span class="hljs-subst">#{entity.label}</span> }"</span> <span class="hljs-keyword">for</span> id, entity <span class="hljs-keyword">of</span> analysis.entities
-      dump entity.label <span class="hljs-keyword">for</span> id, entity <span class="hljs-keyword">of</span> analysis.entities
+      expect(entity.label).toBe <span class="hljs-string">'Kim Renberg'</span>
     )
 
 

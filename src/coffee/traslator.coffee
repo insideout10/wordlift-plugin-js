@@ -59,15 +59,26 @@ class Traslator
       # Add the textual parts to the text.
       @_text += textPre + textPost
 
+
+    # In case the regex didn't find any tag, copy the html over the text.
+    @_text = new String(@_html) if '' is @_text and '' isnt @_html
+
     # Add text position 0 if it's not already set.
     if 0 is @_textPositions.length or 0 isnt @_textPositions[0]
       @_htmlPositions.unshift 0
       @_textPositions.unshift 0
 
+#    console.log '=============================='
+#    console.log @_html
+#    console.log @_text
+#    console.log @_htmlPositions
+#    console.log @_textPositions
+#    console.log '=============================='
+
   # Get the html position, given a text position.
   text2html: (pos) ->
-    htmlPos = @_textPositions[0]
-    textPos = @_textPositions[0]
+    htmlPos = 0
+    textPos = 0
 
     for i in [0...@_textPositions.length]
       break if pos < @_textPositions[i]
@@ -79,14 +90,19 @@ class Traslator
 
   # Get the text position, given an html position.
   html2text: (pos) ->
-    htmlPos = @_textPositions[0]
-    textPos = @_textPositions[0]
+
+    # Return 0 if the specified html position is less than the first HTML position.
+    return 0 if pos < @_htmlPositions[0]
+
+    htmlPos = 0
+    textPos = 0
 
     for i in [0...@_htmlPositions.length]
       break if pos < @_htmlPositions[i]
       htmlPos = @_htmlPositions[i]
       textPos = @_textPositions[i]
 
+#    console.log "#{textPos} + #{pos} - #{htmlPos}"
     textPos + pos - htmlPos
 
   # Insert an Html fragment at the specified location.
@@ -94,7 +110,7 @@ class Traslator
 
 #    dump @_htmlPositions
 #    dump @_textPositions
-#    dump "[ fragment :: #{fragment} ][ pos text :: #{pos.text} ]"
+#    console.log "[ fragment :: #{fragment} ][ pos text :: #{pos.text} ]"
 
     htmlPos = @text2html pos.text
 

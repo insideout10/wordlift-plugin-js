@@ -199,9 +199,7 @@ describe 'services', ->
     it 'finds entities for all the text annotations', inject((AnalysisService, $httpBackend, $rootScope) ->
 
       # Get the mock-up analysis.
-      $.ajax('base/app/assets/eight_players_joined.json',
-        async: false
-      ).done (data) ->
+      $.ajax('base/app/assets/eight_players_joined.json', async: false ).done (data) ->
 
         # Catch all the requests to Freebase.
         $httpBackend.when('HEAD', /.*/).respond(200, '')

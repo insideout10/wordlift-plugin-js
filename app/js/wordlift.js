@@ -47,6 +47,9 @@
         htmlLength += htmlPost.length;
         this._text += textPre + textPost;
       }
+      if ('' === this._text && '' !== this._html) {
+        this._text = new String(this._html);
+      }
       if (0 === this._textPositions.length || 0 !== this._textPositions[0]) {
         this._htmlPositions.unshift(0);
         return this._textPositions.unshift(0);
@@ -55,8 +58,8 @@
 
     Traslator.prototype.text2html = function(pos) {
       var htmlPos, i, textPos, _i, _ref;
-      htmlPos = this._textPositions[0];
-      textPos = this._textPositions[0];
+      htmlPos = 0;
+      textPos = 0;
       for (i = _i = 0, _ref = this._textPositions.length; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
         if (pos < this._textPositions[i]) {
           break;
@@ -69,8 +72,11 @@
 
     Traslator.prototype.html2text = function(pos) {
       var htmlPos, i, textPos, _i, _ref;
-      htmlPos = this._textPositions[0];
-      textPos = this._textPositions[0];
+      if (pos < this._htmlPositions[0]) {
+        return 0;
+      }
+      htmlPos = 0;
+      textPos = 0;
       for (i = _i = 0, _ref = this._htmlPositions.length; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
         if (pos < this._htmlPositions[i]) {
           break;
@@ -221,6 +227,9 @@
       service = {
         _knownTypes: [],
         _entities: {},
+        addEntity: function(entity) {
+          return this._entities[entity.id] = entity;
+        },
         setEntities: (function(_this) {
           return function(entities) {
             return _this._entities = entities;
@@ -653,7 +662,7 @@
   ]);
 
   angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tinymce.plugin.config', 'AnalysisService']).service('EditorService', [
-    'AnalysisService', 'EntityAnnotationService', '$rootScope', function(AnalysisService, EntityAnnotationService, $rootScope) {
+    'AnalysisService', 'EntityAnnotationService', '$rootScope', '$log', function(AnalysisService, EntityAnnotationService, $rootScope, $log) {
       var editor, findEntities, service;
       editor = function() {
         return tinyMCE.get(EDITOR_ID);
@@ -683,7 +692,9 @@
             });
             entities = findEntities(html);
             AnalysisService.preselect(analysis, entities);
-            html = html.replace(/<(\w+)[^>]*\sclass="textannotation[^"]*"[^>]*>([^<]+)<\/\1>/gim, '$2');
+            while (html.match(/<(\w+)[^>]*\sclass="textannotation[^"]*"[^>]*>([^<]+)<\/\1>/gim, '$2')) {
+              html = html.replace(/<(\w+)[^>]*\sclass="textannotation[^"]*"[^>]*>([^<]+)<\/\1>/gim, '$2');
+            }
             traslator = Traslator.create(html);
             _ref = analysis.textAnnotations;
             for (textAnnotationId in _ref) {
@@ -696,9 +707,6 @@
                 selected: true
               });
               if (0 < entityAnnotations.length && (entityAnnotations[0].entity != null)) {
-                if (!entityAnnotations[0].entity) {
-                  console.log(entityAnnotations[0]);
-                }
                 entity = entityAnnotations[0].entity;
                 element += " highlight " + entity.css + "\" itemid=\"" + entity.id;
               }
@@ -711,7 +719,9 @@
               });
             }
             isDirty = ed.isDirty();
-            ed.setContent(traslator.getHtml());
+            ed.setContent(traslator.getHtml(), {
+              format: 'raw'
+            });
             return ed.isNotDirty = !isDirty;
           };
         })(this),
@@ -743,6 +753,7 @@
           cls += " highlight " + entity.css;
           itemscope = 'itemscope';
           itemid = entity.id;
+          AnalysisService.addEntity(entity);
         } else {
           itemscope = null;
           itemid = null;
@@ -751,7 +762,7 @@
         dom.setAttrib(id, 'itemscope', itemscope);
         return dom.setAttrib(id, 'itemid', itemid);
       });
-      $rootScope.$on('analysisReceived', function(event, analysis) {
+      $rootScope.$on(ANALYSIS_EVENT, function(event, analysis) {
         if ((analysis != null) && (analysis.textAnnotations != null)) {
           service.embedAnalysis(analysis);
         }
@@ -947,11 +958,10 @@
       $(window).scroll(scroll);
       $('#content_ifr').contents().scroll(scroll);
       $scope.onEntitySelected = function(textAnnotation, entityAnnotation) {
-        $scope.$emit('selectEntity', {
+        return $scope.$emit('selectEntity', {
           ta: textAnnotation,
           ea: entityAnnotation
         });
-        return window.wordlift.entities[entityAnnotation.entity.id] = entityAnnotation.entity;
       };
       $scope.$on('analysisReceived', function(event, analysis) {
         return $scope.analysis = analysis;
@@ -1024,7 +1034,7 @@
       icon: false,
       onclick: function() {
         return injector.invoke([
-          'EditorService', '$rootScope', function(EditorService, $rootScope) {
+          'EditorService', '$rootScope', '$log', function(EditorService, $rootScope, $log) {
             return $rootScope.$apply(function() {
               var html, text;
               html = tinyMCE.activeEditor.getContent({

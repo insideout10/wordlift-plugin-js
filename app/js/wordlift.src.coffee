@@ -59,15 +59,26 @@ class Traslator
       # Add the textual parts to the text.
       @_text += textPre + textPost
 
+
+    # In case the regex didn't find any tag, copy the html over the text.
+    @_text = new String(@_html) if '' is @_text and '' isnt @_html
+
     # Add text position 0 if it's not already set.
     if 0 is @_textPositions.length or 0 isnt @_textPositions[0]
       @_htmlPositions.unshift 0
       @_textPositions.unshift 0
 
+#    console.log '=============================='
+#    console.log @_html
+#    console.log @_text
+#    console.log @_htmlPositions
+#    console.log @_textPositions
+#    console.log '=============================='
+
   # Get the html position, given a text position.
   text2html: (pos) ->
-    htmlPos = @_textPositions[0]
-    textPos = @_textPositions[0]
+    htmlPos = 0
+    textPos = 0
 
     for i in [0...@_textPositions.length]
       break if pos < @_textPositions[i]
@@ -79,14 +90,19 @@ class Traslator
 
   # Get the text position, given an html position.
   html2text: (pos) ->
-    htmlPos = @_textPositions[0]
-    textPos = @_textPositions[0]
+
+    # Return 0 if the specified html position is less than the first HTML position.
+    return 0 if pos < @_htmlPositions[0]
+
+    htmlPos = 0
+    textPos = 0
 
     for i in [0...@_htmlPositions.length]
       break if pos < @_htmlPositions[i]
       htmlPos = @_htmlPositions[i]
       textPos = @_textPositions[i]
 
+#    console.log "#{textPos} + #{pos} - #{htmlPos}"
     textPos + pos - htmlPos
 
   # Insert an Html fragment at the specified location.
@@ -94,7 +110,7 @@ class Traslator
 
 #    dump @_htmlPositions
 #    dump @_textPositions
-#    dump "[ fragment :: #{fragment} ][ pos text :: #{pos.text} ]"
+#    console.log "[ fragment :: #{fragment} ][ pos text :: #{pos.text} ]"
 
     htmlPos = @text2html pos.text
 
@@ -315,9 +331,15 @@ angular.module('AnalysisService',
           _knownTypes: []
           _entities: {}
 
+          # Add an entity to the local collection of entities.
+          addEntity: (entity) ->
+            @_entities[entity.id] = entity
+
+          # Set the local entity collection.
           setEntities: (entities) =>
             @_entities = entities
 
+          # Set the known types.
           setKnownTypes: (types) =>
             @_knownTypes = types
 
@@ -370,6 +392,7 @@ angular.module('AnalysisService',
         # Analyze the provided content. Only one analysis at a time is run.
         # The merge parameter is passed to the parse call and merges together entities related via sameAs.
           analyze: (content, merge = false) ->
+#            dump "AnalysisService.analyze [ content :: #{content} ][ is running :: #{@isRunning} ][ merge :: #{merge} ]"
             # Exit if an analysis is already running.
             return if @isRunning
 
@@ -389,6 +412,7 @@ angular.module('AnalysisService',
             )
             # If successful, broadcast an *analysisReceived* event.
             .success (data) ->
+#                dump "AnalysisService.analyze [ success ]"
                 $rootScope.$broadcast ANALYSIS_EVENT, that.parse(data, merge)
                 # Set that the analysis is complete.
                 that.isRunning = false
@@ -778,7 +802,7 @@ angular.module('AnalysisService',
 
 angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tinymce.plugin.config', 'AnalysisService'])
 .service('EditorService',
-    ['AnalysisService', 'EntityAnnotationService', '$rootScope', (AnalysisService, EntityAnnotationService, $rootScope) ->
+    ['AnalysisService', 'EntityAnnotationService', '$rootScope', '$log', (AnalysisService, EntityAnnotationService, $rootScope, $log) ->
 
       editor = ->
         tinyMCE.get(EDITOR_ID)
@@ -794,6 +818,7 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
 
         # Get the matches and return them.
         (while match = pattern.exec html
+#          console.log "findEntities [ html index :: #{match.index} ][ text index :: #{traslator.html2text match.index} ]"
           {
             start: traslator.html2text match.index
             end: traslator.html2text (match.index + match[0].length)
@@ -819,8 +844,9 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
           # Preselect entities found in html.
           AnalysisService.preselect analysis, entities
 
-          # Remove existing text annotations.
-          html = html.replace(/<(\w+)[^>]*\sclass="textannotation[^"]*"[^>]*>([^<]+)<\/\1>/gim, '$2')
+          # Remove existing text annotations (the while-match is necessary to remove nested spans).
+          while html.match(/<(\w+)[^>]*\sclass="textannotation[^"]*"[^>]*>([^<]+)<\/\1>/gim, '$2')
+            html = html.replace(/<(\w+)[^>]*\sclass="textannotation[^"]*"[^>]*>([^<]+)<\/\1>/gim, '$2')
 
           # Prepare a traslator instance that will traslate Html and Text positions.
           traslator = Traslator.create html
@@ -835,7 +861,7 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
             entityAnnotations = EntityAnnotationService.find textAnnotation.entityAnnotations, selected: true
             if 0 < entityAnnotations.length and entityAnnotations[0].entity?
               # We deal only with the first entityAnnotation.
-              console.log entityAnnotations[0] if not entityAnnotations[0].entity
+#              console.log entityAnnotations[0] if not entityAnnotations[0].entity
               entity = entityAnnotations[0].entity
               element += " highlight #{entity.css}\" itemid=\"#{entity.id}"
 
@@ -843,13 +869,16 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
             element += '">'
 
             # Finally insert the HTML code.
+#            console.log textAnnotation
             traslator.insertHtml element, text: textAnnotation.start
             traslator.insertHtml '</span>', text: textAnnotation.end
 
 
+#          $log.info "embedAnalysis\n[ pre html :: #{html} ]\n[ post html :: #{traslator.getHtml()} ]\n[ text :: #{traslator.getText()} ]"
+
           # Update the editor Html code.
           isDirty = ed.isDirty()
-          ed.setContent traslator.getHtml()
+          ed.setContent traslator.getHtml(), format: 'raw'
           ed.isNotDirty = not isDirty
 
       # <a name="analyze"></a>
@@ -900,9 +929,13 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
           cls +=  " highlight #{entity.css}"
           itemscope = 'itemscope'
           itemid = entity.id
+
+          # Add the selected entity to the Analysis Service stored entities.
+          AnalysisService.addEntity entity
+
         else
-          itemscope = null
-          itemid = null
+            itemscope = null
+            itemid = null
 
         # Apply changes to the dom.
         dom.setAttrib id, 'class', cls
@@ -913,7 +946,7 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
       # the two aligned - tests/functions.php *wl_embed_analysis* )
       # When an analysis is completed, remove the *running* class from the WordLift toolbar button.
       # (The button is set to running when [an analysis is called](#analyze).
-      $rootScope.$on 'analysisReceived', (event, analysis) ->
+      $rootScope.$on ANALYSIS_EVENT, (event, analysis) ->
         service.embedAnalysis analysis if analysis? and analysis.textAnnotations?
 
         # Remove the *running* class.
@@ -1058,14 +1091,9 @@ angular.module('wordlift.tinymce.plugin.controllers',
 
     # holds a reference to the selected text annotation.
     $scope.textAnnotation = null
+
     # holds a reference to the selected text annotation span.
     $scope.textAnnotationSpan = null
-
-    #      $scope.sortByConfidence = (entity) ->
-    #        entity[Configuration.entityLabels.confidence]
-
-    #      $scope.getLabelFor = (label) ->
-    #        Configuration.entityLabels[label]
 
     setArrowTop = (top) ->
       $('head').append('<style>#wordlift-disambiguation-popover .postbox:before,#wordlift-disambiguation-popover .postbox:after{top:' + top + 'px;}</style>');
@@ -1085,9 +1113,6 @@ angular.module('wordlift.tinymce.plugin.controllers',
 
     $scope.onEntitySelected = (textAnnotation, entityAnnotation) ->
       $scope.$emit 'selectEntity', ta: textAnnotation, ea: entityAnnotation
-      # TODO: the app should not refer to window.wordlift. This should be wrapped somewhere.
-      # Add the selected entity to the entity storage
-      window.wordlift.entities[entityAnnotation.entity.id] = entityAnnotation.entity
 
     # Receive the analysis results and store them in the local scope.
     $scope.$on 'analysisReceived', (event, analysis) ->
@@ -1228,13 +1253,15 @@ $(
 
     # When the editor is clicked, the [EditorService.analyze](app.services.EditorService.html#analyze) method is invoked.
       onclick: ->
-        injector.invoke(['EditorService', '$rootScope', (EditorService, $rootScope) ->
+        injector.invoke(['EditorService', '$rootScope', '$log', (EditorService, $rootScope, $log) ->
           $rootScope.$apply( ->
             # Get the html content of the editor.
             html = tinyMCE.activeEditor.getContent format: 'raw'
 
             # Get the text content from the Html.
             text = Traslator.create(html).getText()
+
+#            $log.info "onclick [ html :: #{html} ][ text :: #{text} ]"
 
             # Send the text content for analysis.
             EditorService.analyze text

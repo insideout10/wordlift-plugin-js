@@ -104,6 +104,11 @@
               </a>
             
               
+              <a class="source" href="tinymce.questa_volta_parliamo_di_seo.spec.html">
+                tinymce.questa_volta_parliamo_di_seo.spec.coffee
+              </a>
+            
+              
               <a class="source" href="tinymce.spec.html">
                 tinymce.spec.coffee
               </a>
@@ -335,6 +340,21 @@ Remove non-breaking spaces.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
+              <p>In case the regex didn’t find any tag, copy the html over the text.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-property">@_text</span> = <span class="hljs-keyword">new</span> String(<span class="hljs-property">@_html</span>) <span class="hljs-keyword">if</span> <span class="hljs-string">''</span> <span class="hljs-keyword">is</span> <span class="hljs-property">@_text</span> <span class="hljs-keyword">and</span> <span class="hljs-string">''</span> <span class="hljs-keyword">isnt</span> <span class="hljs-property">@_html</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
               <p>Add text position 0 if it’s not already set.</p>
 
             </div>
@@ -346,39 +366,20 @@ Remove non-breaking spaces.</p>
         </li>
         
         
-        <li id="section-14">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-14">&#182;</a>
-              </div>
-              <p>Get the html position, given a text position.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">text2html</span>: <span class="hljs-function"><span class="hljs-params">(pos)</span> -&gt;</span>
-    htmlPos = <span class="hljs-property">@_textPositions</span>[<span class="hljs-number">0</span>]
-    textPos = <span class="hljs-property">@_textPositions</span>[<span class="hljs-number">0</span>]
-
-    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">0.</span>..<span class="hljs-property">@_textPositions</span>.length]
-      <span class="hljs-keyword">break</span> <span class="hljs-keyword">if</span> pos &lt; <span class="hljs-property">@_textPositions</span>[i]
-      htmlPos = <span class="hljs-property">@_htmlPositions</span>[i]
-      textPos = <span class="hljs-property">@_textPositions</span>[i]</pre></div></div>
-            
-        </li>
-        
-        
         <li id="section-15">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
-              <p>   dump “#{htmlPos} + #{pos} - #{textPos}”</p>
+              <p>   console.log ‘==============================’
+   console.log @_html
+   console.log @_text
+   console.log @_htmlPositions
+   console.log @_textPositions
+   console.log ‘==============================’</p>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre>    htmlPos + pos - textPos</pre></div></div>
             
         </li>
         
@@ -389,20 +390,18 @@ Remove non-breaking spaces.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
-              <p>Get the text position, given an html position.</p>
+              <p>Get the html position, given a text position.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">html2text</span>: <span class="hljs-function"><span class="hljs-params">(pos)</span> -&gt;</span>
-    htmlPos = <span class="hljs-property">@_textPositions</span>[<span class="hljs-number">0</span>]
-    textPos = <span class="hljs-property">@_textPositions</span>[<span class="hljs-number">0</span>]
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">text2html</span>: <span class="hljs-function"><span class="hljs-params">(pos)</span> -&gt;</span>
+    htmlPos = <span class="hljs-number">0</span>
+    textPos = <span class="hljs-number">0</span>
 
-    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">0.</span>..<span class="hljs-property">@_htmlPositions</span>.length]
-      <span class="hljs-keyword">break</span> <span class="hljs-keyword">if</span> pos &lt; <span class="hljs-property">@_htmlPositions</span>[i]
+    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">0.</span>..<span class="hljs-property">@_textPositions</span>.length]
+      <span class="hljs-keyword">break</span> <span class="hljs-keyword">if</span> pos &lt; <span class="hljs-property">@_textPositions</span>[i]
       htmlPos = <span class="hljs-property">@_htmlPositions</span>[i]
-      textPos = <span class="hljs-property">@_textPositions</span>[i]
-
-    textPos + pos - htmlPos</pre></div></div>
+      textPos = <span class="hljs-property">@_textPositions</span>[i]</pre></div></div>
             
         </li>
         
@@ -413,11 +412,11 @@ Remove non-breaking spaces.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
-              <p>Insert an Html fragment at the specified location.</p>
+              <p>   dump “#{htmlPos} + #{pos} - #{textPos}”</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">insertHtml</span>: <span class="hljs-function"><span class="hljs-params">(fragment, pos)</span> -&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>    htmlPos + pos - textPos</pre></div></div>
             
         </li>
         
@@ -428,9 +427,77 @@ Remove non-breaking spaces.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
+              <p>Get the text position, given an html position.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">html2text</span>: <span class="hljs-function"><span class="hljs-params">(pos)</span> -&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-19">&#182;</a>
+              </div>
+              <p>Return 0 if the specified html position is less than the first HTML position.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span> <span class="hljs-keyword">if</span> pos &lt; <span class="hljs-property">@_htmlPositions</span>[<span class="hljs-number">0</span>]
+
+    htmlPos = <span class="hljs-number">0</span>
+    textPos = <span class="hljs-number">0</span>
+
+    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">0.</span>..<span class="hljs-property">@_htmlPositions</span>.length]
+      <span class="hljs-keyword">break</span> <span class="hljs-keyword">if</span> pos &lt; <span class="hljs-property">@_htmlPositions</span>[i]
+      htmlPos = <span class="hljs-property">@_htmlPositions</span>[i]
+      textPos = <span class="hljs-property">@_textPositions</span>[i]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-20">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-20">&#182;</a>
+              </div>
+              <p>   console.log “#{textPos} + #{pos} - #{htmlPos}”</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    textPos + pos - htmlPos</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-21">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-21">&#182;</a>
+              </div>
+              <p>Insert an Html fragment at the specified location.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">insertHtml</span>: <span class="hljs-function"><span class="hljs-params">(fragment, pos)</span> -&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-22">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-22">&#182;</a>
+              </div>
               <p>   dump @_htmlPositions
    dump @_textPositions
-   dump “[ fragment :: #{fragment} ][ pos text :: #{pos.text} ]”</p>
+   console.log “[ fragment :: #{fragment} ][ pos text :: #{pos.text} ]”</p>
 
             </div>
             
@@ -442,11 +509,11 @@ Remove non-breaking spaces.</p>
         </li>
         
         
-        <li id="section-19">
+        <li id="section-23">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-19">&#182;</a>
+                <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
               <p>Reparse</p>
 
@@ -457,11 +524,11 @@ Remove non-breaking spaces.</p>
         </li>
         
         
-        <li id="section-20">
+        <li id="section-24">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-20">&#182;</a>
+                <a class="pilcrow" href="#section-24">&#182;</a>
               </div>
               <p>Return the html.</p>
 
@@ -473,11 +540,11 @@ Remove non-breaking spaces.</p>
         </li>
         
         
-        <li id="section-21">
+        <li id="section-25">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-21">&#182;</a>
+                <a class="pilcrow" href="#section-25">&#182;</a>
               </div>
               <p>Return the text.</p>
 

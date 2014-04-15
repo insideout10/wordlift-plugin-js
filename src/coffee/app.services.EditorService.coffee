@@ -1,6 +1,6 @@
 angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tinymce.plugin.config', 'AnalysisService'])
 .service('EditorService',
-    ['AnalysisService', 'EntityAnnotationService', '$rootScope', (AnalysisService, EntityAnnotationService, $rootScope) ->
+    ['AnalysisService', 'EntityAnnotationService', '$rootScope', '$log', (AnalysisService, EntityAnnotationService, $rootScope, $log) ->
 
       editor = ->
         tinyMCE.get(EDITOR_ID)
@@ -16,6 +16,7 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
 
         # Get the matches and return them.
         (while match = pattern.exec html
+#          console.log "findEntities [ html index :: #{match.index} ][ text index :: #{traslator.html2text match.index} ]"
           {
             start: traslator.html2text match.index
             end: traslator.html2text (match.index + match[0].length)
@@ -41,8 +42,9 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
           # Preselect entities found in html.
           AnalysisService.preselect analysis, entities
 
-          # Remove existing text annotations.
-          html = html.replace(/<(\w+)[^>]*\sclass="textannotation[^"]*"[^>]*>([^<]+)<\/\1>/gim, '$2')
+          # Remove existing text annotations (the while-match is necessary to remove nested spans).
+          while html.match(/<(\w+)[^>]*\sclass="textannotation[^"]*"[^>]*>([^<]+)<\/\1>/gim, '$2')
+            html = html.replace(/<(\w+)[^>]*\sclass="textannotation[^"]*"[^>]*>([^<]+)<\/\1>/gim, '$2')
 
           # Prepare a traslator instance that will traslate Html and Text positions.
           traslator = Traslator.create html
@@ -57,7 +59,7 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
             entityAnnotations = EntityAnnotationService.find textAnnotation.entityAnnotations, selected: true
             if 0 < entityAnnotations.length and entityAnnotations[0].entity?
               # We deal only with the first entityAnnotation.
-              console.log entityAnnotations[0] if not entityAnnotations[0].entity
+#              console.log entityAnnotations[0] if not entityAnnotations[0].entity
               entity = entityAnnotations[0].entity
               element += " highlight #{entity.css}\" itemid=\"#{entity.id}"
 
@@ -65,13 +67,16 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
             element += '">'
 
             # Finally insert the HTML code.
+#            console.log textAnnotation
             traslator.insertHtml element, text: textAnnotation.start
             traslator.insertHtml '</span>', text: textAnnotation.end
 
 
+#          $log.info "embedAnalysis\n[ pre html :: #{html} ]\n[ post html :: #{traslator.getHtml()} ]\n[ text :: #{traslator.getText()} ]"
+
           # Update the editor Html code.
           isDirty = ed.isDirty()
-          ed.setContent traslator.getHtml()
+          ed.setContent traslator.getHtml(), format: 'raw'
           ed.isNotDirty = not isDirty
 
       # <a name="analyze"></a>
@@ -122,9 +127,13 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
           cls +=  " highlight #{entity.css}"
           itemscope = 'itemscope'
           itemid = entity.id
+
+          # Add the selected entity to the Analysis Service stored entities.
+          AnalysisService.addEntity entity
+
         else
-          itemscope = null
-          itemid = null
+            itemscope = null
+            itemid = null
 
         # Apply changes to the dom.
         dom.setAttrib id, 'class', cls
@@ -135,7 +144,7 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
       # the two aligned - tests/functions.php *wl_embed_analysis* )
       # When an analysis is completed, remove the *running* class from the WordLift toolbar button.
       # (The button is set to running when [an analysis is called](#analyze).
-      $rootScope.$on 'analysisReceived', (event, analysis) ->
+      $rootScope.$on ANALYSIS_EVENT, (event, analysis) ->
         service.embedAnalysis analysis if analysis? and analysis.textAnnotations?
 
         # Remove the *running* class.

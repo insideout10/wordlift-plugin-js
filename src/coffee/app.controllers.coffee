@@ -30,14 +30,9 @@ angular.module('wordlift.tinymce.plugin.controllers',
 
     # holds a reference to the selected text annotation.
     $scope.textAnnotation = null
+
     # holds a reference to the selected text annotation span.
     $scope.textAnnotationSpan = null
-
-    #      $scope.sortByConfidence = (entity) ->
-    #        entity[Configuration.entityLabels.confidence]
-
-    #      $scope.getLabelFor = (label) ->
-    #        Configuration.entityLabels[label]
 
     setArrowTop = (top) ->
       $('head').append('<style>#wordlift-disambiguation-popover .postbox:before,#wordlift-disambiguation-popover .postbox:after{top:' + top + 'px;}</style>');
@@ -57,9 +52,6 @@ angular.module('wordlift.tinymce.plugin.controllers',
 
     $scope.onEntitySelected = (textAnnotation, entityAnnotation) ->
       $scope.$emit 'selectEntity', ta: textAnnotation, ea: entityAnnotation
-      # TODO: the app should not refer to window.wordlift. This should be wrapped somewhere.
-      # Add the selected entity to the entity storage
-      window.wordlift.entities[entityAnnotation.entity.id] = entityAnnotation.entity
 
     # Receive the analysis results and store them in the local scope.
     $scope.$on 'analysisReceived', (event, analysis) ->
