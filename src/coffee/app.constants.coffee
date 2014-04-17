@@ -26,6 +26,7 @@ DCTERMS = 'http://purl.org/dc/terms/'
 
 DBPEDIA = 'dbpedia'
 DBPEDIA_ORG = "http://#{DBPEDIA}.org/"
+DBPEDIA_ORG_REGEX = "http://(\\w{2}\\.)?#{DBPEDIA}.org/"
 
 WGS84_POS = 'http://www.w3.org/2003/01/geo/wgs84_pos#'
 
