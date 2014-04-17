@@ -209,7 +209,7 @@
   });
 
   angular.module('AnalysisService', ['wordlift.tinymce.plugin.services.EntityService', 'wordlift.tinymce.plugin.services.Helpers']).service('AnalysisService', [
-    'EntityAnnotationService', 'EntityService', 'Helpers', 'TextAnnotationService', '$filter', '$http', '$q', '$rootScope', function(EntityAnnotationService, EntityService, Helpers, TextAnnotationService, $filter, $http, $q, $rootScope) {
+    'EntityAnnotationService', 'EntityService', 'Helpers', 'TextAnnotationService', '$filter', '$http', '$q', '$rootScope', '$log', function(EntityAnnotationService, EntityService, Helpers, TextAnnotationService, $filter, $http, $q, $rootScope, $log) {
       var findOrCreateTextAnnotation, service;
       findOrCreateTextAnnotation = function(textAnnotations, textAnnotation) {
         var ta;
@@ -266,7 +266,9 @@
                   uri: annotation.uri
                 });
                 if (0 === entities.length) {
-                  throw "Missing entity in window.wordlift.entities collection!";
+                  $log.error("Missing entity in window.wordlift.entities collection!");
+                  $log.info(annotation);
+                  continue;
                 }
                 analysis.entities[annotation.uri] = entities[0];
                 ea = EntityAnnotationService.create({
