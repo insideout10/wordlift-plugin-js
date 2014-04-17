@@ -69,11 +69,6 @@
               </a>
             
               
-              <a class="source" href="app.services.SearchService.html">
-                app.services.SearchService.coffee
-              </a>
-            
-              
               <a class="source" href="app.services.TextAnnotationService.html">
                 app.services.TextAnnotationService.coffee
               </a>
@@ -1573,12 +1568,11 @@ describe <span class="hljs-string">'TinyMCE'</span>,<span class="hljs-function">
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-85">&#182;</a>
               </div>
-              <p>Embed the analysis results.</p>
+              <p>Embed the analysis results.
+   expect(-&gt;
+     EditorService.embedAnalysis analysis).toThrow ‘Missing entity in window.wordlift.entities collection!’</p>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre>    expect(<span class="hljs-function">-&gt;</span>
-      EditorService.embedAnalysis analysis).toThrow <span class="hljs-string">'Missing entity in window.wordlift.entities collection!'</span></pre></div></div>
             
         </li>
         
@@ -1613,7 +1607,7 @@ describe <span class="hljs-string">'TinyMCE'</span>,<span class="hljs-function">
             </div>
             
             <div class="content"><div class='highlight'><pre>    expect(analysis.entityAnnotations).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
-    expect(Object.keys(analysis.entityAnnotations).length).toEqual <span class="hljs-number">25</span>
+    expect(Object.keys(analysis.entityAnnotations).length).toEqual <span class="hljs-number">24</span>
     <span class="hljs-keyword">for</span> entityAnnotationId, entityAnnotation <span class="hljs-keyword">of</span> analysis.entityAnnotations
       expect(entityAnnotation.entity).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span></pre></div></div>
             
@@ -1756,23 +1750,10 @@ Get the analysis instance, by parsing the json and merging the results.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-96">&#182;</a>
               </div>
-              <p>   EditorService.embedAnalysis analysis</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    expect(<span class="hljs-function">-&gt;</span>
-      EditorService.embedAnalysis analysis).toThrow <span class="hljs-string">'Missing entity in window.wordlift.entities collection!'</span></pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-97">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-97">&#182;</a>
-              </div>
-              <p>Loads fake entities and populate window.wordlift.entities</p>
+              <p>   EditorService.embedAnalysis analysis
+   expect(-&gt;
+     EditorService.embedAnalysis analysis).toThrow ‘Missing entity in window.wordlift.entities collection!’</p>
+<p>Loads fake entities and populate window.wordlift.entities</p>
 
             </div>
             
@@ -1785,11 +1766,11 @@ Get the analysis instance, by parsing the json and merging the results.</p>
         </li>
         
         
-        <li id="section-98">
+        <li id="section-97">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-98">&#182;</a>
+                <a class="pilcrow" href="#section-97">&#182;</a>
               </div>
               <p>Check for consistency</p>
 
@@ -1804,11 +1785,11 @@ Get the analysis instance, by parsing the json and merging the results.</p>
         </li>
         
         
-        <li id="section-99">
+        <li id="section-98">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-99">&#182;</a>
+                <a class="pilcrow" href="#section-98">&#182;</a>
               </div>
               <p>Check for preselected</p>
 
@@ -1820,11 +1801,11 @@ Get the analysis instance, by parsing the json and merging the results.</p>
         </li>
         
         
-        <li id="section-100">
+        <li id="section-99">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-100">&#182;</a>
+                <a class="pilcrow" href="#section-99">&#182;</a>
               </div>
               <pre><code> <span class="hljs-string">'http://data.redlink.io/353/wordlift/entity/Central_Archives_of_the_State_(Italy)'</span>
 </code></pre>

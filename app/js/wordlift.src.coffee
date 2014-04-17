@@ -1038,7 +1038,6 @@ angular.module('wordlift.tinymce.plugin.services.EntityService', [])
 
   ])
 
-
 angular.module('wordlift.tinymce.plugin.services.Helpers', [])
 .service('Helpers', [ ->
 
