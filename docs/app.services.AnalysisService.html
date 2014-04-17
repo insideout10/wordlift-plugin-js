@@ -923,7 +923,7 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
                 <span class="hljs-attribute">sameAs</span>: sameAs
                 <span class="hljs-attribute">source</span>: <span class="hljs-keyword">if</span> id.match(<span class="hljs-string">"^<span class="hljs-subst">#{FREEBASE_COM}</span>.*$"</span>)
                   FREEBASE
-                <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> id.match(<span class="hljs-string">"^<span class="hljs-subst">#{DBPEDIA_ORG}</span>.*$"</span>)
+                <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> id.match(<span class="hljs-string">"^<span class="hljs-subst">#{DBPEDIA_ORG_REGEX}</span>.*$"</span>)
                   DBPEDIA
                 <span class="hljs-keyword">else</span>
                   <span class="hljs-string">'wordlift'</span>

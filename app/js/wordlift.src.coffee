@@ -156,6 +156,7 @@ DCTERMS = 'http://purl.org/dc/terms/'
 
 DBPEDIA = 'dbpedia'
 DBPEDIA_ORG = "http://#{DBPEDIA}.org/"
+DBPEDIA_ORG_REGEX = "http://(\\w{2}\\.)?#{DBPEDIA}.org/"
 
 WGS84_POS = 'http://www.w3.org/2003/01/geo/wgs84_pos#'
 
@@ -512,7 +513,7 @@ angular.module('AnalysisService',
                 sameAs: sameAs
                 source: if id.match("^#{FREEBASE_COM}.*$")
                   FREEBASE
-                else if id.match("^#{DBPEDIA_ORG}.*$")
+                else if id.match("^#{DBPEDIA_ORG_REGEX}.*$")
                   DBPEDIA
                 else
                   'wordlift'
@@ -884,6 +885,7 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
       # <a name="analyze"></a>
       # Send the provided content for analysis using the [AnalysisService.analyze](app.services.AnalysisService.html#analyze) method.
         analyze: (content) ->
+          $log.info "EditorService.analyze [ content :: #{content} ]"
           # If the service is running abort the current request.
           return AnalysisService.abort() if AnalysisService.isRunning
 
@@ -1256,7 +1258,7 @@ $(
         injector.invoke(['EditorService', '$rootScope', '$log', (EditorService, $rootScope, $log) ->
           $rootScope.$apply( ->
             # Get the html content of the editor.
-            html = tinyMCE.activeEditor.getContent format: 'raw'
+            html = editor.getContent format: 'raw'
 
             # Get the text content from the Html.
             text = Traslator.create(html).getText()

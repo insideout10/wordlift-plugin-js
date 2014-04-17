@@ -1,5 +1,5 @@
 (function() {
-  var $, ANALYSIS_EVENT, CONTENT_EDITABLE, CONTENT_IFRAME, CONTEXT, DBPEDIA, DBPEDIA_ORG, DCTERMS, EDITOR_ID, FISE_ONT, FISE_ONT_CONFIDENCE, FISE_ONT_ENTITY_ANNOTATION, FISE_ONT_TEXT_ANNOTATION, FREEBASE, FREEBASE_COM, FREEBASE_NS, FREEBASE_NS_DESCRIPTION, GRAPH, MCE_WORDLIFT, RDFS, RDFS_COMMENT, RDFS_LABEL, RUNNING_CLASS, SCHEMA_ORG, SCHEMA_ORG_DESCRIPTION, TEXT_ANNOTATION, Traslator, VALUE, WGS84_POS, container, injector,
+  var $, ANALYSIS_EVENT, CONTENT_EDITABLE, CONTENT_IFRAME, CONTEXT, DBPEDIA, DBPEDIA_ORG, DBPEDIA_ORG_REGEX, DCTERMS, EDITOR_ID, FISE_ONT, FISE_ONT_CONFIDENCE, FISE_ONT_ENTITY_ANNOTATION, FISE_ONT_TEXT_ANNOTATION, FREEBASE, FREEBASE_COM, FREEBASE_NS, FREEBASE_NS_DESCRIPTION, GRAPH, MCE_WORDLIFT, RDFS, RDFS_COMMENT, RDFS_LABEL, RUNNING_CLASS, SCHEMA_ORG, SCHEMA_ORG_DESCRIPTION, TEXT_ANNOTATION, Traslator, VALUE, WGS84_POS, container, injector,
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   Traslator = (function() {
@@ -147,6 +147,8 @@
   DBPEDIA = 'dbpedia';
 
   DBPEDIA_ORG = "http://" + DBPEDIA + ".org/";
+
+  DBPEDIA_ORG_REGEX = "http://(\\w{2}\\.)?" + DBPEDIA + ".org/";
 
   WGS84_POS = 'http://www.w3.org/2003/01/geo/wgs84_pos#';
 
@@ -392,7 +394,7 @@
                 label: getLanguage(RDFS_LABEL, item, language),
                 labels: get(RDFS_LABEL, item),
                 sameAs: sameAs,
-                source: id.match("^" + FREEBASE_COM + ".*$") ? FREEBASE : id.match("^" + DBPEDIA_ORG + ".*$") ? DBPEDIA : 'wordlift',
+                source: id.match("^" + FREEBASE_COM + ".*$") ? FREEBASE : id.match("^" + DBPEDIA_ORG_REGEX + ".*$") ? DBPEDIA : 'wordlift',
                 _item: item
               };
               entity.description = getLanguage([RDFS_COMMENT, FREEBASE_NS_DESCRIPTION, SCHEMA_ORG_DESCRIPTION], item, language);
@@ -726,6 +728,7 @@
           };
         })(this),
         analyze: function(content) {
+          $log.info("EditorService.analyze [ content :: " + content + " ]");
           if (AnalysisService.isRunning) {
             return AnalysisService.abort();
           }
@@ -1037,7 +1040,7 @@
           'EditorService', '$rootScope', '$log', function(EditorService, $rootScope, $log) {
             return $rootScope.$apply(function() {
               var html, text;
-              html = tinyMCE.activeEditor.getContent({
+              html = editor.getContent({
                 format: 'raw'
               });
               text = Traslator.create(html).getText();
