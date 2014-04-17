@@ -227,7 +227,7 @@ angular.module('AnalysisService',
                 sameAs: sameAs
                 source: if id.match("^#{FREEBASE_COM}.*$")
                   FREEBASE
-                else if id.match("^#{DBPEDIA_ORG}.*$")
+                else if id.match("^#{DBPEDIA_ORG_REGEX}.*$")
                   DBPEDIA
                 else
                   'wordlift'
