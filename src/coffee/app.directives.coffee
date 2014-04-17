@@ -81,4 +81,34 @@ angular.module('wordlift.tinymce.plugin.directives', ['wordlift.tinymce.plugin.c
       </div>
     """
   )
+.directive('autocomplete', ['$compile', '$q', '$log', ($compile, $q, $log) ->
+  restrict: "A",
+  scope:
+    source: '&'
+    onSelect: '&'
+  link: (originalScope, elem, attrs, ctrl) ->
+
+    templateHtml = '<wl-entity on-select="select(entityAnnotation)" entity-annotation="entityAnnotation"></wl-entity>'
+    
+    elem.autocomplete
+      source: (request, response) ->
+        locals = { $viewValue: request.term }
+        $q.when(originalScope.source(locals)).then (matches)->
+          response matches
+      minLength: 3
+    .data("ui-autocomplete")._renderItem = (ul, ea) ->
+      
+      scope = originalScope.$new();
+      scope.entityAnnotation = ea
+      scope.select = originalScope.onSelect
+      
+      originalScope.$on '$destroy', ()-> 
+        scope.$destroy();
+      el = angular.element(templateHtml)
+      compiled = $compile(el)     
+            
+      $("<li>").append(el).appendTo(ul)
+      compiled(scope)
+
+])
 

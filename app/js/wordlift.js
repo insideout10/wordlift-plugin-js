@@ -204,7 +204,45 @@
       },
       template: "<div class=\"wl-entity-input-boxes\" ng-repeat=\"textAnnotation in textAnnotations\">\n  <div ng-repeat=\"entityAnnotation in textAnnotation.entityAnnotations | filterObjectBy:'selected':true\">\n\n    <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][uri]' value='{{entityAnnotation.entity.id}}'>\n    <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][label]' value='{{entityAnnotation.entity.label}}'>\n    <textarea name='wl_entities[{{entityAnnotation.entity.id}}][description]'>{{entityAnnotation.entity.description}}</textarea>\n\n    <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][main_type]' value='{{entityAnnotation.entity.type}}'>\n\n    <input ng-repeat=\"type in entityAnnotation.entity.types\" type='text'\n    	name='wl_entities[{{entityAnnotation.entity.id}}][type][]' value='{{type}}'>\n\n    <input ng-repeat=\"image in entityAnnotation.entity.thumbnails\" type='text'\n      name='wl_entities[{{entityAnnotation.entity.id}}][image][]' value='{{image}}'>\n    <input ng-repeat=\"sameAs in entityAnnotation.entity.sameAs\" type='text'\n      name='wl_entities[{{entityAnnotation.entity.id}}][sameas][]' value='{{sameAs}}'>\n\n    <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][latitude]' value='{{entityAnnotation.entity.latitude}}'>\n    <input type='text' name='wl_entities[{{entityAnnotation.entity.id}}][longitude]' value='{{entityAnnotation.entity.longitude}}'>\n\n  </div>\n</div>"
     };
-  });
+  }).directive('autocomplete', [
+    '$compile', '$q', '$log', function($compile, $q, $log) {
+      return {
+        restrict: "A",
+        scope: {
+          source: '&',
+          onSelect: '&'
+        },
+        link: function(originalScope, elem, attrs, ctrl) {
+          var templateHtml;
+          templateHtml = '<wl-entity on-select="select(entityAnnotation)" entity-annotation="entityAnnotation"></wl-entity>';
+          return elem.autocomplete({
+            source: function(request, response) {
+              var locals;
+              locals = {
+                $viewValue: request.term
+              };
+              return $q.when(originalScope.source(locals)).then(function(matches) {
+                return response(matches);
+              });
+            },
+            minLength: 3
+          }).data("ui-autocomplete")._renderItem = function(ul, ea) {
+            var compiled, el, scope;
+            scope = originalScope.$new();
+            scope.entityAnnotation = ea;
+            scope.select = originalScope.onSelect;
+            originalScope.$on('$destroy', function() {
+              return scope.$destroy();
+            });
+            el = angular.element(templateHtml);
+            compiled = $compile(el);
+            $("<li>").append(el).appendTo(ul);
+            return compiled(scope);
+          };
+        }
+      };
+    }
+  ]);
 
   angular.module('AnalysisService', ['wordlift.tinymce.plugin.services.EntityService', 'wordlift.tinymce.plugin.services.Helpers']).service('AnalysisService', [
     'EntityAnnotationService', 'EntityService', 'Helpers', 'TextAnnotationService', '$filter', '$http', '$q', '$rootScope', function(EntityAnnotationService, EntityService, Helpers, TextAnnotationService, $filter, $http, $q, $rootScope) {
@@ -938,7 +976,7 @@
       return filtered;
     };
   }).controller('EntitiesController', [
-    'EditorService', '$log', '$scope', function(EditorService, $log, $scope) {
+    'EntityAnnotationService', 'EditorService', '$http', '$log', '$scope', function(EntityAnnotationService, EditorService, $http, $log, $scope) {
       var el, scroll, setArrowTop;
       $scope.analysis = null;
       $scope.textAnnotation = null;
@@ -957,6 +995,22 @@
       };
       $(window).scroll(scroll);
       $('#content_ifr').contents().scroll(scroll);
+      $scope.search = function(term) {
+        return $http({
+          method: 'post',
+          url: ajaxurl + '?action=wordlift_search',
+          data: term
+        }).then(function(response) {
+          return response.data.map(function(entity) {
+            return EntityAnnotationService.create({
+              'entity': entity
+            });
+          });
+        });
+      };
+      $scope.onEntitySearched = function(entityAnnotation) {
+        return $log.debug("Selected an entity on search");
+      };
       $scope.onEntitySelected = function(textAnnotation, entityAnnotation) {
         return $scope.$emit('selectEntity', {
           ta: textAnnotation,
@@ -1004,22 +1058,12 @@
 
   angular.module('wordlift.tinymce.plugin', ['wordlift.tinymce.plugin.controllers', 'wordlift.tinymce.plugin.directives']);
 
-  $(container = $('<div id="wl-app" class="wl-app">\n  <div id="wl-error-controller" class="wl-error-controller" ng-controller="ErrorController">\n    <p ng-bind="message"></p>\n  </div>\n  <div id="wordlift-disambiguation-popover" class="metabox-holder" ng-controller="EntitiesController">\n    <div class="postbox">\n      <div class="handlediv" title="Click to toggle"><br></div>\n      <h3 class="hndle"><span>Semantic Web</span></h3>\n      <div class="inside">\n        <form role="form">\n          <div class="form-group">\n            <div class="ui-widget">\n              <input type="text" class="form-control" id="search" placeholder="search or create">\n            </div>\n          </div>\n\n          <wl-entities on-select="onEntitySelected(textAnnotation, entityAnnotation)" text-annotation="textAnnotation"></wl-entities>\n\n        </form>\n\n        <wl-entity-input-boxes text-annotations="analysis.textAnnotations"></wl-entity-input-boxes>\n      </div>\n    </div>\n  </div>\n</div>').appendTo('form[name=post]'), $('#wordlift-disambiguation-popover').css({
+  $(container = $('<div id="wl-app" class="wl-app">\n  <div id="wl-error-controller" class="wl-error-controller" ng-controller="ErrorController">\n    <p ng-bind="message"></p>\n  </div>\n  <div id="wordlift-disambiguation-popover" class="metabox-holder" ng-controller="EntitiesController">\n    <div class="postbox">\n      <div class="handlediv" title="Click to toggle"><br></div>\n      <h3 class="hndle"><span>Semantic Web</span></h3>\n      <div class="inside">\n        <form role="form">\n          <div class="form-group">\n            <div class="ui-widget">\n              <input type="text" class="form-control" id="search" placeholder="search or create" autocomplete source="search($viewValue)" on-select="onEntitySearched(entityAnnotation)">\n            </div>\n          </div>\n          <wl-entities on-select="onEntitySelected(textAnnotation, entityAnnotation)" text-annotation="textAnnotation"></wl-entities>\n\n        </form>\n\n        <wl-entity-input-boxes text-annotations="analysis.textAnnotations"></wl-entity-input-boxes>\n      </div>\n    </div>\n  </div>\n</div>').appendTo('form[name=post]'), $('#wordlift-disambiguation-popover').css({
     display: 'none',
     height: $('body').height() - $('#wpadminbar').height() + 12,
     top: $('#wpadminbar').height() - 1,
     right: 20
-  }).draggable(), $('#search').autocomplete({
-    source: ajaxurl + '?action=wordlift_search',
-    minLength: 2,
-    select: function(event, ui) {
-      console.log(event);
-      return console.log(ui);
-    }
-  }).data("ui-autocomplete")._renderItem = function(ul, item) {
-    console.log(ul);
-    return $("<li>").append("<li>\n  <div class=\"entity " + item.types + "\">\n    <!-- div class=\"thumbnail\" style=\"background-image: url('')\"></div -->\n    <div class=\"thumbnail empty\"></div>\n    <div class=\"confidence\"></div>\n    <div class=\"label\">" + item.label + "</div>\n    <div class=\"type\"></div>\n    <div class=\"source\"></div>\n  </div>\n</li>").appendTo(ul);
-  }, $('#wordlift-disambiguation-popover .handlediv').click(function(e) {
+  }).draggable(), $('#wordlift-disambiguation-popover .handlediv').click(function(e) {
     return $('#wordlift-disambiguation-popover').hide();
   }), injector = angular.bootstrap($('#wl-app'), ['wordlift.tinymce.plugin']), injector.invoke([
     'AnalysisService', function(AnalysisService) {

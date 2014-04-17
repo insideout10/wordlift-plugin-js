@@ -69,6 +69,11 @@
               </a>
             
               
+              <a class="source" href="app.services.SearchService.html">
+                app.services.SearchService.coffee
+              </a>
+            
+              
               <a class="source" href="app.services.TextAnnotationService.html">
                 app.services.TextAnnotationService.coffee
               </a>
@@ -346,7 +351,40 @@ in the select attribute is called.</p>
         &lt;/div&gt;
       &lt;/div&gt;
     """</span>
-  )</pre></div></div>
+  )
+.directive<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'autocomplete'</span>, [<span class="hljs-string">'$compile'</span>, <span class="hljs-string">'$q'</span>, <span class="hljs-string">'$log'</span>, ($compile, $q, $log) -&gt;
+  restrict: <span class="hljs-string">"A"</span>,
+  scope:
+    source: <span class="hljs-string">'&amp;'</span>
+    onSelect: <span class="hljs-string">'&amp;'</span>
+  link: (originalScope, elem, attrs, ctrl) -&gt;
+
+    templateHtml = <span class="hljs-string">'&lt;wl-entity on-select="select(entityAnnotation)" entity-annotation="entityAnnotation"&gt;&lt;/wl-entity&gt;'</span>
+    
+    elem.autocomplete
+      source: (request, response) -&gt;
+        locals = { $viewValue: request.term }
+        $q.<span class="hljs-keyword">when</span>(originalScope.source(locals)).<span class="hljs-keyword">then</span> (matches)-&gt;
+          response matches
+      minLength: <span class="hljs-number">3</span>
+    .data(<span class="hljs-string">"ui-autocomplete"</span>)._renderItem = (ul, ea) -&gt;
+      
+      scope = originalScope.$<span class="hljs-keyword">new</span>();
+      scope.entityAnnotation = ea
+      scope.select = originalScope.onSelect
+      
+      originalScope.$<span class="hljs-literal">on</span> <span class="hljs-string">'$destroy'</span>, ()-&gt; 
+        scope.$destroy();
+      el = angular.element(templateHtml)
+      compiled = $compile(el)     
+            
+      $(<span class="hljs-string">"&lt;li&gt;"</span>).append(el).appendTo(ul)
+      compiled(scope)
+
+])</span>
+
+
+</span></pre></div></div>
             
         </li>
         
