@@ -52,7 +52,7 @@ $(
   injector.invoke ['AnalysisService', (AnalysisService) ->
     if window.wordlift?
       AnalysisService.setKnownTypes window.wordlift.types
-      AnalysisService.setEntities   window.wordlift.entities
+      AnalysisService.setEntities window.wordlift.entities
   ]
 
   # Add WordLift as a plugin of the TinyMCE editor.
@@ -60,21 +60,21 @@ $(
 
     # Add a WordLift button the TinyMCE editor.
     editor.addButton 'wordlift',
-      text: 'WordLift'
-      icon: false
+      classes: 'widget btn wordlift'
+      text: ''
+      tooltip: 'Click to analyze the content'
 
     # When the editor is clicked, the [EditorService.analyze](app.services.EditorService.html#analyze) method is invoked.
       onclick: ->
         injector.invoke(['EditorService', '$rootScope', '$log', (EditorService, $rootScope, $log) ->
-          $rootScope.$apply( ->
+          $rootScope.$apply(->
             # Get the html content of the editor.
-            html = tinyMCE.activeEditor.getContent format: 'raw'
+            html = editor.getContent format: 'raw'
 
             # Get the text content from the Html.
             text = Traslator.create(html).getText()
 
-#            $log.info "onclick [ html :: #{html} ][ text :: #{text} ]"
-
+            # $log.info "onclick [ html :: #{html} ][ text :: #{text} ]"
             # Send the text content for analysis.
             EditorService.analyze text
           )
@@ -85,7 +85,7 @@ $(
     editor.onClick.add (editor, e) ->
       injector.invoke(['$rootScope', ($rootScope) ->
         # execute the following commands in the angular js context.
-        $rootScope.$apply(  ->
+        $rootScope.$apply(->
           # send a message about the currently clicked annotation.
           $rootScope.$broadcast 'textAnnotationClicked', e.target.id, e
         )

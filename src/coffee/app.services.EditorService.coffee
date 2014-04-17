@@ -82,6 +82,7 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
       # <a name="analyze"></a>
       # Send the provided content for analysis using the [AnalysisService.analyze](app.services.AnalysisService.html#analyze) method.
         analyze: (content) ->
+          # $log.info "EditorService.analyze [ content :: #{content} ]"
           # If the service is running abort the current request.
           return AnalysisService.abort() if AnalysisService.isRunning
 

@@ -1,5 +1,5 @@
 (function() {
-  var $, ANALYSIS_EVENT, CONTENT_EDITABLE, CONTENT_IFRAME, CONTEXT, DBPEDIA, DBPEDIA_ORG, DCTERMS, EDITOR_ID, FISE_ONT, FISE_ONT_CONFIDENCE, FISE_ONT_ENTITY_ANNOTATION, FISE_ONT_TEXT_ANNOTATION, FREEBASE, FREEBASE_COM, FREEBASE_NS, FREEBASE_NS_DESCRIPTION, GRAPH, MCE_WORDLIFT, RDFS, RDFS_COMMENT, RDFS_LABEL, RUNNING_CLASS, SCHEMA_ORG, SCHEMA_ORG_DESCRIPTION, TEXT_ANNOTATION, Traslator, VALUE, WGS84_POS, container, injector,
+  var $, ANALYSIS_EVENT, CONTENT_EDITABLE, CONTENT_IFRAME, CONTEXT, DBPEDIA, DBPEDIA_ORG, DBPEDIA_ORG_REGEX, DCTERMS, EDITOR_ID, FISE_ONT, FISE_ONT_CONFIDENCE, FISE_ONT_ENTITY_ANNOTATION, FISE_ONT_TEXT_ANNOTATION, FREEBASE, FREEBASE_COM, FREEBASE_NS, FREEBASE_NS_DESCRIPTION, GRAPH, MCE_WORDLIFT, RDFS, RDFS_COMMENT, RDFS_LABEL, RUNNING_CLASS, SCHEMA_ORG, SCHEMA_ORG_DESCRIPTION, TEXT_ANNOTATION, Traslator, VALUE, WGS84_POS, container, injector,
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   Traslator = (function() {
@@ -148,6 +148,8 @@
 
   DBPEDIA_ORG = "http://" + DBPEDIA + ".org/";
 
+  DBPEDIA_ORG_REGEX = "http://(\\w{2}\\.)?" + DBPEDIA + ".org/";
+
   WGS84_POS = 'http://www.w3.org/2003/01/geo/wgs84_pos#';
 
   EDITOR_ID = 'content';
@@ -158,7 +160,7 @@
 
   RUNNING_CLASS = 'running';
 
-  MCE_WORDLIFT = '.mce_wordlift';
+  MCE_WORDLIFT = '.mce_wordlift, .mce-wordlift button';
 
   CONTENT_EDITABLE = 'contenteditable';
 
@@ -245,7 +247,7 @@
   ]);
 
   angular.module('AnalysisService', ['wordlift.tinymce.plugin.services.EntityService', 'wordlift.tinymce.plugin.services.Helpers']).service('AnalysisService', [
-    'EntityAnnotationService', 'EntityService', 'Helpers', 'TextAnnotationService', '$filter', '$http', '$q', '$rootScope', function(EntityAnnotationService, EntityService, Helpers, TextAnnotationService, $filter, $http, $q, $rootScope) {
+    'EntityAnnotationService', 'EntityService', 'Helpers', 'TextAnnotationService', '$filter', '$http', '$q', '$rootScope', '$log', function(EntityAnnotationService, EntityService, Helpers, TextAnnotationService, $filter, $http, $q, $rootScope, $log) {
       var findOrCreateTextAnnotation, service;
       findOrCreateTextAnnotation = function(textAnnotations, textAnnotation) {
         var ta;
@@ -302,7 +304,9 @@
                   uri: annotation.uri
                 });
                 if (0 === entities.length) {
-                  throw "Missing entity in window.wordlift.entities collection!";
+                  $log.error("Missing entity in window.wordlift.entities collection!");
+                  $log.info(annotation);
+                  continue;
                 }
                 analysis.entities[annotation.uri] = entities[0];
                 ea = EntityAnnotationService.create({
@@ -430,7 +434,7 @@
                 label: getLanguage(RDFS_LABEL, item, language),
                 labels: get(RDFS_LABEL, item),
                 sameAs: sameAs,
-                source: id.match("^" + FREEBASE_COM + ".*$") ? FREEBASE : id.match("^" + DBPEDIA_ORG + ".*$") ? DBPEDIA : 'wordlift',
+                source: id.match("^" + FREEBASE_COM + ".*$") ? FREEBASE : id.match("^" + DBPEDIA_ORG_REGEX + ".*$") ? DBPEDIA : 'wordlift',
                 _item: item
               };
               entity.description = getLanguage([RDFS_COMMENT, FREEBASE_NS_DESCRIPTION, SCHEMA_ORG_DESCRIPTION], item, language);
@@ -1074,14 +1078,15 @@
     }
   ]), tinymce.PluginManager.add('wordlift', function(editor, url) {
     editor.addButton('wordlift', {
-      text: 'WordLift',
-      icon: false,
+      classes: 'widget btn wordlift',
+      text: '',
+      tooltip: 'Click to analyze the content',
       onclick: function() {
         return injector.invoke([
           'EditorService', '$rootScope', '$log', function(EditorService, $rootScope, $log) {
             return $rootScope.$apply(function() {
               var html, text;
-              html = tinyMCE.activeEditor.getContent({
+              html = editor.getContent({
                 format: 'raw'
               });
               text = Traslator.create(html).getText();

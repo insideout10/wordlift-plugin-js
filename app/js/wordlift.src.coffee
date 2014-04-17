@@ -156,6 +156,7 @@ DCTERMS = 'http://purl.org/dc/terms/'
 
 DBPEDIA = 'dbpedia'
 DBPEDIA_ORG = "http://#{DBPEDIA}.org/"
+DBPEDIA_ORG_REGEX = "http://(\\w{2}\\.)?#{DBPEDIA}.org/"
 
 WGS84_POS = 'http://www.w3.org/2003/01/geo/wgs84_pos#'
 
@@ -164,7 +165,7 @@ EDITOR_ID = 'content'
 TEXT_ANNOTATION = 'textannotation'
 CONTENT_IFRAME = '#content_ifr'
 RUNNING_CLASS = 'running'
-MCE_WORDLIFT = '.mce_wordlift'
+MCE_WORDLIFT = '.mce_wordlift, .mce-wordlift button'
 CONTENT_EDITABLE = 'contenteditable'
 
 angular.module('wordlift.tinymce.plugin.config', [])
@@ -331,8 +332,8 @@ angular.module('AnalysisService',
   ['wordlift.tinymce.plugin.services.EntityService', 'wordlift.tinymce.plugin.services.Helpers'])
 .service('AnalysisService',
     [ 'EntityAnnotationService', 'EntityService', 'Helpers', 'TextAnnotationService', '$filter', '$http', '$q',
-      '$rootScope',
-      (EntityAnnotationService, EntityService, Helpers, TextAnnotationService, $filter, $http, $q, $rootScope) ->
+      '$rootScope', '$log',
+      (EntityAnnotationService, EntityService, Helpers, TextAnnotationService, $filter, $http, $q, $rootScope, $log) ->
 
         # Find an entity in the analysis
         # or within window.wordlift.entities storage if needed
@@ -361,15 +362,15 @@ angular.module('AnalysisService',
           _knownTypes: []
           _entities: {}
 
-          # Add an entity to the local collection of entities.
+        # Add an entity to the local collection of entities.
           addEntity: (entity) ->
             @_entities[entity.id] = entity
 
-          # Set the local entity collection.
+        # Set the local entity collection.
           setEntities: (entities) =>
             @_entities = entities
 
-          # Set the known types.
+        # Set the known types.
           setKnownTypes: (types) =>
             @_knownTypes = types
 
@@ -400,9 +401,10 @@ angular.module('AnalysisService',
 
                 # If the entity is missing raise an excpetion!
                 if 0 is entities.length
-                  throw "Missing entity in window.wordlift.entities collection!"
+                  $log.error "Missing entity in window.wordlift.entities collection!"
+                  $log.info annotation
                   # TODO: wouldn't it be better to continue here instead of throwing an exception?
-                  # continue
+                  continue
 
                 # Use the first found entity
                 analysis.entities[annotation.uri] = entities[0]
@@ -542,7 +544,7 @@ angular.module('AnalysisService',
                 sameAs: sameAs
                 source: if id.match("^#{FREEBASE_COM}.*$")
                   FREEBASE
-                else if id.match("^#{DBPEDIA_ORG}.*$")
+                else if id.match("^#{DBPEDIA_ORG_REGEX}.*$")
                   DBPEDIA
                 else
                   'wordlift'
@@ -803,7 +805,8 @@ angular.module('AnalysisService',
 
             # Create entity annotations instances.
             for id, item of entityAnnotations
-              entityAnnotations[entityAnnotation.id] = entityAnnotation for entityAnnotation in createEntityAnnotations(item, language)
+              entityAnnotations[entityAnnotation.id] = entityAnnotation for entityAnnotation in createEntityAnnotations(item,
+                language)
 
             # For every text annotation delete entity annotations that refer to the same entity (after merging).
             if merge
@@ -914,6 +917,7 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
       # <a name="analyze"></a>
       # Send the provided content for analysis using the [AnalysisService.analyze](app.services.AnalysisService.html#analyze) method.
         analyze: (content) ->
+          # $log.info "EditorService.analyze [ content :: #{content} ]"
           # If the service is running abort the current request.
           return AnalysisService.abort() if AnalysisService.isRunning
 
@@ -1262,7 +1266,7 @@ $(
   injector.invoke ['AnalysisService', (AnalysisService) ->
     if window.wordlift?
       AnalysisService.setKnownTypes window.wordlift.types
-      AnalysisService.setEntities   window.wordlift.entities
+      AnalysisService.setEntities window.wordlift.entities
   ]
 
   # Add WordLift as a plugin of the TinyMCE editor.
@@ -1270,21 +1274,21 @@ $(
 
     # Add a WordLift button the TinyMCE editor.
     editor.addButton 'wordlift',
-      text: 'WordLift'
-      icon: false
+      classes: 'widget btn wordlift'
+      text: ''
+      tooltip: 'Click to analyze the content'
 
     # When the editor is clicked, the [EditorService.analyze](app.services.EditorService.html#analyze) method is invoked.
       onclick: ->
         injector.invoke(['EditorService', '$rootScope', '$log', (EditorService, $rootScope, $log) ->
-          $rootScope.$apply( ->
+          $rootScope.$apply(->
             # Get the html content of the editor.
-            html = tinyMCE.activeEditor.getContent format: 'raw'
+            html = editor.getContent format: 'raw'
 
             # Get the text content from the Html.
             text = Traslator.create(html).getText()
 
-#            $log.info "onclick [ html :: #{html} ][ text :: #{text} ]"
-
+            # $log.info "onclick [ html :: #{html} ][ text :: #{text} ]"
             # Send the text content for analysis.
             EditorService.analyze text
           )
@@ -1295,7 +1299,7 @@ $(
     editor.onClick.add (editor, e) ->
       injector.invoke(['$rootScope', ($rootScope) ->
         # execute the following commands in the angular js context.
-        $rootScope.$apply(  ->
+        $rootScope.$apply(->
           # send a message about the currently clicked annotation.
           $rootScope.$broadcast 'textAnnotationClicked', e.target.id, e
         )

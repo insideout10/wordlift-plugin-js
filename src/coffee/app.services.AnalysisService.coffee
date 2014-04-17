@@ -16,8 +16,8 @@ angular.module('AnalysisService',
   ['wordlift.tinymce.plugin.services.EntityService', 'wordlift.tinymce.plugin.services.Helpers'])
 .service('AnalysisService',
     [ 'EntityAnnotationService', 'EntityService', 'Helpers', 'TextAnnotationService', '$filter', '$http', '$q',
-      '$rootScope',
-      (EntityAnnotationService, EntityService, Helpers, TextAnnotationService, $filter, $http, $q, $rootScope) ->
+      '$rootScope', '$log',
+      (EntityAnnotationService, EntityService, Helpers, TextAnnotationService, $filter, $http, $q, $rootScope, $log) ->
 
         # Find an entity in the analysis
         # or within window.wordlift.entities storage if needed
@@ -46,15 +46,15 @@ angular.module('AnalysisService',
           _knownTypes: []
           _entities: {}
 
-          # Add an entity to the local collection of entities.
+        # Add an entity to the local collection of entities.
           addEntity: (entity) ->
             @_entities[entity.id] = entity
 
-          # Set the local entity collection.
+        # Set the local entity collection.
           setEntities: (entities) =>
             @_entities = entities
 
-          # Set the known types.
+        # Set the known types.
           setKnownTypes: (types) =>
             @_knownTypes = types
 
@@ -85,9 +85,10 @@ angular.module('AnalysisService',
 
                 # If the entity is missing raise an excpetion!
                 if 0 is entities.length
-                  throw "Missing entity in window.wordlift.entities collection!"
+                  $log.error "Missing entity in window.wordlift.entities collection!"
+                  $log.info annotation
                   # TODO: wouldn't it be better to continue here instead of throwing an exception?
-                  # continue
+                  continue
 
                 # Use the first found entity
                 analysis.entities[annotation.uri] = entities[0]
@@ -227,7 +228,7 @@ angular.module('AnalysisService',
                 sameAs: sameAs
                 source: if id.match("^#{FREEBASE_COM}.*$")
                   FREEBASE
-                else if id.match("^#{DBPEDIA_ORG}.*$")
+                else if id.match("^#{DBPEDIA_ORG_REGEX}.*$")
                   DBPEDIA
                 else
                   'wordlift'
@@ -488,7 +489,8 @@ angular.module('AnalysisService',
 
             # Create entity annotations instances.
             for id, item of entityAnnotations
-              entityAnnotations[entityAnnotation.id] = entityAnnotation for entityAnnotation in createEntityAnnotations(item, language)
+              entityAnnotations[entityAnnotation.id] = entityAnnotation for entityAnnotation in createEntityAnnotations(item,
+                language)
 
             # For every text annotation delete entity annotations that refer to the same entity (after merging).
             if merge

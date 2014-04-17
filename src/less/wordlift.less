@@ -29,11 +29,13 @@
 }
 
 // TinyMCE toolbar
-.mceIcon.mce_wordlift {
-  background: data-uri('../img/wordlift-logo-20x20.png');
+.wp_themeSkin .mceIcon.mce_wordlift, .mce-widget.mce-btn.mce-wordlift button {
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-image: data-uri('../img/wordlift-logo-20x20.png');
 
   &.running {
-    background: data-uri('../img/spinner-20x20.gif');
+    background-image: data-uri('../img/spinner-20x20.gif');
   }
 }
 
@@ -292,6 +294,7 @@ body#tinymce {
   .textannotation {
     border-bottom: 2px solid #2b2b2b;
     padding: 2px;
+    cursor: pointer;
     cursor: hand;
 
     &.wl-creative-work { .highlight(@wl-creative-work-color) }

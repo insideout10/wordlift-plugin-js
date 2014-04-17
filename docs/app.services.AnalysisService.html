@@ -163,8 +163,8 @@ angular.<span class="hljs-built_in">module</span>(<span class="hljs-string">'Ana
   [<span class="hljs-string">'wordlift.tinymce.plugin.services.EntityService'</span>, <span class="hljs-string">'wordlift.tinymce.plugin.services.Helpers'</span>])
 .service(<span class="hljs-string">'AnalysisService'</span>,
     [ <span class="hljs-string">'EntityAnnotationService'</span>, <span class="hljs-string">'EntityService'</span>, <span class="hljs-string">'Helpers'</span>, <span class="hljs-string">'TextAnnotationService'</span>, <span class="hljs-string">'$filter'</span>, <span class="hljs-string">'$http'</span>, <span class="hljs-string">'$q'</span>,
-      <span class="hljs-string">'$rootScope'</span>,
-      <span class="hljs-function"><span class="hljs-params">(EntityAnnotationService, EntityService, Helpers, TextAnnotationService, $filter, $http, $q, $rootScope)</span> -&gt;</span></pre></div></div>
+      <span class="hljs-string">'$rootScope'</span>, <span class="hljs-string">'$log'</span>,
+      <span class="hljs-function"><span class="hljs-params">(EntityAnnotationService, EntityService, Helpers, TextAnnotationService, $filter, $http, $q, $rootScope, $log)</span> -&gt;</span></pre></div></div>
             
         </li>
         
@@ -427,7 +427,8 @@ Otherwise a new text annotation is created</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>                <span class="hljs-keyword">if</span> <span class="hljs-number">0</span> <span class="hljs-keyword">is</span> entities.length
-                  <span class="hljs-keyword">throw</span> <span class="hljs-string">"Missing entity in window.wordlift.entities collection!"</span></pre></div></div>
+                  $log.error <span class="hljs-string">"Missing entity in window.wordlift.entities collection!"</span>
+                  $log.info annotation</pre></div></div>
             
         </li>
         
@@ -438,10 +439,11 @@ Otherwise a new text annotation is created</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
-              <p>TODO: wouldn’t it be better to continue here instead of throwing an exception?
-continue</p>
+              <p>TODO: wouldn’t it be better to continue here instead of throwing an exception?</p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre>                  <span class="hljs-keyword">continue</span></pre></div></div>
             
         </li>
         
@@ -928,7 +930,7 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
                 <span class="hljs-attribute">sameAs</span>: sameAs
                 <span class="hljs-attribute">source</span>: <span class="hljs-keyword">if</span> id.match(<span class="hljs-string">"^<span class="hljs-subst">#{FREEBASE_COM}</span>.*$"</span>)
                   FREEBASE
-                <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> id.match(<span class="hljs-string">"^<span class="hljs-subst">#{DBPEDIA_ORG}</span>.*$"</span>)
+                <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> id.match(<span class="hljs-string">"^<span class="hljs-subst">#{DBPEDIA_ORG_REGEX}</span>.*$"</span>)
                   DBPEDIA
                 <span class="hljs-keyword">else</span>
                   <span class="hljs-string">'wordlift'</span>
@@ -1946,7 +1948,8 @@ TODO: have a user-set priority.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">for</span> id, item <span class="hljs-keyword">of</span> entityAnnotations
-              entityAnnotations[entityAnnotation.id] = entityAnnotation <span class="hljs-keyword">for</span> entityAnnotation <span class="hljs-keyword">in</span> createEntityAnnotations(item, language)</pre></div></div>
+              entityAnnotations[entityAnnotation.id] = entityAnnotation <span class="hljs-keyword">for</span> entityAnnotation <span class="hljs-keyword">in</span> createEntityAnnotations(item,
+                language)</pre></div></div>
             
         </li>
         
