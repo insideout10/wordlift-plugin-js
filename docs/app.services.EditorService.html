@@ -484,8 +484,7 @@ Send the provided content for analysis using the <a href="app.services.AnalysisS
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-attribute">analyze</span>: <span class="hljs-function"><span class="hljs-params">(content)</span> -&gt;</span>
-          $log.info <span class="hljs-string">"EditorService.analyze [ content :: <span class="hljs-subst">#{content}</span> ]"</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-attribute">analyze</span>: <span class="hljs-function"><span class="hljs-params">(content)</span> -&gt;</span></pre></div></div>
             
         </li>
         
@@ -496,7 +495,8 @@ Send the provided content for analysis using the <a href="app.services.AnalysisS
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-24">&#182;</a>
               </div>
-              <p>If the service is running abort the current request.</p>
+              <p>$log.info “EditorService.analyze [ content :: #{content} ]”
+If the service is running abort the current request.</p>
 
             </div>
             

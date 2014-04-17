@@ -165,7 +165,7 @@ EDITOR_ID = 'content'
 TEXT_ANNOTATION = 'textannotation'
 CONTENT_IFRAME = '#content_ifr'
 RUNNING_CLASS = 'running'
-MCE_WORDLIFT = '.mce_wordlift'
+MCE_WORDLIFT = '.mce_wordlift, .mce-wordlift button'
 CONTENT_EDITABLE = 'contenteditable'
 
 angular.module('wordlift.tinymce.plugin.config', [])
@@ -885,7 +885,7 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
       # <a name="analyze"></a>
       # Send the provided content for analysis using the [AnalysisService.analyze](app.services.AnalysisService.html#analyze) method.
         analyze: (content) ->
-          $log.info "EditorService.analyze [ content :: #{content} ]"
+          # $log.info "EditorService.analyze [ content :: #{content} ]"
           # If the service is running abort the current request.
           return AnalysisService.abort() if AnalysisService.isRunning
 
@@ -1250,8 +1250,9 @@ $(
 
     # Add a WordLift button the TinyMCE editor.
     editor.addButton 'wordlift',
-      text: 'WordLift'
-      icon: false
+      classes: 'widget btn wordlift'
+      text: ''
+      tooltip: 'Click to analyze the content'
 
     # When the editor is clicked, the [EditorService.analyze](app.services.EditorService.html#analyze) method is invoked.
       onclick: ->

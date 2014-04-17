@@ -160,7 +160,7 @@
 
   RUNNING_CLASS = 'running';
 
-  MCE_WORDLIFT = '.mce_wordlift';
+  MCE_WORDLIFT = '.mce_wordlift, .mce-wordlift button';
 
   CONTENT_EDITABLE = 'contenteditable';
 
@@ -728,7 +728,6 @@
           };
         })(this),
         analyze: function(content) {
-          $log.info("EditorService.analyze [ content :: " + content + " ]");
           if (AnalysisService.isRunning) {
             return AnalysisService.abort();
           }
@@ -1033,8 +1032,9 @@
     }
   ]), tinymce.PluginManager.add('wordlift', function(editor, url) {
     editor.addButton('wordlift', {
-      text: 'WordLift',
-      icon: false,
+      classes: 'widget btn wordlift',
+      text: '',
+      tooltip: 'Click to analyze the content',
       onclick: function() {
         return injector.invoke([
           'EditorService', '$rootScope', '$log', function(EditorService, $rootScope, $log) {
