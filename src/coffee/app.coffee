@@ -84,8 +84,9 @@ $(
 
     # Add a WordLift button the TinyMCE editor.
     editor.addButton 'wordlift',
-      text: 'WordLift'
-      icon: false
+      classes: 'widget btn wordlift'
+      text: ''
+      tooltip: 'Click to analyze the content'
 
     # When the editor is clicked, the [EditorService.analyze](app.services.EditorService.html#analyze) method is invoked.
       onclick: ->
