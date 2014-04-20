@@ -23,7 +23,7 @@ angular.module('wordlift.tinymce.plugin.controllers',
 
       filtered
   )
-.controller('EntitiesController', ['EditorService', '$log', '$scope', (EditorService, $log, $scope) ->
+.controller('EntitiesController', ['EntityAnnotationService','EditorService', '$http', '$log', '$scope', (EntityAnnotationService, EditorService, $http, $log, $scope) ->
 
     # holds a reference to the current analysis results.
     $scope.analysis = null
@@ -49,7 +49,22 @@ angular.module('wordlift.tinymce.plugin.controllers',
     # TODO: move these hooks on the popover, in order to hook/unhook the events.
     $(window).scroll(scroll)
     $('#content_ifr').contents().scroll(scroll)
-
+    
+    # Search for entities server side
+    $scope.search = (term) ->
+      return $http
+        method: 'post'
+        url: ajaxurl + '?action=wordlift_search'
+        data: term
+      .then (response) ->
+        # Create a fake entity annotation for each entity
+        response.data.map (entity)->
+          EntityAnnotationService.create { 'entity': entity }
+    
+    # Search for entities server side
+    $scope.onEntitySearched = (entityAnnotation) ->
+      $log.debug "Selected an entity on search"
+    
     $scope.onEntitySelected = (textAnnotation, entityAnnotation) ->
       $scope.$emit 'selectEntity', ta: textAnnotation, ea: entityAnnotation
 

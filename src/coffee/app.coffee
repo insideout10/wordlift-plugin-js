@@ -19,10 +19,9 @@ $(
             <form role="form">
               <div class="form-group">
                 <div class="ui-widget">
-                  <input type="text" class="form-control" id="search" placeholder="search or create">
+                  <input type="text" class="form-control" id="search" placeholder="search or create" autocomplete source="search($viewValue)" on-select="onEntitySearched(entityAnnotation)">
                 </div>
               </div>
-
               <wl-entities on-select="onEntitySelected(textAnnotation, entityAnnotation)" text-annotation="textAnnotation"></wl-entities>
 
             </form>
@@ -43,29 +42,6 @@ $(
       right: 20
     )
   .draggable()
-
-  $('#search').autocomplete
-    source: ajaxurl + '?action=wordlift_search',
-    minLength: 2,
-    select: (event, ui) ->
-      console.log event
-      console.log ui
-  .data("ui-autocomplete")._renderItem = (ul, item) ->
-    console.log ul
-    $("<li>")
-    .append("""
-        <li>
-          <div class="entity #{item.types}">
-            <!-- div class="thumbnail" style="background-image: url('')"></div -->
-            <div class="thumbnail empty"></div>
-            <div class="confidence"></div>
-            <div class="label">#{item.label}</div>
-            <div class="type"></div>
-            <div class="source"></div>
-          </div>
-        </li>
-    """)
-    .appendTo(ul)
 
   # When the user clicks on the handle, hide the popover.
   $('#wordlift-disambiguation-popover .handlediv').click (e) ->

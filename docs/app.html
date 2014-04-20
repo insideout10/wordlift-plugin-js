@@ -181,10 +181,9 @@
             &lt;form role="form"&gt;
               &lt;div class="form-group"&gt;
                 &lt;div class="ui-widget"&gt;
-                  &lt;input type="text" class="form-control" id="search" placeholder="search or create"&gt;
+                  &lt;input type="text" class="form-control" id="search" placeholder="search or create" autocomplete source="search($viewValue)" on-select="onEntitySearched(entityAnnotation)"&gt;
                 &lt;/div&gt;
               &lt;/div&gt;
-
               &lt;wl-entities on-select="onEntitySelected(textAnnotation, entityAnnotation)" text-annotation="textAnnotation"&gt;&lt;/wl-entities&gt;
 
             &lt;/form&gt;
@@ -204,30 +203,7 @@
       <span class="hljs-attribute">top</span>: $(<span class="hljs-string">'#wpadminbar'</span>).height() - <span class="hljs-number">1</span>
       <span class="hljs-attribute">right</span>: <span class="hljs-number">20</span>
     )
-  .draggable()
-
-  $(<span class="hljs-string">'#search'</span>).autocomplete
-    <span class="hljs-attribute">source</span>: ajaxurl + <span class="hljs-string">'?action=wordlift_search'</span>,
-    <span class="hljs-attribute">minLength</span>: <span class="hljs-number">2</span>,
-    <span class="hljs-attribute">select</span>: <span class="hljs-function"><span class="hljs-params">(event, ui)</span> -&gt;</span>
-      <span class="hljs-built_in">console</span>.log event
-      <span class="hljs-built_in">console</span>.log ui
-  .data<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">"ui-autocomplete"</span>)</span>.<span class="hljs-title">_renderItem</span> = <span class="hljs-params">(ul, item)</span> -&gt;</span>
-    <span class="hljs-built_in">console</span>.log ul
-    $(<span class="hljs-string">"&lt;li&gt;"</span>)
-    .append(<span class="hljs-string">"""
-        &lt;li&gt;
-          &lt;div class="entity <span class="hljs-subst">#{item.types}</span>"&gt;
-            &lt;!-- div class="thumbnail" style="background-image: url('')"&gt;&lt;/div --&gt;
-            &lt;div class="thumbnail empty"&gt;&lt;/div&gt;
-            &lt;div class="confidence"&gt;&lt;/div&gt;
-            &lt;div class="label"&gt;<span class="hljs-subst">#{item.label}</span>&lt;/div&gt;
-            &lt;div class="type"&gt;&lt;/div&gt;
-            &lt;div class="source"&gt;&lt;/div&gt;
-          &lt;/div&gt;
-        &lt;/li&gt;
-    """</span>)
-    .appendTo(ul)</pre></div></div>
+  .draggable()</pre></div></div>
             
         </li>
         

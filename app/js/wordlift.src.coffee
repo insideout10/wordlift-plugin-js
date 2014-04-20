@@ -282,6 +282,36 @@ angular.module('wordlift.tinymce.plugin.directives', ['wordlift.tinymce.plugin.c
       </div>
     """
   )
+.directive('autocomplete', ['$compile', '$q', '$log', ($compile, $q, $log) ->
+  restrict: "A",
+  scope:
+    source: '&'
+    onSelect: '&'
+  link: (originalScope, elem, attrs, ctrl) ->
+
+    templateHtml = '<wl-entity on-select="select(entityAnnotation)" entity-annotation="entityAnnotation"></wl-entity>'
+    
+    elem.autocomplete
+      source: (request, response) ->
+        locals = { $viewValue: request.term }
+        $q.when(originalScope.source(locals)).then (matches)->
+          response matches
+      minLength: 3
+    .data("ui-autocomplete")._renderItem = (ul, ea) ->
+      
+      scope = originalScope.$new();
+      scope.entityAnnotation = ea
+      scope.select = originalScope.onSelect
+      
+      originalScope.$on '$destroy', ()-> 
+        scope.$destroy();
+      el = angular.element(templateHtml)
+      compiled = $compile(el)     
+            
+      $("<li>").append(el).appendTo(ul)
+      compiled(scope)
+
+])
 
 
 # The AnalysisService aim is to parse the Analysis response from an analysis process
@@ -1088,7 +1118,7 @@ angular.module('wordlift.tinymce.plugin.controllers',
 
       filtered
   )
-.controller('EntitiesController', ['EditorService', '$log', '$scope', (EditorService, $log, $scope) ->
+.controller('EntitiesController', ['EntityAnnotationService','EditorService', '$http', '$log', '$scope', (EntityAnnotationService, EditorService, $http, $log, $scope) ->
 
     # holds a reference to the current analysis results.
     $scope.analysis = null
@@ -1114,7 +1144,22 @@ angular.module('wordlift.tinymce.plugin.controllers',
     # TODO: move these hooks on the popover, in order to hook/unhook the events.
     $(window).scroll(scroll)
     $('#content_ifr').contents().scroll(scroll)
-
+    
+    # Search for entities server side
+    $scope.search = (term) ->
+      return $http
+        method: 'post'
+        url: ajaxurl + '?action=wordlift_search'
+        data: term
+      .then (response) ->
+        # Create a fake entity annotation for each entity
+        response.data.map (entity)->
+          EntityAnnotationService.create { 'entity': entity }
+    
+    # Search for entities server side
+    $scope.onEntitySearched = (entityAnnotation) ->
+      $log.debug "Selected an entity on search"
+    
     $scope.onEntitySelected = (textAnnotation, entityAnnotation) ->
       $scope.$emit 'selectEntity', ta: textAnnotation, ea: entityAnnotation
 
@@ -1187,10 +1232,9 @@ $(
             <form role="form">
               <div class="form-group">
                 <div class="ui-widget">
-                  <input type="text" class="form-control" id="search" placeholder="search or create">
+                  <input type="text" class="form-control" id="search" placeholder="search or create" autocomplete source="search($viewValue)" on-select="onEntitySearched(entityAnnotation)">
                 </div>
               </div>
-
               <wl-entities on-select="onEntitySelected(textAnnotation, entityAnnotation)" text-annotation="textAnnotation"></wl-entities>
 
             </form>
@@ -1211,29 +1255,6 @@ $(
       right: 20
     )
   .draggable()
-
-  $('#search').autocomplete
-    source: ajaxurl + '?action=wordlift_search',
-    minLength: 2,
-    select: (event, ui) ->
-      console.log event
-      console.log ui
-  .data("ui-autocomplete")._renderItem = (ul, item) ->
-    console.log ul
-    $("<li>")
-    .append("""
-        <li>
-          <div class="entity #{item.types}">
-            <!-- div class="thumbnail" style="background-image: url('')"></div -->
-            <div class="thumbnail empty"></div>
-            <div class="confidence"></div>
-            <div class="label">#{item.label}</div>
-            <div class="type"></div>
-            <div class="source"></div>
-          </div>
-        </li>
-    """)
-    .appendTo(ul)
 
   # When the user clicks on the handle, hide the popover.
   $('#wordlift-disambiguation-popover .handlediv').click (e) ->
