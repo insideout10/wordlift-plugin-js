@@ -464,16 +464,9 @@ describe 'TinyMCE', ->
     # Set the textual content in the editor.
     ed.setContent html, format: 'raw'
 
-    # If window.wordlift.entities is empty, the preselect raises an exception
     # Get the analysis instance, by parsing the json and merging the results.
     analysis = AnalysisService.parse json, true
-    # TODO: re-enable this.
-#    expect(window.wordlift.entities).toEqual {}
-    # Try to embed the analysis results.
 
-    #    EditorService.embedAnalysis analysis
-#    expect(->
-#      EditorService.embedAnalysis analysis).toThrow 'Missing entity in window.wordlift.entities collection!'
     #
     # Loads fake entities and populate window.wordlift.entities
     $.ajax('base/app/assets/wordlift_entities_0.json', async: false).done (data) ->
@@ -484,7 +477,7 @@ describe 'TinyMCE', ->
 
     # Check for consistency
     expect(analysis.entityAnnotations).not.toBe undefined
-    expect(Object.keys(analysis.entityAnnotations).length).toEqual 26
+    expect(Object.keys(analysis.entityAnnotations).length).toEqual 27
     for entityAnnotationId, entityAnnotation of analysis.entityAnnotations
       expect(entityAnnotation.entity).not.toBe undefined
       expect(entityAnnotation.relation).not.toBe undefined

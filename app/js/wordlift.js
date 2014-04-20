@@ -271,18 +271,12 @@
         isRunning: false
       };
       service.addEntity = function(entity) {
-        $log.info("AnalysisService addEntity");
-        $log.info(entity);
         return this._entities[entity.id] = entity;
       };
       service.setEntities = function(entities) {
-        $log.info("AnalysisService setEntities");
-        $log.info(entities);
         return this._entities = entities;
       };
       service.setKnownTypes = function(types) {
-        $log.info("AnalysisService setKnownTypes");
-        $log.info(types);
         return this._knownTypes = types;
       };
       service.abort = function() {
@@ -351,7 +345,7 @@
         });
       };
       service.parse = function(data, merge) {
-        var anotherEntityAnnotation, anotherId, containsOrEquals, context, createEntity, createEntityAnnotations, createLanguage, createTextAnnotation, dctype, entities, entity, entityAnnotation, entityAnnotations, expand, get, getA, getKnownTypes, getLanguage, graph, id, item, language, languages, mergeEntities, mergeUnique, textAnnotation, textAnnotationId, textAnnotations, types, _i, _j, _len, _len1, _ref, _ref1, _ref2;
+        var anotherEntityAnnotation, anotherId, containsOrEquals, context, createEntity, createEntityAnnotations, createLanguage, createTextAnnotation, dctype, entities, entity, entityAnnotation, entityAnnotations, expand, get, getA, getKnownTypes, getLanguage, graph, id, item, language, languages, mergeEntities, mergeUnique, textAnnotation, textAnnotationId, textAnnotations, types, _i, _j, _len, _len1, _ref, _ref1, _ref2, _ref3;
         if (merge == null) {
           merge = false;
         }
@@ -419,10 +413,6 @@
             }
             return _results;
           });
-          $log.info("AnalysisService.parse [ known types :: ");
-          $log.info(service);
-          $log.info(service._knownTypes);
-          $log.info(" ]");
           knownTypes = getKnownTypes(types, service._knownTypes);
           css = knownTypes[0].type.css;
           entity = {
@@ -438,6 +428,7 @@
             source: id.match("^" + FREEBASE_COM + ".*$") ? FREEBASE : id.match("^" + DBPEDIA_ORG_REGEX + ".*$") ? DBPEDIA : 'wordlift',
             _item: item
           };
+          entity.sources = [entity.source];
           entity.description = getLanguage([RDFS_COMMENT, FREEBASE_NS_DESCRIPTION, SCHEMA_ORG_DESCRIPTION], item, language);
           entity.descriptions = get([RDFS_COMMENT, FREEBASE_NS_DESCRIPTION, SCHEMA_ORG_DESCRIPTION], item);
           if (entity.description == null) {
@@ -592,7 +583,11 @@
               existing = entities[sameAs];
               mergeUnique(entity.sameAs, existing.sameAs);
               mergeUnique(entity.thumbnails, existing.thumbnails);
-              entity.source += ", " + existing.source;
+              mergeUnique(entity.sources, existing.sources);
+              if (entity.css == null) {
+                entity.css = existing.css;
+              }
+              entity.source = entity.sources.join(', ');
               if (DBPEDIA === existing.source) {
                 entity.description = existing.description;
               }
@@ -665,27 +660,34 @@
             mergeEntities(entity, entities);
           }
         }
+        if (merge) {
+          _ref = this._entities;
+          for (id in _ref) {
+            entity = _ref[id];
+            mergeEntities(entity, entities);
+          }
+        }
         for (id in textAnnotations) {
           item = textAnnotations[id];
           textAnnotations[id] = createTextAnnotation(item);
         }
         for (id in entityAnnotations) {
           item = entityAnnotations[id];
-          _ref = createEntityAnnotations(item, language);
-          for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
-            entityAnnotation = _ref[_j];
+          _ref1 = createEntityAnnotations(item, language);
+          for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+            entityAnnotation = _ref1[_j];
             entityAnnotations[entityAnnotation.id] = entityAnnotation;
           }
         }
         if (merge) {
           for (textAnnotationId in textAnnotations) {
             textAnnotation = textAnnotations[textAnnotationId];
-            _ref1 = textAnnotation.entityAnnotations;
-            for (id in _ref1) {
-              entityAnnotation = _ref1[id];
-              _ref2 = textAnnotation.entityAnnotations;
-              for (anotherId in _ref2) {
-                anotherEntityAnnotation = _ref2[anotherId];
+            _ref2 = textAnnotation.entityAnnotations;
+            for (id in _ref2) {
+              entityAnnotation = _ref2[id];
+              _ref3 = textAnnotation.entityAnnotations;
+              for (anotherId in _ref3) {
+                anotherEntityAnnotation = _ref3[anotherId];
                 if (id !== anotherId && entityAnnotation.entity === anotherEntityAnnotation.entity) {
                   delete textAnnotation.entityAnnotations[anotherId];
                 }
