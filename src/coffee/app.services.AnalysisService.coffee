@@ -54,20 +54,20 @@ angular.module('AnalysisService',
 
         # Add an entity to the local collection of entities.
         service.addEntity = (entity) ->
-          $log.info "AnalysisService addEntity"
-          $log.info entity
+#          $log.info "AnalysisService addEntity"
+#          $log.info entity
           @_entities[entity.id] = entity
 
         # Set the local entity collection.
         service.setEntities = (entities) ->
-          $log.info "AnalysisService setEntities"
-          $log.info entities
+#          $log.info "AnalysisService setEntities"
+#          $log.info entities
           @_entities = entities
 
         # Set the known types.
         service.setKnownTypes = (types) ->
-          $log.info "AnalysisService setKnownTypes"
-          $log.info types
+#          $log.info "AnalysisService setKnownTypes"
+#          $log.info types
           @_knownTypes = types
 
         # Abort a running analysis.
@@ -216,10 +216,10 @@ angular.module('AnalysisService',
             )
 
             # Get the known types.
-            $log.info "AnalysisService.parse [ known types :: "
-            $log.info service
-            $log.info service._knownTypes
-            $log.info " ]"
+#            $log.info "AnalysisService.parse [ known types :: "
+#            $log.info service
+#            $log.info service._knownTypes
+#            $log.info " ]"
             knownTypes = getKnownTypes(types, service._knownTypes)
             # Get the stylesheet classes.
             css = knownTypes[0].type.css
@@ -242,6 +242,9 @@ angular.module('AnalysisService',
               else
                 'wordlift'
               _item: item
+
+            # Add sources as an array.
+            entity.sources = [ entity.source ]
 
             entity.description = getLanguage(
               [
@@ -406,7 +409,9 @@ angular.module('AnalysisService',
                 # TODO: make concats unique.
                 mergeUnique(entity.sameAs, existing.sameAs)
                 mergeUnique(entity.thumbnails, existing.thumbnails)
-                entity.source += ", #{existing.source}"
+                mergeUnique(entity.sources, existing.sources)
+                entity.css = existing.css if not entity.css?
+                entity.source = entity.sources.join(', ')
                 # Prefer the DBpedia description.
                 # TODO: have a user-set priority.
                 entity.description = existing.description if DBPEDIA is existing.source
@@ -493,7 +498,11 @@ angular.module('AnalysisService',
 
           # Cycle in every entity.
           mergeEntities(entity, entities) for id, entity of entities if merge
-          #            mergeEntities(entity, entities) for id, entity of @_entities if merge
+          mergeEntities(entity, entities) for id, entity of @_entities if merge
+
+#          $log.info "[ entities :: "
+#          $log.info entities
+#          $log.info " ]"
 
           # Create text annotation instances.
           textAnnotations[id] = createTextAnnotation(item) for id, item of textAnnotations
