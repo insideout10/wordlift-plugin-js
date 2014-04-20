@@ -245,12 +245,11 @@ Otherwise a new text annotation is created</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
-              <p>Add an entity to the local collection of entities.</p>
+              <p>Holds the analysis promise, used to abort the analysis.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          <span class="hljs-attribute">addEntity</span>: <span class="hljs-function"><span class="hljs-params">(entity)</span> -&gt;</span>
-            <span class="hljs-property">@_entities</span>[entity.id] = entity</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-attribute">promise</span>: <span class="hljs-literal">undefined</span></pre></div></div>
             
         </li>
         
@@ -261,12 +260,11 @@ Otherwise a new text annotation is created</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
-              <p>Set the local entity collection.</p>
+              <p>If true, an analysis is running.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          <span class="hljs-attribute">setEntities</span>: <span class="hljs-function"><span class="hljs-params">(entities)</span> =&gt;</span>
-            <span class="hljs-property">@_entities</span> = entities</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-attribute">isRunning</span>: <span class="hljs-literal">false</span></pre></div></div>
             
         </li>
         
@@ -277,12 +275,14 @@ Otherwise a new text annotation is created</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
-              <p>Set the known types.</p>
+              <p>Add an entity to the local collection of entities.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          <span class="hljs-attribute">setKnownTypes</span>: <span class="hljs-function"><span class="hljs-params">(types)</span> =&gt;</span>
-            <span class="hljs-property">@_knownTypes</span> = types</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        service.<span class="hljs-function"><span class="hljs-title">addEntity</span> = <span class="hljs-params">(entity)</span> -&gt;</span>
+          $log.info <span class="hljs-string">"AnalysisService addEntity"</span>
+          $log.info entity
+          <span class="hljs-property">@_entities</span>[entity.id] = entity</pre></div></div>
             
         </li>
         
@@ -293,11 +293,14 @@ Otherwise a new text annotation is created</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
-              <p>Holds the analysis promise, used to abort the analysis.</p>
+              <p>Set the local entity collection.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          <span class="hljs-attribute">promise</span>: <span class="hljs-literal">undefined</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>        service.<span class="hljs-function"><span class="hljs-title">setEntities</span> = <span class="hljs-params">(entities)</span> -&gt;</span>
+          $log.info <span class="hljs-string">"AnalysisService setEntities"</span>
+          $log.info entities
+          <span class="hljs-property">@_entities</span> = entities</pre></div></div>
             
         </li>
         
@@ -308,11 +311,14 @@ Otherwise a new text annotation is created</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
-              <p>If true, an analysis is running.</p>
+              <p>Set the known types.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          <span class="hljs-attribute">isRunning</span>: <span class="hljs-literal">false</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>        service.<span class="hljs-function"><span class="hljs-title">setKnownTypes</span> = <span class="hljs-params">(types)</span> -&gt;</span>
+          $log.info <span class="hljs-string">"AnalysisService setKnownTypes"</span>
+          $log.info types
+          <span class="hljs-property">@_knownTypes</span> = types</pre></div></div>
             
         </li>
         
@@ -327,7 +333,7 @@ Otherwise a new text annotation is created</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          <span class="hljs-attribute">abort</span>:<span class="hljs-function"> -&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>        service.<span class="hljs-function"><span class="hljs-title">abort</span> = -&gt;</span></pre></div></div>
             
         </li>
         
@@ -342,7 +348,7 @@ Otherwise a new text annotation is created</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            <span class="hljs-property">@promise</span>.resolve() <span class="hljs-keyword">if</span> <span class="hljs-property">@isRunning</span> <span class="hljs-keyword">and</span> <span class="hljs-property">@promise</span>?</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-property">@promise</span>.resolve() <span class="hljs-keyword">if</span> <span class="hljs-property">@isRunning</span> <span class="hljs-keyword">and</span> <span class="hljs-property">@promise</span>?</pre></div></div>
             
         </li>
         
@@ -357,7 +363,7 @@ Otherwise a new text annotation is created</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          <span class="hljs-attribute">preselect</span>: <span class="hljs-function"><span class="hljs-params">(analysis, annotations)</span> =&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>        service.<span class="hljs-function"><span class="hljs-title">preselect</span> = <span class="hljs-params">(analysis, annotations)</span> -&gt;</span></pre></div></div>
             
         </li>
         
@@ -372,10 +378,10 @@ Otherwise a new text annotation is created</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">for</span> annotation <span class="hljs-keyword">in</span> annotations
-              textAnnotation = findOrCreateTextAnnotation analysis.textAnnotations, annotation
-              entityAnnotations = EntityAnnotationService.find textAnnotation.entityAnnotations, <span class="hljs-attribute">uri</span>: annotation.uri
-              <span class="hljs-keyword">if</span> <span class="hljs-number">0</span> &lt; entityAnnotations.length</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">for</span> annotation <span class="hljs-keyword">in</span> annotations
+            textAnnotation = findOrCreateTextAnnotation analysis.textAnnotations, annotation
+            entityAnnotations = EntityAnnotationService.find textAnnotation.entityAnnotations, <span class="hljs-attribute">uri</span>: annotation.uri
+            <span class="hljs-keyword">if</span> <span class="hljs-number">0</span> &lt; entityAnnotations.length</pre></div></div>
             
         </li>
         
@@ -390,8 +396,8 @@ Otherwise a new text annotation is created</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                entityAnnotations[<span class="hljs-number">0</span>].selected = <span class="hljs-literal">true</span>
-              <span class="hljs-keyword">else</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>              entityAnnotations[<span class="hljs-number">0</span>].selected = <span class="hljs-literal">true</span>
+            <span class="hljs-keyword">else</span></pre></div></div>
             
         </li>
         
@@ -406,7 +412,7 @@ Otherwise a new text annotation is created</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                entities = EntityService.find Helpers.merge(analysis.entities, <span class="hljs-property">@_entities</span>), <span class="hljs-attribute">uri</span>: annotation.uri</pre></div></div>
+            <div class="content"><div class='highlight'><pre>              entities = EntityService.find analysis.entities, <span class="hljs-attribute">uri</span>: annotation.uri</pre></div></div>
             
         </li>
         
@@ -417,13 +423,9 @@ Otherwise a new text annotation is created</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
-              <p>If the entity is missing raise an excpetion!</p>
-
+              <pre><code>           entities = EntityService.find <span class="hljs-property">@_entities</span>, <span class="hljs-attribute">uri</span>: annotation.uri <span class="hljs-keyword">if</span> <span class="hljs-number">0</span> <span class="hljs-keyword">is</span> entities.length
+</code></pre>
             </div>
-            
-            <div class="content"><div class='highlight'><pre>                <span class="hljs-keyword">if</span> <span class="hljs-number">0</span> <span class="hljs-keyword">is</span> entities.length
-                  $log.error <span class="hljs-string">"Missing entity in window.wordlift.entities collection!"</span>
-                  $log.info annotation</pre></div></div>
             
         </li>
         
@@ -434,11 +436,13 @@ Otherwise a new text annotation is created</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
-              <p>TODO: wouldn’t it be better to continue here instead of throwing an exception?</p>
+              <p>If the entity is missing raise an excpetion!</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                  <span class="hljs-keyword">continue</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>              <span class="hljs-keyword">if</span> <span class="hljs-number">0</span> <span class="hljs-keyword">is</span> entities.length
+                $log.error <span class="hljs-string">"Missing entity in window.wordlift.entities collection!"</span>
+                $log.info annotation</pre></div></div>
             
         </li>
         
@@ -449,11 +453,11 @@ Otherwise a new text annotation is created</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
-              <p>Use the first found entity</p>
+              <p>TODO: wouldn’t it be better to continue here instead of throwing an exception?</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                analysis.entities[annotation.uri] = entities[<span class="hljs-number">0</span>]</pre></div></div>
+            <div class="content"><div class='highlight'><pre>                <span class="hljs-keyword">continue</span></pre></div></div>
             
         </li>
         
@@ -464,18 +468,11 @@ Otherwise a new text annotation is created</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
-              <p>Create the new entityAssociation</p>
+              <p>Use the first found entity</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                ea = EntityAnnotationService.create
-                  <span class="hljs-attribute">label</span>: annotation.label
-                  <span class="hljs-attribute">confidence</span>: <span class="hljs-number">1</span>
-                  <span class="hljs-attribute">entity</span>: analysis.entities[annotation.uri]
-                  <span class="hljs-attribute">relation</span>: analysis.textAnnotations[textAnnotation.id]
-                  <span class="hljs-attribute">selected</span>: <span class="hljs-literal">true</span>
-
-                analysis.entityAnnotations[ea.id] = ea</pre></div></div>
+            <div class="content"><div class='highlight'><pre>              analysis.entities[annotation.uri] = entities[<span class="hljs-number">0</span>]</pre></div></div>
             
         </li>
         
@@ -486,11 +483,18 @@ Otherwise a new text annotation is created</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-21">&#182;</a>
               </div>
-              <p>Add a reference to the current textAssociation</p>
+              <p>Create the new entityAssociation</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                textAnnotation.entityAnnotations[ea.id] = analysis.entityAnnotations[ea.id]</pre></div></div>
+            <div class="content"><div class='highlight'><pre>              ea = EntityAnnotationService.create
+                <span class="hljs-attribute">label</span>: annotation.label
+                <span class="hljs-attribute">confidence</span>: <span class="hljs-number">1</span>
+                <span class="hljs-attribute">entity</span>: analysis.entities[annotation.uri]
+                <span class="hljs-attribute">relation</span>: analysis.textAnnotations[textAnnotation.id]
+                <span class="hljs-attribute">selected</span>: <span class="hljs-literal">true</span>
+
+              analysis.entityAnnotations[ea.id] = ea</pre></div></div>
             
         </li>
         
@@ -501,13 +505,11 @@ Otherwise a new text annotation is created</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
-              <p><a name="analyze"></a>
-Analyze the provided content. Only one analysis at a time is run.
-The merge parameter is passed to the parse call and merges together entities related via sameAs.</p>
+              <p>Add a reference to the current textAssociation</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          <span class="hljs-attribute">analyze</span>: <span class="hljs-function"><span class="hljs-params">(content, merge = <span class="hljs-literal">false</span>)</span> -&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>              textAnnotation.entityAnnotations[ea.id] = analysis.entityAnnotations[ea.id]</pre></div></div>
             
         </li>
         
@@ -518,12 +520,13 @@ The merge parameter is passed to the parse call and merges together entities rel
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
-              <pre><code>       dump <span class="hljs-string">"AnalysisService.analyze [ content :: <span class="hljs-subst">#{content}</span> ][ is running :: <span class="hljs-subst">#{<span class="hljs-property">@isRunning</span>}</span> ][ merge :: <span class="hljs-subst">#{merge}</span> ]"</span>
-</code></pre><p>Exit if an analysis is already running.</p>
+              <p><a name="analyze"></a>
+Analyze the provided content. Only one analysis at a time is run.
+The merge parameter is passed to the parse call and merges together entities related via sameAs.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">return</span> <span class="hljs-keyword">if</span> <span class="hljs-property">@isRunning</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>        service.<span class="hljs-function"><span class="hljs-title">analyze</span> = <span class="hljs-params">(content, merge = <span class="hljs-literal">false</span>)</span> -&gt;</span></pre></div></div>
             
         </li>
         
@@ -534,11 +537,12 @@ The merge parameter is passed to the parse call and merges together entities rel
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-24">&#182;</a>
               </div>
-              <p>Set that an analysis is running.</p>
+              <pre><code>       dump <span class="hljs-string">"AnalysisService.analyze [ content :: <span class="hljs-subst">#{content}</span> ][ is running :: <span class="hljs-subst">#{<span class="hljs-property">@isRunning</span>}</span> ][ merge :: <span class="hljs-subst">#{merge}</span> ]"</span>
+</code></pre><p>Exit if an analysis is already running.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            <span class="hljs-property">@isRunning</span> = <span class="hljs-literal">true</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">return</span> <span class="hljs-keyword">if</span> service.isRunning</pre></div></div>
             
         </li>
         
@@ -549,20 +553,11 @@ The merge parameter is passed to the parse call and merges together entities rel
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-25">&#182;</a>
               </div>
-              <p>Store the promise in the class to allow interrupting the request.</p>
+              <p>Set that an analysis is running.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            <span class="hljs-property">@promise</span> = $q.defer()
-
-            that = @
-
-            $http(
-              <span class="hljs-attribute">method</span>: <span class="hljs-string">'post'</span>
-              <span class="hljs-attribute">url</span>: ajaxurl + <span class="hljs-string">'?action=wordlift_analyze'</span>
-              <span class="hljs-attribute">data</span>: content
-              <span class="hljs-attribute">timeout</span>: <span class="hljs-property">@promise</span>.promise
-            )</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          service.isRunning = <span class="hljs-literal">true</span></pre></div></div>
             
         </li>
         
@@ -573,11 +568,18 @@ The merge parameter is passed to the parse call and merges together entities rel
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-26">&#182;</a>
               </div>
-              <p>If successful, broadcast an <em>analysisReceived</em> event.</p>
+              <p>Store the promise in the class to allow interrupting the request.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            .success <span class="hljs-function"><span class="hljs-params">(data)</span> -&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>          service.promise = $q.defer()
+
+          $http(
+            <span class="hljs-attribute">method</span>: <span class="hljs-string">'post'</span>
+            <span class="hljs-attribute">url</span>: ajaxurl + <span class="hljs-string">'?action=wordlift_analyze'</span>
+            <span class="hljs-attribute">data</span>: content
+            <span class="hljs-attribute">timeout</span>: service.promise.promise
+          )</pre></div></div>
             
         </li>
         
@@ -588,11 +590,11 @@ The merge parameter is passed to the parse call and merges together entities rel
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-27">&#182;</a>
               </div>
-              <pre><code>           dump <span class="hljs-string">"AnalysisService.analyze [ success ]"</span>
-</code></pre>
+              <p>If successful, broadcast an <em>analysisReceived</em> event.</p>
+
             </div>
             
-            <div class="content"><div class='highlight'><pre>                $rootScope.$broadcast ANALYSIS_EVENT, that.parse(data, merge)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          .success <span class="hljs-function"><span class="hljs-params">(data)</span> -&gt;</span></pre></div></div>
             
         </li>
         
@@ -603,13 +605,11 @@ The merge parameter is passed to the parse call and merges together entities rel
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-28">&#182;</a>
               </div>
-              <p>Set that the analysis is complete.</p>
-
+              <pre><code>           dump <span class="hljs-string">"AnalysisService.analyze [ success ]"</span>
+</code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>                that.isRunning = <span class="hljs-literal">false</span>
-
-            .error <span class="hljs-function"><span class="hljs-params">(data, status)</span> -&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>              $rootScope.$broadcast ANALYSIS_EVENT, service.parse(data, merge)</pre></div></div>
             
         </li>
         
@@ -624,11 +624,9 @@ The merge parameter is passed to the parse call and merges together entities rel
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                that.isRunning = <span class="hljs-literal">false</span>
-                $rootScope.$broadcast ANALYSIS_EVENT, <span class="hljs-literal">undefined</span>
+            <div class="content"><div class='highlight'><pre>              service.isRunning = <span class="hljs-literal">false</span>
 
-                <span class="hljs-keyword">return</span> <span class="hljs-keyword">if</span> <span class="hljs-number">0</span> <span class="hljs-keyword">is</span> status <span class="hljs-comment"># analysis aborted.</span>
-                $rootScope.$broadcast <span class="hljs-string">'error'</span>, <span class="hljs-string">'An error occurred while requesting an analysis.'</span></pre></div></div>
+          .error <span class="hljs-function"><span class="hljs-params">(data, status)</span> -&gt;</span></pre></div></div>
             
         </li>
         
@@ -639,16 +637,15 @@ The merge parameter is passed to the parse call and merges together entities rel
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-30">&#182;</a>
               </div>
-              <p>Parse the response data from the analysis request (Redlink).
-If <em>merge</em> is set to true, entity annotations and entities with matching sameAs will be merged.</p>
+              <p>Set that the analysis is complete.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          <span class="hljs-attribute">parse</span>: <span class="hljs-function"><span class="hljs-params">(data, merge = <span class="hljs-literal">false</span>)</span> =&gt;</span>
-            languages = []
-            textAnnotations = {}
-            entityAnnotations = {}
-            entities = {}</pre></div></div>
+            <div class="content"><div class='highlight'><pre>              service.isRunning = <span class="hljs-literal">false</span>
+              $rootScope.$broadcast ANALYSIS_EVENT, <span class="hljs-literal">undefined</span>
+
+              <span class="hljs-keyword">return</span> <span class="hljs-keyword">if</span> <span class="hljs-number">0</span> <span class="hljs-keyword">is</span> status <span class="hljs-comment"># analysis aborted.</span>
+              $rootScope.$broadcast <span class="hljs-string">'error'</span>, <span class="hljs-string">'An error occurred while requesting an analysis.'</span></pre></div></div>
             
         </li>
         
@@ -659,9 +656,16 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-31">&#182;</a>
               </div>
-              <p>support functions:</p>
+              <p>Parse the response data from the analysis request (Redlink).
+If <em>merge</em> is set to true, entity annotations and entities with matching sameAs will be merged.</p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre>        service.<span class="hljs-function"><span class="hljs-title">parse</span> = <span class="hljs-params">(data, merge = <span class="hljs-literal">false</span>)</span> -&gt;</span>
+          languages = []
+          textAnnotations = {}
+          entityAnnotations = {}
+          entities = {}</pre></div></div>
             
         </li>
         
@@ -672,16 +676,9 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-32">&#182;</a>
               </div>
-              <p>Get the known type given the specified types. Current supported types are:</p>
-<ul>
-<li>person</li>
-<li>organization</li>
-<li>place</li>
-</ul>
+              <p>support functions:</p>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre>            <span class="hljs-function"><span class="hljs-title">getKnownTypes</span> = <span class="hljs-params">(types)</span> =&gt;</span></pre></div></div>
             
         </li>
         
@@ -692,13 +689,16 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-33">&#182;</a>
               </div>
-              <p>An array with known types according to the specified types.</p>
+              <p>Get the known type given the specified types. Current supported types are:</p>
+<ul>
+<li>person</li>
+<li>organization</li>
+<li>place</li>
+</ul>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>              returnTypes = []
-              defaultType = <span class="hljs-literal">undefined</span>
-              <span class="hljs-keyword">for</span> kt <span class="hljs-keyword">in</span> <span class="hljs-property">@_knownTypes</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-function"><span class="hljs-title">getKnownTypes</span> = <span class="hljs-params">(types, knownTypes)</span> -&gt;</span></pre></div></div>
             
         </li>
         
@@ -709,13 +709,13 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-34">&#182;</a>
               </div>
-              <p>Set the default type, identified by an asterisk (*) in the sameAs values.</p>
+              <p>An array with known types according to the specified types.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                defaultType = [
-                  { <span class="hljs-attribute">type</span>: kt }
-                ] <span class="hljs-keyword">if</span> <span class="hljs-string">'*'</span> <span class="hljs-keyword">in</span> kt.sameAs</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            returnTypes = []
+            defaultType = <span class="hljs-literal">undefined</span>
+            <span class="hljs-keyword">for</span> kt <span class="hljs-keyword">in</span> knownTypes</pre></div></div>
             
         </li>
         
@@ -726,11 +726,13 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-35">&#182;</a>
               </div>
-              <p>Get all the URIs associated to this known type.</p>
+              <p>Set the default type, identified by an asterisk (*) in the sameAs values.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                uris = kt.sameAs.concat kt.uri</pre></div></div>
+            <div class="content"><div class='highlight'><pre>              defaultType = [
+                { <span class="hljs-attribute">type</span>: kt }
+              ] <span class="hljs-keyword">if</span> <span class="hljs-string">'*'</span> <span class="hljs-keyword">in</span> kt.sameAs</pre></div></div>
             
         </li>
         
@@ -741,12 +743,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-36">&#182;</a>
               </div>
-              <p>If there is 1+ uri in common between the known types and the provided types, then add the known type.</p>
+              <p>Get all the URIs associated to this known type.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                matches = (uri <span class="hljs-keyword">for</span> uri <span class="hljs-keyword">in</span> uris <span class="hljs-keyword">when</span> containsOrEquals(uri, types))
-                returnTypes.push { <span class="hljs-attribute">matches</span>: matches, <span class="hljs-attribute">type</span>: kt } <span class="hljs-keyword">if</span> <span class="hljs-number">0</span> &lt; matches.length</pre></div></div>
+            <div class="content"><div class='highlight'><pre>              uris = kt.sameAs.concat kt.uri</pre></div></div>
             
         </li>
         
@@ -757,11 +758,12 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-37">&#182;</a>
               </div>
-              <p>Return the defaul type if not known types have been found.</p>
+              <p>If there is 1+ uri in common between the known types and the provided types, then add the known type.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>              <span class="hljs-keyword">return</span> defaultType <span class="hljs-keyword">if</span> <span class="hljs-number">0</span> <span class="hljs-keyword">is</span> returnTypes.length</pre></div></div>
+            <div class="content"><div class='highlight'><pre>              matches = (uri <span class="hljs-keyword">for</span> uri <span class="hljs-keyword">in</span> uris <span class="hljs-keyword">when</span> containsOrEquals(uri, types))
+              returnTypes.push { <span class="hljs-attribute">matches</span>: matches, <span class="hljs-attribute">type</span>: kt } <span class="hljs-keyword">if</span> <span class="hljs-number">0</span> &lt; matches.length</pre></div></div>
             
         </li>
         
@@ -772,12 +774,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-38">&#182;</a>
               </div>
-              <p>Sort and return the match types.</p>
+              <p>Return the defaul type if not known types have been found.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>              $filter(<span class="hljs-string">'orderBy'</span>) returnTypes, <span class="hljs-string">'matches'</span>, <span class="hljs-literal">true</span>
-              returnTypes</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">return</span> defaultType <span class="hljs-keyword">if</span> <span class="hljs-number">0</span> <span class="hljs-keyword">is</span> returnTypes.length</pre></div></div>
             
         </li>
         
@@ -788,12 +789,12 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-39">&#182;</a>
               </div>
-              <p>create an entity.</p>
+              <p>Sort and return the match types.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            <span class="hljs-function"><span class="hljs-title">createEntity</span> = <span class="hljs-params">(item, language)</span> -&gt;</span>
-              id = get(<span class="hljs-string">'@id'</span>, item)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            $filter(<span class="hljs-string">'orderBy'</span>) returnTypes, <span class="hljs-string">'matches'</span>, <span class="hljs-literal">true</span>
+            returnTypes</pre></div></div>
             
         </li>
         
@@ -804,14 +805,12 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-40">&#182;</a>
               </div>
-              <p>Get the types associated with the entity.</p>
+              <p>create an entity.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>              types = get(<span class="hljs-string">'@type'</span>, item)
-              types = <span class="hljs-keyword">if</span> angular.isArray types <span class="hljs-keyword">then</span> types <span class="hljs-keyword">else</span> [ types ]
-              sameAs = get(<span class="hljs-string">'http://www.w3.org/2002/07/owl#sameAs'</span>, item)
-              sameAs = <span class="hljs-keyword">if</span> angular.isArray sameAs <span class="hljs-keyword">then</span> sameAs <span class="hljs-keyword">else</span> [ sameAs ]</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-function"><span class="hljs-title">createEntity</span> = <span class="hljs-params">(item, language)</span> -&gt;</span>
+            id = get(<span class="hljs-string">'@id'</span>, item)</pre></div></div>
             
         </li>
         
@@ -822,9 +821,14 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-41">&#182;</a>
               </div>
-              <pre><code>   <span class="hljs-built_in">console</span>.log <span class="hljs-string">"createEntity [ id :: <span class="hljs-subst">#{id}</span> ][ language :: <span class="hljs-subst">#{language}</span> ][ types :: <span class="hljs-subst">#{types}</span> ][ sameAs :: <span class="hljs-subst">#{sameAs}</span> ]"</span>
-</code></pre>
+              <p>Get the types associated with the entity.</p>
+
             </div>
+            
+            <div class="content"><div class='highlight'><pre>            types = get(<span class="hljs-string">'@type'</span>, item)
+            types = <span class="hljs-keyword">if</span> angular.isArray types <span class="hljs-keyword">then</span> types <span class="hljs-keyword">else</span> [ types ]
+            sameAs = get(<span class="hljs-string">'http://www.w3.org/2002/07/owl#sameAs'</span>, item)
+            sameAs = <span class="hljs-keyword">if</span> angular.isArray sameAs <span class="hljs-keyword">then</span> sameAs <span class="hljs-keyword">else</span> [ sameAs ]</pre></div></div>
             
         </li>
         
@@ -835,24 +839,9 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-42">&#182;</a>
               </div>
-              <p>Get all the thumbnails; for each thumbnail execute the provided function.</p>
-
+              <pre><code>   <span class="hljs-built_in">console</span>.log <span class="hljs-string">"createEntity [ id :: <span class="hljs-subst">#{id}</span> ][ language :: <span class="hljs-subst">#{language}</span> ][ types :: <span class="hljs-subst">#{types}</span> ][ sameAs :: <span class="hljs-subst">#{sameAs}</span> ]"</span>
+</code></pre>
             </div>
-            
-            <div class="content"><div class='highlight'><pre>              thumbnails = get(
-                [
-                  <span class="hljs-string">'http://xmlns.com/foaf/0.1/depiction'</span>
-                  <span class="hljs-string">"<span class="hljs-subst">#{FREEBASE_NS}</span>common.topic.image"</span>
-                  <span class="hljs-string">"<span class="hljs-subst">#{SCHEMA_ORG}</span>image"</span>
-                ],
-                item,
-              <span class="hljs-function"><span class="hljs-params">(values)</span> -&gt;</span>
-                values = <span class="hljs-keyword">if</span> angular.isArray values <span class="hljs-keyword">then</span> values <span class="hljs-keyword">else</span> [ values ]
-                <span class="hljs-keyword">for</span> value <span class="hljs-keyword">in</span> values
-                  match = <span class="hljs-regexp">/m\.(.*)$/i</span>.exec value
-                  <span class="hljs-keyword">if</span> <span class="hljs-literal">null</span> <span class="hljs-keyword">is</span> match
-                    value
-                  <span class="hljs-keyword">else</span></pre></div></div>
             
         </li>
         
@@ -863,12 +852,24 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-43">&#182;</a>
               </div>
-              <p>If it’s a Freebase URL normalize the link to the image.</p>
+              <p>Get all the thumbnails; for each thumbnail execute the provided function.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                    <span class="hljs-string">"https://usercontent.googleapis.com/<span class="hljs-subst">#{FREEBASE}</span>/v1/image/m/<span class="hljs-subst">#{match[<span class="hljs-number">1</span>]}</span>?maxwidth=4096&amp;maxheight=4096"</span>
-              )</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            thumbnails = get(
+              [
+                <span class="hljs-string">'http://xmlns.com/foaf/0.1/depiction'</span>
+                <span class="hljs-string">"<span class="hljs-subst">#{FREEBASE_NS}</span>common.topic.image"</span>
+                <span class="hljs-string">"<span class="hljs-subst">#{SCHEMA_ORG}</span>image"</span>
+              ],
+              item,
+            <span class="hljs-function"><span class="hljs-params">(values)</span> -&gt;</span>
+              values = <span class="hljs-keyword">if</span> angular.isArray values <span class="hljs-keyword">then</span> values <span class="hljs-keyword">else</span> [ values ]
+              <span class="hljs-keyword">for</span> value <span class="hljs-keyword">in</span> values
+                match = <span class="hljs-regexp">/m\.(.*)$/i</span>.exec value
+                <span class="hljs-keyword">if</span> <span class="hljs-literal">null</span> <span class="hljs-keyword">is</span> match
+                  value
+                <span class="hljs-keyword">else</span></pre></div></div>
             
         </li>
         
@@ -879,11 +880,12 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-44">&#182;</a>
               </div>
-              <p>Get the known types.</p>
+              <p>If it’s a Freebase URL normalize the link to the image.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>              knownTypes = getKnownTypes(types)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>                  <span class="hljs-string">"https://usercontent.googleapis.com/<span class="hljs-subst">#{FREEBASE}</span>/v1/image/m/<span class="hljs-subst">#{match[<span class="hljs-number">1</span>]}</span>?maxwidth=4096&amp;maxheight=4096"</span>
+            )</pre></div></div>
             
         </li>
         
@@ -894,11 +896,15 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-45">&#182;</a>
               </div>
-              <p>Get the stylesheet classes.</p>
+              <p>Get the known types.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>              css = knownTypes[<span class="hljs-number">0</span>].type.css</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            $log.info <span class="hljs-string">"AnalysisService.parse [ known types :: "</span>
+            $log.info service
+            $log.info service._knownTypes
+            $log.info <span class="hljs-string">" ]"</span>
+            knownTypes = getKnownTypes(types, service._knownTypes)</pre></div></div>
             
         </li>
         
@@ -909,43 +915,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-46">&#182;</a>
               </div>
-              <p>create the entity model.</p>
+              <p>Get the stylesheet classes.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>              entity =
-                <span class="hljs-attribute">id</span>: id
-                <span class="hljs-attribute">thumbnail</span>: <span class="hljs-keyword">if</span> <span class="hljs-number">0</span> &lt; thumbnails.length <span class="hljs-keyword">then</span> thumbnails[<span class="hljs-number">0</span>] <span class="hljs-keyword">else</span> <span class="hljs-literal">null</span>
-                <span class="hljs-attribute">thumbnails</span>: thumbnails
-                <span class="hljs-attribute">css</span>: css
-                <span class="hljs-attribute">type</span>: knownTypes[<span class="hljs-number">0</span>].type.uri <span class="hljs-comment"># This is the main type for the entity.</span>
-                <span class="hljs-attribute">types</span>: types
-                <span class="hljs-attribute">label</span>: getLanguage(RDFS_LABEL, item, language)
-                <span class="hljs-attribute">labels</span>: get(RDFS_LABEL, item)
-                <span class="hljs-attribute">sameAs</span>: sameAs
-                <span class="hljs-attribute">source</span>: <span class="hljs-keyword">if</span> id.match(<span class="hljs-string">"^<span class="hljs-subst">#{FREEBASE_COM}</span>.*$"</span>)
-                  FREEBASE
-                <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> id.match(<span class="hljs-string">"^<span class="hljs-subst">#{DBPEDIA_ORG_REGEX}</span>.*$"</span>)
-                  DBPEDIA
-                <span class="hljs-keyword">else</span>
-                  <span class="hljs-string">'wordlift'</span>
-                <span class="hljs-attribute">_item</span>: item
-
-              entity.description = getLanguage(
-                [
-                  RDFS_COMMENT
-                  FREEBASE_NS_DESCRIPTION
-                  SCHEMA_ORG_DESCRIPTION
-                ], item, language
-              )
-              entity.descriptions = get(
-                [
-                  RDFS_COMMENT
-                  FREEBASE_NS_DESCRIPTION
-                  SCHEMA_ORG_DESCRIPTION
-                ],
-                item
-              )</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            css = knownTypes[<span class="hljs-number">0</span>].type.css</pre></div></div>
             
         </li>
         
@@ -956,17 +930,43 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-47">&#182;</a>
               </div>
-              <p>Avoid null in entity description.</p>
+              <p>create the entity model.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>              entity.description = <span class="hljs-string">''</span> <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> entity.description?
+            <div class="content"><div class='highlight'><pre>            entity =
+              <span class="hljs-attribute">id</span>: id
+              <span class="hljs-attribute">thumbnail</span>: <span class="hljs-keyword">if</span> <span class="hljs-number">0</span> &lt; thumbnails.length <span class="hljs-keyword">then</span> thumbnails[<span class="hljs-number">0</span>] <span class="hljs-keyword">else</span> <span class="hljs-literal">null</span>
+              <span class="hljs-attribute">thumbnails</span>: thumbnails
+              <span class="hljs-attribute">css</span>: css
+              <span class="hljs-attribute">type</span>: knownTypes[<span class="hljs-number">0</span>].type.uri <span class="hljs-comment"># This is the main type for the entity.</span>
+              <span class="hljs-attribute">types</span>: types
+              <span class="hljs-attribute">label</span>: getLanguage(RDFS_LABEL, item, language)
+              <span class="hljs-attribute">labels</span>: get(RDFS_LABEL, item)
+              <span class="hljs-attribute">sameAs</span>: sameAs
+              <span class="hljs-attribute">source</span>: <span class="hljs-keyword">if</span> id.match(<span class="hljs-string">"^<span class="hljs-subst">#{FREEBASE_COM}</span>.*$"</span>)
+                FREEBASE
+              <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> id.match(<span class="hljs-string">"^<span class="hljs-subst">#{DBPEDIA_ORG_REGEX}</span>.*$"</span>)
+                DBPEDIA
+              <span class="hljs-keyword">else</span>
+                <span class="hljs-string">'wordlift'</span>
+              <span class="hljs-attribute">_item</span>: item
 
-              entity.latitude = get <span class="hljs-string">"<span class="hljs-subst">#{WGS84_POS}</span>lat"</span>, item
-              entity.longitude = get <span class="hljs-string">"<span class="hljs-subst">#{WGS84_POS}</span>long"</span>, item
-              <span class="hljs-keyword">if</span> <span class="hljs-number">0</span> <span class="hljs-keyword">is</span> entity.latitude.length <span class="hljs-keyword">or</span> <span class="hljs-number">0</span> <span class="hljs-keyword">is</span> entity.longitude.length
-                entity.latitude = <span class="hljs-string">''</span>
-                entity.longitude = <span class="hljs-string">''</span></pre></div></div>
+            entity.description = getLanguage(
+              [
+                RDFS_COMMENT
+                FREEBASE_NS_DESCRIPTION
+                SCHEMA_ORG_DESCRIPTION
+              ], item, language
+            )
+            entity.descriptions = get(
+              [
+                RDFS_COMMENT
+                FREEBASE_NS_DESCRIPTION
+                SCHEMA_ORG_DESCRIPTION
+              ],
+              item
+            )</pre></div></div>
             
         </li>
         
@@ -976,6 +976,27 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-48">&#182;</a>
+              </div>
+              <p>Avoid null in entity description.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            entity.description = <span class="hljs-string">''</span> <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> entity.description?
+
+            entity.latitude = get <span class="hljs-string">"<span class="hljs-subst">#{WGS84_POS}</span>lat"</span>, item
+            entity.longitude = get <span class="hljs-string">"<span class="hljs-subst">#{WGS84_POS}</span>long"</span>, item
+            <span class="hljs-keyword">if</span> <span class="hljs-number">0</span> <span class="hljs-keyword">is</span> entity.latitude.length <span class="hljs-keyword">or</span> <span class="hljs-number">0</span> <span class="hljs-keyword">is</span> entity.longitude.length
+              entity.latitude = <span class="hljs-string">''</span>
+              entity.longitude = <span class="hljs-string">''</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-49">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-49">&#182;</a>
               </div>
               <p>Check if thumbnails exists.
        if thumbnails? and angular.isArray thumbnails
@@ -992,33 +1013,18 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
         </li>
         
         
-        <li id="section-49">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-49">&#182;</a>
-              </div>
-              <p>return the entity.
-       console.log “createEntity [ entity id :: #{entity.id} ][ language :: #{language} ][ types :: #{types} ][ sameAs :: #{sameAs} ]”</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>              entity</pre></div></div>
-            
-        </li>
-        
-        
         <li id="section-50">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-50">&#182;</a>
               </div>
-              <p>Create an entity annotation. An entity annotation is created for each related text-annotation.</p>
+              <p>return the entity.
+       console.log “createEntity [ entity id :: #{entity.id} ][ language :: #{language} ][ types :: #{types} ][ sameAs :: #{sameAs} ]”</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            <span class="hljs-function"><span class="hljs-title">createEntityAnnotations</span> = <span class="hljs-params">(item, language)</span> -&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>            entity</pre></div></div>
             
         </li>
         
@@ -1029,11 +1035,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-51">&#182;</a>
               </div>
-              <p>Get the reference to the entity.</p>
+              <p>Create an entity annotation. An entity annotation is created for each related text-annotation.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>              reference = get <span class="hljs-string">"<span class="hljs-subst">#{FISE_ONT}</span>entity-reference"</span>, item</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-function"><span class="hljs-title">createEntityAnnotations</span> = <span class="hljs-params">(item, language)</span> -&gt;</span></pre></div></div>
             
         </li>
         
@@ -1044,11 +1050,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-52">&#182;</a>
               </div>
-              <p>If the referenced entity is not found, return null</p>
+              <p>Get the reference to the entity.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>              <span class="hljs-keyword">return</span> [] <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> entities[reference]?</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            reference = get <span class="hljs-string">"<span class="hljs-subst">#{FISE_ONT}</span>entity-reference"</span>, item</pre></div></div>
             
         </li>
         
@@ -1059,11 +1065,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-53">&#182;</a>
               </div>
-              <p>Prepare the return array.</p>
+              <p>If the referenced entity is not found, return null</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>              annotations = []</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">return</span> [] <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> entities[reference]?</pre></div></div>
             
         </li>
         
@@ -1074,11 +1080,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-54">&#182;</a>
               </div>
-              <p>get the related text annotation.</p>
+              <p>Prepare the return array.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>              relations = get <span class="hljs-string">"<span class="hljs-subst">#{DCTERMS}</span>relation"</span>, item</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            annotations = []</pre></div></div>
             
         </li>
         
@@ -1089,11 +1095,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-55">&#182;</a>
               </div>
-              <p>Ensure we’re dealing with an array.</p>
+              <p>get the related text annotation.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>              relations = <span class="hljs-keyword">if</span> angular.isArray relations <span class="hljs-keyword">then</span> relations <span class="hljs-keyword">else</span> [ relations ]</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            relations = get <span class="hljs-string">"<span class="hljs-subst">#{DCTERMS}</span>relation"</span>, item</pre></div></div>
             
         </li>
         
@@ -1104,12 +1110,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-56">&#182;</a>
               </div>
-              <p>For each text annotation bound to this entity annotation, create an entity annotation and add it to the text annotation.</p>
+              <p>Ensure we’re dealing with an array.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>              <span class="hljs-keyword">for</span> relation <span class="hljs-keyword">in</span> relations
-                textAnnotation = textAnnotations[relation]</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            relations = <span class="hljs-keyword">if</span> angular.isArray relations <span class="hljs-keyword">then</span> relations <span class="hljs-keyword">else</span> [ relations ]</pre></div></div>
             
         </li>
         
@@ -1120,17 +1125,12 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-57">&#182;</a>
               </div>
-              <p>Create an entity annotation.</p>
+              <p>For each text annotation bound to this entity annotation, create an entity annotation and add it to the text annotation.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                entityAnnotation = EntityAnnotationService.create
-                  <span class="hljs-attribute">id</span>: get <span class="hljs-string">'@id'</span>, item
-                  <span class="hljs-attribute">label</span>: getLanguage <span class="hljs-string">"<span class="hljs-subst">#{FISE_ONT}</span>entity-label"</span>, item, language
-                  <span class="hljs-attribute">confidence</span>: get FISE_ONT_CONFIDENCE, item
-                  <span class="hljs-attribute">entity</span>: entities[reference]
-                  <span class="hljs-attribute">relation</span>: textAnnotation
-                  <span class="hljs-attribute">_item</span>: item</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">for</span> relation <span class="hljs-keyword">in</span> relations
+              textAnnotation = textAnnotations[relation]</pre></div></div>
             
         </li>
         
@@ -1141,11 +1141,17 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-58">&#182;</a>
               </div>
-              <p>Create a binding from the textannotation to the entity annotation.</p>
+              <p>Create an entity annotation.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                textAnnotation.entityAnnotations[entityAnnotation.id] = entityAnnotation <span class="hljs-keyword">if</span> textAnnotation?</pre></div></div>
+            <div class="content"><div class='highlight'><pre>              entityAnnotation = EntityAnnotationService.create
+                <span class="hljs-attribute">id</span>: get <span class="hljs-string">'@id'</span>, item
+                <span class="hljs-attribute">label</span>: getLanguage <span class="hljs-string">"<span class="hljs-subst">#{FISE_ONT}</span>entity-label"</span>, item, language
+                <span class="hljs-attribute">confidence</span>: get FISE_ONT_CONFIDENCE, item
+                <span class="hljs-attribute">entity</span>: entities[reference]
+                <span class="hljs-attribute">relation</span>: textAnnotation
+                <span class="hljs-attribute">_item</span>: item</pre></div></div>
             
         </li>
         
@@ -1156,11 +1162,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-59">&#182;</a>
               </div>
-              <p>Accumulate the annotations.</p>
+              <p>Create a binding from the textannotation to the entity annotation.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                annotations.push entityAnnotation</pre></div></div>
+            <div class="content"><div class='highlight'><pre>              textAnnotation.entityAnnotations[entityAnnotation.id] = entityAnnotation <span class="hljs-keyword">if</span> textAnnotation?</pre></div></div>
             
         </li>
         
@@ -1171,29 +1177,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-60">&#182;</a>
               </div>
-              <p>Return the  entity annotations.</p>
+              <p>Accumulate the annotations.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>              annotations
-
-
-            <span class="hljs-function"><span class="hljs-title">createTextAnnotation</span> = <span class="hljs-params">(item)</span> -&gt;</span>
-              TextAnnotationService.create
-                <span class="hljs-attribute">id</span>: get(<span class="hljs-string">'@id'</span>, item)
-                <span class="hljs-attribute">text</span>: get(<span class="hljs-string">"<span class="hljs-subst">#{FISE_ONT}</span>selected-text"</span>, item)[VALUE]
-                <span class="hljs-attribute">start</span>: get <span class="hljs-string">"<span class="hljs-subst">#{FISE_ONT}</span>start"</span>, item
-                <span class="hljs-attribute">end</span>: get <span class="hljs-string">"<span class="hljs-subst">#{FISE_ONT}</span>end"</span>, item
-                <span class="hljs-attribute">confidence</span>: get FISE_ONT_CONFIDENCE, item
-                <span class="hljs-attribute">entityAnnotations</span>: {}
-                <span class="hljs-attribute">_item</span>: item
-
-            <span class="hljs-function"><span class="hljs-title">createLanguage</span> = <span class="hljs-params">(item)</span> -&gt;</span>
-              {
-              <span class="hljs-attribute">code</span>: get <span class="hljs-string">"<span class="hljs-subst">#{DCTERMS}</span>language"</span>, item
-              <span class="hljs-attribute">confidence</span>: get FISE_ONT_CONFIDENCE, item
-              <span class="hljs-attribute">_item</span>: item
-              }</pre></div></div>
+            <div class="content"><div class='highlight'><pre>              annotations.push entityAnnotation</pre></div></div>
             
         </li>
         
@@ -1204,11 +1192,29 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-61">&#182;</a>
               </div>
-              <p>Get the values associated with the specified key(s). Keys are expanded.</p>
+              <p>Return the  entity annotations.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            <span class="hljs-function"><span class="hljs-title">get</span> = <span class="hljs-params">(what, container, filter)</span> -&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>            annotations
+
+
+          <span class="hljs-function"><span class="hljs-title">createTextAnnotation</span> = <span class="hljs-params">(item)</span> -&gt;</span>
+            TextAnnotationService.create
+              <span class="hljs-attribute">id</span>: get(<span class="hljs-string">'@id'</span>, item)
+              <span class="hljs-attribute">text</span>: get(<span class="hljs-string">"<span class="hljs-subst">#{FISE_ONT}</span>selected-text"</span>, item)[VALUE]
+              <span class="hljs-attribute">start</span>: get <span class="hljs-string">"<span class="hljs-subst">#{FISE_ONT}</span>start"</span>, item
+              <span class="hljs-attribute">end</span>: get <span class="hljs-string">"<span class="hljs-subst">#{FISE_ONT}</span>end"</span>, item
+              <span class="hljs-attribute">confidence</span>: get FISE_ONT_CONFIDENCE, item
+              <span class="hljs-attribute">entityAnnotations</span>: {}
+              <span class="hljs-attribute">_item</span>: item
+
+          <span class="hljs-function"><span class="hljs-title">createLanguage</span> = <span class="hljs-params">(item)</span> -&gt;</span>
+            {
+            <span class="hljs-attribute">code</span>: get <span class="hljs-string">"<span class="hljs-subst">#{DCTERMS}</span>language"</span>, item
+            <span class="hljs-attribute">confidence</span>: get FISE_ONT_CONFIDENCE, item
+            <span class="hljs-attribute">_item</span>: item
+            }</pre></div></div>
             
         </li>
         
@@ -1219,11 +1225,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-62">&#182;</a>
               </div>
-              <p>If it’s a single key, call getA</p>
+              <p>Get the values associated with the specified key(s). Keys are expanded.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>              <span class="hljs-keyword">return</span> getA(what, container, filter) <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> angular.isArray what</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-function"><span class="hljs-title">get</span> = <span class="hljs-params">(what, container, filter)</span> -&gt;</span></pre></div></div>
             
         </li>
         
@@ -1234,11 +1240,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-63">&#182;</a>
               </div>
-              <p>Prepare the return array.</p>
+              <p>If it’s a single key, call getA</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>              values = []</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">return</span> getA(what, container, filter) <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> angular.isArray what</pre></div></div>
             
         </li>
         
@@ -1249,12 +1255,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-64">&#182;</a>
               </div>
-              <p>For each key, add the result.</p>
+              <p>Prepare the return array.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>              <span class="hljs-keyword">for</span> key <span class="hljs-keyword">in</span> what
-                add = getA(key, container, filter)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            values = []</pre></div></div>
             
         </li>
         
@@ -1265,11 +1270,12 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-65">&#182;</a>
               </div>
-              <p>Ensure the result is an array.</p>
+              <p>For each key, add the result.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                add = <span class="hljs-keyword">if</span> angular.isArray add <span class="hljs-keyword">then</span> add <span class="hljs-keyword">else</span> [ add ]</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">for</span> key <span class="hljs-keyword">in</span> what
+              add = getA(key, container, filter)</pre></div></div>
             
         </li>
         
@@ -1280,11 +1286,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-66">&#182;</a>
               </div>
-              <p>Merge unique the results.</p>
+              <p>Ensure the result is an array.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                mergeUnique values, add</pre></div></div>
+            <div class="content"><div class='highlight'><pre>              add = <span class="hljs-keyword">if</span> angular.isArray add <span class="hljs-keyword">then</span> add <span class="hljs-keyword">else</span> [ add ]</pre></div></div>
             
         </li>
         
@@ -1295,11 +1301,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-67">&#182;</a>
               </div>
-              <p>Return the result array.</p>
+              <p>Merge unique the results.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>              values</pre></div></div>
+            <div class="content"><div class='highlight'><pre>              mergeUnique values, add</pre></div></div>
             
         </li>
         
@@ -1310,12 +1316,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-68">&#182;</a>
               </div>
-              <p>Get the values associated with the specified key. Keys are expanded.</p>
+              <p>Return the result array.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            <span class="hljs-function"><span class="hljs-title">getA</span> = <span class="hljs-params">(what, container, filter = (a) -&gt;
-              a)</span> -&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>            values</pre></div></div>
             
         </li>
         
@@ -1326,11 +1331,12 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-69">&#182;</a>
               </div>
-              <p>expand the what key.</p>
+              <p>Get the values associated with the specified key. Keys are expanded.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>              whatExp = expand(what)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-function"><span class="hljs-title">getA</span> = <span class="hljs-params">(what, container, filter = (a) -&gt;
+            a)</span> -&gt;</span></pre></div></div>
             
         </li>
         
@@ -1341,13 +1347,11 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-70">&#182;</a>
               </div>
-              <p>return the value bound to the specified key.
-       console.log “[ what exp :: #{whatExp} ][ key :: #{expand key} ][ value :: #{value} ][ match :: #{whatExp is expand(key)} ]” for key, value of container</p>
+              <p>expand the what key.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>              <span class="hljs-keyword">return</span> filter(value) <span class="hljs-keyword">for</span> key, value <span class="hljs-keyword">of</span> container <span class="hljs-keyword">when</span> whatExp <span class="hljs-keyword">is</span> expand(key)
-              []</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            whatExp = expand(what)</pre></div></div>
             
         </li>
         
@@ -1358,12 +1362,13 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-71">&#182;</a>
               </div>
-              <p>get the value for specified property (what) in the provided container in the specified language.
-items must conform to {‘@language’:…, ‘@value’:…} format.</p>
+              <p>return the value bound to the specified key.
+       console.log “[ what exp :: #{whatExp} ][ key :: #{expand key} ][ value :: #{value} ][ match :: #{whatExp is expand(key)} ]” for key, value of container</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            <span class="hljs-function"><span class="hljs-title">getLanguage</span> = <span class="hljs-params">(what, container, language)</span> -&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">return</span> filter(value) <span class="hljs-keyword">for</span> key, value <span class="hljs-keyword">of</span> container <span class="hljs-keyword">when</span> whatExp <span class="hljs-keyword">is</span> expand(key)
+            []</pre></div></div>
             
         </li>
         
@@ -1374,11 +1379,12 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-72">&#182;</a>
               </div>
-              <p>if there’s no item return null.</p>
+              <p>get the value for specified property (what) in the provided container in the specified language.
+items must conform to {‘@language’:…, ‘@value’:…} format.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>              <span class="hljs-keyword">return</span> <span class="hljs-keyword">if</span> <span class="hljs-literal">null</span> <span class="hljs-keyword">is</span> items = get(what, container)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-function"><span class="hljs-title">getLanguage</span> = <span class="hljs-params">(what, container, language)</span> -&gt;</span></pre></div></div>
             
         </li>
         
@@ -1389,11 +1395,11 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-73">&#182;</a>
               </div>
-              <p>transform to an array if it’s not already.</p>
+              <p>if there’s no item return null.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>              items = <span class="hljs-keyword">if</span> angular.isArray items <span class="hljs-keyword">then</span> items <span class="hljs-keyword">else</span> [ items ]</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">return</span> <span class="hljs-keyword">if</span> <span class="hljs-literal">null</span> <span class="hljs-keyword">is</span> items = get(what, container)</pre></div></div>
             
         </li>
         
@@ -1404,11 +1410,11 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-74">&#182;</a>
               </div>
-              <p>cycle through the array.</p>
+              <p>transform to an array if it’s not already.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>              <span class="hljs-keyword">return</span> item[VALUE] <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> items <span class="hljs-keyword">when</span> language <span class="hljs-keyword">is</span> item[<span class="hljs-string">'@language'</span>]</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            items = <span class="hljs-keyword">if</span> angular.isArray items <span class="hljs-keyword">then</span> items <span class="hljs-keyword">else</span> [ items ]</pre></div></div>
             
         </li>
         
@@ -1419,13 +1425,11 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-75">&#182;</a>
               </div>
-              <p>if not found return the english value.</p>
+              <p>cycle through the array.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>              <span class="hljs-keyword">return</span> item[VALUE] <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> items <span class="hljs-keyword">when</span> <span class="hljs-string">'en'</span> <span class="hljs-keyword">is</span> item[<span class="hljs-string">'@language'</span>]
-
-            <span class="hljs-function"><span class="hljs-title">containsOrEquals</span> = <span class="hljs-params">(what, where)</span> -&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">return</span> item[VALUE] <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> items <span class="hljs-keyword">when</span> language <span class="hljs-keyword">is</span> item[<span class="hljs-string">'@language'</span>]</pre></div></div>
             
         </li>
         
@@ -1436,12 +1440,13 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-76">&#182;</a>
               </div>
-              <pre><code>   dump <span class="hljs-string">"containsOrEquals [ what :: <span class="hljs-subst">#{what}</span> ][ where :: <span class="hljs-subst">#{where}</span> ]"</span>
-</code></pre><p>if where is not defined return false.</p>
+              <p>if not found return the english value.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>              <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span> <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> where?</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">return</span> item[VALUE] <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> items <span class="hljs-keyword">when</span> <span class="hljs-string">'en'</span> <span class="hljs-keyword">is</span> item[<span class="hljs-string">'@language'</span>]
+
+          <span class="hljs-function"><span class="hljs-title">containsOrEquals</span> = <span class="hljs-params">(what, where)</span> -&gt;</span></pre></div></div>
             
         </li>
         
@@ -1452,11 +1457,12 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-77">&#182;</a>
               </div>
-              <p>ensure the where argument is an array.</p>
+              <pre><code>   dump <span class="hljs-string">"containsOrEquals [ what :: <span class="hljs-subst">#{what}</span> ][ where :: <span class="hljs-subst">#{where}</span> ]"</span>
+</code></pre><p>if where is not defined return false.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>              whereArray = <span class="hljs-keyword">if</span> angular.isArray where <span class="hljs-keyword">then</span> where <span class="hljs-keyword">else</span> [ where ]</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span> <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> where?</pre></div></div>
             
         </li>
         
@@ -1467,12 +1473,11 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-78">&#182;</a>
               </div>
-              <p>expand the what string.</p>
+              <p>ensure the where argument is an array.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>              whatExp = expand(what)
-              <span class="hljs-keyword">if</span> <span class="hljs-string">'@'</span> <span class="hljs-keyword">is</span> what.charAt(<span class="hljs-number">0</span>)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            whereArray = <span class="hljs-keyword">if</span> angular.isArray where <span class="hljs-keyword">then</span> where <span class="hljs-keyword">else</span> [ where ]</pre></div></div>
             
         </li>
         
@@ -1483,12 +1488,12 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-79">&#182;</a>
               </div>
-              <p>return true if the string is found.</p>
+              <p>expand the what string.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span> <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> whereArray <span class="hljs-keyword">when</span> whatExp <span class="hljs-keyword">is</span> expand(item)
-              <span class="hljs-keyword">else</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>            whatExp = expand(what)
+            <span class="hljs-keyword">if</span> <span class="hljs-string">'@'</span> <span class="hljs-keyword">is</span> what.charAt(<span class="hljs-number">0</span>)</pre></div></div>
             
         </li>
         
@@ -1503,7 +1508,8 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span> <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> whereArray <span class="hljs-keyword">when</span> whatExp <span class="hljs-keyword">is</span> expand(item)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>              <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span> <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> whereArray <span class="hljs-keyword">when</span> whatExp <span class="hljs-keyword">is</span> expand(item)
+            <span class="hljs-keyword">else</span></pre></div></div>
             
         </li>
         
@@ -1514,19 +1520,11 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-81">&#182;</a>
               </div>
-              <p>otherwise false.</p>
+              <p>return true if the string is found.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>              <span class="hljs-literal">false</span>
-
-            <span class="hljs-function"><span class="hljs-title">mergeUnique</span> = <span class="hljs-params">(array1, array2)</span> -&gt;</span>
-              array1.push item <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> array2 <span class="hljs-keyword">when</span> item <span class="hljs-keyword">not</span> <span class="hljs-keyword">in</span> array1
-
-            <span class="hljs-function"><span class="hljs-title">mergeEntities</span> = <span class="hljs-params">(entity, entities)</span> -&gt;</span>
-              <span class="hljs-keyword">for</span> sameAs <span class="hljs-keyword">in</span> entity.sameAs
-                <span class="hljs-keyword">if</span> entities[sameAs]? <span class="hljs-keyword">and</span> entities[sameAs] <span class="hljs-keyword">isnt</span> entity
-                  existing = entities[sameAs]</pre></div></div>
+            <div class="content"><div class='highlight'><pre>              <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span> <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> whereArray <span class="hljs-keyword">when</span> whatExp <span class="hljs-keyword">is</span> expand(item)</pre></div></div>
             
         </li>
         
@@ -1537,13 +1535,20 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-82">&#182;</a>
               </div>
-              <p>TODO: make concats unique.</p>
+              <p>otherwise false.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                  mergeUnique(entity.sameAs, existing.sameAs)
-                  mergeUnique(entity.thumbnails, existing.thumbnails)
-                  entity.source += <span class="hljs-string">", <span class="hljs-subst">#{existing.source}</span>"</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-literal">false</span>
+
+          <span class="hljs-function"><span class="hljs-title">mergeUnique</span> = <span class="hljs-params">(array1, array2)</span> -&gt;</span>
+            array1 = [] <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> array1?
+            array1.push item <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> array2 <span class="hljs-keyword">when</span> item <span class="hljs-keyword">not</span> <span class="hljs-keyword">in</span> array1
+
+          <span class="hljs-function"><span class="hljs-title">mergeEntities</span> = <span class="hljs-params">(entity, entities)</span> -&gt;</span>
+            <span class="hljs-keyword">for</span> sameAs <span class="hljs-keyword">in</span> entity.sameAs
+              <span class="hljs-keyword">if</span> entities[sameAs]? <span class="hljs-keyword">and</span> entities[sameAs] <span class="hljs-keyword">isnt</span> entity
+                existing = entities[sameAs]</pre></div></div>
             
         </li>
         
@@ -1554,14 +1559,13 @@ items must conform to {‘@language’:…, ‘@value’:…} format.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-83">&#182;</a>
               </div>
-              <p>Prefer the DBpedia description.
-TODO: have a user-set priority.</p>
+              <p>TODO: make concats unique.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                  entity.description = existing.description <span class="hljs-keyword">if</span> DBPEDIA <span class="hljs-keyword">is</span> existing.source
-                  entity.longitude = existing.longitude <span class="hljs-keyword">if</span> DBPEDIA <span class="hljs-keyword">is</span> existing.source <span class="hljs-keyword">and</span> existing.longitude?
-                  entity.latitude = existing.latitude <span class="hljs-keyword">if</span> DBPEDIA <span class="hljs-keyword">is</span> existing.source <span class="hljs-keyword">and</span> existing.latitude?</pre></div></div>
+            <div class="content"><div class='highlight'><pre>                mergeUnique(entity.sameAs, existing.sameAs)
+                mergeUnique(entity.thumbnails, existing.thumbnails)
+                entity.source += <span class="hljs-string">", <span class="hljs-subst">#{existing.source}</span>"</span></pre></div></div>
             
         </li>
         
@@ -1572,13 +1576,14 @@ TODO: have a user-set priority.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-84">&#182;</a>
               </div>
-              <p>Delete the sameAs entity from the index.</p>
+              <p>Prefer the DBpedia description.
+TODO: have a user-set priority.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                  entities[sameAs] = entity
-                  mergeEntities entity, entities
-              entity</pre></div></div>
+            <div class="content"><div class='highlight'><pre>                entity.description = existing.description <span class="hljs-keyword">if</span> DBPEDIA <span class="hljs-keyword">is</span> existing.source
+                entity.longitude = existing.longitude <span class="hljs-keyword">if</span> DBPEDIA <span class="hljs-keyword">is</span> existing.source <span class="hljs-keyword">and</span> existing.longitude?
+                entity.latitude = existing.latitude <span class="hljs-keyword">if</span> DBPEDIA <span class="hljs-keyword">is</span> existing.source <span class="hljs-keyword">and</span> existing.latitude?</pre></div></div>
             
         </li>
         
@@ -1589,11 +1594,13 @@ TODO: have a user-set priority.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-85">&#182;</a>
               </div>
-              <p>expand a string to a full path if it contains a prefix.</p>
+              <p>Delete the sameAs entity from the index.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            <span class="hljs-function"><span class="hljs-title">expand</span> = <span class="hljs-params">(content)</span> -&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>                entities[sameAs] = entity
+                mergeEntities entity, entities
+            entity</pre></div></div>
             
         </li>
         
@@ -1604,14 +1611,11 @@ TODO: have a user-set priority.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-86">&#182;</a>
               </div>
-              <p>if there’s no prefix, return the original string.</p>
+              <p>expand a string to a full path if it contains a prefix.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>              <span class="hljs-keyword">if</span> <span class="hljs-literal">null</span> <span class="hljs-keyword">is</span> matches = content.match(<span class="hljs-regexp">/([\w|\d]+):(.*)/</span>)
-                prefix = content
-                path = <span class="hljs-string">''</span>
-              <span class="hljs-keyword">else</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-function"><span class="hljs-title">expand</span> = <span class="hljs-params">(content)</span> -&gt;</span></pre></div></div>
             
         </li>
         
@@ -1622,12 +1626,14 @@ TODO: have a user-set priority.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-87">&#182;</a>
               </div>
-              <p>get the prefix and the path.</p>
+              <p>if there’s no prefix, return the original string.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                prefix = matches[<span class="hljs-number">1</span>]
-                path = matches[<span class="hljs-number">2</span>]</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">if</span> <span class="hljs-literal">null</span> <span class="hljs-keyword">is</span> matches = content.match(<span class="hljs-regexp">/([\w|\d]+):(.*)/</span>)
+              prefix = content
+              path = <span class="hljs-string">''</span>
+            <span class="hljs-keyword">else</span></pre></div></div>
             
         </li>
         
@@ -1638,14 +1644,12 @@ TODO: have a user-set priority.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-88">&#182;</a>
               </div>
-              <p>if the prefix is unknown, leave it.</p>
+              <p>get the prefix and the path.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>              <span class="hljs-keyword">if</span> context[prefix]?
-                prepend = <span class="hljs-keyword">if</span> angular.isString context[prefix] <span class="hljs-keyword">then</span> context[prefix] <span class="hljs-keyword">else</span> context[prefix][<span class="hljs-string">'@id'</span>]
-              <span class="hljs-keyword">else</span>
-                prepend = prefix + <span class="hljs-string">':'</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>              prefix = matches[<span class="hljs-number">1</span>]
+              path = matches[<span class="hljs-number">2</span>]</pre></div></div>
             
         </li>
         
@@ -1656,11 +1660,14 @@ TODO: have a user-set priority.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-89">&#182;</a>
               </div>
-              <p>return the full path.</p>
+              <p>if the prefix is unknown, leave it.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>              prepend + path</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">if</span> context[prefix]?
+              prepend = <span class="hljs-keyword">if</span> angular.isString context[prefix] <span class="hljs-keyword">then</span> context[prefix] <span class="hljs-keyword">else</span> context[prefix][<span class="hljs-string">'@id'</span>]
+            <span class="hljs-keyword">else</span>
+              prepend = prefix + <span class="hljs-string">':'</span></pre></div></div>
             
         </li>
         
@@ -1671,13 +1678,11 @@ TODO: have a user-set priority.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-90">&#182;</a>
               </div>
-              <p>Check that the response is valid.</p>
+              <p>return the full path.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> ( data[CONTEXT]? <span class="hljs-keyword">and</span> data[GRAPH]? )
-              $rootScope.$broadcast <span class="hljs-string">'error'</span>, <span class="hljs-string">'The analysis response is invalid. Please try again later.'</span>
-              <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>            prepend + path</pre></div></div>
             
         </li>
         
@@ -1688,15 +1693,13 @@ TODO: have a user-set priority.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-91">&#182;</a>
               </div>
-              <p>data is split in a context and a graph.</p>
+              <p>Check that the response is valid.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            context = data[CONTEXT]
-            graph = data[GRAPH]
-
-            <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> graph
-              id = item[<span class="hljs-string">'@id'</span>]</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> ( data[CONTEXT]? <span class="hljs-keyword">and</span> data[GRAPH]? )
+            $rootScope.$broadcast <span class="hljs-string">'error'</span>, <span class="hljs-string">'The analysis response is invalid. Please try again later.'</span>
+            <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span></pre></div></div>
             
         </li>
         
@@ -1707,13 +1710,15 @@ TODO: have a user-set priority.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-92">&#182;</a>
               </div>
-              <pre><code>   <span class="hljs-built_in">console</span>.log <span class="hljs-string">"[ id :: <span class="hljs-subst">#{id}</span> ]"</span>
-</code></pre>
+              <p>data is split in a context and a graph.</p>
+
             </div>
             
-            <div class="content"><div class='highlight'><pre>
-              types = item[<span class="hljs-string">'@type'</span>]
-              dctype = get <span class="hljs-string">"<span class="hljs-subst">#{DCTERMS}</span>type"</span>, item</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          context = data[CONTEXT]
+          graph = data[GRAPH]
+
+          <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> graph
+            id = item[<span class="hljs-string">'@id'</span>]</pre></div></div>
             
         </li>
         
@@ -1724,9 +1729,13 @@ TODO: have a user-set priority.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-93">&#182;</a>
               </div>
-              <pre><code>   <span class="hljs-built_in">console</span>.log <span class="hljs-string">"[ id :: <span class="hljs-subst">#{id}</span> ][ dc:type :: <span class="hljs-subst">#{dctype}</span> ]"</span>
+              <pre><code>   <span class="hljs-built_in">console</span>.log <span class="hljs-string">"[ id :: <span class="hljs-subst">#{id}</span> ]"</span>
 </code></pre>
             </div>
+            
+            <div class="content"><div class='highlight'><pre>
+            types = item[<span class="hljs-string">'@type'</span>]
+            dctype = get <span class="hljs-string">"<span class="hljs-subst">#{DCTERMS}</span>type"</span>, item</pre></div></div>
             
         </li>
         
@@ -1737,12 +1746,9 @@ TODO: have a user-set priority.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-94">&#182;</a>
               </div>
-              <p>TextAnnotation/LinguisticSystem</p>
-
+              <pre><code>   <span class="hljs-built_in">console</span>.log <span class="hljs-string">"[ id :: <span class="hljs-subst">#{id}</span> ][ dc:type :: <span class="hljs-subst">#{dctype}</span> ]"</span>
+</code></pre>
             </div>
-            
-            <div class="content"><div class='highlight'><pre>              <span class="hljs-keyword">if</span> containsOrEquals(FISE_ONT_TEXT_ANNOTATION,
-                types) <span class="hljs-keyword">and</span> containsOrEquals(<span class="hljs-string">"<span class="hljs-subst">#{DCTERMS}</span>LinguisticSystem"</span>, dctype)</pre></div></div>
             
         </li>
         
@@ -1753,11 +1759,12 @@ TODO: have a user-set priority.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-95">&#182;</a>
               </div>
-              <pre><code>     dump <span class="hljs-string">"language [ id :: <span class="hljs-subst">#{id}</span> ][ dc:type :: <span class="hljs-subst">#{dctype}</span> ]"</span>
-</code></pre>
+              <p>TextAnnotation/LinguisticSystem</p>
+
             </div>
             
-            <div class="content"><div class='highlight'><pre>                languages.push createLanguage(item)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">if</span> containsOrEquals(FISE_ONT_TEXT_ANNOTATION,
+              types) <span class="hljs-keyword">and</span> containsOrEquals(<span class="hljs-string">"<span class="hljs-subst">#{DCTERMS}</span>LinguisticSystem"</span>, dctype)</pre></div></div>
             
         </li>
         
@@ -1768,11 +1775,11 @@ TODO: have a user-set priority.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-96">&#182;</a>
               </div>
-              <p>TextAnnotation</p>
-
+              <pre><code>     dump <span class="hljs-string">"language [ id :: <span class="hljs-subst">#{id}</span> ][ dc:type :: <span class="hljs-subst">#{dctype}</span> ]"</span>
+</code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>              <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> containsOrEquals(FISE_ONT_TEXT_ANNOTATION, types)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>              languages.push createLanguage(item)</pre></div></div>
             
         </li>
         
@@ -1783,11 +1790,11 @@ TODO: have a user-set priority.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-97">&#182;</a>
               </div>
-              <pre><code>     $log.debug <span class="hljs-string">"TextAnnotation [ @id :: <span class="hljs-subst">#{id}</span> ][ types :: <span class="hljs-subst">#{types}</span> ]"</span>
-</code></pre>
+              <p>TextAnnotation</p>
+
             </div>
             
-            <div class="content"><div class='highlight'><pre>                textAnnotations[id] = item</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> containsOrEquals(FISE_ONT_TEXT_ANNOTATION, types)</pre></div></div>
             
         </li>
         
@@ -1798,11 +1805,11 @@ TODO: have a user-set priority.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-98">&#182;</a>
               </div>
-              <p>EntityAnnotation</p>
-
+              <pre><code>     $log.debug <span class="hljs-string">"TextAnnotation [ @id :: <span class="hljs-subst">#{id}</span> ][ types :: <span class="hljs-subst">#{types}</span> ]"</span>
+</code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>              <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> containsOrEquals(FISE_ONT_ENTITY_ANNOTATION, types)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>              textAnnotations[id] = item</pre></div></div>
             
         </li>
         
@@ -1813,11 +1820,11 @@ TODO: have a user-set priority.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-99">&#182;</a>
               </div>
-              <pre><code>     $log.debug <span class="hljs-string">"EntityAnnotation [ @id :: <span class="hljs-subst">#{id}</span> ][ types :: <span class="hljs-subst">#{types}</span> ]"</span>
-</code></pre>
+              <p>EntityAnnotation</p>
+
             </div>
             
-            <div class="content"><div class='highlight'><pre>                entityAnnotations[id] = item</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> containsOrEquals(FISE_ONT_ENTITY_ANNOTATION, types)</pre></div></div>
             
         </li>
         
@@ -1828,11 +1835,11 @@ TODO: have a user-set priority.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-100">&#182;</a>
               </div>
-              <p>Entity</p>
-
+              <pre><code>     $log.debug <span class="hljs-string">"EntityAnnotation [ @id :: <span class="hljs-subst">#{id}</span> ][ types :: <span class="hljs-subst">#{types}</span> ]"</span>
+</code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>              <span class="hljs-keyword">else</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>              entityAnnotations[id] = item</pre></div></div>
             
         </li>
         
@@ -1843,11 +1850,11 @@ TODO: have a user-set priority.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-101">&#182;</a>
               </div>
-              <pre><code>     $log.debug <span class="hljs-string">"Entity [ @id :: <span class="hljs-subst">#{id}</span> ][ types :: <span class="hljs-subst">#{types}</span> ]"</span>
-</code></pre>
+              <p>Entity</p>
+
             </div>
             
-            <div class="content"><div class='highlight'><pre>                entities[id] = item</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">else</span></pre></div></div>
             
         </li>
         
@@ -1858,16 +1865,11 @@ TODO: have a user-set priority.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-102">&#182;</a>
               </div>
-              <p>sort the languages by confidence.</p>
-
+              <pre><code>     $log.debug <span class="hljs-string">"Entity [ @id :: <span class="hljs-subst">#{id}</span> ][ types :: <span class="hljs-subst">#{types}</span> ]"</span>
+</code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>            languages.sort <span class="hljs-function"><span class="hljs-params">(a, b)</span> -&gt;</span>
-              <span class="hljs-keyword">if</span> a.confidence &lt; b.confidence
-                <span class="hljs-keyword">return</span> -<span class="hljs-number">1</span>
-              <span class="hljs-keyword">if</span> a.confidence &gt; b.confidence
-                <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>
-              <span class="hljs-number">0</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>              entities[id] = item</pre></div></div>
             
         </li>
         
@@ -1878,11 +1880,16 @@ TODO: have a user-set priority.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-103">&#182;</a>
               </div>
-              <p>create a reference to the default language.</p>
+              <p>sort the languages by confidence.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            language = languages[<span class="hljs-number">0</span>].code</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          languages.sort <span class="hljs-function"><span class="hljs-params">(a, b)</span> -&gt;</span>
+            <span class="hljs-keyword">if</span> a.confidence &lt; b.confidence
+              <span class="hljs-keyword">return</span> -<span class="hljs-number">1</span>
+            <span class="hljs-keyword">if</span> a.confidence &gt; b.confidence
+              <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>
+            <span class="hljs-number">0</span></pre></div></div>
             
         </li>
         
@@ -1893,11 +1900,11 @@ TODO: have a user-set priority.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-104">&#182;</a>
               </div>
-              <p>Create entities instances in the entities array.</p>
+              <p>create a reference to the default language.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            entities[id] = createEntity(item, language) <span class="hljs-keyword">for</span> id, item <span class="hljs-keyword">of</span> entities</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          language = languages[<span class="hljs-number">0</span>].code</pre></div></div>
             
         </li>
         
@@ -1908,11 +1915,11 @@ TODO: have a user-set priority.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-105">&#182;</a>
               </div>
-              <p>Cycle in every entity.</p>
+              <p>Create entities instances in the entities array.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            mergeEntities(entity, entities) <span class="hljs-keyword">for</span> id, entity <span class="hljs-keyword">of</span> entities <span class="hljs-keyword">if</span> merge</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          entities[id] = createEntity(item, language) <span class="hljs-keyword">for</span> id, item <span class="hljs-keyword">of</span> entities</pre></div></div>
             
         </li>
         
@@ -1923,11 +1930,11 @@ TODO: have a user-set priority.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-106">&#182;</a>
               </div>
-              <p>Create text annotation instances.</p>
+              <p>Cycle in every entity.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            textAnnotations[id] = createTextAnnotation(item) <span class="hljs-keyword">for</span> id, item <span class="hljs-keyword">of</span> textAnnotations</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          mergeEntities(entity, entities) <span class="hljs-keyword">for</span> id, entity <span class="hljs-keyword">of</span> entities <span class="hljs-keyword">if</span> merge</pre></div></div>
             
         </li>
         
@@ -1938,13 +1945,9 @@ TODO: have a user-set priority.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-107">&#182;</a>
               </div>
-              <p>Create entity annotations instances.</p>
-
+              <pre><code>       mergeEntities(entity, entities) <span class="hljs-keyword">for</span> id, entity <span class="hljs-keyword">of</span> <span class="hljs-property">@_entities</span> <span class="hljs-keyword">if</span> merge
+</code></pre>
             </div>
-            
-            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">for</span> id, item <span class="hljs-keyword">of</span> entityAnnotations
-              entityAnnotations[entityAnnotation.id] = entityAnnotation <span class="hljs-keyword">for</span> entityAnnotation <span class="hljs-keyword">in</span> createEntityAnnotations(item,
-                language)</pre></div></div>
             
         </li>
         
@@ -1955,11 +1958,11 @@ TODO: have a user-set priority.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-108">&#182;</a>
               </div>
-              <p>For every text annotation delete entity annotations that refer to the same entity (after merging).</p>
+              <p>Create text annotation instances.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">if</span> merge</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          textAnnotations[id] = createTextAnnotation(item) <span class="hljs-keyword">for</span> id, item <span class="hljs-keyword">of</span> textAnnotations</pre></div></div>
             
         </li>
         
@@ -1970,11 +1973,13 @@ TODO: have a user-set priority.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-109">&#182;</a>
               </div>
-              <p>Cycle in text annotations.</p>
+              <p>Create entity annotations instances.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>              <span class="hljs-keyword">for</span> textAnnotationId, textAnnotation <span class="hljs-keyword">of</span> textAnnotations</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">for</span> id, item <span class="hljs-keyword">of</span> entityAnnotations
+            entityAnnotations[entityAnnotation.id] = entityAnnotation <span class="hljs-keyword">for</span> entityAnnotation <span class="hljs-keyword">in</span> createEntityAnnotations(item,
+              language)</pre></div></div>
             
         </li>
         
@@ -1985,11 +1990,11 @@ TODO: have a user-set priority.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-110">&#182;</a>
               </div>
-              <p>Cycle in entity annotations.</p>
+              <p>For every text annotation delete entity annotations that refer to the same entity (after merging).</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                <span class="hljs-keyword">for</span> id, entityAnnotation <span class="hljs-keyword">of</span> textAnnotation.entityAnnotations</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">if</span> merge</pre></div></div>
             
         </li>
         
@@ -2000,12 +2005,11 @@ TODO: have a user-set priority.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-111">&#182;</a>
               </div>
-              <pre><code>       <span class="hljs-built_in">console</span>.log <span class="hljs-string">"[ text-annotation id :: <span class="hljs-subst">#{textAnnotationId}</span> ][ entity-annotation id :: <span class="hljs-subst">#{entityAnnotation.id}</span> ]"</span>
-</code></pre><p>Check if there are entity annotations referring to the same entity, and if so, delete it.</p>
+              <p>Cycle in text annotations.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                  <span class="hljs-keyword">for</span> anotherId, anotherEntityAnnotation <span class="hljs-keyword">of</span> textAnnotation.entityAnnotations <span class="hljs-keyword">when</span> id <span class="hljs-keyword">isnt</span> anotherId <span class="hljs-keyword">and</span> entityAnnotation.entity <span class="hljs-keyword">is</span> anotherEntityAnnotation.entity</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">for</span> textAnnotationId, textAnnotation <span class="hljs-keyword">of</span> textAnnotations</pre></div></div>
             
         </li>
         
@@ -2016,11 +2020,11 @@ TODO: have a user-set priority.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-112">&#182;</a>
               </div>
-              <pre><code>         <span class="hljs-built_in">console</span>.log <span class="hljs-string">"[ id :: <span class="hljs-subst">#{id}</span> ][ another id :: <span class="hljs-subst">#{anotherId}</span> ]"</span>
-</code></pre>
+              <p>Cycle in entity annotations.</p>
+
             </div>
             
-            <div class="content"><div class='highlight'><pre>                    <span class="hljs-keyword">delete</span> textAnnotation.entityAnnotations[anotherId]</pre></div></div>
+            <div class="content"><div class='highlight'><pre>              <span class="hljs-keyword">for</span> id, entityAnnotation <span class="hljs-keyword">of</span> textAnnotation.entityAnnotations</pre></div></div>
             
         </li>
         
@@ -2031,17 +2035,12 @@ TODO: have a user-set priority.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-113">&#182;</a>
               </div>
-              <p>return the analysis result.</p>
+              <pre><code>       <span class="hljs-built_in">console</span>.log <span class="hljs-string">"[ text-annotation id :: <span class="hljs-subst">#{textAnnotationId}</span> ][ entity-annotation id :: <span class="hljs-subst">#{entityAnnotation.id}</span> ]"</span>
+</code></pre><p>Check if there are entity annotations referring to the same entity, and if so, delete it.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            {
-            <span class="hljs-attribute">language</span>: language
-            <span class="hljs-attribute">entities</span>: entities
-            <span class="hljs-attribute">entityAnnotations</span>: entityAnnotations
-            <span class="hljs-attribute">textAnnotations</span>: textAnnotations
-            <span class="hljs-attribute">languages</span>: languages
-            }</pre></div></div>
+            <div class="content"><div class='highlight'><pre>                <span class="hljs-keyword">for</span> anotherId, anotherEntityAnnotation <span class="hljs-keyword">of</span> textAnnotation.entityAnnotations <span class="hljs-keyword">when</span> id <span class="hljs-keyword">isnt</span> anotherId <span class="hljs-keyword">and</span> entityAnnotation.entity <span class="hljs-keyword">is</span> anotherEntityAnnotation.entity</pre></div></div>
             
         </li>
         
@@ -2051,6 +2050,42 @@ TODO: have a user-set priority.</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-114">&#182;</a>
+              </div>
+              <pre><code>         <span class="hljs-built_in">console</span>.log <span class="hljs-string">"[ id :: <span class="hljs-subst">#{id}</span> ][ another id :: <span class="hljs-subst">#{anotherId}</span> ]"</span>
+</code></pre>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                  <span class="hljs-keyword">delete</span> textAnnotation.entityAnnotations[anotherId]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-115">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-115">&#182;</a>
+              </div>
+              <p>return the analysis result.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          {
+          <span class="hljs-attribute">language</span>: language
+          <span class="hljs-attribute">entities</span>: entities
+          <span class="hljs-attribute">entityAnnotations</span>: entityAnnotations
+          <span class="hljs-attribute">textAnnotations</span>: textAnnotations
+          <span class="hljs-attribute">languages</span>: languages
+          }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-116">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-116">&#182;</a>
               </div>
               <p>Return the service instance</p>
 
