@@ -188,9 +188,11 @@ angular.module('AnalysisService',
           # create an entity.
           createEntity = (item, language) ->
             id = get('@id', item)
-            # Get the types associated with the entity.
-            types = get('@type', item)
-            types = if angular.isArray types then types else [ types ]
+            # Get the types expanding the type URI.
+            types = get('@type', item, (ts) ->
+              ts = if angular.isArray ts then ts else [ ts ]
+              (expand(t) for t in ts)
+            )
             sameAs = get('http://www.w3.org/2002/07/owl#sameAs', item)
             sameAs = if angular.isArray sameAs then sameAs else [ sameAs ]
 
@@ -425,6 +427,7 @@ angular.module('AnalysisService',
 
           # expand a string to a full path if it contains a prefix.
           expand = (content) ->
+            return if not content?
             # if there's no prefix, return the original string.
             if null is matches = content.match(/([\w|\d]+):(.*)/)
               prefix = content
