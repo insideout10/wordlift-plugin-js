@@ -17,7 +17,7 @@ angular.module('AnalysisService',
 .service('AnalysisService',
     [ 'EntityAnnotationService', 'EntityService', 'Helpers', 'TextAnnotationService', '$filter', '$http', '$q',
       '$rootScope', '$log',
-      (EntityAnnotationService, EntityService, Helpers, TextAnnotationService, $filter, $http, $q, $rootScope, $log) ->
+      (EntityAnnotationService, EntityService, h, TextAnnotationService, $filter, $http, $q, $rootScope, $log) ->
 
         # Find an entity in the analysis
         # or within window.wordlift.entities storage if needed
@@ -191,7 +191,7 @@ angular.module('AnalysisService',
             # Get the types expanding the type URI.
             types = get('@type', item, (ts) ->
               ts = if angular.isArray ts then ts else [ ts ]
-              (expand(t) for t in ts)
+              (h.expand(t, context) for t in ts)
             )
             sameAs = get('http://www.w3.org/2002/07/owl#sameAs', item)
             sameAs = if angular.isArray sameAs then sameAs else [ sameAs ]
@@ -244,6 +244,7 @@ angular.module('AnalysisService',
               else
                 'wordlift'
               _item: item
+              props: EntityService.createProps item, context
 
             # Add sources as an array.
             entity.sources = [ entity.source ]
@@ -365,10 +366,10 @@ angular.module('AnalysisService',
           getA = (what, container, filter = (a) ->
             a) ->
             # expand the what key.
-            whatExp = expand(what)
+            whatExp = h.expand(what, context)
             # return the value bound to the specified key.
             #        console.log "[ what exp :: #{whatExp} ][ key :: #{expand key} ][ value :: #{value} ][ match :: #{whatExp is expand(key)} ]" for key, value of container
-            return filter(value) for key, value of container when whatExp is expand(key)
+            return filter(value) for key, value of container when whatExp is h.expand(key, context)
             []
 
           # get the value for specified property (what) in the provided container in the specified language.
@@ -390,13 +391,13 @@ angular.module('AnalysisService',
             # ensure the where argument is an array.
             whereArray = if angular.isArray where then where else [ where ]
             # expand the what string.
-            whatExp = expand(what)
+            whatExp = h.expand what, context
             if '@' is what.charAt(0)
               # return true if the string is found.
-              return true for item in whereArray when whatExp is expand(item)
+              return true for item in whereArray when whatExp is h.expand(item, context)
             else
               # return true if the string is found.
-              return true for item in whereArray when whatExp is expand(item)
+              return true for item in whereArray when whatExp is h.expand(item, context)
             # otherwise false.
             false
 
@@ -425,26 +426,26 @@ angular.module('AnalysisService',
                 mergeEntities entity, entities
             entity
 
-          # expand a string to a full path if it contains a prefix.
-          expand = (content) ->
-            return if not content?
-            # if there's no prefix, return the original string.
-            if null is matches = content.match(/([\w|\d]+):(.*)/)
-              prefix = content
-              path = ''
-            else
-              # get the prefix and the path.
-              prefix = matches[1]
-              path = matches[2]
-
-            # if the prefix is unknown, leave it.
-            if context[prefix]?
-              prepend = if angular.isString context[prefix] then context[prefix] else context[prefix]['@id']
-            else
-              prepend = prefix + ':'
-
-            # return the full path.
-            prepend + path
+#          # expand a string to a full path if it contains a prefix.
+#          expand = (content) ->
+#            return if not content?
+#            # if there's no prefix, return the original string.
+#            if null is matches = content.match(/([\w|\d]+):(.*)/)
+#              prefix = content
+#              path = ''
+#            else
+#              # get the prefix and the path.
+#              prefix = matches[1]
+#              path = matches[2]
+#
+#            # if the prefix is unknown, leave it.
+#            if context[prefix]?
+#              prepend = if angular.isString context[prefix] then context[prefix] else context[prefix]['@id']
+#            else
+#              prepend = prefix + ':'
+#
+#            # return the full path.
+#            prepend + path
 
           # Check that the response is valid.
           if not ( data[CONTEXT]? and data[GRAPH]? )
