@@ -24,7 +24,7 @@ angular.module('wordlift.tinymce.plugin.services.Helpers', [])
      * @return {string} An expanded string.
      ###
     service._expand = (content, context) ->
-      # console.log "expand [ content :: #{content} ][ context :: #{context} ]"
+      # console.log "_expand [ content :: #{content} ][ context :: #{context} ]"
       return if not content?
       # if there's no prefix, return the original string.
       if null is matches = "#{content}".match(/([\w|\d]+):(.*)/)
@@ -55,6 +55,65 @@ angular.module('wordlift.tinymce.plugin.services.Helpers', [])
         return (service.expand(c, context) for c in content)
 
       service._expand content, context
+
+    # Get the values associated with the specified key(s). Keys are expanded.
+    service.get = (what, container, context, filter) ->
+      # If it's a single key, call getA
+      return service.getA(what, container, context, filter) if not angular.isArray what
+
+      # Prepare the return array.
+      values = []
+
+      # For each key, add the result.
+      for key in what
+        add = service.getA key, container, context, filter
+        # Ensure the result is an array.
+        add = if angular.isArray add then add else [ add ]
+        # Merge unique the results.
+        service.mergeUnique values, add
+
+      # Return the result array.
+      values
+
+    # Get the values associated with the specified key. Keys are expanded.
+    service.getA = (what, container, context, filter = ((a) -> a)) ->
+      # expand the what key.
+      whatExp = service.expand what, context
+      # return the value bound to the specified key.
+      #        console.log "[ what exp :: #{whatExp} ][ key :: #{expand key} ][ value :: #{value} ][ match :: #{whatExp is expand(key)} ]" for key, value of container
+      return filter(value) for key, value of container when whatExp is service.expand(key, context)
+      []
+
+    # get the value for specified property (what) in the provided container in the specified language.
+    # items must conform to {'@language':..., '@value':...} format.
+    service.getLanguage = (what, container, language, context) ->
+      # if there's no item return null.
+      return if null is items = service.get(what, container, context)
+      # transform to an array if it's not already.
+      items = if angular.isArray items then items else [ items ]
+      # cycle through the array.
+      return item[VALUE] for item in items when language is item['@language']
+      # if not found return the english value.
+      return item[VALUE] for item in items when 'en' is item['@language']
+
+    service.mergeUnique = (array1, array2) ->
+      array1 = [] if not array1?
+      array1.push item for item in array2 when item not in array1
+
+    service.containsOrEquals = (what, where, context) ->
+      return false if not where?
+      # ensure the where argument is an array.
+      whereArray = if angular.isArray where then where else [ where ]
+      # expand the what string.
+      whatExp = service.expand what, context
+      if '@' is what.charAt(0)
+        # return true if the string is found.
+        return true for item in whereArray when whatExp is service.expand(item, context)
+      else
+        # return true if the string is found.
+        return true for item in whereArray when whatExp is service.expand(item, context)
+      # otherwise false.
+      false
 
     # Return the services.
     service

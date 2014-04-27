@@ -54,20 +54,14 @@ angular.module('AnalysisService',
 
         # Add an entity to the local collection of entities.
         service.addEntity = (entity) ->
-#          $log.info "AnalysisService addEntity"
-#          $log.info entity
           @_entities[entity.id] = entity
 
         # Set the local entity collection.
         service.setEntities = (entities) ->
-#          $log.info "AnalysisService setEntities"
-#          $log.info entities
           @_entities = entities
 
         # Set the known types.
         service.setKnownTypes = (types) ->
-#          $log.info "AnalysisService setKnownTypes"
-#          $log.info types
           @_knownTypes = types
 
         # Abort a running analysis.
@@ -154,144 +148,10 @@ angular.module('AnalysisService',
           entityAnnotations = {}
           entities = {}
 
-          # support functions:
-
-          # Get the known type given the specified types. Current supported types are:
-          #  * person
-          #  * organization
-          #  * place
-          getKnownTypes = (types, knownTypes) ->
-
-            # An array with known types according to the specified types.
-            returnTypes = []
-            defaultType = undefined
-            for kt in knownTypes
-              # Set the default type, identified by an asterisk (*) in the sameAs values.
-              defaultType = [
-                { type: kt }
-              ] if '*' in kt.sameAs
-              # Get all the URIs associated to this known type.
-              uris = kt.sameAs.concat kt.uri
-              # If there is 1+ uri in common between the known types and the provided types, then add the known type.
-              matches = (uri for uri in uris when containsOrEquals(uri, types))
-              returnTypes.push { matches: matches, type: kt } if 0 < matches.length
-
-
-            # Return the defaul type if not known types have been found.
-            return defaultType if 0 is returnTypes.length
-
-            # Sort and return the match types.
-            $filter('orderBy') returnTypes, 'matches', true
-            returnTypes
-
-
-          # create an entity.
-          createEntity = (item, language) ->
-            id = get('@id', item)
-            # Get the types expanding the type URI.
-            types = get('@type', item, (ts) ->
-              ts = if angular.isArray ts then ts else [ ts ]
-              (h.expand(t, context) for t in ts)
-            )
-            sameAs = get('http://www.w3.org/2002/07/owl#sameAs', item)
-            sameAs = if angular.isArray sameAs then sameAs else [ sameAs ]
-
-            #        console.log "createEntity [ id :: #{id} ][ language :: #{language} ][ types :: #{types} ][ sameAs :: #{sameAs} ]"
-
-            # Get all the thumbnails; for each thumbnail execute the provided function.
-            thumbnails = get(
-              [
-                'http://xmlns.com/foaf/0.1/depiction'
-                "#{FREEBASE_NS}common.topic.image"
-                "#{SCHEMA_ORG}image"
-              ],
-              item,
-            (values) ->
-              values = if angular.isArray values then values else [ values ]
-              for value in values
-                match = /m\.(.*)$/i.exec value
-                if null is match
-                  value
-                else
-                  # If it's a Freebase URL normalize the link to the image.
-                  "https://usercontent.googleapis.com/#{FREEBASE}/v1/image/m/#{match[1]}?maxwidth=4096&maxheight=4096"
-            )
-
-            # Get the known types.
-#            $log.info "AnalysisService.parse [ known types :: "
-#            $log.info service
-#            $log.info service._knownTypes
-#            $log.info " ]"
-            knownTypes = getKnownTypes(types, service._knownTypes)
-            # Get the stylesheet classes.
-            css = knownTypes[0].type.css
-
-            # create the entity model.
-            entity =
-              id: id
-              thumbnail: if 0 < thumbnails.length then thumbnails[0] else null
-              thumbnails: thumbnails
-              css: css
-              type: knownTypes[0].type.uri # This is the main type for the entity.
-              types: types
-              label: getLanguage(RDFS_LABEL, item, language)
-              labels: get(RDFS_LABEL, item)
-              sameAs: sameAs
-              source: if id.match("^#{FREEBASE_COM}.*$")
-                FREEBASE
-              else if id.match("^#{DBPEDIA_ORG_REGEX}.*$")
-                DBPEDIA
-              else
-                'wordlift'
-              _item: item
-              props: EntityService.createProps item, context
-
-            # Add sources as an array.
-            entity.sources = [ entity.source ]
-
-            entity.description = getLanguage(
-              [
-                RDFS_COMMENT
-                FREEBASE_NS_DESCRIPTION
-                SCHEMA_ORG_DESCRIPTION
-              ], item, language
-            )
-            entity.descriptions = get(
-              [
-                RDFS_COMMENT
-                FREEBASE_NS_DESCRIPTION
-                SCHEMA_ORG_DESCRIPTION
-              ],
-              item
-            )
-
-            # Avoid null in entity description.
-            entity.description = '' if not entity.description?
-
-            entity.latitude = get "#{WGS84_POS}lat", item
-            entity.longitude = get "#{WGS84_POS}long", item
-            if 0 is entity.latitude.length or 0 is entity.longitude.length
-              entity.latitude = ''
-              entity.longitude = ''
-
-            # Check if thumbnails exists.
-            #        if thumbnails? and angular.isArray thumbnails
-            #          $q.all(($http.head thumbnail for thumbnail in thumbnails))
-            #            .then (results) ->
-            #              # Populate the thumbnails array only with existing images (those that return *status code* 200).
-            #              entity.thumbnails = (result.config.url for result in results when 200 is result.status)
-            #              # Set the main thumbnail as the first.
-            #              # TODO: use the lightest image as first.
-            #              entity.thumbnail  = entity.thumbnails[0] if 0 < entity.thumbnails.length'
-
-            # return the entity.
-            #        console.log "createEntity [ entity id :: #{entity.id} ][ language :: #{language} ][ types :: #{types} ][ sameAs :: #{sameAs} ]"
-            entity
-
           # Create an entity annotation. An entity annotation is created for each related text-annotation.
           createEntityAnnotations = (item, language) ->
             # Get the reference to the entity.
-            reference = get "#{FISE_ONT}entity-reference", item
+            reference = h.get "#{FISE_ONT}entity-reference", item, context
             # If the referenced entity is not found, return null
             return [] if not entities[reference]?
 
@@ -299,7 +159,7 @@ angular.module('AnalysisService',
             annotations = []
 
             # get the related text annotation.
-            relations = get "#{DCTERMS}relation", item
+            relations = h.get "#{DCTERMS}relation", item, context
             # Ensure we're dealing with an array.
             relations = if angular.isArray relations then relations else [ relations ]
 
@@ -309,9 +169,9 @@ angular.module('AnalysisService',
 
               # Create an entity annotation.
               entityAnnotation = EntityAnnotationService.create
-                id: get '@id', item
-                label: getLanguage "#{FISE_ONT}entity-label", item, language
-                confidence: get FISE_ONT_CONFIDENCE, item
+                id: h.get '@id', item, context
+                label: h.getLanguage "#{FISE_ONT}entity-label", item, language, context
+                confidence: h.get FISE_ONT_CONFIDENCE, item, context
                 entity: entities[reference]
                 relation: textAnnotation
                 _item: item
@@ -328,124 +188,21 @@ angular.module('AnalysisService',
 
           createTextAnnotation = (item) ->
             TextAnnotationService.create
-              id: get('@id', item)
-              text: get("#{FISE_ONT}selected-text", item)[VALUE]
-              start: get "#{FISE_ONT}start", item
-              end: get "#{FISE_ONT}end", item
-              confidence: get FISE_ONT_CONFIDENCE, item
+              id: h.get '@id', item, context
+              text: h.get("#{FISE_ONT}selected-text", item, context)[VALUE]
+              start: h.get "#{FISE_ONT}start", item, context
+              end: h.get "#{FISE_ONT}end", item, context
+              confidence: h.get FISE_ONT_CONFIDENCE, item, context
               entityAnnotations: {}
               _item: item
 
           createLanguage = (item) ->
             {
-            code: get "#{DCTERMS}language", item
-            confidence: get FISE_ONT_CONFIDENCE, item
+            code: h.get "#{DCTERMS}language", item, context
+            confidence: h.get FISE_ONT_CONFIDENCE, item, context
             _item: item
             }
 
-          # Get the values associated with the specified key(s). Keys are expanded.
-          get = (what, container, filter) ->
-            # If it's a single key, call getA
-            return getA(what, container, filter) if not angular.isArray what
-
-            # Prepare the return array.
-            values = []
-
-            # For each key, add the result.
-            for key in what
-              add = getA(key, container, filter)
-              # Ensure the result is an array.
-              add = if angular.isArray add then add else [ add ]
-              # Merge unique the results.
-              mergeUnique values, add
-
-            # Return the result array.
-            values
-
-          # Get the values associated with the specified key. Keys are expanded.
-          getA = (what, container, filter = (a) ->
-            a) ->
-            # expand the what key.
-            whatExp = h.expand(what, context)
-            # return the value bound to the specified key.
-            #        console.log "[ what exp :: #{whatExp} ][ key :: #{expand key} ][ value :: #{value} ][ match :: #{whatExp is expand(key)} ]" for key, value of container
-            return filter(value) for key, value of container when whatExp is h.expand(key, context)
-            []
-
-          # get the value for specified property (what) in the provided container in the specified language.
-          # items must conform to {'@language':..., '@value':...} format.
-          getLanguage = (what, container, language) ->
-            # if there's no item return null.
-            return if null is items = get(what, container)
-            # transform to an array if it's not already.
-            items = if angular.isArray items then items else [ items ]
-            # cycle through the array.
-            return item[VALUE] for item in items when language is item['@language']
-            # if not found return the english value.
-            return item[VALUE] for item in items when 'en' is item['@language']
-
-          containsOrEquals = (what, where) ->
-            #        dump "containsOrEquals [ what :: #{what} ][ where :: #{where} ]"
-            # if where is not defined return false.
-            return false if not where?
-            # ensure the where argument is an array.
-            whereArray = if angular.isArray where then where else [ where ]
-            # expand the what string.
-            whatExp = h.expand what, context
-            if '@' is what.charAt(0)
-              # return true if the string is found.
-              return true for item in whereArray when whatExp is h.expand(item, context)
-            else
-              # return true if the string is found.
-              return true for item in whereArray when whatExp is h.expand(item, context)
-            # otherwise false.
-            false
-
-          mergeUnique = (array1, array2) ->
-            array1 = [] if not array1?
-            array1.push item for item in array2 when item not in array1
-
-          mergeEntities = (entity, entities) ->
-            for sameAs in entity.sameAs
-              if entities[sameAs]? and entities[sameAs] isnt entity
-                existing = entities[sameAs]
-                # TODO: make concats unique.
-                mergeUnique(entity.sameAs, existing.sameAs)
-                mergeUnique(entity.thumbnails, existing.thumbnails)
-                mergeUnique(entity.sources, existing.sources)
-                entity.css = existing.css if not entity.css?
-                entity.source = entity.sources.join(', ')
-                # Prefer the DBpedia description.
-                # TODO: have a user-set priority.
-                entity.description = existing.description if DBPEDIA is existing.source
-                entity.longitude = existing.longitude if DBPEDIA is existing.source and existing.longitude?
-                entity.latitude = existing.latitude if DBPEDIA is existing.source and existing.latitude?
-
-                # Delete the sameAs entity from the index.
-                entities[sameAs] = entity
-                mergeEntities entity, entities
-            entity
-
-#          # expand a string to a full path if it contains a prefix.
-#          expand = (content) ->
-#            return if not content?
-#            # if there's no prefix, return the original string.
-#            if null is matches = content.match(/([\w|\d]+):(.*)/)
-#              prefix = content
-#              path = ''
-#            else
-#              # get the prefix and the path.
-#              prefix = matches[1]
-#              path = matches[2]
-#
-#            # if the prefix is unknown, leave it.
-#            if context[prefix]?
-#              prepend = if angular.isString context[prefix] then context[prefix] else context[prefix]['@id']
-#            else
-#              prepend = prefix + ':'
-#
-#            # return the full path.
-#            prepend + path
 
           # Check that the response is valid.
           if not ( data[CONTEXT]? and data[GRAPH]? )
@@ -461,23 +218,22 @@ angular.module('AnalysisService',
             #        console.log "[ id :: #{id} ]"
 
             types = item['@type']
-            dctype = get "#{DCTERMS}type", item
+            dctype = h.get "#{DCTERMS}type", item, context
 
             #        console.log "[ id :: #{id} ][ dc:type :: #{dctype} ]"
 
             # TextAnnotation/LinguisticSystem
-            if containsOrEquals(FISE_ONT_TEXT_ANNOTATION,
-              types) and containsOrEquals("#{DCTERMS}LinguisticSystem", dctype)
+            if h.containsOrEquals(FISE_ONT_TEXT_ANNOTATION, types, context) and h.containsOrEquals("#{DCTERMS}LinguisticSystem", dctype, context)
               #          dump "language [ id :: #{id} ][ dc:type :: #{dctype} ]"
               languages.push createLanguage(item)
 
               # TextAnnotation
-            else if containsOrEquals(FISE_ONT_TEXT_ANNOTATION, types)
+            else if h.containsOrEquals(FISE_ONT_TEXT_ANNOTATION, types, context)
               #          $log.debug "TextAnnotation [ @id :: #{id} ][ types :: #{types} ]"
               textAnnotations[id] = item
 
               # EntityAnnotation
-            else if containsOrEquals(FISE_ONT_ENTITY_ANNOTATION, types)
+            else if h.containsOrEquals(FISE_ONT_ENTITY_ANNOTATION, types, context)
               #          $log.debug "EntityAnnotation [ @id :: #{id} ][ types :: #{types} ]"
               entityAnnotations[id] = item
 
@@ -498,11 +254,11 @@ angular.module('AnalysisService',
           language = languages[0].code
 
           # Create entities instances in the entities array.
-          entities[id] = createEntity(item, language) for id, item of entities
+          entities[id] = EntityService.create(item, language, service._knownTypes, context) for id, item of entities
 
           # Cycle in every entity.
-          mergeEntities(entity, entities) for id, entity of entities if merge
-          mergeEntities(entity, entities) for id, entity of @_entities if merge
+          EntityService.merge(entity, entities) for id, entity of entities if merge
+          EntityService.merge(entity, entities) for id, entity of @_entities if merge
 
 #          $log.info "[ entities :: "
 #          $log.info entities
