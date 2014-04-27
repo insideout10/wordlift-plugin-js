@@ -27,6 +27,7 @@ $(
             </form>
 
             <wl-entity-input-boxes text-annotations="analysis.textAnnotations"></wl-entity-input-boxes>
+            <wl-entity-props text-annotations="analysis.textAnnotations"></wl-entity-props>
           </div>
         </div>
       </div>

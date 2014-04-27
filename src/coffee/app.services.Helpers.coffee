@@ -36,10 +36,11 @@ angular.module('wordlift.tinymce.plugin.services.Helpers', [])
         path = matches[2]
 
       # if the prefix is unknown, leave it.
-      if context[prefix]?
-        prepend = if angular.isString context[prefix] then context[prefix] else context[prefix]['@id']
-      else
-        prepend = prefix + ':'
+      return content if not context[prefix]?
+
+      prepend = if angular.isString context[prefix] then context[prefix] else context[prefix]['@id']
+
+      #      console.log "_expand [ content :: #{content} ][ prepend :: #{prepend} ][ path :: #{path} ]"
 
       # return the full path.
       prepend + path
@@ -106,12 +107,8 @@ angular.module('wordlift.tinymce.plugin.services.Helpers', [])
       whereArray = if angular.isArray where then where else [ where ]
       # expand the what string.
       whatExp = service.expand what, context
-      if '@' is what.charAt(0)
-        # return true if the string is found.
-        return true for item in whereArray when whatExp is service.expand(item, context)
-      else
-        # return true if the string is found.
-        return true for item in whereArray when whatExp is service.expand(item, context)
+      # return true if the string is found.
+      return true for item in whereArray when whatExp is service.expand(item, context)
       # otherwise false.
       false
 

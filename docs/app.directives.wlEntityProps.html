@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>app.directives.wlEntityProps.coffee</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page">
+            
+              
+              <a class="source" href="app.html">
+                app.coffee
+              </a>
+            
+              
+              <a class="source" href="app.config.html">
+                app.config.coffee
+              </a>
+            
+              
+              <a class="source" href="app.constants.html">
+                app.constants.coffee
+              </a>
+            
+              
+              <a class="source" href="app.controllers.html">
+                app.controllers.coffee
+              </a>
+            
+              
+              <a class="source" href="app.directives.html">
+                app.directives.coffee
+              </a>
+            
+              
+              <a class="source" href="app.directives.wlEntityProps.html">
+                app.directives.wlEntityProps.coffee
+              </a>
+            
+              
+              <a class="source" href="app.services.AnalysisService.html">
+                app.services.AnalysisService.coffee
+              </a>
+            
+              
+              <a class="source" href="app.services.EditorService.html">
+                app.services.EditorService.coffee
+              </a>
+            
+              
+              <a class="source" href="app.services.EntityAnnotationService.html">
+                app.services.EntityAnnotationService.coffee
+              </a>
+            
+              
+              <a class="source" href="app.services.EntityService.html">
+                app.services.EntityService.coffee
+              </a>
+            
+              
+              <a class="source" href="app.services.Helpers.html">
+                app.services.Helpers.coffee
+              </a>
+            
+              
+              <a class="source" href="app.services.TextAnnotationService.html">
+                app.services.TextAnnotationService.coffee
+              </a>
+            
+              
+              <a class="source" href="app.services.html">
+                app.services.coffee
+              </a>
+            
+              
+              <a class="source" href="traslator.html">
+                traslator.coffee
+              </a>
+            
+              
+              <a class="source" href="EntitiesController.spec.html">
+                EntitiesController.spec.coffee
+              </a>
+            
+              
+              <a class="source" href="addtl_properties.spec.html">
+                addtl_properties.spec.coffee
+              </a>
+            
+              
+              <a class="source" href="controllers.error.spec.html">
+                controllers.error.spec.coffee
+              </a>
+            
+              
+              <a class="source" href="directives.spec.html">
+                directives.spec.coffee
+              </a>
+            
+              
+              <a class="source" href="services.spec.html">
+                services.spec.coffee
+              </a>
+            
+              
+              <a class="source" href="tinymce.questa_volta_parliamo_di_seo.spec.html">
+                tinymce.questa_volta_parliamo_di_seo.spec.coffee
+              </a>
+            
+              
+              <a class="source" href="tinymce.spec.html">
+                tinymce.spec.coffee
+              </a>
+            
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>app.directives.wlEntityProps.coffee</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>angular.<span class="hljs-built_in">module</span>(<span class="hljs-string">'wordlift.directives.wlEntityProps'</span>, [])
+.directive(<span class="hljs-string">'wlEntityProps'</span>,<span class="hljs-function"> -&gt;</span>
+    <span class="hljs-attribute">restrict</span>: <span class="hljs-string">'E'</span>
+    <span class="hljs-attribute">scope</span>:
+      <span class="hljs-attribute">textAnnotations</span>: <span class="hljs-string">'='</span>
+    <span class="hljs-attribute">template</span>: <span class="hljs-string">"""
+      &lt;div class="wl-entity-props" ng-repeat="textAnnotation in textAnnotations"&gt;
+        &lt;div ng-repeat="ea in textAnnotation.entityAnnotations | filterObjectBy:'selected':true"&gt;
+          &lt;div ng-repeat="(k, ps) in ea.entity.props"&gt;
+            &lt;input ng-repeat="p in ps" name="wl_props[{{ea.entity.id}}][{{k}}][]" ng-value="p" type="text" /&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    """</span>
+  )</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

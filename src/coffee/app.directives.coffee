@@ -1,4 +1,4 @@
-angular.module('wordlift.tinymce.plugin.directives', ['wordlift.tinymce.plugin.controllers'])
+angular.module('wordlift.tinymce.plugin.directives', ['wordlift.directives.wlEntityProps','wordlift.tinymce.plugin.controllers'])
 # The wlEntities directive provides a UI for disambiguating the entities for a provided text annotation.
 .directive('wlEntities', ->
     # Restrict the directive to elements only (<wl-entities text-annotation="..."></wl-entities>)
@@ -46,6 +46,7 @@ angular.module('wordlift.tinymce.plugin.directives', ['wordlift.tinymce.plugin.c
         <div class="thumbnail empty" ng-hide="entityAnnotation.entity.thumbnail" title="{{entityAnnotation.entity.id}}"></div>
         <div class="confidence" ng-bind="entityAnnotation.confidence"></div>
         <div class="label" ng-bind="entityAnnotation.entity.label"></div>
+        <div class="url" ng-bind="entityAnnotation.entity.id"></div>
         <div class="type"></div>
         <div class="source" ng-class="entityAnnotation.entity.source" ng-bind="entityAnnotation.entity.source"></div>
       </div>
@@ -82,33 +83,31 @@ angular.module('wordlift.tinymce.plugin.directives', ['wordlift.tinymce.plugin.c
     """
   )
 .directive('autocomplete', ['$compile', '$q', '$log', ($compile, $q, $log) ->
-  restrict: "A",
-  scope:
-    source: '&'
-    onSelect: '&'
-  link: (originalScope, elem, attrs, ctrl) ->
+    restrict: "A",
+    scope:
+      source: '&'
+      onSelect: '&'
+    link: (originalScope, elem, attrs, ctrl) ->
+      templateHtml = '<wl-entity on-select="select(entityAnnotation)" entity-annotation="entityAnnotation"></wl-entity>'
 
-    templateHtml = '<wl-entity on-select="select(entityAnnotation)" entity-annotation="entityAnnotation"></wl-entity>'
-    
-    elem.autocomplete
-      source: (request, response) ->
-        locals = { $viewValue: request.term }
-        $q.when(originalScope.source(locals)).then (matches)->
-          response matches
-      minLength: 3
-    .data("ui-autocomplete")._renderItem = (ul, ea) ->
-      
-      scope = originalScope.$new();
-      scope.entityAnnotation = ea
-      scope.select = originalScope.onSelect
-      
-      originalScope.$on '$destroy', ()-> 
-        scope.$destroy();
-      el = angular.element(templateHtml)
-      compiled = $compile(el)     
-            
-      $("<li>").append(el).appendTo(ul)
-      compiled(scope)
+      elem.autocomplete
+        source: (request, response) ->
+          locals = { $viewValue: request.term }
+          $q.when(originalScope.source(locals)).then (matches)->
+            response matches
+        minLength: 3
+      .data("ui-autocomplete")._renderItem = (ul, ea) ->
+        scope = originalScope.$new();
+        scope.entityAnnotation = ea
+        scope.select = originalScope.onSelect
 
-])
+        originalScope.$on '$destroy', ()->
+          scope.$destroy();
+        el = angular.element(templateHtml)
+        compiled = $compile(el)
+
+        $("<li>").append(el).appendTo(ul)
+        compiled(scope)
+
+  ])
 

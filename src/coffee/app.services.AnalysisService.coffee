@@ -147,11 +147,12 @@ angular.module('AnalysisService',
             types = item['@type']
             dctype = h.get "#{DCTERMS}type", item, context
 
-            #        console.log "[ id :: #{id} ][ dc:type :: #{dctype} ]"
+#            console.log "[ id :: #{id} ][ dc:type :: #{dctype} ]"
 
             # TextAnnotation/LinguisticSystem
+#            console.log "[ FISE_ONT_TEXT_ANNOTATION :: #{FISE_ONT_TEXT_ANNOTATION} ][ DCTERMS :: #{DCTERMS} ]"
             if h.containsOrEquals(FISE_ONT_TEXT_ANNOTATION, types, context) and h.containsOrEquals("#{DCTERMS}LinguisticSystem", dctype, context)
-              #          dump "language [ id :: #{id} ][ dc:type :: #{dctype} ]"
+              # dump "language [ id :: #{id} ][ dc:type :: #{dctype} ]"
               languages.push createLanguage(item)
 
               # TextAnnotation

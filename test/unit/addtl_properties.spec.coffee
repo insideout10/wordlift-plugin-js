@@ -28,8 +28,11 @@ describe 'services', ->
       expect(analysis).toEqual jasmine.any(Object)
 
       for entityId, entity of analysis.entities
-        dump "[ entityId :: #{entityId} ][ props :: #{entity.props} ][ entity :: #{entity} ]"
+        # dump "[ entityId :: #{entityId} ][ props :: #{entity.props} ][ entity :: #{entity} ]"
+        expect(entity.props).toEqual jasmine.any(Object)
 
         for propId, propValue of entity.props
-          dump "[ propId :: #{propId} ][ propValue :: #{propValue} ]"
+          # dump "[ propId :: #{propId} ][ propValue :: #{propValue} ]"
+          expect(propValue).not.toBe undefined
+
     )
