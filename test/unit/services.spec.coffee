@@ -113,10 +113,12 @@ describe 'services', ->
 
     it 'merges data while keeping sameAs', inject((AnalysisService, $httpBackend, $rootScope) ->
 
+      url = 'base/app/assets/english.002.json'
+
+      # dump "[ url :: #{url} ]"
+
       # Get the mock-up analysis.
-      $.ajax('base/app/assets/english.002.json',
-        async: false
-      ).done (data) ->
+      $.ajax(url, async: false).done (data) ->
 
         # Catch all the requests to Freebase.
         $httpBackend.when('HEAD', /.*/).respond(200, '')
@@ -157,6 +159,7 @@ describe 'services', ->
         # Set a reference to the entity.
         entity = entityAnnotation.entity
         expect(entity).not.toBe undefined
+        # dump "[ entity id :: #{entity.id} ][ sameAs :: #{entity.sameAs} ][ thumbnails :: #{entity.thumbnails} ]"
         expect(entity.thumbnails.length).toEqual 9
         for i in [0...entity.thumbnails.length]
           expect(entity.thumbnails[i]).toEqual entity.thumbnails[i]
