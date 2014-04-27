@@ -19,29 +19,6 @@ angular.module('AnalysisService',
       '$rootScope', '$log',
       (EntityAnnotationService, EntityService, h, TextAnnotationService, $filter, $http, $q, $rootScope, $log) ->
 
-        # Find an entity in the analysis
-        # or within window.wordlift.entities storage if needed
-#        findEntityByUriWithScope = (scope, uri)->
-#          for entityId, entity of scope
-#            return entity if uri is entity?.id or uri in entity?.sameAs
-
-        # Find a text annotation in the provided collection which matches the start and end values.
-        # Otherwise a new text annotation is created
-        findOrCreateTextAnnotation = (textAnnotations, textAnnotation) ->
-          # Return the text annotation if existing.
-          ta = TextAnnotationService.find textAnnotations, textAnnotation.start, textAnnotation.end
-          return ta if ta?
-
-          # Create a new text annotation.
-          ta = TextAnnotationService.create
-            text: textAnnotation.label
-            start: textAnnotation.start
-            end: textAnnotation.end
-            confidence: 1.0
-
-          textAnnotations[ta.id] = ta
-          ta
-
         service =
           _knownTypes: []
           _entities: {}
@@ -74,7 +51,7 @@ angular.module('AnalysisService',
 
           # Find the existing entities in the html
           for annotation in annotations
-            textAnnotation = findOrCreateTextAnnotation analysis.textAnnotations, annotation
+            textAnnotation = TextAnnotationService.findOrCreate analysis.textAnnotations, annotation
             entityAnnotations = EntityAnnotationService.find textAnnotation.entityAnnotations, uri: annotation.uri
             if 0 < entityAnnotations.length
               # We don't expect more than one entity annotation for an URI inside a text annotation.
@@ -109,7 +86,7 @@ angular.module('AnalysisService',
         # Analyze the provided content. Only one analysis at a time is run.
         # The merge parameter is passed to the parse call and merges together entities related via sameAs.
         service.analyze = (content, merge = false) ->
-#            dump "AnalysisService.analyze [ content :: #{content} ][ is running :: #{@isRunning} ][ merge :: #{merge} ]"
+          # dump "AnalysisService.analyze [ content :: #{content} ][ is running :: #{@isRunning} ][ merge :: #{merge} ]"
           # Exit if an analysis is already running.
           return if service.isRunning
 
@@ -127,7 +104,6 @@ angular.module('AnalysisService',
           )
           # If successful, broadcast an *analysisReceived* event.
           .success (data) ->
-#                dump "AnalysisService.analyze [ success ]"
               $rootScope.$broadcast ANALYSIS_EVENT, service.parse(data, merge)
               # Set that the analysis is complete.
               service.isRunning = false
@@ -148,61 +124,12 @@ angular.module('AnalysisService',
           entityAnnotations = {}
           entities = {}
 
-          # Create an entity annotation. An entity annotation is created for each related text-annotation.
-          createEntityAnnotations = (item, language) ->
-            # Get the reference to the entity.
-            reference = h.get "#{FISE_ONT}entity-reference", item, context
-            # If the referenced entity is not found, return null
-            return [] if not entities[reference]?
-
-            # Prepare the return array.
-            annotations = []
-
-            # get the related text annotation.
-            relations = h.get "#{DCTERMS}relation", item, context
-            # Ensure we're dealing with an array.
-            relations = if angular.isArray relations then relations else [ relations ]
-
-            # For each text annotation bound to this entity annotation, create an entity annotation and add it to the text annotation.
-            for relation in relations
-              textAnnotation = textAnnotations[relation]
-
-              # Create an entity annotation.
-              entityAnnotation = EntityAnnotationService.create
-                id: h.get '@id', item, context
-                label: h.getLanguage "#{FISE_ONT}entity-label", item, language, context
-                confidence: h.get FISE_ONT_CONFIDENCE, item, context
-                entity: entities[reference]
-                relation: textAnnotation
-                _item: item
-
-              # Create a binding from the textannotation to the entity annotation.
-              textAnnotation.entityAnnotations[entityAnnotation.id] = entityAnnotation if textAnnotation?
-
-              # Accumulate the annotations.
-              annotations.push entityAnnotation
-
-            # Return the  entity annotations.
-            annotations
-
-
-          createTextAnnotation = (item) ->
-            TextAnnotationService.create
-              id: h.get '@id', item, context
-              text: h.get("#{FISE_ONT}selected-text", item, context)[VALUE]
-              start: h.get "#{FISE_ONT}start", item, context
-              end: h.get "#{FISE_ONT}end", item, context
-              confidence: h.get FISE_ONT_CONFIDENCE, item, context
-              entityAnnotations: {}
-              _item: item
-
           createLanguage = (item) ->
             {
             code: h.get "#{DCTERMS}language", item, context
             confidence: h.get FISE_ONT_CONFIDENCE, item, context
             _item: item
             }
-
 
           # Check that the response is valid.
           if not ( data[CONTEXT]? and data[GRAPH]? )
@@ -260,17 +187,12 @@ angular.module('AnalysisService',
           EntityService.merge(entity, entities) for id, entity of entities if merge
           EntityService.merge(entity, entities) for id, entity of @_entities if merge
 
-#          $log.info "[ entities :: "
-#          $log.info entities
-#          $log.info " ]"
-
           # Create text annotation instances.
-          textAnnotations[id] = createTextAnnotation(item) for id, item of textAnnotations
+          textAnnotations[id] = TextAnnotationService.build(item, context) for id, item of textAnnotations
 
           # Create entity annotations instances.
           for id, item of entityAnnotations
-            entityAnnotations[entityAnnotation.id] = entityAnnotation for entityAnnotation in createEntityAnnotations(item,
-              language)
+            entityAnnotations[entityAnnotation.id] = entityAnnotation for entityAnnotation in EntityAnnotationService.build(item, language, entities, textAnnotations, context)
 
           # For every text annotation delete entity annotations that refer to the same entity (after merging).
           if merge
