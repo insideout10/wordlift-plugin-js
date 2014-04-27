@@ -1352,7 +1352,8 @@
   left: 0;
   right: 0;
 }
-.wl-entity-input-boxes {
+.wl-entity-input-boxes,
+.wl-entity-props {
   display: none;
 }
 .wl-error-controller {
@@ -1396,6 +1397,14 @@
   left: 50px;
   margin-left: 4px;
   font-weight: 600;
+}
+.entity .url {
+  position: absolute;
+  top: 14px;
+  left: 50px;
+  margin-left: 4px;
+  font-size: 8px;
+  line-height: 8px;
 }
 .entity .confidence {
   position: absolute;

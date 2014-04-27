@@ -166,7 +166,17 @@
 
   angular.module('wordlift.tinymce.plugin.config', []);
 
-  angular.module('wordlift.tinymce.plugin.directives', ['wordlift.tinymce.plugin.controllers']).directive('wlEntities', function() {
+  angular.module('wordlift.directives.wlEntityProps', []).directive('wlEntityProps', function() {
+    return {
+      restrict: 'E',
+      scope: {
+        textAnnotations: '='
+      },
+      template: "<div class=\"wl-entity-props\" ng-repeat=\"textAnnotation in textAnnotations\">\n  <div ng-repeat=\"ea in textAnnotation.entityAnnotations | filterObjectBy:'selected':true\">\n    <div ng-repeat=\"(k, ps) in ea.entity.props\">\n      <input ng-repeat=\"p in ps\" name=\"wl_props[{{ea.entity.id}}][{{k}}][]\" ng-value=\"p\" type=\"text\" />\n    </div>\n  </div>\n</div>"
+    };
+  });
+
+  angular.module('wordlift.tinymce.plugin.directives', ['wordlift.directives.wlEntityProps', 'wordlift.tinymce.plugin.controllers']).directive('wlEntities', function() {
     return {
       restrict: 'E',
       scope: {
@@ -196,7 +206,7 @@
         entityAnnotation: '=',
         onSelect: '&'
       },
-      template: "<div class=\"entity {{entityAnnotation.entity.css}}\" ng-class=\"{selected: true==entityAnnotation.selected}\" ng-click=\"onSelect()\" ng-show=\"entityAnnotation.entity.label\">\n  <div class=\"thumbnail\" ng-show=\"entityAnnotation.entity.thumbnail\" title=\"{{entityAnnotation.entity.id}}\" ng-attr-style=\"background-image: url({{entityAnnotation.entity.thumbnail}})\"></div>\n  <div class=\"thumbnail empty\" ng-hide=\"entityAnnotation.entity.thumbnail\" title=\"{{entityAnnotation.entity.id}}\"></div>\n  <div class=\"confidence\" ng-bind=\"entityAnnotation.confidence\"></div>\n  <div class=\"label\" ng-bind=\"entityAnnotation.entity.label\"></div>\n  <div class=\"type\"></div>\n  <div class=\"source\" ng-class=\"entityAnnotation.entity.source\" ng-bind=\"entityAnnotation.entity.source\"></div>\n</div>"
+      template: "<div class=\"entity {{entityAnnotation.entity.css}}\" ng-class=\"{selected: true==entityAnnotation.selected}\" ng-click=\"onSelect()\" ng-show=\"entityAnnotation.entity.label\">\n  <div class=\"thumbnail\" ng-show=\"entityAnnotation.entity.thumbnail\" title=\"{{entityAnnotation.entity.id}}\" ng-attr-style=\"background-image: url({{entityAnnotation.entity.thumbnail}})\"></div>\n  <div class=\"thumbnail empty\" ng-hide=\"entityAnnotation.entity.thumbnail\" title=\"{{entityAnnotation.entity.id}}\"></div>\n  <div class=\"confidence\" ng-bind=\"entityAnnotation.confidence\"></div>\n  <div class=\"label\" ng-bind=\"entityAnnotation.entity.label\"></div>\n  <div class=\"url\" ng-bind=\"entityAnnotation.entity.id\"></div>\n  <div class=\"type\"></div>\n  <div class=\"source\" ng-class=\"entityAnnotation.entity.source\" ng-bind=\"entityAnnotation.entity.source\"></div>\n</div>"
     };
   }).directive('wlEntityInputBoxes', function() {
     return {
@@ -247,23 +257,8 @@
   ]);
 
   angular.module('AnalysisService', ['wordlift.tinymce.plugin.services.EntityService', 'wordlift.tinymce.plugin.services.Helpers']).service('AnalysisService', [
-    'EntityAnnotationService', 'EntityService', 'Helpers', 'TextAnnotationService', '$filter', '$http', '$q', '$rootScope', '$log', function(EntityAnnotationService, EntityService, Helpers, TextAnnotationService, $filter, $http, $q, $rootScope, $log) {
-      var findOrCreateTextAnnotation, service;
-      findOrCreateTextAnnotation = function(textAnnotations, textAnnotation) {
-        var ta;
-        ta = TextAnnotationService.find(textAnnotations, textAnnotation.start, textAnnotation.end);
-        if (ta != null) {
-          return ta;
-        }
-        ta = TextAnnotationService.create({
-          text: textAnnotation.label,
-          start: textAnnotation.start,
-          end: textAnnotation.end,
-          confidence: 1.0
-        });
-        textAnnotations[ta.id] = ta;
-        return ta;
-      };
+    'EntityAnnotationService', 'EntityService', 'Helpers', 'TextAnnotationService', '$filter', '$http', '$q', '$rootScope', '$log', function(EntityAnnotationService, EntityService, h, TextAnnotationService, $filter, $http, $q, $rootScope, $log) {
+      var service;
       service = {
         _knownTypes: [],
         _entities: {},
@@ -289,7 +284,7 @@
         _results = [];
         for (_i = 0, _len = annotations.length; _i < _len; _i++) {
           annotation = annotations[_i];
-          textAnnotation = findOrCreateTextAnnotation(analysis.textAnnotations, annotation);
+          textAnnotation = TextAnnotationService.findOrCreate(analysis.textAnnotations, annotation);
           entityAnnotations = EntityAnnotationService.find(textAnnotation.entityAnnotations, {
             uri: annotation.uri
           });
@@ -345,7 +340,7 @@
         });
       };
       service.parse = function(data, merge) {
-        var anotherEntityAnnotation, anotherId, containsOrEquals, context, createEntity, createEntityAnnotations, createLanguage, createTextAnnotation, dctype, entities, entity, entityAnnotation, entityAnnotations, expand, get, getA, getKnownTypes, getLanguage, graph, id, item, language, languages, mergeEntities, mergeUnique, textAnnotation, textAnnotationId, textAnnotations, types, _i, _j, _len, _len1, _ref, _ref1, _ref2, _ref3;
+        var anotherEntityAnnotation, anotherId, context, createLanguage, dctype, entities, entity, entityAnnotation, entityAnnotations, graph, id, item, language, languages, textAnnotation, textAnnotationId, textAnnotations, types, _i, _j, _len, _len1, _ref, _ref1, _ref2, _ref3;
         if (merge == null) {
           merge = false;
         }
@@ -353,271 +348,12 @@
         textAnnotations = {};
         entityAnnotations = {};
         entities = {};
-        getKnownTypes = function(types, knownTypes) {
-          var defaultType, kt, matches, returnTypes, uri, uris, _i, _len;
-          returnTypes = [];
-          defaultType = void 0;
-          for (_i = 0, _len = knownTypes.length; _i < _len; _i++) {
-            kt = knownTypes[_i];
-            if (__indexOf.call(kt.sameAs, '*') >= 0) {
-              defaultType = [
-                {
-                  type: kt
-                }
-              ];
-            }
-            uris = kt.sameAs.concat(kt.uri);
-            matches = (function() {
-              var _j, _len1, _results;
-              _results = [];
-              for (_j = 0, _len1 = uris.length; _j < _len1; _j++) {
-                uri = uris[_j];
-                if (containsOrEquals(uri, types)) {
-                  _results.push(uri);
-                }
-              }
-              return _results;
-            })();
-            if (0 < matches.length) {
-              returnTypes.push({
-                matches: matches,
-                type: kt
-              });
-            }
-          }
-          if (0 === returnTypes.length) {
-            return defaultType;
-          }
-          $filter('orderBy')(returnTypes, 'matches', true);
-          return returnTypes;
-        };
-        createEntity = function(item, language) {
-          var css, entity, id, knownTypes, sameAs, thumbnails, types;
-          id = get('@id', item);
-          types = get('@type', item);
-          types = angular.isArray(types) ? types : [types];
-          sameAs = get('http://www.w3.org/2002/07/owl#sameAs', item);
-          sameAs = angular.isArray(sameAs) ? sameAs : [sameAs];
-          thumbnails = get(['http://xmlns.com/foaf/0.1/depiction', "" + FREEBASE_NS + "common.topic.image", "" + SCHEMA_ORG + "image"], item, function(values) {
-            var match, value, _i, _len, _results;
-            values = angular.isArray(values) ? values : [values];
-            _results = [];
-            for (_i = 0, _len = values.length; _i < _len; _i++) {
-              value = values[_i];
-              match = /m\.(.*)$/i.exec(value);
-              if (null === match) {
-                _results.push(value);
-              } else {
-                _results.push("https://usercontent.googleapis.com/" + FREEBASE + "/v1/image/m/" + match[1] + "?maxwidth=4096&maxheight=4096");
-              }
-            }
-            return _results;
-          });
-          knownTypes = getKnownTypes(types, service._knownTypes);
-          css = knownTypes[0].type.css;
-          entity = {
-            id: id,
-            thumbnail: 0 < thumbnails.length ? thumbnails[0] : null,
-            thumbnails: thumbnails,
-            css: css,
-            type: knownTypes[0].type.uri,
-            types: types,
-            label: getLanguage(RDFS_LABEL, item, language),
-            labels: get(RDFS_LABEL, item),
-            sameAs: sameAs,
-            source: id.match("^" + FREEBASE_COM + ".*$") ? FREEBASE : id.match("^" + DBPEDIA_ORG_REGEX + ".*$") ? DBPEDIA : 'wordlift',
-            _item: item
-          };
-          entity.sources = [entity.source];
-          entity.description = getLanguage([RDFS_COMMENT, FREEBASE_NS_DESCRIPTION, SCHEMA_ORG_DESCRIPTION], item, language);
-          entity.descriptions = get([RDFS_COMMENT, FREEBASE_NS_DESCRIPTION, SCHEMA_ORG_DESCRIPTION], item);
-          if (entity.description == null) {
-            entity.description = '';
-          }
-          entity.latitude = get("" + WGS84_POS + "lat", item);
-          entity.longitude = get("" + WGS84_POS + "long", item);
-          if (0 === entity.latitude.length || 0 === entity.longitude.length) {
-            entity.latitude = '';
-            entity.longitude = '';
-          }
-          return entity;
-        };
-        createEntityAnnotations = function(item, language) {
-          var annotations, entityAnnotation, reference, relation, relations, textAnnotation, _i, _len;
-          reference = get("" + FISE_ONT + "entity-reference", item);
-          if (entities[reference] == null) {
-            return [];
-          }
-          annotations = [];
-          relations = get("" + DCTERMS + "relation", item);
-          relations = angular.isArray(relations) ? relations : [relations];
-          for (_i = 0, _len = relations.length; _i < _len; _i++) {
-            relation = relations[_i];
-            textAnnotation = textAnnotations[relation];
-            entityAnnotation = EntityAnnotationService.create({
-              id: get('@id', item),
-              label: getLanguage("" + FISE_ONT + "entity-label", item, language),
-              confidence: get(FISE_ONT_CONFIDENCE, item),
-              entity: entities[reference],
-              relation: textAnnotation,
-              _item: item
-            });
-            if (textAnnotation != null) {
-              textAnnotation.entityAnnotations[entityAnnotation.id] = entityAnnotation;
-            }
-            annotations.push(entityAnnotation);
-          }
-          return annotations;
-        };
-        createTextAnnotation = function(item) {
-          return TextAnnotationService.create({
-            id: get('@id', item),
-            text: get("" + FISE_ONT + "selected-text", item)[VALUE],
-            start: get("" + FISE_ONT + "start", item),
-            end: get("" + FISE_ONT + "end", item),
-            confidence: get(FISE_ONT_CONFIDENCE, item),
-            entityAnnotations: {},
-            _item: item
-          });
-        };
         createLanguage = function(item) {
           return {
-            code: get("" + DCTERMS + "language", item),
-            confidence: get(FISE_ONT_CONFIDENCE, item),
+            code: h.get("" + DCTERMS + "language", item, context),
+            confidence: h.get(FISE_ONT_CONFIDENCE, item, context),
             _item: item
           };
-        };
-        get = function(what, container, filter) {
-          var add, key, values, _i, _len;
-          if (!angular.isArray(what)) {
-            return getA(what, container, filter);
-          }
-          values = [];
-          for (_i = 0, _len = what.length; _i < _len; _i++) {
-            key = what[_i];
-            add = getA(key, container, filter);
-            add = angular.isArray(add) ? add : [add];
-            mergeUnique(values, add);
-          }
-          return values;
-        };
-        getA = function(what, container, filter) {
-          var key, value, whatExp;
-          if (filter == null) {
-            filter = function(a) {
-              return a;
-            };
-          }
-          whatExp = expand(what);
-          for (key in container) {
-            value = container[key];
-            if (whatExp === expand(key)) {
-              return filter(value);
-            }
-          }
-          return [];
-        };
-        getLanguage = function(what, container, language) {
-          var item, items, _i, _j, _len, _len1;
-          if (null === (items = get(what, container))) {
-            return;
-          }
-          items = angular.isArray(items) ? items : [items];
-          for (_i = 0, _len = items.length; _i < _len; _i++) {
-            item = items[_i];
-            if (language === item['@language']) {
-              return item[VALUE];
-            }
-          }
-          for (_j = 0, _len1 = items.length; _j < _len1; _j++) {
-            item = items[_j];
-            if ('en' === item['@language']) {
-              return item[VALUE];
-            }
-          }
-        };
-        containsOrEquals = function(what, where) {
-          var item, whatExp, whereArray, _i, _j, _len, _len1;
-          if (where == null) {
-            return false;
-          }
-          whereArray = angular.isArray(where) ? where : [where];
-          whatExp = expand(what);
-          if ('@' === what.charAt(0)) {
-            for (_i = 0, _len = whereArray.length; _i < _len; _i++) {
-              item = whereArray[_i];
-              if (whatExp === expand(item)) {
-                return true;
-              }
-            }
-          } else {
-            for (_j = 0, _len1 = whereArray.length; _j < _len1; _j++) {
-              item = whereArray[_j];
-              if (whatExp === expand(item)) {
-                return true;
-              }
-            }
-          }
-          return false;
-        };
-        mergeUnique = function(array1, array2) {
-          var item, _i, _len, _results;
-          if (array1 == null) {
-            array1 = [];
-          }
-          _results = [];
-          for (_i = 0, _len = array2.length; _i < _len; _i++) {
-            item = array2[_i];
-            if (__indexOf.call(array1, item) < 0) {
-              _results.push(array1.push(item));
-            }
-          }
-          return _results;
-        };
-        mergeEntities = function(entity, entities) {
-          var existing, sameAs, _i, _len, _ref;
-          _ref = entity.sameAs;
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            sameAs = _ref[_i];
-            if ((entities[sameAs] != null) && entities[sameAs] !== entity) {
-              existing = entities[sameAs];
-              mergeUnique(entity.sameAs, existing.sameAs);
-              mergeUnique(entity.thumbnails, existing.thumbnails);
-              mergeUnique(entity.sources, existing.sources);
-              if (entity.css == null) {
-                entity.css = existing.css;
-              }
-              entity.source = entity.sources.join(', ');
-              if (DBPEDIA === existing.source) {
-                entity.description = existing.description;
-              }
-              if (DBPEDIA === existing.source && (existing.longitude != null)) {
-                entity.longitude = existing.longitude;
-              }
-              if (DBPEDIA === existing.source && (existing.latitude != null)) {
-                entity.latitude = existing.latitude;
-              }
-              entities[sameAs] = entity;
-              mergeEntities(entity, entities);
-            }
-          }
-          return entity;
-        };
-        expand = function(content) {
-          var matches, path, prefix, prepend;
-          if (null === (matches = content.match(/([\w|\d]+):(.*)/))) {
-            prefix = content;
-            path = '';
-          } else {
-            prefix = matches[1];
-            path = matches[2];
-          }
-          if (context[prefix] != null) {
-            prepend = angular.isString(context[prefix]) ? context[prefix] : context[prefix]['@id'];
-          } else {
-            prepend = prefix + ':';
-          }
-          return prepend + path;
         };
         if (!((data[CONTEXT] != null) && (data[GRAPH] != null))) {
           $rootScope.$broadcast('error', 'The analysis response is invalid. Please try again later.');
@@ -629,12 +365,12 @@
           item = graph[_i];
           id = item['@id'];
           types = item['@type'];
-          dctype = get("" + DCTERMS + "type", item);
-          if (containsOrEquals(FISE_ONT_TEXT_ANNOTATION, types) && containsOrEquals("" + DCTERMS + "LinguisticSystem", dctype)) {
+          dctype = h.get("" + DCTERMS + "type", item, context);
+          if (h.containsOrEquals(FISE_ONT_TEXT_ANNOTATION, types, context) && h.containsOrEquals("" + DCTERMS + "LinguisticSystem", dctype, context)) {
             languages.push(createLanguage(item));
-          } else if (containsOrEquals(FISE_ONT_TEXT_ANNOTATION, types)) {
+          } else if (h.containsOrEquals(FISE_ONT_TEXT_ANNOTATION, types, context)) {
             textAnnotations[id] = item;
-          } else if (containsOrEquals(FISE_ONT_ENTITY_ANNOTATION, types)) {
+          } else if (h.containsOrEquals(FISE_ONT_ENTITY_ANNOTATION, types, context)) {
             entityAnnotations[id] = item;
           } else {
             entities[id] = item;
@@ -652,28 +388,28 @@
         language = languages[0].code;
         for (id in entities) {
           item = entities[id];
-          entities[id] = createEntity(item, language);
+          entities[id] = EntityService.create(item, language, service._knownTypes, context);
         }
         if (merge) {
           for (id in entities) {
             entity = entities[id];
-            mergeEntities(entity, entities);
+            EntityService.merge(entity, entities);
           }
         }
         if (merge) {
           _ref = this._entities;
           for (id in _ref) {
             entity = _ref[id];
-            mergeEntities(entity, entities);
+            EntityService.merge(entity, entities);
           }
         }
         for (id in textAnnotations) {
           item = textAnnotations[id];
-          textAnnotations[id] = createTextAnnotation(item);
+          textAnnotations[id] = TextAnnotationService.build(item, context);
         }
         for (id in entityAnnotations) {
           item = entityAnnotations[id];
-          _ref1 = createEntityAnnotations(item, language);
+          _ref1 = EntityAnnotationService.build(item, language, entities, textAnnotations, context);
           for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
             entityAnnotation = _ref1[_j];
             entityAnnotations[entityAnnotation.id] = entityAnnotation;
@@ -820,138 +556,512 @@
   ]);
 
   angular.module('wordlift.tinymce.plugin.services.EntityAnnotationService', []).service('EntityAnnotationService', [
-    'Helpers', function(Helpers) {
-      return {
-        create: function(params) {
-          var defaults;
-          defaults = {
-            id: 'uri:local-entity-annotation-' + Helpers.uniqueId(32),
-            label: '',
-            confidence: 0.0,
-            entity: null,
-            relation: null,
-            selected: false,
-            _item: null
-          };
-          if ((params.entity != null) && (params.entity.label == null)) {
-            params.entity.label = params.label;
+    'Helpers', function(h) {
+      var service;
+      service = {};
+      service.create = function(params) {
+        var defaults;
+        defaults = {
+          id: 'uri:local-entity-annotation-' + h.uniqueId(32),
+          label: '',
+          confidence: 0.0,
+          entity: null,
+          relation: null,
+          selected: false,
+          _item: null
+        };
+        if ((params.entity != null) && (params.entity.label == null)) {
+          params.entity.label = params.label;
+        }
+        return h.merge(defaults, params);
+      };
+
+      /**
+       * Create an entity annotation. An entity annotation is created for each related text-annotation.
+       * @param {object} Entity raw data.
+       * @param {string} The language code.
+       * @return {array} An array of entity annotations.
+       */
+      service.build = function(item, language, entities, tas, context) {
+        var annotations, entityAnnotation, reference, relation, relations, textAnnotation, _i, _len;
+        reference = h.get("" + FISE_ONT + "entity-reference", item, context);
+        if (entities[reference] == null) {
+          return [];
+        }
+        annotations = [];
+        relations = h.get("" + DCTERMS + "relation", item, context);
+        relations = angular.isArray(relations) ? relations : [relations];
+        for (_i = 0, _len = relations.length; _i < _len; _i++) {
+          relation = relations[_i];
+          textAnnotation = tas[relation];
+          entityAnnotation = service.create({
+            id: h.get('@id', item, context),
+            label: h.getLanguage("" + FISE_ONT + "entity-label", item, language, context),
+            confidence: h.get(FISE_ONT_CONFIDENCE, item, context),
+            entity: entities[reference],
+            relation: textAnnotation,
+            _item: item
+          });
+          if (textAnnotation != null) {
+            textAnnotation.entityAnnotations[entityAnnotation.id] = entityAnnotation;
           }
-          return Helpers.merge(defaults, params);
-        },
-        find: function(entityAnnotations, filter) {
-          var entityAnnotation, entityAnnotationId;
-          if (filter.uri != null) {
-            return (function() {
-              var _ref, _results;
-              _results = [];
-              for (entityAnnotationId in entityAnnotations) {
-                entityAnnotation = entityAnnotations[entityAnnotationId];
-                if (filter.uri === entityAnnotation.entity.id || (_ref = filter.uri, __indexOf.call(entityAnnotation.entity.sameAs, _ref) >= 0)) {
-                  _results.push(entityAnnotation);
-                }
+          annotations.push(entityAnnotation);
+        }
+        return annotations;
+      };
+      service.find = function(entityAnnotations, filter) {
+        var entityAnnotation, id;
+        if (filter.uri != null) {
+          return (function() {
+            var _ref, _results;
+            _results = [];
+            for (id in entityAnnotations) {
+              entityAnnotation = entityAnnotations[id];
+              if (filter.uri === entityAnnotation.entity.id || (_ref = filter.uri, __indexOf.call(entityAnnotation.entity.sameAs, _ref) >= 0)) {
+                _results.push(entityAnnotation);
               }
-              return _results;
-            })();
-          }
-          if (filter.selected != null) {
-            return (function() {
-              var _results;
-              _results = [];
-              for (entityAnnotationId in entityAnnotations) {
-                entityAnnotation = entityAnnotations[entityAnnotationId];
-                if (entityAnnotation.selected === filter.selected) {
-                  _results.push(entityAnnotation);
-                }
+            }
+            return _results;
+          })();
+        }
+        if (filter.selected != null) {
+          return (function() {
+            var _results;
+            _results = [];
+            for (id in entityAnnotations) {
+              entityAnnotation = entityAnnotations[id];
+              if (entityAnnotation.selected === filter.selected) {
+                _results.push(entityAnnotation);
               }
-              return _results;
-            })();
-          }
+            }
+            return _results;
+          })();
         }
       };
+      return service;
     }
   ]);
 
-  angular.module('wordlift.tinymce.plugin.services.EntityService', []).service('EntityService', [
-    function() {
-      return {
-        find: function(entities, filter) {
-          var entity, entityId;
-          if (filter.uri != null) {
-            return (function() {
-              var _ref, _results;
-              _results = [];
-              for (entityId in entities) {
-                entity = entities[entityId];
-                if (filter.uri === (entity != null ? entity.id : void 0) || (_ref = filter.uri, __indexOf.call(entity != null ? entity.sameAs : void 0, _ref) >= 0)) {
-                  _results.push(entity);
-                }
+  angular.module('wordlift.tinymce.plugin.services.EntityService', ['wordlift.tinymce.plugin.services.Helpers']).service('EntityService', [
+    'Helpers', '$filter', function(h, $filter) {
+      var service;
+      service = {};
+      service.find = function(entities, filter) {
+        var entity, entityId;
+        if (filter.uri != null) {
+          return (function() {
+            var _ref, _results;
+            _results = [];
+            for (entityId in entities) {
+              entity = entities[entityId];
+              if (filter.uri === (entity != null ? entity.id : void 0) || (_ref = filter.uri, __indexOf.call(entity != null ? entity.sameAs : void 0, _ref) >= 0)) {
+                _results.push(entity);
               }
-              return _results;
-            })();
-          }
+            }
+            return _results;
+          })();
         }
       };
+
+      /**
+       * Create an entity using the provided data and context.
+       * @param {object} An item object containing the entity raw data.
+       * @param {object} A context instance with prefix -> URL key-value pairs.
+       * @return {object} An entity instance.
+       */
+      service.create = function(item, language, kt, context) {
+        var css, entity, fn, id, knownTypes, sameAs, thumbnails, types;
+        id = h.get('@id', item, context);
+        types = h.get('@type', item, context, function(ts) {
+          var t, _i, _len, _results;
+          ts = angular.isArray(ts) ? ts : [ts];
+          _results = [];
+          for (_i = 0, _len = ts.length; _i < _len; _i++) {
+            t = ts[_i];
+            _results.push(h.expand(t, context));
+          }
+          return _results;
+        });
+        sameAs = h.get('http://www.w3.org/2002/07/owl#sameAs', item, context);
+        sameAs = angular.isArray(sameAs) ? sameAs : [sameAs];
+        fn = function(values) {
+          var match, value, _i, _len, _results;
+          values = angular.isArray(values) ? values : [values];
+          _results = [];
+          for (_i = 0, _len = values.length; _i < _len; _i++) {
+            value = values[_i];
+            match = /m\.(.*)$/i.exec(value);
+            if (null === match) {
+              _results.push(value);
+            } else {
+              _results.push("https://usercontent.googleapis.com/" + FREEBASE + "/v1/image/m/" + match[1] + "?maxwidth=4096&maxheight=4096");
+            }
+          }
+          return _results;
+        };
+        thumbnails = h.get(['http://xmlns.com/foaf/0.1/depiction', "" + FREEBASE_NS + "common.topic.image", "" + SCHEMA_ORG + "image"], item, context, fn);
+        knownTypes = service.getKnownTypes(types, kt, context);
+        css = knownTypes[0].type.css;
+        entity = {
+          id: id,
+          thumbnail: 0 < thumbnails.length ? thumbnails[0] : null,
+          thumbnails: thumbnails,
+          css: css,
+          type: knownTypes[0].type.uri,
+          types: types,
+          label: h.getLanguage(RDFS_LABEL, item, language, context),
+          labels: h.get(RDFS_LABEL, item, context),
+          sameAs: sameAs,
+          source: id.match("^" + FREEBASE_COM + ".*$") ? FREEBASE : id.match("^" + DBPEDIA_ORG_REGEX + ".*$") ? DBPEDIA : 'wordlift',
+          _item: item,
+          props: service.createProps(item, context)
+        };
+        entity.sources = [entity.source];
+        entity.description = h.getLanguage([RDFS_COMMENT, FREEBASE_NS_DESCRIPTION, SCHEMA_ORG_DESCRIPTION], item, language, context);
+        entity.descriptions = h.get([RDFS_COMMENT, FREEBASE_NS_DESCRIPTION, SCHEMA_ORG_DESCRIPTION], item, context);
+        if (entity.description == null) {
+          entity.description = '';
+        }
+        entity.latitude = h.get("" + WGS84_POS + "lat", item, context);
+        entity.longitude = h.get("" + WGS84_POS + "long", item, context);
+        if (0 === entity.latitude.length || 0 === entity.longitude.length) {
+          entity.latitude = '';
+          entity.longitude = '';
+        }
+        return entity;
+      };
+      service.merge = function(entity, entities) {
+        var existing, sameAs, _i, _len, _ref;
+        _ref = entity.sameAs;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          sameAs = _ref[_i];
+          if ((entities[sameAs] != null) && entities[sameAs] !== entity) {
+            existing = entities[sameAs];
+            h.mergeUnique(entity.sameAs, existing.sameAs);
+            h.mergeUnique(entity.thumbnails, existing.thumbnails);
+            h.mergeUnique(entity.sources, existing.sources);
+            if (entity.css == null) {
+              entity.css = existing.css;
+            }
+            entity.source = entity.sources.join(', ');
+            if (DBPEDIA === existing.source) {
+              entity.description = existing.description;
+            }
+            if (DBPEDIA === existing.source && (existing.longitude != null)) {
+              entity.longitude = existing.longitude;
+            }
+            if (DBPEDIA === existing.source && (existing.latitude != null)) {
+              entity.latitude = existing.latitude;
+            }
+            entities[sameAs] = entity;
+            service.merge(entity, entities);
+          }
+        }
+        return entity;
+      };
+
+      /**
+       * Get the known type given the specified types.
+       * @param {array} An array of types.
+       * @param {object} An object representing the known types.
+       * @return {object} The default type.
+       */
+      service.getKnownTypes = function(types, knownTypes, context) {
+        var defaultType, kt, matches, returnTypes, uri, uris, _i, _len;
+        returnTypes = [];
+        defaultType = void 0;
+        for (_i = 0, _len = knownTypes.length; _i < _len; _i++) {
+          kt = knownTypes[_i];
+          if (__indexOf.call(kt.sameAs, '*') >= 0) {
+            defaultType = [
+              {
+                type: kt
+              }
+            ];
+          }
+          uris = kt.sameAs.concat(kt.uri);
+          matches = (function() {
+            var _j, _len1, _results;
+            _results = [];
+            for (_j = 0, _len1 = uris.length; _j < _len1; _j++) {
+              uri = uris[_j];
+              if (h.containsOrEquals(uri, types, context)) {
+                _results.push(uri);
+              }
+            }
+            return _results;
+          })();
+          if (0 < matches.length) {
+            returnTypes.push({
+              matches: matches,
+              type: kt
+            });
+          }
+        }
+        if (0 === returnTypes.length) {
+          return defaultType;
+        }
+        $filter('orderBy')(returnTypes, 'matches', true);
+        return returnTypes;
+      };
+
+      /**
+       * Create a key-values pair of properties.
+       * @param {object} An item object containing the entity raw data.
+       * @param {object} A context instance with prefix -> URL key-value pairs.
+       * @return {object} A key-values pair of entity properties.
+       */
+      service.createProps = function(item, context) {
+        var expKey, key, props, value;
+        props = {};
+        for (key in item) {
+          value = item[key];
+          if (angular.isObject(value)) {
+            continue;
+          }
+          expKey = h.expand(key, context);
+          if (props[expKey] == null) {
+            props[expKey] = [];
+          }
+          props[expKey].push(h.expand(value, context));
+        }
+        return props;
+      };
+      return service;
     }
   ]);
 
   angular.module('wordlift.tinymce.plugin.services.Helpers', []).service('Helpers', [
     function() {
-      return {
-        merge: function(options, overrides) {
-          return this.extend(this.extend({}, options), overrides);
-        },
-        extend: function(object, properties) {
-          var key, val;
-          for (key in properties) {
-            val = properties[key];
-            object[key] = val;
+      var service;
+      service = {};
+      service.merge = function(options, overrides) {
+        return this.extend(this.extend({}, options), overrides);
+      };
+      service.extend = function(object, properties) {
+        var key, val;
+        for (key in properties) {
+          val = properties[key];
+          object[key] = val;
+        }
+        return object;
+      };
+      service.uniqueId = function(length) {
+        var id;
+        if (length == null) {
+          length = 8;
+        }
+        id = '';
+        while (id.length < length) {
+          id += Math.random().toString(36).substr(2);
+        }
+        return id.substr(0, length);
+      };
+
+      /**
+       * Expand a string using the provided context.
+       * @param {string} A content string to be expanded.
+       * @param {object} A context providing prefix -> URL key-value pairs
+       * @return {string} An expanded string.
+       */
+      service._expand = function(content, context) {
+        var matches, path, prefix, prepend;
+        if (content == null) {
+          return;
+        }
+        if (null === (matches = ("" + content).match(/([\w|\d]+):(.*)/))) {
+          prefix = content;
+          path = '';
+        } else {
+          prefix = matches[1];
+          path = matches[2];
+        }
+        if (context[prefix] == null) {
+          return content;
+        }
+        prepend = angular.isString(context[prefix]) ? context[prefix] : context[prefix]['@id'];
+        return prepend + path;
+      };
+
+      /**
+       * Expand the specified content using the prefixes in the provided context.
+       * @param {string|array} The content string or an array of strings.
+       * @param {object} A context made of prefix -> URLs value pairs.
+       * @return {string|array} An expanded string or an array of expanded strings.
+       */
+      service.expand = function(content, context) {
+        var c;
+        if (angular.isArray(content)) {
+          return (function() {
+            var _i, _len, _results;
+            _results = [];
+            for (_i = 0, _len = content.length; _i < _len; _i++) {
+              c = content[_i];
+              _results.push(service.expand(c, context));
+            }
+            return _results;
+          })();
+        }
+        return service._expand(content, context);
+      };
+      service.get = function(what, container, context, filter) {
+        var add, key, values, _i, _len;
+        if (!angular.isArray(what)) {
+          return service.getA(what, container, context, filter);
+        }
+        values = [];
+        for (_i = 0, _len = what.length; _i < _len; _i++) {
+          key = what[_i];
+          add = service.getA(key, container, context, filter);
+          add = angular.isArray(add) ? add : [add];
+          service.mergeUnique(values, add);
+        }
+        return values;
+      };
+      service.getA = function(what, container, context, filter) {
+        var key, value, whatExp;
+        if (filter == null) {
+          filter = (function(a) {
+            return a;
+          });
+        }
+        whatExp = service.expand(what, context);
+        for (key in container) {
+          value = container[key];
+          if (whatExp === service.expand(key, context)) {
+            return filter(value);
           }
-          return object;
-        },
-        uniqueId: function(length) {
-          var id;
-          if (length == null) {
-            length = 8;
+        }
+        return [];
+      };
+      service.getLanguage = function(what, container, language, context) {
+        var item, items, _i, _j, _len, _len1;
+        if (null === (items = service.get(what, container, context))) {
+          return;
+        }
+        items = angular.isArray(items) ? items : [items];
+        for (_i = 0, _len = items.length; _i < _len; _i++) {
+          item = items[_i];
+          if (language === item['@language']) {
+            return item[VALUE];
           }
-          id = '';
-          while (id.length < length) {
-            id += Math.random().toString(36).substr(2);
+        }
+        for (_j = 0, _len1 = items.length; _j < _len1; _j++) {
+          item = items[_j];
+          if ('en' === item['@language']) {
+            return item[VALUE];
           }
-          return id.substr(0, length);
         }
       };
+      service.mergeUnique = function(array1, array2) {
+        var item, _i, _len, _results;
+        if (array1 == null) {
+          array1 = [];
+        }
+        _results = [];
+        for (_i = 0, _len = array2.length; _i < _len; _i++) {
+          item = array2[_i];
+          if (__indexOf.call(array1, item) < 0) {
+            _results.push(array1.push(item));
+          }
+        }
+        return _results;
+      };
+      service.containsOrEquals = function(what, where, context) {
+        var item, whatExp, whereArray, _i, _len;
+        if (where == null) {
+          return false;
+        }
+        whereArray = angular.isArray(where) ? where : [where];
+        whatExp = service.expand(what, context);
+        for (_i = 0, _len = whereArray.length; _i < _len; _i++) {
+          item = whereArray[_i];
+          if (whatExp === service.expand(item, context)) {
+            return true;
+          }
+        }
+        return false;
+      };
+      return service;
     }
   ]);
 
   angular.module('wordlift.tinymce.plugin.services.TextAnnotationService', []).service('TextAnnotationService', [
-    'Helpers', function(Helpers) {
-      return {
-        create: function(params) {
-          var defaults;
-          if (params == null) {
-            params = {};
-          }
-          defaults = {
-            id: 'urn:local-text-annotation-' + Helpers.uniqueId(32),
-            text: '',
-            start: 0,
-            end: 0,
-            confidence: 0.0,
-            entityAnnotations: {},
-            _item: null
-          };
-          return Helpers.merge(defaults, params);
-        },
-        find: function(textAnnotations, start, end) {
-          var textAnnotation, textAnnotationId;
-          for (textAnnotationId in textAnnotations) {
-            textAnnotation = textAnnotations[textAnnotationId];
-            if (textAnnotation.start === start && textAnnotation.end === end) {
-              return textAnnotation;
-            }
+    'Helpers', function(h) {
+      var service;
+      service = {};
+
+      /**
+       * Create a text annotation using the specified parameters.
+       * @param {object} An object containing the parameters to set.
+       * @return {object} A text annotation instance.
+       */
+      service.create = function(params) {
+        var defaults;
+        if (params == null) {
+          params = {};
+        }
+        defaults = {
+          id: 'urn:local-text-annotation-' + h.uniqueId(32),
+          text: '',
+          start: 0,
+          end: 0,
+          confidence: 0.0,
+          entityAnnotations: {},
+          _item: null
+        };
+        return h.merge(defaults, params);
+      };
+
+      /**
+       * Create a text annotation.
+       * @param {object} The text annotation raw data.
+       * @param {object} The context data holding prefix -> URL key-value pairs.
+       * @return {object} A text annotation.
+       */
+      service.build = function(item, context) {
+        return service.create({
+          id: h.get('@id', item, context),
+          text: h.get("" + FISE_ONT + "selected-text", item, context)[VALUE],
+          start: h.get("" + FISE_ONT + "start", item, context),
+          end: h.get("" + FISE_ONT + "end", item, context),
+          confidence: h.get(FISE_ONT_CONFIDENCE, item, context),
+          entityAnnotations: {},
+          _item: item
+        });
+      };
+      service.find = function(textAnnotations, start, end) {
+        var textAnnotation, textAnnotationId;
+        for (textAnnotationId in textAnnotations) {
+          textAnnotation = textAnnotations[textAnnotationId];
+          if (textAnnotation.start === start && textAnnotation.end === end) {
+            return textAnnotation;
           }
         }
       };
+
+      /**
+       * Find a text annotation in the provided collection which matches the start and end values.
+       * @param {object} A collection of text annotations.
+       * @param {object} Text annotation used for search or to create a new text annotation.
+       * @return {object} The text annotation matching the parameters or a new text annotation with those parameters.
+       */
+      service.findOrCreate = function(textAnnotations, textAnnotation) {
+        var ta;
+        ta = service.find(textAnnotations, textAnnotation.start, textAnnotation.end);
+        if (ta != null) {
+          return ta;
+        }
+        ta = service.create({
+          text: textAnnotation.label,
+          start: textAnnotation.start,
+          end: textAnnotation.end,
+          confidence: 1.0
+        });
+        textAnnotations[ta.id] = ta;
+        return ta;
+      };
+      return service;
     }
   ]);
 
@@ -1066,7 +1176,7 @@
 
   angular.module('wordlift.tinymce.plugin', ['wordlift.tinymce.plugin.controllers', 'wordlift.tinymce.plugin.directives']);
 
-  $(container = $('<div id="wl-app" class="wl-app">\n  <div id="wl-error-controller" class="wl-error-controller" ng-controller="ErrorController">\n    <p ng-bind="message"></p>\n  </div>\n  <div id="wordlift-disambiguation-popover" class="metabox-holder" ng-controller="EntitiesController">\n    <div class="postbox">\n      <div class="handlediv" title="Click to toggle"><br></div>\n      <h3 class="hndle"><span>Semantic Web</span></h3>\n      <div class="inside">\n        <form role="form">\n          <div class="form-group">\n            <div class="ui-widget">\n              <input type="text" class="form-control" id="search" placeholder="search or create" autocomplete source="search($viewValue)" on-select="onEntitySearched(entityAnnotation)">\n            </div>\n          </div>\n          <wl-entities on-select="onEntitySelected(textAnnotation, entityAnnotation)" text-annotation="textAnnotation"></wl-entities>\n\n        </form>\n\n        <wl-entity-input-boxes text-annotations="analysis.textAnnotations"></wl-entity-input-boxes>\n      </div>\n    </div>\n  </div>\n</div>').appendTo('form[name=post]'), $('#wordlift-disambiguation-popover').css({
+  $(container = $('<div id="wl-app" class="wl-app">\n  <div id="wl-error-controller" class="wl-error-controller" ng-controller="ErrorController">\n    <p ng-bind="message"></p>\n  </div>\n  <div id="wordlift-disambiguation-popover" class="metabox-holder" ng-controller="EntitiesController">\n    <div class="postbox">\n      <div class="handlediv" title="Click to toggle"><br></div>\n      <h3 class="hndle"><span>Semantic Web</span></h3>\n      <div class="inside">\n        <form role="form">\n          <div class="form-group">\n            <div class="ui-widget">\n              <input type="text" class="form-control" id="search" placeholder="search or create" autocomplete source="search($viewValue)" on-select="onEntitySearched(entityAnnotation)">\n            </div>\n          </div>\n          <wl-entities on-select="onEntitySelected(textAnnotation, entityAnnotation)" text-annotation="textAnnotation"></wl-entities>\n\n        </form>\n\n        <wl-entity-input-boxes text-annotations="analysis.textAnnotations"></wl-entity-input-boxes>\n        <wl-entity-props text-annotations="analysis.textAnnotations"></wl-entity-props>\n      </div>\n    </div>\n  </div>\n</div>').appendTo('form[name=post]'), $('#wordlift-disambiguation-popover').css({
     display: 'none',
     height: $('body').height() - $('#wpadminbar').height() + 12,
     top: $('#wpadminbar').height() - 1,
