@@ -251,11 +251,40 @@
             
             <div class="content"><div class='highlight'><pre>      expect(analysis).toEqual jasmine.any(Object)
 
-      <span class="hljs-keyword">for</span> entityId, entity <span class="hljs-keyword">of</span> analysis.entities
-        dump <span class="hljs-string">"[ entityId :: <span class="hljs-subst">#{entityId}</span> ][ props :: <span class="hljs-subst">#{entity.props}</span> ][ entity :: <span class="hljs-subst">#{entity}</span> ]"</span>
+      <span class="hljs-keyword">for</span> entityId, entity <span class="hljs-keyword">of</span> analysis.entities</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p>dump “[ entityId :: #{entityId} ][ props :: #{entity.props} ][ entity :: #{entity} ]”</p>
 
-        <span class="hljs-keyword">for</span> propId, propValue <span class="hljs-keyword">of</span> entity.props
-          dump <span class="hljs-string">"[ propId :: <span class="hljs-subst">#{propId}</span> ][ propValue :: <span class="hljs-subst">#{propValue}</span> ]"</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        expect(entity.props).toEqual jasmine.any(Object)
+
+        <span class="hljs-keyword">for</span> propId, propValue <span class="hljs-keyword">of</span> entity.props</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>dump “[ propId :: #{propId} ][ propValue :: #{propValue} ]”</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          expect(propValue).<span class="hljs-keyword">not</span>.toBe <span class="hljs-literal">undefined</span>
+
     )</pre></div></div>
             
         </li>
