@@ -16,6 +16,7 @@ module.exports = (grunt) ->
             'src/coffee/traslator.coffee'
             'src/coffee/app.constants.coffee'
             'src/coffee/app.config.coffee'
+            'src/coffee/app.directives.wlEntityProps.coffee'
             'src/coffee/app.directives.coffee'
             'src/coffee/app.services.AnalysisService.coffee'
             'src/coffee/app.services.EditorService.coffee'
