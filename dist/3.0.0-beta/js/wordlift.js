@@ -1139,9 +1139,9 @@
         return $scope.analysis = analysis;
       });
       return $scope.$on('textAnnotationClicked', function(event, id, sourceElement) {
-        var pos, _ref;
-        $scope.textAnnotation = $scope.analysis.textAnnotations[id];
-        if ((((_ref = $scope.textAnnotation) != null ? _ref.entityAnnotations : void 0) == null) || 0 === Object.keys($scope.textAnnotation.entityAnnotations).length) {
+        var pos, _ref, _ref1;
+        $scope.textAnnotation = (_ref = $scope.analysis) != null ? _ref.textAnnotations[id] : void 0;
+        if ((((_ref1 = $scope.textAnnotation) != null ? _ref1.entityAnnotations : void 0) == null) || 0 === Object.keys($scope.textAnnotation.entityAnnotations).length) {
           return $('#wordlift-disambiguation-popover').hide();
         } else {
           pos = EditorService.getWinPos(sourceElement);
