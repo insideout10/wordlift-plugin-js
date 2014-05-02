@@ -1117,7 +1117,9 @@
         return $http({
           method: 'post',
           url: ajaxurl + '?action=wordlift_search',
-          data: term
+          data: {
+            'term': term
+          }
         }).then(function(response) {
           return response.data.map(function(entity) {
             return EntityAnnotationService.create({

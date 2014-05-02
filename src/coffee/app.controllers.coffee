@@ -55,7 +55,7 @@ angular.module('wordlift.tinymce.plugin.controllers',
       return $http
         method: 'post'
         url: ajaxurl + '?action=wordlift_search'
-        data: term
+        data: { 'term' : term }
       .then (response) ->
         # Create a fake entity annotation for each entity
         response.data.map (entity)->
