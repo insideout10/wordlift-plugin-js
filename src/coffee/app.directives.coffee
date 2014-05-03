@@ -93,14 +93,24 @@ angular.module('wordlift.tinymce.plugin.directives', ['wordlift.directives.wlEnt
       elem.autocomplete
         source: (request, response) ->
           locals = { $viewValue: request.term }
-          $q.when(originalScope.source(locals)).then (matches)->
+          $q.when(originalScope.source(locals)).then (matches) ->
             response matches
         minLength: 3
       .data("ui-autocomplete")._renderItem = (ul, ea) ->
+        
         scope = originalScope.$new();
         scope.entityAnnotation = ea
-        scope.select = originalScope.onSelect
-
+        
+        scope.select = (entityAnnotation) ->
+          # Set the higher priority for this item
+          entityAnnotation.confidence = 1.0
+          # Reset autocomplete field & hide results
+          angular.element(elem).val('')
+          angular.element(ul).hide()
+          # Call the onSelect callback
+          originalScope.onSelect
+            entityAnnotation: entityAnnotation
+         
         originalScope.$on '$destroy', ()->
           scope.$destroy();
         el = angular.element(templateHtml)

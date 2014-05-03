@@ -242,7 +242,14 @@
             var compiled, el, scope;
             scope = originalScope.$new();
             scope.entityAnnotation = ea;
-            scope.select = originalScope.onSelect;
+            scope.select = function(entityAnnotation) {
+              entityAnnotation.confidence = 1.0;
+              angular.element(elem).val('');
+              angular.element(ul).hide();
+              return originalScope.onSelect({
+                entityAnnotation: entityAnnotation
+              });
+            };
             originalScope.$on('$destroy', function() {
               return scope.$destroy();
             });
@@ -278,6 +285,25 @@
         if (this.isRunning && (this.promise != null)) {
           return this.promise.resolve();
         }
+      };
+      service.enhance = function(analysis, textAnnotation, entityAnnotation) {
+        var ea, entityAnnotations, id, _ref;
+        entityAnnotations = EntityAnnotationService.find(textAnnotation.entityAnnotations, {
+          uri: entityAnnotation.entity.id
+        });
+        if (0 === entityAnnotations.length) {
+          analysis.entities[entityAnnotation.entity.id] = entityAnnotation.entity;
+          _ref = textAnnotation.entityAnnotations;
+          for (id in _ref) {
+            ea = _ref[id];
+            ea.selected = false;
+          }
+          entityAnnotation.selected = true;
+          analysis.entityAnnotations[entityAnnotation.id] = entityAnnotation;
+          textAnnotation.entityAnnotations[entityAnnotation.id] = analysis.entityAnnotations[entityAnnotation.id];
+          return true;
+        }
+        return false;
       };
       service.preselect = function(analysis, annotations) {
         var annotation, ea, entities, entityAnnotations, textAnnotation, _i, _len, _results;
@@ -1094,7 +1120,7 @@
       return filtered;
     };
   }).controller('EntitiesController', [
-    'EntityAnnotationService', 'EditorService', '$http', '$log', '$scope', function(EntityAnnotationService, EditorService, $http, $log, $scope) {
+    'AnalysisService', 'EntityAnnotationService', 'EditorService', '$http', '$log', '$scope', function(AnalysisService, EntityAnnotationService, EditorService, $http, $log, $scope) {
       var el, scroll, setArrowTop;
       $scope.analysis = null;
       $scope.textAnnotation = null;
@@ -1128,8 +1154,14 @@
           });
         });
       };
-      $scope.onEntitySearched = function(entityAnnotation) {
-        return $log.debug("Selected an entity on search");
+      $scope.onSearchedEntitySelected = function(entityAnnotation) {
+        $log.debug("Selected an entity on search");
+        if (AnalysisService.enhance($scope.analysis, $scope.textAnnotation, entityAnnotation) === true) {
+          return $scope.$emit('selectEntity', {
+            ta: $scope.textAnnotation,
+            ea: entityAnnotation
+          });
+        }
       };
       $scope.onEntitySelected = function(textAnnotation, entityAnnotation) {
         return $scope.$emit('selectEntity', {
@@ -1178,7 +1210,7 @@
 
   angular.module('wordlift.tinymce.plugin', ['wordlift.tinymce.plugin.controllers', 'wordlift.tinymce.plugin.directives']);
 
-  $(container = $('<div id="wl-app" class="wl-app">\n  <div id="wl-error-controller" class="wl-error-controller" ng-controller="ErrorController">\n    <p ng-bind="message"></p>\n  </div>\n  <div id="wordlift-disambiguation-popover" class="metabox-holder" ng-controller="EntitiesController">\n    <div class="postbox">\n      <div class="handlediv" title="Click to toggle"><br></div>\n      <h3 class="hndle"><span>Semantic Web</span></h3>\n      <div class="inside">\n        <form role="form">\n          <div class="form-group">\n            <div class="ui-widget">\n              <input type="text" class="form-control" id="search" placeholder="search or create" autocomplete source="search($viewValue)" on-select="onEntitySearched(entityAnnotation)">\n            </div>\n          </div>\n          <wl-entities on-select="onEntitySelected(textAnnotation, entityAnnotation)" text-annotation="textAnnotation"></wl-entities>\n\n        </form>\n\n        <wl-entity-input-boxes text-annotations="analysis.textAnnotations"></wl-entity-input-boxes>\n        <wl-entity-props text-annotations="analysis.textAnnotations"></wl-entity-props>\n      </div>\n    </div>\n  </div>\n</div>').appendTo('form[name=post]'), $('#wordlift-disambiguation-popover').css({
+  $(container = $('<div id="wl-app" class="wl-app">\n  <div id="wl-error-controller" class="wl-error-controller" ng-controller="ErrorController">\n    <p ng-bind="message"></p>\n  </div>\n  <div id="wordlift-disambiguation-popover" class="metabox-holder" ng-controller="EntitiesController">\n    <div class="postbox">\n      <div class="handlediv" title="Click to toggle"><br></div>\n      <h3 class="hndle"><span>Semantic Web</span></h3>\n      <div class="inside">\n        <form role="form">\n          <div class="form-group">\n            <div class="ui-widget">\n              <input type="text" class="form-control" id="search" placeholder="search or create" autocomplete on-select="onSearchedEntitySelected(entityAnnotation)" source="search($viewValue)">\n            </div>\n          </div>\n          <wl-entities on-select="onEntitySelected(textAnnotation, entityAnnotation)" text-annotation="textAnnotation"></wl-entities>\n\n        </form>\n\n        <wl-entity-input-boxes text-annotations="analysis.textAnnotations"></wl-entity-input-boxes>\n        <wl-entity-props text-annotations="analysis.textAnnotations"></wl-entity-props>\n      </div>\n    </div>\n  </div>\n</div>').appendTo('form[name=post]'), $('#wordlift-disambiguation-popover').css({
     display: 'none',
     height: $('body').height() - $('#wpadminbar').height() + 12,
     top: $('#wpadminbar').height() - 1,

@@ -23,7 +23,7 @@ angular.module('wordlift.tinymce.plugin.controllers',
 
       filtered
   )
-.controller('EntitiesController', ['EntityAnnotationService','EditorService', '$http', '$log', '$scope', (EntityAnnotationService, EditorService, $http, $log, $scope) ->
+.controller('EntitiesController', ['AnalysisService','EntityAnnotationService','EditorService', '$http', '$log', '$scope', (AnalysisService, EntityAnnotationService, EditorService, $http, $log, $scope) ->
 
     # holds a reference to the current analysis results.
     $scope.analysis = null
@@ -60,11 +60,14 @@ angular.module('wordlift.tinymce.plugin.controllers',
         # Create a fake entity annotation for each entity
         response.data.map (entity)->
           EntityAnnotationService.create { 'entity': entity }
-    
     # Search for entities server side
-    $scope.onEntitySearched = (entityAnnotation) ->
+    $scope.onSearchedEntitySelected = (entityAnnotation) ->
       $log.debug "Selected an entity on search"
-    
+      # Enhance current analysis with the selected entity if needed 
+      if AnalysisService.enhance($scope.analysis, $scope.textAnnotation, entityAnnotation) is true
+        # Updates the editor accordingly 
+        $scope.$emit 'selectEntity', ta: $scope.textAnnotation, ea: entityAnnotation
+
     $scope.onEntitySelected = (textAnnotation, entityAnnotation) ->
       $scope.$emit 'selectEntity', ta: textAnnotation, ea: entityAnnotation
 
@@ -74,9 +77,6 @@ angular.module('wordlift.tinymce.plugin.controllers',
 
     # When a text annotation is clicked, open the disambiguation popover.
     $scope.$on 'textAnnotationClicked', (event, id, sourceElement) ->
-
-      # Get the text annotation with the provided id.
-#      $scope.textAnnotationSpan = angular.element sourceElement.target
 
       # Set the current text annotation to the one specified.
       $scope.textAnnotation = $scope.analysis?.textAnnotations[id]

@@ -309,14 +309,24 @@ angular.module('wordlift.tinymce.plugin.directives', ['wordlift.directives.wlEnt
       elem.autocomplete
         source: (request, response) ->
           locals = { $viewValue: request.term }
-          $q.when(originalScope.source(locals)).then (matches)->
+          $q.when(originalScope.source(locals)).then (matches) ->
             response matches
         minLength: 3
       .data("ui-autocomplete")._renderItem = (ul, ea) ->
+        
         scope = originalScope.$new();
         scope.entityAnnotation = ea
-        scope.select = originalScope.onSelect
-
+        
+        scope.select = (entityAnnotation) ->
+          # Set the higher priority for this item
+          entityAnnotation.confidence = 1.0
+          # Reset autocomplete field & hide results
+          angular.element(elem).val('')
+          angular.element(ul).hide()
+          # Call the onSelect callback
+          originalScope.onSelect
+            entityAnnotation: entityAnnotation
+         
         originalScope.$on '$destroy', ()->
           scope.$destroy();
         el = angular.element(templateHtml)
@@ -375,6 +385,28 @@ angular.module('AnalysisService',
         service.abort = ->
           # Abort the analysis if an analysis is running and there's a reference to its promise.
           @promise.resolve() if @isRunning and @promise?
+
+        # Enhance analysis
+        service.enhance = (analysis, textAnnotation, entityAnnotation)->
+          
+          # Look for an existing entityAnnotation for the current uri
+          entityAnnotations = EntityAnnotationService.find textAnnotation.entityAnnotations, uri: entityAnnotation.entity.id
+          if 0 is entityAnnotations.length
+            # Add the current entity to the current analysis
+            analysis.entities[entityAnnotation.entity.id] = entityAnnotation.entity
+            # Unflag selected entityAnnotations for the current textAnnotation
+            for id, ea of textAnnotation.entityAnnotations
+              ea.selected = false
+            # Flag the current entityAnnotation as selected
+            entityAnnotation.selected = true          
+            # Add the current entityAnnotation to the current analysis
+            analysis.entityAnnotations[entityAnnotation.id] = entityAnnotation
+            # Add a reference to the current textAnnotation
+            textAnnotation.entityAnnotations[entityAnnotation.id] = analysis.entityAnnotations[entityAnnotation.id]
+            # Return true
+            return true
+          # Return false 
+          false
 
         # Preselect entity annotations in the provided analysis using the provided collection of annotations.
         service.preselect = (analysis, annotations) ->
@@ -1192,7 +1224,7 @@ angular.module('wordlift.tinymce.plugin.controllers',
 
       filtered
   )
-.controller('EntitiesController', ['EntityAnnotationService','EditorService', '$http', '$log', '$scope', (EntityAnnotationService, EditorService, $http, $log, $scope) ->
+.controller('EntitiesController', ['AnalysisService','EntityAnnotationService','EditorService', '$http', '$log', '$scope', (AnalysisService, EntityAnnotationService, EditorService, $http, $log, $scope) ->
 
     # holds a reference to the current analysis results.
     $scope.analysis = null
@@ -1229,11 +1261,14 @@ angular.module('wordlift.tinymce.plugin.controllers',
         # Create a fake entity annotation for each entity
         response.data.map (entity)->
           EntityAnnotationService.create { 'entity': entity }
-    
     # Search for entities server side
-    $scope.onEntitySearched = (entityAnnotation) ->
+    $scope.onSearchedEntitySelected = (entityAnnotation) ->
       $log.debug "Selected an entity on search"
-    
+      # Enhance current analysis with the selected entity if needed 
+      if AnalysisService.enhance($scope.analysis, $scope.textAnnotation, entityAnnotation) is true
+        # Updates the editor accordingly 
+        $scope.$emit 'selectEntity', ta: $scope.textAnnotation, ea: entityAnnotation
+
     $scope.onEntitySelected = (textAnnotation, entityAnnotation) ->
       $scope.$emit 'selectEntity', ta: textAnnotation, ea: entityAnnotation
 
@@ -1243,9 +1278,6 @@ angular.module('wordlift.tinymce.plugin.controllers',
 
     # When a text annotation is clicked, open the disambiguation popover.
     $scope.$on 'textAnnotationClicked', (event, id, sourceElement) ->
-
-      # Get the text annotation with the provided id.
-#      $scope.textAnnotationSpan = angular.element sourceElement.target
 
       # Set the current text annotation to the one specified.
       $scope.textAnnotation = $scope.analysis?.textAnnotations[id]
@@ -1306,7 +1338,7 @@ $(
             <form role="form">
               <div class="form-group">
                 <div class="ui-widget">
-                  <input type="text" class="form-control" id="search" placeholder="search or create" autocomplete source="search($viewValue)" on-select="onEntitySearched(entityAnnotation)">
+                  <input type="text" class="form-control" id="search" placeholder="search or create" autocomplete on-select="onSearchedEntitySelected(entityAnnotation)" source="search($viewValue)">
                 </div>
               </div>
               <wl-entities on-select="onEntitySelected(textAnnotation, entityAnnotation)" text-annotation="textAnnotation"></wl-entities>

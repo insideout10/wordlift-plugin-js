@@ -46,6 +46,28 @@ angular.module('AnalysisService',
           # Abort the analysis if an analysis is running and there's a reference to its promise.
           @promise.resolve() if @isRunning and @promise?
 
+        # Enhance analysis
+        service.enhance = (analysis, textAnnotation, entityAnnotation)->
+          
+          # Look for an existing entityAnnotation for the current uri
+          entityAnnotations = EntityAnnotationService.find textAnnotation.entityAnnotations, uri: entityAnnotation.entity.id
+          if 0 is entityAnnotations.length
+            # Add the current entity to the current analysis
+            analysis.entities[entityAnnotation.entity.id] = entityAnnotation.entity
+            # Unflag selected entityAnnotations for the current textAnnotation
+            for id, ea of textAnnotation.entityAnnotations
+              ea.selected = false
+            # Flag the current entityAnnotation as selected
+            entityAnnotation.selected = true          
+            # Add the current entityAnnotation to the current analysis
+            analysis.entityAnnotations[entityAnnotation.id] = entityAnnotation
+            # Add a reference to the current textAnnotation
+            textAnnotation.entityAnnotations[entityAnnotation.id] = analysis.entityAnnotations[entityAnnotation.id]
+            # Return true
+            return true
+          # Return false 
+          false
+
         # Preselect entity annotations in the provided analysis using the provided collection of annotations.
         service.preselect = (analysis, annotations) ->
 

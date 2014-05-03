@@ -19,7 +19,7 @@ $(
             <form role="form">
               <div class="form-group">
                 <div class="ui-widget">
-                  <input type="text" class="form-control" id="search" placeholder="search or create" autocomplete source="search($viewValue)" on-select="onEntitySearched(entityAnnotation)">
+                  <input type="text" class="form-control" id="search" placeholder="search or create" autocomplete on-select="onSearchedEntitySelected(entityAnnotation)" source="search($viewValue)">
                 </div>
               </div>
               <wl-entities on-select="onEntitySelected(textAnnotation, entityAnnotation)" text-annotation="textAnnotation"></wl-entities>

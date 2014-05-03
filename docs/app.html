@@ -191,7 +191,7 @@
             &lt;form role="form"&gt;
               &lt;div class="form-group"&gt;
                 &lt;div class="ui-widget"&gt;
-                  &lt;input type="text" class="form-control" id="search" placeholder="search or create" autocomplete source="search($viewValue)" on-select="onEntitySearched(entityAnnotation)"&gt;
+                  &lt;input type="text" class="form-control" id="search" placeholder="search or create" autocomplete on-select="onSearchedEntitySelected(entityAnnotation)" source="search($viewValue)"&gt;
                 &lt;/div&gt;
               &lt;/div&gt;
               &lt;wl-entities on-select="onEntitySelected(textAnnotation, entityAnnotation)" text-annotation="textAnnotation"&gt;&lt;/wl-entities&gt;
