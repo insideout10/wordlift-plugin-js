@@ -17,15 +17,15 @@ $(
           <h3 class="hndle"><span>Semantic Web</span></h3>
           <div class="ui-widget toolbar">
             <span class="wl-active-tab" ng-bind="activeToolbarTab" />
-            <span ng-click="setActiveToolbarTab('Search for entities')" class="wl-search-toolbar-icon" />
-            <span ng-click="setActiveToolbarTab('Add new entity')" class="wl-add-entity-toolbar-icon" />
+            <span ng_class="{'selected' : isActiveToolbarTab('Search for entities')}" ng-click="setActiveToolbarTab('Search for entities')" class="wl-search-toolbar-icon" />
+            <span ng_class="{'selected' : isActiveToolbarTab('Add new entity')}" ng-click="setActiveToolbarTab('Add new entity')" class="wl-add-entity-toolbar-icon" />
           </div>
           <div class="inside">
             <form role="form">
               <div class="form-group">
                 <div ng-show="isActiveToolbarTab('Search for entities')" class="tab">
                   <div class="ui-widget">
-                    <input type="text" class="form-control" id="search" placeholder="search or create" autocomplete on-select="onSearchedEntitySelected(entityAnnotation)" source="search($viewValue)">
+                    <input type="text" class="form-control" id="search" placeholder="search for entities" autocomplete on-select="onSearchedEntitySelected(entityAnnotation)" source="search($viewValue)">
                   </div>       
                 </div>
                 <div ng-show="isActiveToolbarTab('Add new entity')" class="tab">

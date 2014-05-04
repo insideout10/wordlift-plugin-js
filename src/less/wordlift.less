@@ -182,6 +182,11 @@
   .right {
     text-align:right
   }
+
+  .tab {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px; 
+  }
 }
 
 #wpadminbar .ab-top-menu > li#wp-admin-bar-wordlift {
@@ -353,6 +358,9 @@ body#tinymce {
   .wl-active-tab {
     position:absolute;
     left: 11px;
+    border-left:@wl-brand-color 12px solid;
+    padding-left:6px;
+
   }
   .wl-search-toolbar-icon { 
     .toolbar-icon(@fa-var-search); 
@@ -360,5 +368,9 @@ body#tinymce {
 
   .wl-add-entity-toolbar-icon { 
     .toolbar-icon(@fa-var-pencil); 
+  }
+
+  .selected {
+    color:@wl-brand-color;
   }
 }

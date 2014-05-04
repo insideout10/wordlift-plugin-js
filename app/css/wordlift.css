@@ -1572,6 +1572,10 @@
 #wordlift-disambiguation-popover .right {
   text-align: right;
 }
+#wordlift-disambiguation-popover .tab {
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
 #wpadminbar .ab-top-menu > li#wp-admin-bar-wordlift {
   float: right;
   cursor: pointer;
@@ -1717,6 +1721,8 @@ body#tinymce[contenteditable=false] {
 .toolbar .wl-active-tab {
   position: absolute;
   left: 11px;
+  border-left: #f20f62 12px solid;
+  padding-left: 6px;
 }
 .toolbar .wl-search-toolbar-icon {
   font-family: FontAwesome;
@@ -1743,4 +1749,7 @@ body#tinymce[contenteditable=false] {
 }
 .toolbar .wl-add-entity-toolbar-icon:before {
   content: "\f040";
+}
+.toolbar .selected {
+  color: #f20f62;
 }
