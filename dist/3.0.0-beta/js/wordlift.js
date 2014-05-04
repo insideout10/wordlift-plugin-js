@@ -1129,6 +1129,7 @@
   }).controller('EntitiesController', [
     'AnalysisService', 'EntityAnnotationService', 'EditorService', '$http', '$log', '$scope', function(AnalysisService, EntityAnnotationService, EditorService, $http, $log, $scope) {
       var el, scroll, setArrowTop;
+      $scope.isRunning = false;
       $scope.analysis = null;
       $scope.textAnnotation = null;
       $scope.textAnnotationSpan = null;
@@ -1158,7 +1159,7 @@
       };
       $(window).scroll(scroll);
       $('#content_ifr').contents().scroll(scroll);
-      $scope.search = function(term) {
+      $scope.onSearch = function(term) {
         return $http({
           method: 'post',
           url: ajaxurl + '?action=wordlift_search',
@@ -1174,12 +1175,14 @@
         });
       };
       $scope.onNewEntityCreate = function(entity) {
+        $scope.isRunning = true;
         return $http({
           method: 'post',
           url: ajaxurl + '?action=wordlift_add_entity',
           data: $scope.newEntity
         }).success(function(data, status, headers, config) {
           var entityAnnotation;
+          $scope.isRunning = false;
           entityAnnotation = EntityAnnotationService.create({
             'entity': data
           });
@@ -1191,11 +1194,11 @@
             });
           }
         }).error(function(data, status, headers, config) {
+          $scope.isRunning = false;
           return $log.debug("Got en error on onNewEntityCreate");
         });
       };
       $scope.onSearchedEntitySelected = function(entityAnnotation) {
-        $log.debug("Selected an entity on search");
         if (AnalysisService.enhance($scope.analysis, $scope.textAnnotation, entityAnnotation) === true) {
           return $scope.$emit('selectEntity', {
             ta: $scope.textAnnotation,
@@ -1216,10 +1219,10 @@
         return $scope.knownTypes = types;
       });
       return $scope.$on('textAnnotationClicked', function(event, id, sourceElement) {
-        var pos, _ref, _ref1;
+        var pos, _ref, _ref1, _ref2;
         $scope.textAnnotation = (_ref = $scope.analysis) != null ? _ref.textAnnotations[id] : void 0;
-        $scope.newEntity.label = $scope.textAnnotation.text;
-        if ((((_ref1 = $scope.textAnnotation) != null ? _ref1.entityAnnotations : void 0) == null) || 0 === Object.keys($scope.textAnnotation.entityAnnotations).length) {
+        $scope.newEntity.label = (_ref1 = $scope.textAnnotation) != null ? _ref1.text : void 0;
+        if ((((_ref2 = $scope.textAnnotation) != null ? _ref2.entityAnnotations : void 0) == null) || 0 === Object.keys($scope.textAnnotation.entityAnnotations).length) {
           return $('#wordlift-disambiguation-popover').hide();
         } else {
           pos = EditorService.getWinPos(sourceElement);
@@ -1254,7 +1257,7 @@
 
   angular.module('wordlift.tinymce.plugin', ['wordlift.tinymce.plugin.controllers', 'wordlift.tinymce.plugin.directives']);
 
-  $(container = $('<div id="wl-app" class="wl-app">\n  <div id="wl-error-controller" class="wl-error-controller" ng-controller="ErrorController">\n    <p ng-bind="message"></p>\n  </div>\n  <div id="wordlift-disambiguation-popover" class="metabox-holder" ng-controller="EntitiesController">\n    <div class="postbox">\n      <div class="handlediv" title="Click to toggle"><br></div>\n      <h3 class="hndle"><span>Semantic Web</span></h3>\n      <div class="ui-widget toolbar">\n        <span class="wl-active-tab" ng-bind="activeToolbarTab" />\n        <span ng_class="{\'selected\' : isActiveToolbarTab(\'Search for entities\')}" ng-click="setActiveToolbarTab(\'Search for entities\')" class="wl-search-toolbar-icon" />\n        <span ng_class="{\'selected\' : isActiveToolbarTab(\'Add new entity\')}" ng-click="setActiveToolbarTab(\'Add new entity\')" class="wl-add-entity-toolbar-icon" />\n      </div>\n      <div class="inside">\n        <form role="form">\n          <div class="form-group">\n            <div ng-show="isActiveToolbarTab(\'Search for entities\')" class="tab">\n              <div class="ui-widget">\n                <input type="text" class="form-control" id="search" placeholder="search for entities" autocomplete on-select="onSearchedEntitySelected(entityAnnotation)" source="search($viewValue)">\n              </div>       \n            </div>\n            <div ng-show="isActiveToolbarTab(\'Add new entity\')" class="tab">\n              <div class="ui-widget">\n                <input ng-model="newEntity.label" type="text" class="form-control" id="label" placeholder="label">\n              </div>\n              <div class="ui-widget">\n                <select ng-model="newEntity.type" ng-options="type.uri as type.uri for type in knownTypes" placeholder="type">\n                  <option value="" disabled selected>Select the entity type</option>\n                </select>\n              </div>\n              <div class="ui-widget right">\n                <button ng-click="onNewEntityCreate(newEntity)">Save the entity</button>\n              </div>\n            </div>\n          </div>\n          <wl-entities on-select="onEntitySelected(textAnnotation, entityAnnotation)" text-annotation="textAnnotation"></wl-entities>\n\n        </form>\n        \n        <wl-entity-input-boxes text-annotations="analysis.textAnnotations"></wl-entity-input-boxes>\n        <wl-entity-props text-annotations="analysis.textAnnotations"></wl-entity-props>\n      </div>\n    </div>\n  </div>\n</div>').appendTo('form[name=post]'), $('#wordlift-disambiguation-popover').css({
+  $(container = $('<div id="wl-app" class="wl-app">\n  <div id="wl-error-controller" class="wl-error-controller" ng-controller="ErrorController">\n    <p ng-bind="message"></p>\n  </div>\n  <div id="wordlift-disambiguation-popover" class="metabox-holder" ng-controller="EntitiesController">\n    <div class="postbox">\n      <div class="handlediv" title="Click to toggle"><br></div>\n      <h3 class="hndle"><span>Semantic Web</span></h3>\n      <div class="ui-widget toolbar">\n        <span class="wl-active-tab" ng-bind="activeToolbarTab" />\n        <i ng_class="{\'selected\' : isActiveToolbarTab(\'Search for entities\')}" ng-click="setActiveToolbarTab(\'Search for entities\')" class="wl-search-toolbar-icon" />\n        <i ng_class="{\'selected\' : isActiveToolbarTab(\'Add new entity\')}" ng-click="setActiveToolbarTab(\'Add new entity\')" class="wl-add-entity-toolbar-icon" />\n      </div>\n      <div class="inside">\n        <form role="form">\n          <div class="form-group">\n            <div ng-show="isActiveToolbarTab(\'Search for entities\')" class="tab">\n              <div class="ui-widget">\n                <input type="text" class="form-control" id="search" placeholder="search for entities" autocomplete on-select="onSearchedEntitySelected(entityAnnotation)" source="onSearch($viewValue)">\n              </div>       \n            </div>\n            <div ng-show="isActiveToolbarTab(\'Add new entity\')" class="tab">\n              <div class="ui-widget">\n                <input ng-model="newEntity.label" type="text" class="form-control" id="label" placeholder="label">\n              </div>\n              <div class="ui-widget">\n                <select ng-model="newEntity.type" ng-options="type.uri as type.uri for type in knownTypes" placeholder="type">\n                  <option value="" disabled selected>Select the entity type</option>\n                </select>\n              </div>\n              <div class="ui-widget right">\n                <i class="wl-spinner" ng-show="isRunning"></i>\n                <button ng-click="onNewEntityCreate(newEntity)">Save the entity</button>\n              </div>\n            </div>\n          </div>\n          <wl-entities on-select="onEntitySelected(textAnnotation, entityAnnotation)" text-annotation="textAnnotation"></wl-entities>\n\n        </form>\n        \n        <wl-entity-input-boxes text-annotations="analysis.textAnnotations"></wl-entity-input-boxes>\n        <wl-entity-props text-annotations="analysis.textAnnotations"></wl-entity-props>\n      </div>\n    </div>\n  </div>\n</div>').appendTo('form[name=post]'), $('#wordlift-disambiguation-popover').css({
     display: 'none',
     height: $('body').height() - $('#wpadminbar').height() + 12,
     top: $('#wpadminbar').height() - 1,

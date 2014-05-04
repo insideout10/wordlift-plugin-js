@@ -1233,6 +1233,7 @@ angular.module('wordlift.tinymce.plugin.controllers',
   )
 .controller('EntitiesController', ['AnalysisService','EntityAnnotationService','EditorService', '$http', '$log', '$scope', (AnalysisService, EntityAnnotationService, EditorService, $http, $log, $scope) ->
 
+    $scope.isRunning = false
     # holds a reference to the current analysis results.
     $scope.analysis = null
     # holds a reference to the selected text annotation.
@@ -1244,6 +1245,7 @@ angular.module('wordlift.tinymce.plugin.controllers',
       label: null
       type: null
     }
+    # Toolbar
     $scope.activeToolbarTab = 'Search for entities'
     $scope.isActiveToolbarTab  = (tab)->
       $scope.activeToolbarTab is tab
@@ -1269,8 +1271,9 @@ angular.module('wordlift.tinymce.plugin.controllers',
     $(window).scroll(scroll)
     $('#content_ifr').contents().scroll(scroll)
     
+
     # Search for entities server side
-    $scope.search = (term) ->
+    $scope.onSearch = (term) ->
       return $http
         method: 'post'
         url: ajaxurl + '?action=wordlift_search'
@@ -1282,11 +1285,14 @@ angular.module('wordlift.tinymce.plugin.controllers',
     
     # Create a new entity from the disambiguation widget
     $scope.onNewEntityCreate = (entity) ->
+      $scope.isRunning = true
+    
       $http
         method: 'post'
         url: ajaxurl + '?action=wordlift_add_entity'
         data: $scope.newEntity
       .success (data, status, headers, config) ->
+        $scope.isRunning = false
         # Create a fake entity annotation for each entity
         entityAnnotation = EntityAnnotationService.create { 'entity': data }
         # Set the higher priority for this annotation
@@ -1296,16 +1302,17 @@ angular.module('wordlift.tinymce.plugin.controllers',
           # Update the editor accordingly 
           $scope.$emit 'selectEntity', ta: $scope.textAnnotation, ea: entityAnnotation
       .error (data, status, headers, config) ->
+        $scope.isRunning = false
         $log.debug "Got en error on onNewEntityCreate"
 
     # Search for entities server side
     $scope.onSearchedEntitySelected = (entityAnnotation) ->
-      $log.debug "Selected an entity on search"
       # Enhance current analysis with the selected entity if needed 
       if AnalysisService.enhance($scope.analysis, $scope.textAnnotation, entityAnnotation) is true
         # Update the editor accordingly 
         $scope.$emit 'selectEntity', ta: $scope.textAnnotation, ea: entityAnnotation
 
+    # On entity click emit a selectEntity event 
     $scope.onEntitySelected = (textAnnotation, entityAnnotation) ->
       $scope.$emit 'selectEntity', ta: textAnnotation, ea: entityAnnotation
 
@@ -1322,7 +1329,7 @@ angular.module('wordlift.tinymce.plugin.controllers',
       # Set the current text annotation to the one specified.
       $scope.textAnnotation = $scope.analysis?.textAnnotations[id]
       # Set default new entity label accordingly to the current textAnnotation Text
-      $scope.newEntity.label = $scope.textAnnotation.text
+      $scope.newEntity.label = $scope.textAnnotation?.text
 
       # hide the popover if there are no entities.
       if not $scope.textAnnotation?.entityAnnotations? or 0 is Object.keys($scope.textAnnotation.entityAnnotations).length
@@ -1378,15 +1385,15 @@ $(
           <h3 class="hndle"><span>Semantic Web</span></h3>
           <div class="ui-widget toolbar">
             <span class="wl-active-tab" ng-bind="activeToolbarTab" />
-            <span ng_class="{'selected' : isActiveToolbarTab('Search for entities')}" ng-click="setActiveToolbarTab('Search for entities')" class="wl-search-toolbar-icon" />
-            <span ng_class="{'selected' : isActiveToolbarTab('Add new entity')}" ng-click="setActiveToolbarTab('Add new entity')" class="wl-add-entity-toolbar-icon" />
+            <i ng_class="{'selected' : isActiveToolbarTab('Search for entities')}" ng-click="setActiveToolbarTab('Search for entities')" class="wl-search-toolbar-icon" />
+            <i ng_class="{'selected' : isActiveToolbarTab('Add new entity')}" ng-click="setActiveToolbarTab('Add new entity')" class="wl-add-entity-toolbar-icon" />
           </div>
           <div class="inside">
             <form role="form">
               <div class="form-group">
                 <div ng-show="isActiveToolbarTab('Search for entities')" class="tab">
                   <div class="ui-widget">
-                    <input type="text" class="form-control" id="search" placeholder="search for entities" autocomplete on-select="onSearchedEntitySelected(entityAnnotation)" source="search($viewValue)">
+                    <input type="text" class="form-control" id="search" placeholder="search for entities" autocomplete on-select="onSearchedEntitySelected(entityAnnotation)" source="onSearch($viewValue)">
                   </div>       
                 </div>
                 <div ng-show="isActiveToolbarTab('Add new entity')" class="tab">
@@ -1399,6 +1406,7 @@ $(
                     </select>
                   </div>
                   <div class="ui-widget right">
+                    <i class="wl-spinner" ng-show="isRunning"></i>
                     <button ng-click="onNewEntityCreate(newEntity)">Save the entity</button>
                   </div>
                 </div>

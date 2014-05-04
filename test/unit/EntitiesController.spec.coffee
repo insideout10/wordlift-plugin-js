@@ -36,6 +36,9 @@ describe "EditorController tests", ->
       # Check that the root scope broadcast method has been called.
       expect($rootScope.$broadcast).toHaveBeenCalledWith('analysisReceived', jasmine.any(Object))
 
+      # Check that the root scope broadcast method has been called.
+      expect($rootScope.$broadcast).toHaveBeenCalledWith('configurationTypesLoaded', jasmine.any(Object))
+
       # Get a reference to the analysis structure.
       args = $rootScope.$broadcast.calls.argsFor 1
       analysis = args[1]

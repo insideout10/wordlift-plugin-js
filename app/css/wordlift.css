@@ -1576,6 +1576,25 @@
   border-bottom: 1px solid #eee;
   padding-bottom: 10px;
 }
+#wordlift-disambiguation-popover .wl-spinner {
+  display: block;
+  font-family: FontAwesome;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 14px;
+  padding: 0px 3px;
+  -webkit-animation: spin 2s infinite linear;
+  -moz-animation: spin 2s infinite linear;
+  -o-animation: spin 2s infinite linear;
+  animation: spin 2s infinite linear;
+  display: inline-block;
+}
+#wordlift-disambiguation-popover .wl-spinner:before {
+  content: "\f110";
+}
 #wpadminbar .ab-top-menu > li#wp-admin-bar-wordlift {
   float: right;
   cursor: pointer;
@@ -1737,6 +1756,9 @@ body#tinymce[contenteditable=false] {
 .toolbar .wl-search-toolbar-icon:before {
   content: "\f002";
 }
+.toolbar .wl-search-toolbar-icon.selected {
+  color: #f20f62;
+}
 .toolbar .wl-add-entity-toolbar-icon {
   font-family: FontAwesome;
   font-style: normal;
@@ -1750,6 +1772,6 @@ body#tinymce[contenteditable=false] {
 .toolbar .wl-add-entity-toolbar-icon:before {
   content: "\f040";
 }
-.toolbar .selected {
+.toolbar .wl-add-entity-toolbar-icon.selected {
   color: #f20f62;
 }

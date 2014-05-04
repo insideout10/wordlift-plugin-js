@@ -173,6 +173,7 @@
   )
 .controller<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'EntitiesController'</span>, [<span class="hljs-string">'AnalysisService'</span>,<span class="hljs-string">'EntityAnnotationService'</span>,<span class="hljs-string">'EditorService'</span>, <span class="hljs-string">'$http'</span>, <span class="hljs-string">'$log'</span>, <span class="hljs-string">'$scope'</span>, (AnalysisService, EntityAnnotationService, EditorService, $http, $log, $scope) -&gt;
 
+    $scope.isRunning = <span class="hljs-literal">false</span>
 </span></span></pre></div></div>
             
         </li>
@@ -236,12 +237,7 @@
             <div class="content"><div class='highlight'><pre>    $scope.newEntity = {
       <span class="hljs-attribute">label</span>: <span class="hljs-literal">null</span>
       <span class="hljs-attribute">type</span>: <span class="hljs-literal">null</span>
-    }
-    $scope.activeToolbarTab = <span class="hljs-string">'Search for entities'</span>
-    $scope.<span class="hljs-function"><span class="hljs-title">isActiveToolbarTab</span>  = <span class="hljs-params">(tab)</span>-&gt;</span>
-      $scope.activeToolbarTab <span class="hljs-keyword">is</span> tab
-    $scope.<span class="hljs-function"><span class="hljs-title">setActiveToolbarTab</span>  = <span class="hljs-params">(tab)</span>-&gt;</span>
-      $scope.activeToolbarTab = tab</pre></div></div>
+    }</pre></div></div>
             
         </li>
         
@@ -251,6 +247,25 @@
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>Toolbar</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    $scope.activeToolbarTab = <span class="hljs-string">'Search for entities'</span>
+    $scope.<span class="hljs-function"><span class="hljs-title">isActiveToolbarTab</span>  = <span class="hljs-params">(tab)</span>-&gt;</span>
+      $scope.activeToolbarTab <span class="hljs-keyword">is</span> tab
+    $scope.<span class="hljs-function"><span class="hljs-title">setActiveToolbarTab</span>  = <span class="hljs-params">(tab)</span>-&gt;</span>
+      $scope.activeToolbarTab = tab</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
               <p>holds a reference to the knows types from AnalysisService</p>
 
@@ -264,11 +279,11 @@
         </li>
         
         
-        <li id="section-7">
+        <li id="section-8">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-7">&#182;</a>
+                <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
               <p>a reference to the current text annotation span in the editor.</p>
 
@@ -281,11 +296,11 @@
         </li>
         
         
-        <li id="section-8">
+        <li id="section-9">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-8">&#182;</a>
+                <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
               <p>get the position of the clicked element.</p>
 
@@ -296,11 +311,11 @@
         </li>
         
         
-        <li id="section-9">
+        <li id="section-10">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-9">&#182;</a>
+                <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
               <p>set the popover arrow to the element position.</p>
 
@@ -311,11 +326,11 @@
         </li>
         
         
-        <li id="section-10">
+        <li id="section-11">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-10">&#182;</a>
+                <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
               <p>TODO: move these hooks on the popover, in order to hook/unhook the events.</p>
 
@@ -327,17 +342,17 @@
         </li>
         
         
-        <li id="section-11">
+        <li id="section-12">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-11">&#182;</a>
+                <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
               <p>Search for entities server side</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    $scope.<span class="hljs-function"><span class="hljs-title">search</span> = <span class="hljs-params">(term)</span> -&gt;</span>
+            <div class="content"><div class='highlight'><pre>    $scope.<span class="hljs-function"><span class="hljs-title">onSearch</span> = <span class="hljs-params">(term)</span> -&gt;</span>
       <span class="hljs-keyword">return</span> $http
         <span class="hljs-attribute">method</span>: <span class="hljs-string">'post'</span>
         <span class="hljs-attribute">url</span>: ajaxurl + <span class="hljs-string">'?action=wordlift_search'</span>
@@ -347,11 +362,11 @@
         </li>
         
         
-        <li id="section-12">
+        <li id="section-13">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-12">&#182;</a>
+                <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
               <p>Create a fake entity annotation for each entity</p>
 
@@ -363,37 +378,25 @@
         </li>
         
         
-        <li id="section-13">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-13">&#182;</a>
-              </div>
-              <p>Create a new entity from the disambiguation widget</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    $scope.<span class="hljs-function"><span class="hljs-title">onNewEntityCreate</span> = <span class="hljs-params">(entity)</span> -&gt;</span>
-      $http
-        <span class="hljs-attribute">method</span>: <span class="hljs-string">'post'</span>
-        <span class="hljs-attribute">url</span>: ajaxurl + <span class="hljs-string">'?action=wordlift_add_entity'</span>
-        <span class="hljs-attribute">data</span>: $scope.newEntity
-      .success <span class="hljs-function"><span class="hljs-params">(data, status, headers, config)</span> -&gt;</span></pre></div></div>
-            
-        </li>
-        
-        
         <li id="section-14">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
-              <p>Create a fake entity annotation for each entity</p>
+              <p>Create a new entity from the disambiguation widget</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        entityAnnotation = EntityAnnotationService.create { <span class="hljs-string">'entity'</span>: data }</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    $scope.<span class="hljs-function"><span class="hljs-title">onNewEntityCreate</span> = <span class="hljs-params">(entity)</span> -&gt;</span>
+      $scope.isRunning = <span class="hljs-literal">true</span>
+    
+      $http
+        <span class="hljs-attribute">method</span>: <span class="hljs-string">'post'</span>
+        <span class="hljs-attribute">url</span>: ajaxurl + <span class="hljs-string">'?action=wordlift_add_entity'</span>
+        <span class="hljs-attribute">data</span>: $scope.newEntity
+      .success <span class="hljs-function"><span class="hljs-params">(data, status, headers, config)</span> -&gt;</span>
+        $scope.isRunning = <span class="hljs-literal">false</span></pre></div></div>
             
         </li>
         
@@ -404,11 +407,11 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
-              <p>Set the higher priority for this annotation</p>
+              <p>Create a fake entity annotation for each entity</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        entityAnnotation.confidence = <span class="hljs-number">1.0</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>        entityAnnotation = EntityAnnotationService.create { <span class="hljs-string">'entity'</span>: data }</pre></div></div>
             
         </li>
         
@@ -419,11 +422,11 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
-              <p>Enhance current analysis with the selected entity if needed </p>
+              <p>Set the higher priority for this annotation</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> AnalysisService.enhance($scope.analysis, $scope.textAnnotation, entityAnnotation) <span class="hljs-keyword">is</span> <span class="hljs-literal">true</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>        entityAnnotation.confidence = <span class="hljs-number">1.0</span></pre></div></div>
             
         </li>
         
@@ -434,13 +437,11 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
-              <p>Update the editor accordingly </p>
+              <p>Enhance current analysis with the selected entity if needed </p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          $scope.$emit <span class="hljs-string">'selectEntity'</span>, <span class="hljs-attribute">ta</span>: $scope.textAnnotation, <span class="hljs-attribute">ea</span>: entityAnnotation
-      .error <span class="hljs-function"><span class="hljs-params">(data, status, headers, config)</span> -&gt;</span>
-        $log.debug <span class="hljs-string">"Got en error on onNewEntityCreate"</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> AnalysisService.enhance($scope.analysis, $scope.textAnnotation, entityAnnotation) <span class="hljs-keyword">is</span> <span class="hljs-literal">true</span></pre></div></div>
             
         </li>
         
@@ -451,12 +452,14 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
-              <p>Search for entities server side</p>
+              <p>Update the editor accordingly </p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    $scope.<span class="hljs-function"><span class="hljs-title">onSearchedEntitySelected</span> = <span class="hljs-params">(entityAnnotation)</span> -&gt;</span>
-      $log.debug <span class="hljs-string">"Selected an entity on search"</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>          $scope.$emit <span class="hljs-string">'selectEntity'</span>, <span class="hljs-attribute">ta</span>: $scope.textAnnotation, <span class="hljs-attribute">ea</span>: entityAnnotation
+      .error <span class="hljs-function"><span class="hljs-params">(data, status, headers, config)</span> -&gt;</span>
+        $scope.isRunning = <span class="hljs-literal">false</span>
+        $log.debug <span class="hljs-string">"Got en error on onNewEntityCreate"</span></pre></div></div>
             
         </li>
         
@@ -467,11 +470,11 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
-              <p>Enhance current analysis with the selected entity if needed </p>
+              <p>Search for entities server side</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> AnalysisService.enhance($scope.analysis, $scope.textAnnotation, entityAnnotation) <span class="hljs-keyword">is</span> <span class="hljs-literal">true</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>    $scope.<span class="hljs-function"><span class="hljs-title">onSearchedEntitySelected</span> = <span class="hljs-params">(entityAnnotation)</span> -&gt;</span></pre></div></div>
             
         </li>
         
@@ -482,14 +485,11 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
-              <p>Update the editor accordingly </p>
+              <p>Enhance current analysis with the selected entity if needed </p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        $scope.$emit <span class="hljs-string">'selectEntity'</span>, <span class="hljs-attribute">ta</span>: $scope.textAnnotation, <span class="hljs-attribute">ea</span>: entityAnnotation
-
-    $scope.<span class="hljs-function"><span class="hljs-title">onEntitySelected</span> = <span class="hljs-params">(textAnnotation, entityAnnotation)</span> -&gt;</span>
-      $scope.$emit <span class="hljs-string">'selectEntity'</span>, <span class="hljs-attribute">ta</span>: textAnnotation, <span class="hljs-attribute">ea</span>: entityAnnotation</pre></div></div>
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> AnalysisService.enhance($scope.analysis, $scope.textAnnotation, entityAnnotation) <span class="hljs-keyword">is</span> <span class="hljs-literal">true</span></pre></div></div>
             
         </li>
         
@@ -499,6 +499,37 @@
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-21">&#182;</a>
+              </div>
+              <p>Update the editor accordingly </p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        $scope.$emit <span class="hljs-string">'selectEntity'</span>, <span class="hljs-attribute">ta</span>: $scope.textAnnotation, <span class="hljs-attribute">ea</span>: entityAnnotation</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-22">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-22">&#182;</a>
+              </div>
+              <p>On entity click emit a selectEntity event </p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    $scope.<span class="hljs-function"><span class="hljs-title">onEntitySelected</span> = <span class="hljs-params">(textAnnotation, entityAnnotation)</span> -&gt;</span>
+      $scope.$emit <span class="hljs-string">'selectEntity'</span>, <span class="hljs-attribute">ta</span>: textAnnotation, <span class="hljs-attribute">ea</span>: entityAnnotation</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-23">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
               <p>Receive the analysis results and store them in the local scope.</p>
 
@@ -513,11 +544,11 @@
         </li>
         
         
-        <li id="section-22">
+        <li id="section-24">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-22">&#182;</a>
+                <a class="pilcrow" href="#section-24">&#182;</a>
               </div>
               <p>When a text annotation is clicked, open the disambiguation popover.</p>
 
@@ -528,11 +559,11 @@
         </li>
         
         
-        <li id="section-23">
+        <li id="section-25">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-23">&#182;</a>
+                <a class="pilcrow" href="#section-25">&#182;</a>
               </div>
               <p>Set the current text annotation to the one specified.</p>
 
@@ -543,26 +574,26 @@
         </li>
         
         
-        <li id="section-24">
+        <li id="section-26">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-24">&#182;</a>
+                <a class="pilcrow" href="#section-26">&#182;</a>
               </div>
               <p>Set default new entity label accordingly to the current textAnnotation Text</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      $scope.newEntity.label = $scope.textAnnotation.text</pre></div></div>
+            <div class="content"><div class='highlight'><pre>      $scope.newEntity.label = $scope.textAnnotation?.text</pre></div></div>
             
         </li>
         
         
-        <li id="section-25">
+        <li id="section-27">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-25">&#182;</a>
+                <a class="pilcrow" href="#section-27">&#182;</a>
               </div>
               <p>hide the popover if there are no entities.</p>
 
@@ -574,11 +605,11 @@
         </li>
         
         
-        <li id="section-26">
+        <li id="section-28">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-26">&#182;</a>
+                <a class="pilcrow" href="#section-28">&#182;</a>
               </div>
               <p>show the popover.</p>
 
@@ -589,11 +620,11 @@
         </li>
         
         
-        <li id="section-27">
+        <li id="section-29">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-27">&#182;</a>
+                <a class="pilcrow" href="#section-29">&#182;</a>
               </div>
               <p>get the position of the clicked element.</p>
 
@@ -604,11 +635,11 @@
         </li>
         
         
-        <li id="section-28">
+        <li id="section-30">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-28">&#182;</a>
+                <a class="pilcrow" href="#section-30">&#182;</a>
               </div>
               <p>set the popover arrow to the element position.</p>
 
@@ -619,11 +650,11 @@
         </li>
         
         
-        <li id="section-29">
+        <li id="section-31">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-29">&#182;</a>
+                <a class="pilcrow" href="#section-31">&#182;</a>
               </div>
               <p>show the popover.</p>
 
@@ -639,11 +670,11 @@
         </li>
         
         
-        <li id="section-30">
+        <li id="section-32">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-30">&#182;</a>
+                <a class="pilcrow" href="#section-32">&#182;</a>
               </div>
               <p>Set the element as a jQuery UI Dialog.</p>
 
@@ -662,11 +693,11 @@
         </li>
         
         
-        <li id="section-31">
+        <li id="section-33">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-31">&#182;</a>
+                <a class="pilcrow" href="#section-33">&#182;</a>
               </div>
               <p>Show the dialog box when an error is raised.</p>
 

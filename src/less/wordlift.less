@@ -144,6 +144,21 @@
   right: 10px;
   z-index: 99;
 
+  .fa-icon(@icon) {
+    display: block;
+    &:before {
+      content: @icon; 
+    }
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    line-height: 14px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-size: 14px;
+    padding: 0px 3px;
+  }
+
   .content {
     height: 400px;
     background: white;
@@ -186,6 +201,15 @@
   .tab {
     border-bottom: 1px solid #eee;
     padding-bottom: 10px; 
+  }
+
+  .wl-spinner { 
+    .fa-icon(@fa-var-spinner);
+    -webkit-animation: spin 2s infinite linear;
+    -moz-animation: spin 2s infinite linear;
+    -o-animation: spin 2s infinite linear;
+    animation: spin 2s infinite linear;
+    display:inline-block;
   }
 }
 
@@ -354,6 +378,10 @@ body#tinymce {
     -moz-osx-font-smoothing: grayscale;
     font-size: 14px;
     padding: 0px 3px;
+
+    &.selected {
+      color:@wl-brand-color;
+    }
   }
   .wl-active-tab {
     position:absolute;
@@ -370,7 +398,5 @@ body#tinymce {
     .toolbar-icon(@fa-var-pencil); 
   }
 
-  .selected {
-    color:@wl-brand-color;
-  }
 }
+
