@@ -40,6 +40,12 @@ angular.module('AnalysisService',
         # Set the known types.
         service.setKnownTypes = (types) ->
           @_knownTypes = types
+          $rootScope.$broadcast CONFIGURATION_TYPES_EVENT, types
+          @_knownTypes
+          
+        # Get the known types.
+        service.getKnownTypes = () ->
+          @_knownTypes
 
         # Abort a running analysis.
         service.abort = ->

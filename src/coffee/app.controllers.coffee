@@ -27,13 +27,24 @@ angular.module('wordlift.tinymce.plugin.controllers',
 
     # holds a reference to the current analysis results.
     $scope.analysis = null
-
     # holds a reference to the selected text annotation.
     $scope.textAnnotation = null
-
     # holds a reference to the selected text annotation span.
     $scope.textAnnotationSpan = null
-
+    # new entity model
+    $scope.newEntity = {
+      label: null
+      type: null
+    }
+    $scope.activeToolbarTab = 'Search for entities'
+    $scope.isActiveToolbarTab  = (tab)->
+      $scope.activeToolbarTab is tab
+    $scope.setActiveToolbarTab  = (tab)->
+      $scope.activeToolbarTab = tab
+      
+    # holds a reference to the knows types from AnalysisService
+    $scope.knownTypes = null
+    
     setArrowTop = (top) ->
       $('head').append('<style>#wordlift-disambiguation-popover .postbox:before,#wordlift-disambiguation-popover .postbox:after{top:' + top + 'px;}</style>');
 
@@ -60,12 +71,31 @@ angular.module('wordlift.tinymce.plugin.controllers',
         # Create a fake entity annotation for each entity
         response.data.map (entity)->
           EntityAnnotationService.create { 'entity': entity }
+    
+    # Create a new entity from the disambiguation widget
+    $scope.onNewEntityCreate = (entity) ->
+      $http
+        method: 'post'
+        url: ajaxurl + '?action=wordlift_add_entity'
+        data: $scope.newEntity
+      .success (data, status, headers, config) ->
+        # Create a fake entity annotation for each entity
+        entityAnnotation = EntityAnnotationService.create { 'entity': data }
+        # Set the higher priority for this annotation
+        entityAnnotation.confidence = 1.0
+        # Enhance current analysis with the selected entity if needed 
+        if AnalysisService.enhance($scope.analysis, $scope.textAnnotation, entityAnnotation) is true
+          # Update the editor accordingly 
+          $scope.$emit 'selectEntity', ta: $scope.textAnnotation, ea: entityAnnotation
+      .error (data, status, headers, config) ->
+        $log.debug "Got en error on onNewEntityCreate"
+
     # Search for entities server side
     $scope.onSearchedEntitySelected = (entityAnnotation) ->
       $log.debug "Selected an entity on search"
       # Enhance current analysis with the selected entity if needed 
       if AnalysisService.enhance($scope.analysis, $scope.textAnnotation, entityAnnotation) is true
-        # Updates the editor accordingly 
+        # Update the editor accordingly 
         $scope.$emit 'selectEntity', ta: $scope.textAnnotation, ea: entityAnnotation
 
     $scope.onEntitySelected = (textAnnotation, entityAnnotation) ->
@@ -75,11 +105,16 @@ angular.module('wordlift.tinymce.plugin.controllers',
     $scope.$on 'analysisReceived', (event, analysis) ->
       $scope.analysis = analysis
 
+    $scope.$on 'configurationTypesLoaded', (event, types)->
+      $scope.knownTypes = types
+
     # When a text annotation is clicked, open the disambiguation popover.
     $scope.$on 'textAnnotationClicked', (event, id, sourceElement) ->
 
       # Set the current text annotation to the one specified.
       $scope.textAnnotation = $scope.analysis?.textAnnotations[id]
+      # Set default new entity label accordingly to the current textAnnotation Text
+      $scope.newEntity.label = $scope.textAnnotation.text
 
       # hide the popover if there are no entities.
       if not $scope.textAnnotation?.entityAnnotations? or 0 is Object.keys($scope.textAnnotation.entityAnnotations).length

@@ -56,7 +56,7 @@
     background-color: @color;
     color: contrast(@color); }
 }
-
+  
 .entity {
   width: 100%;
   background: white;
@@ -174,8 +174,13 @@
     left: 30px;
   }
 
-  #search {
-    width: 100%;
+  input, select {
+    width:100%;
+    font-size: 11px;
+    margin:3px 0px;
+  }
+  .right {
+    text-align:right
   }
 }
 
@@ -323,3 +328,37 @@ body#tinymce {
   }
 }
 
+// Disambiguation toolbar
+.toolbar {
+  
+  text-align:right;
+  padding:4px 10px;
+  background-color:#eee;
+  border-bottom: 1px solid #eee;
+   position:relative;
+
+  .toolbar-icon(@icon) {
+    &:before {
+      content: @icon; 
+    }
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    line-height: 14px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-size: 14px;
+    padding: 0px 3px;
+  }
+  .wl-active-tab {
+    position:absolute;
+    left: 11px;
+  }
+  .wl-search-toolbar-icon { 
+    .toolbar-icon(@fa-var-search); 
+  }
+
+  .wl-add-entity-toolbar-icon { 
+    .toolbar-icon(@fa-var-pencil); 
+  }
+}

@@ -1,5 +1,5 @@
 (function() {
-  var $, ANALYSIS_EVENT, CONTENT_EDITABLE, CONTENT_IFRAME, CONTEXT, DBPEDIA, DBPEDIA_ORG, DBPEDIA_ORG_REGEX, DCTERMS, EDITOR_ID, FISE_ONT, FISE_ONT_CONFIDENCE, FISE_ONT_ENTITY_ANNOTATION, FISE_ONT_TEXT_ANNOTATION, FREEBASE, FREEBASE_COM, FREEBASE_NS, FREEBASE_NS_DESCRIPTION, GRAPH, MCE_WORDLIFT, RDFS, RDFS_COMMENT, RDFS_LABEL, RUNNING_CLASS, SCHEMA_ORG, SCHEMA_ORG_DESCRIPTION, TEXT_ANNOTATION, Traslator, VALUE, WGS84_POS, container, injector,
+  var $, ANALYSIS_EVENT, CONFIGURATION_TYPES_EVENT, CONTENT_EDITABLE, CONTENT_IFRAME, CONTEXT, DBPEDIA, DBPEDIA_ORG, DBPEDIA_ORG_REGEX, DCTERMS, EDITOR_ID, FISE_ONT, FISE_ONT_CONFIDENCE, FISE_ONT_ENTITY_ANNOTATION, FISE_ONT_TEXT_ANNOTATION, FREEBASE, FREEBASE_COM, FREEBASE_NS, FREEBASE_NS_DESCRIPTION, GRAPH, MCE_WORDLIFT, RDFS, RDFS_COMMENT, RDFS_LABEL, RUNNING_CLASS, SCHEMA_ORG, SCHEMA_ORG_DESCRIPTION, TEXT_ANNOTATION, Traslator, VALUE, WGS84_POS, container, injector,
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   Traslator = (function() {
@@ -115,6 +115,8 @@
   VALUE = '@value';
 
   ANALYSIS_EVENT = 'analysisReceived';
+
+  CONFIGURATION_TYPES_EVENT = 'configurationTypesLoaded';
 
   RDFS = 'http://www.w3.org/2000/01/rdf-schema#';
 
@@ -279,7 +281,12 @@
         return this._entities = entities;
       };
       service.setKnownTypes = function(types) {
-        return this._knownTypes = types;
+        this._knownTypes = types;
+        $rootScope.$broadcast(CONFIGURATION_TYPES_EVENT, types);
+        return this._knownTypes;
+      };
+      service.getKnownTypes = function() {
+        return this._knownTypes;
       };
       service.abort = function() {
         if (this.isRunning && (this.promise != null)) {
@@ -1125,6 +1132,18 @@
       $scope.analysis = null;
       $scope.textAnnotation = null;
       $scope.textAnnotationSpan = null;
+      $scope.newEntity = {
+        label: null,
+        type: null
+      };
+      $scope.activeToolbarTab = 'Search for entities';
+      $scope.isActiveToolbarTab = function(tab) {
+        return $scope.activeToolbarTab === tab;
+      };
+      $scope.setActiveToolbarTab = function(tab) {
+        return $scope.activeToolbarTab = tab;
+      };
+      $scope.knownTypes = null;
       setArrowTop = function(top) {
         return $('head').append('<style>#wordlift-disambiguation-popover .postbox:before,#wordlift-disambiguation-popover .postbox:after{top:' + top + 'px;}</style>');
       };
@@ -1154,6 +1173,27 @@
           });
         });
       };
+      $scope.onNewEntityCreate = function(entity) {
+        return $http({
+          method: 'post',
+          url: ajaxurl + '?action=wordlift_add_entity',
+          data: $scope.newEntity
+        }).success(function(data, status, headers, config) {
+          var entityAnnotation;
+          entityAnnotation = EntityAnnotationService.create({
+            'entity': data
+          });
+          entityAnnotation.confidence = 1.0;
+          if (AnalysisService.enhance($scope.analysis, $scope.textAnnotation, entityAnnotation) === true) {
+            return $scope.$emit('selectEntity', {
+              ta: $scope.textAnnotation,
+              ea: entityAnnotation
+            });
+          }
+        }).error(function(data, status, headers, config) {
+          return $log.debug("Got en error on onNewEntityCreate");
+        });
+      };
       $scope.onSearchedEntitySelected = function(entityAnnotation) {
         $log.debug("Selected an entity on search");
         if (AnalysisService.enhance($scope.analysis, $scope.textAnnotation, entityAnnotation) === true) {
@@ -1172,9 +1212,13 @@
       $scope.$on('analysisReceived', function(event, analysis) {
         return $scope.analysis = analysis;
       });
+      $scope.$on('configurationTypesLoaded', function(event, types) {
+        return $scope.knownTypes = types;
+      });
       return $scope.$on('textAnnotationClicked', function(event, id, sourceElement) {
         var pos, _ref, _ref1;
         $scope.textAnnotation = (_ref = $scope.analysis) != null ? _ref.textAnnotations[id] : void 0;
+        $scope.newEntity.label = $scope.textAnnotation.text;
         if ((((_ref1 = $scope.textAnnotation) != null ? _ref1.entityAnnotations : void 0) == null) || 0 === Object.keys($scope.textAnnotation.entityAnnotations).length) {
           return $('#wordlift-disambiguation-popover').hide();
         } else {
@@ -1210,7 +1254,7 @@
 
   angular.module('wordlift.tinymce.plugin', ['wordlift.tinymce.plugin.controllers', 'wordlift.tinymce.plugin.directives']);
 
-  $(container = $('<div id="wl-app" class="wl-app">\n  <div id="wl-error-controller" class="wl-error-controller" ng-controller="ErrorController">\n    <p ng-bind="message"></p>\n  </div>\n  <div id="wordlift-disambiguation-popover" class="metabox-holder" ng-controller="EntitiesController">\n    <div class="postbox">\n      <div class="handlediv" title="Click to toggle"><br></div>\n      <h3 class="hndle"><span>Semantic Web</span></h3>\n      <div class="inside">\n        <form role="form">\n          <div class="form-group">\n            <div class="ui-widget">\n              <input type="text" class="form-control" id="search" placeholder="search or create" autocomplete on-select="onSearchedEntitySelected(entityAnnotation)" source="search($viewValue)">\n            </div>\n          </div>\n          <wl-entities on-select="onEntitySelected(textAnnotation, entityAnnotation)" text-annotation="textAnnotation"></wl-entities>\n\n        </form>\n\n        <wl-entity-input-boxes text-annotations="analysis.textAnnotations"></wl-entity-input-boxes>\n        <wl-entity-props text-annotations="analysis.textAnnotations"></wl-entity-props>\n      </div>\n    </div>\n  </div>\n</div>').appendTo('form[name=post]'), $('#wordlift-disambiguation-popover').css({
+  $(container = $('<div id="wl-app" class="wl-app">\n  <div id="wl-error-controller" class="wl-error-controller" ng-controller="ErrorController">\n    <p ng-bind="message"></p>\n  </div>\n  <div id="wordlift-disambiguation-popover" class="metabox-holder" ng-controller="EntitiesController">\n    <div class="postbox">\n      <div class="handlediv" title="Click to toggle"><br></div>\n      <h3 class="hndle"><span>Semantic Web</span></h3>\n      <div class="ui-widget toolbar">\n        <span class="wl-active-tab" ng-bind="activeToolbarTab" />\n        <span ng-click="setActiveToolbarTab(\'Search for entities\')" class="wl-search-toolbar-icon" />\n        <span ng-click="setActiveToolbarTab(\'Add new entity\')" class="wl-add-entity-toolbar-icon" />\n      </div>\n      <div class="inside">\n        <form role="form">\n          <div class="form-group">\n            <div ng-show="isActiveToolbarTab(\'Search for entities\')" class="tab">\n              <div class="ui-widget">\n                <input type="text" class="form-control" id="search" placeholder="search or create" autocomplete on-select="onSearchedEntitySelected(entityAnnotation)" source="search($viewValue)">\n              </div>       \n            </div>\n            <div ng-show="isActiveToolbarTab(\'Add new entity\')" class="tab">\n              <div class="ui-widget">\n                <input ng-model="newEntity.label" type="text" class="form-control" id="label" placeholder="label">\n              </div>\n              <div class="ui-widget">\n                <select ng-model="newEntity.type" ng-options="type.uri as type.uri for type in knownTypes" placeholder="type">\n                  <option value="" disabled selected>Select the entity type</option>\n                </select>\n              </div>\n              <div class="ui-widget right">\n                <button ng-click="onNewEntityCreate(newEntity)">Save the entity</button>\n              </div>\n            </div>\n          </div>\n          <wl-entities on-select="onEntitySelected(textAnnotation, entityAnnotation)" text-annotation="textAnnotation"></wl-entities>\n\n        </form>\n        \n        <wl-entity-input-boxes text-annotations="analysis.textAnnotations"></wl-entity-input-boxes>\n        <wl-entity-props text-annotations="analysis.textAnnotations"></wl-entity-props>\n      </div>\n    </div>\n  </div>\n</div>').appendTo('form[name=post]'), $('#wordlift-disambiguation-popover').css({
     display: 'none',
     height: $('body').height() - $('#wpadminbar').height() + 12,
     top: $('#wpadminbar').height() - 1,

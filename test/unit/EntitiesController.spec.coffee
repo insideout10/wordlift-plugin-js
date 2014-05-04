@@ -37,7 +37,7 @@ describe "EditorController tests", ->
       expect($rootScope.$broadcast).toHaveBeenCalledWith('analysisReceived', jasmine.any(Object))
 
       # Get a reference to the analysis structure.
-      args = $rootScope.$broadcast.calls.argsFor 0
+      args = $rootScope.$broadcast.calls.argsFor 1
       analysis = args[1]
 
       expect(analysis).not.toBe undefined

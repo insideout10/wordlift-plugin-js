@@ -1563,8 +1563,14 @@
   bottom: 0px;
   left: 30px;
 }
-#wordlift-disambiguation-popover #search {
+#wordlift-disambiguation-popover input,
+#wordlift-disambiguation-popover select {
   width: 100%;
+  font-size: 11px;
+  margin: 3px 0px;
+}
+#wordlift-disambiguation-popover .right {
+  text-align: right;
 }
 #wpadminbar .ab-top-menu > li#wp-admin-bar-wordlift {
   float: right;
@@ -1700,4 +1706,41 @@ body#tinymce .textannotation .textannotation {
 }
 body#tinymce[contenteditable=false] {
   background-color: #f1f1f1;
+}
+.toolbar {
+  text-align: right;
+  padding: 4px 10px;
+  background-color: #eee;
+  border-bottom: 1px solid #eee;
+  position: relative;
+}
+.toolbar .wl-active-tab {
+  position: absolute;
+  left: 11px;
+}
+.toolbar .wl-search-toolbar-icon {
+  font-family: FontAwesome;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 14px;
+  padding: 0px 3px;
+}
+.toolbar .wl-search-toolbar-icon:before {
+  content: "\f002";
+}
+.toolbar .wl-add-entity-toolbar-icon {
+  font-family: FontAwesome;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 14px;
+  padding: 0px 3px;
+}
+.toolbar .wl-add-entity-toolbar-icon:before {
+  content: "\f040";
 }

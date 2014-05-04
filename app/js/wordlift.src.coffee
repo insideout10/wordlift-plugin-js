@@ -134,6 +134,7 @@ GRAPH = '@graph'
 VALUE = '@value'
 
 ANALYSIS_EVENT = 'analysisReceived'
+CONFIGURATION_TYPES_EVENT = 'configurationTypesLoaded'
 
 RDFS = 'http://www.w3.org/2000/01/rdf-schema#'
 RDFS_LABEL = "#{RDFS}label"
@@ -380,6 +381,12 @@ angular.module('AnalysisService',
         # Set the known types.
         service.setKnownTypes = (types) ->
           @_knownTypes = types
+          $rootScope.$broadcast CONFIGURATION_TYPES_EVENT, types
+          @_knownTypes
+          
+        # Get the known types.
+        service.getKnownTypes = () ->
+          @_knownTypes
 
         # Abort a running analysis.
         service.abort = ->
@@ -1228,13 +1235,24 @@ angular.module('wordlift.tinymce.plugin.controllers',
 
     # holds a reference to the current analysis results.
     $scope.analysis = null
-
     # holds a reference to the selected text annotation.
     $scope.textAnnotation = null
-
     # holds a reference to the selected text annotation span.
     $scope.textAnnotationSpan = null
-
+    # new entity model
+    $scope.newEntity = {
+      label: null
+      type: null
+    }
+    $scope.activeToolbarTab = 'Search for entities'
+    $scope.isActiveToolbarTab  = (tab)->
+      $scope.activeToolbarTab is tab
+    $scope.setActiveToolbarTab  = (tab)->
+      $scope.activeToolbarTab = tab
+      
+    # holds a reference to the knows types from AnalysisService
+    $scope.knownTypes = null
+    
     setArrowTop = (top) ->
       $('head').append('<style>#wordlift-disambiguation-popover .postbox:before,#wordlift-disambiguation-popover .postbox:after{top:' + top + 'px;}</style>');
 
@@ -1261,12 +1279,31 @@ angular.module('wordlift.tinymce.plugin.controllers',
         # Create a fake entity annotation for each entity
         response.data.map (entity)->
           EntityAnnotationService.create { 'entity': entity }
+    
+    # Create a new entity from the disambiguation widget
+    $scope.onNewEntityCreate = (entity) ->
+      $http
+        method: 'post'
+        url: ajaxurl + '?action=wordlift_add_entity'
+        data: $scope.newEntity
+      .success (data, status, headers, config) ->
+        # Create a fake entity annotation for each entity
+        entityAnnotation = EntityAnnotationService.create { 'entity': data }
+        # Set the higher priority for this annotation
+        entityAnnotation.confidence = 1.0
+        # Enhance current analysis with the selected entity if needed 
+        if AnalysisService.enhance($scope.analysis, $scope.textAnnotation, entityAnnotation) is true
+          # Update the editor accordingly 
+          $scope.$emit 'selectEntity', ta: $scope.textAnnotation, ea: entityAnnotation
+      .error (data, status, headers, config) ->
+        $log.debug "Got en error on onNewEntityCreate"
+
     # Search for entities server side
     $scope.onSearchedEntitySelected = (entityAnnotation) ->
       $log.debug "Selected an entity on search"
       # Enhance current analysis with the selected entity if needed 
       if AnalysisService.enhance($scope.analysis, $scope.textAnnotation, entityAnnotation) is true
-        # Updates the editor accordingly 
+        # Update the editor accordingly 
         $scope.$emit 'selectEntity', ta: $scope.textAnnotation, ea: entityAnnotation
 
     $scope.onEntitySelected = (textAnnotation, entityAnnotation) ->
@@ -1276,11 +1313,16 @@ angular.module('wordlift.tinymce.plugin.controllers',
     $scope.$on 'analysisReceived', (event, analysis) ->
       $scope.analysis = analysis
 
+    $scope.$on 'configurationTypesLoaded', (event, types)->
+      $scope.knownTypes = types
+
     # When a text annotation is clicked, open the disambiguation popover.
     $scope.$on 'textAnnotationClicked', (event, id, sourceElement) ->
 
       # Set the current text annotation to the one specified.
       $scope.textAnnotation = $scope.analysis?.textAnnotations[id]
+      # Set default new entity label accordingly to the current textAnnotation Text
+      $scope.newEntity.label = $scope.textAnnotation.text
 
       # hide the popover if there are no entities.
       if not $scope.textAnnotation?.entityAnnotations? or 0 is Object.keys($scope.textAnnotation.entityAnnotations).length
@@ -1334,17 +1376,37 @@ $(
         <div class="postbox">
           <div class="handlediv" title="Click to toggle"><br></div>
           <h3 class="hndle"><span>Semantic Web</span></h3>
+          <div class="ui-widget toolbar">
+            <span class="wl-active-tab" ng-bind="activeToolbarTab" />
+            <span ng-click="setActiveToolbarTab('Search for entities')" class="wl-search-toolbar-icon" />
+            <span ng-click="setActiveToolbarTab('Add new entity')" class="wl-add-entity-toolbar-icon" />
+          </div>
           <div class="inside">
             <form role="form">
               <div class="form-group">
-                <div class="ui-widget">
-                  <input type="text" class="form-control" id="search" placeholder="search or create" autocomplete on-select="onSearchedEntitySelected(entityAnnotation)" source="search($viewValue)">
+                <div ng-show="isActiveToolbarTab('Search for entities')" class="tab">
+                  <div class="ui-widget">
+                    <input type="text" class="form-control" id="search" placeholder="search or create" autocomplete on-select="onSearchedEntitySelected(entityAnnotation)" source="search($viewValue)">
+                  </div>       
+                </div>
+                <div ng-show="isActiveToolbarTab('Add new entity')" class="tab">
+                  <div class="ui-widget">
+                    <input ng-model="newEntity.label" type="text" class="form-control" id="label" placeholder="label">
+                  </div>
+                  <div class="ui-widget">
+                    <select ng-model="newEntity.type" ng-options="type.uri as type.uri for type in knownTypes" placeholder="type">
+                      <option value="" disabled selected>Select the entity type</option>
+                    </select>
+                  </div>
+                  <div class="ui-widget right">
+                    <button ng-click="onNewEntityCreate(newEntity)">Save the entity</button>
+                  </div>
                 </div>
               </div>
               <wl-entities on-select="onEntitySelected(textAnnotation, entityAnnotation)" text-annotation="textAnnotation"></wl-entities>
 
             </form>
-
+            
             <wl-entity-input-boxes text-annotations="analysis.textAnnotations"></wl-entity-input-boxes>
             <wl-entity-props text-annotations="analysis.textAnnotations"></wl-entity-props>
           </div>

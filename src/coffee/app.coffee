@@ -15,17 +15,37 @@ $(
         <div class="postbox">
           <div class="handlediv" title="Click to toggle"><br></div>
           <h3 class="hndle"><span>Semantic Web</span></h3>
+          <div class="ui-widget toolbar">
+            <span class="wl-active-tab" ng-bind="activeToolbarTab" />
+            <span ng-click="setActiveToolbarTab('Search for entities')" class="wl-search-toolbar-icon" />
+            <span ng-click="setActiveToolbarTab('Add new entity')" class="wl-add-entity-toolbar-icon" />
+          </div>
           <div class="inside">
             <form role="form">
               <div class="form-group">
-                <div class="ui-widget">
-                  <input type="text" class="form-control" id="search" placeholder="search or create" autocomplete on-select="onSearchedEntitySelected(entityAnnotation)" source="search($viewValue)">
+                <div ng-show="isActiveToolbarTab('Search for entities')" class="tab">
+                  <div class="ui-widget">
+                    <input type="text" class="form-control" id="search" placeholder="search or create" autocomplete on-select="onSearchedEntitySelected(entityAnnotation)" source="search($viewValue)">
+                  </div>       
+                </div>
+                <div ng-show="isActiveToolbarTab('Add new entity')" class="tab">
+                  <div class="ui-widget">
+                    <input ng-model="newEntity.label" type="text" class="form-control" id="label" placeholder="label">
+                  </div>
+                  <div class="ui-widget">
+                    <select ng-model="newEntity.type" ng-options="type.uri as type.uri for type in knownTypes" placeholder="type">
+                      <option value="" disabled selected>Select the entity type</option>
+                    </select>
+                  </div>
+                  <div class="ui-widget right">
+                    <button ng-click="onNewEntityCreate(newEntity)">Save the entity</button>
+                  </div>
                 </div>
               </div>
               <wl-entities on-select="onEntitySelected(textAnnotation, entityAnnotation)" text-annotation="textAnnotation"></wl-entities>
 
             </form>
-
+            
             <wl-entity-input-boxes text-annotations="analysis.textAnnotations"></wl-entity-input-boxes>
             <wl-entity-props text-annotations="analysis.textAnnotations"></wl-entity-props>
           </div>

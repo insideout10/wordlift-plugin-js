@@ -4,6 +4,7 @@ GRAPH = '@graph'
 VALUE = '@value'
 
 ANALYSIS_EVENT = 'analysisReceived'
+CONFIGURATION_TYPES_EVENT = 'configurationTypesLoaded'
 
 RDFS = 'http://www.w3.org/2000/01/rdf-schema#'
 RDFS_LABEL = "#{RDFS}label"
