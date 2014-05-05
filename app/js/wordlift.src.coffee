@@ -1385,8 +1385,8 @@ $(
           <h3 class="hndle"><span>Semantic Web</span></h3>
           <div class="ui-widget toolbar">
             <span class="wl-active-tab" ng-bind="activeToolbarTab" />
-            <i ng_class="{'selected' : isActiveToolbarTab('Search for entities')}" ng-click="setActiveToolbarTab('Search for entities')" class="wl-search-toolbar-icon" />
-            <i ng_class="{'selected' : isActiveToolbarTab('Add new entity')}" ng-click="setActiveToolbarTab('Add new entity')" class="wl-add-entity-toolbar-icon" />
+            <i ng-class="{'selected' : isActiveToolbarTab('Search for entities')}" ng-click="setActiveToolbarTab('Search for entities')" class="wl-search-toolbar-icon" />
+            <i ng-class="{'selected' : isActiveToolbarTab('Add new entity')}" ng-click="setActiveToolbarTab('Add new entity')" class="wl-add-entity-toolbar-icon" />
           </div>
           <div class="inside">
             <form role="form">
@@ -1401,7 +1401,7 @@ $(
                     <input ng-model="newEntity.label" type="text" class="form-control" id="label" placeholder="label">
                   </div>
                   <div class="ui-widget">
-                    <select ng-model="newEntity.type" ng-options="type.uri as type.uri for type in knownTypes" placeholder="type">
+                    <select ng-model="newEntity.type" ng-options="type.uri as type.label for type in knownTypes" placeholder="type">
                       <option value="" disabled selected>Select the entity type</option>
                     </select>
                   </div>
