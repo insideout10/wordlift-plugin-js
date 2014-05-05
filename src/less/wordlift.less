@@ -58,7 +58,6 @@
 }
   
 .entity {
-  width: 100%;
   background: white;
   border: 1px solid gray;
   height: 50px;
@@ -210,6 +209,20 @@
     -o-animation: spin 2s infinite linear;
     animation: spin 2s infinite linear;
     display:inline-block;
+  }
+  .wl-entities-wrapper.ng-hide-add, .wl-entities-wrapper.ng-hide-remove {
+  -webkit-transition:0.5s linear all;
+  transition:0.5s linear all;
+
+  /* remember to add this */
+  display:block!important;
+  opacity:1;
+}
+  #wl-entities-wrapper {
+    &.ng-hide {
+      display:block!important;
+      opacity: 0.3;
+    }
   }
 }
 

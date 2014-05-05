@@ -372,6 +372,11 @@ in the select attribute is called.</p>
           $q.<span class="hljs-keyword">when</span>(originalScope.source(locals)).<span class="hljs-keyword">then</span> (matches) -&gt;
             response matches
         minLength: <span class="hljs-number">3</span>
+        open: () -&gt;
+          originalScope.$emit(<span class="hljs-string">'autocompleteOpened'</span>)
+        close: () -&gt;
+          originalScope.$emit(<span class="hljs-string">'autocompleteClosed'</span>)
+      
       .data(<span class="hljs-string">"ui-autocomplete"</span>)._renderItem = (ul, ea) -&gt;
         
         scope = originalScope.$<span class="hljs-keyword">new</span>();
@@ -409,7 +414,8 @@ in the select attribute is called.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>          angular.element(elem).val(<span class="hljs-string">''</span>)
-          angular.element(ul).hide()</pre></div></div>
+          angular.element(ul).hide()
+          originalScope.$emit(<span class="hljs-string">'autocompleteClosed'</span>)</pre></div></div>
             
         </li>
         
@@ -434,7 +440,7 @@ in the select attribute is called.</p>
 
         $(<span class="hljs-string">"&lt;li&gt;"</span>).append(el).appendTo(ul)
         compiled(scope)
-
+      
   ])</pre></div></div>
             
         </li>

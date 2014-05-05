@@ -96,6 +96,11 @@ angular.module('wordlift.tinymce.plugin.directives', ['wordlift.directives.wlEnt
           $q.when(originalScope.source(locals)).then (matches) ->
             response matches
         minLength: 3
+        open: () ->
+          originalScope.$emit('autocompleteOpened')
+        close: () ->
+          originalScope.$emit('autocompleteClosed')
+      
       .data("ui-autocomplete")._renderItem = (ul, ea) ->
         
         scope = originalScope.$new();
@@ -107,6 +112,8 @@ angular.module('wordlift.tinymce.plugin.directives', ['wordlift.directives.wlEnt
           # Reset autocomplete field & hide results
           angular.element(elem).val('')
           angular.element(ul).hide()
+          originalScope.$emit('autocompleteClosed')
+      
           # Call the onSelect callback
           originalScope.onSelect
             entityAnnotation: entityAnnotation
@@ -118,6 +125,6 @@ angular.module('wordlift.tinymce.plugin.directives', ['wordlift.directives.wlEnt
 
         $("<li>").append(el).appendTo(ul)
         compiled(scope)
-
+      
   ])
 

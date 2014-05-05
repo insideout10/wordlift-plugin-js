@@ -313,6 +313,11 @@ angular.module('wordlift.tinymce.plugin.directives', ['wordlift.directives.wlEnt
           $q.when(originalScope.source(locals)).then (matches) ->
             response matches
         minLength: 3
+        open: () ->
+          originalScope.$emit('autocompleteOpened')
+        close: () ->
+          originalScope.$emit('autocompleteClosed')
+      
       .data("ui-autocomplete")._renderItem = (ul, ea) ->
         
         scope = originalScope.$new();
@@ -324,6 +329,8 @@ angular.module('wordlift.tinymce.plugin.directives', ['wordlift.directives.wlEnt
           # Reset autocomplete field & hide results
           angular.element(elem).val('')
           angular.element(ul).hide()
+          originalScope.$emit('autocompleteClosed')
+      
           # Call the onSelect callback
           originalScope.onSelect
             entityAnnotation: entityAnnotation
@@ -335,7 +342,7 @@ angular.module('wordlift.tinymce.plugin.directives', ['wordlift.directives.wlEnt
 
         $("<li>").append(el).appendTo(ul)
         compiled(scope)
-
+      
   ])
 
 
@@ -1245,13 +1252,17 @@ angular.module('wordlift.tinymce.plugin.controllers',
       label: null
       type: null
     }
+
     # Toolbar
     $scope.activeToolbarTab = 'Search for entities'
     $scope.isActiveToolbarTab  = (tab)->
       $scope.activeToolbarTab is tab
     $scope.setActiveToolbarTab  = (tab)->
+      $scope.autocompleteOpened = false
       $scope.activeToolbarTab = tab
-      
+    
+    $scope.autocompleteOpened = false
+  
     # holds a reference to the knows types from AnalysisService
     $scope.knownTypes = null
     
@@ -1320,6 +1331,12 @@ angular.module('wordlift.tinymce.plugin.controllers',
     $scope.$on 'analysisReceived', (event, analysis) ->
       $scope.analysis = analysis
 
+    $scope.$on 'autocompleteOpened', (event) ->
+      $scope.autocompleteOpened = true
+
+    $scope.$on 'autocompleteClosed', (event) ->
+      $scope.autocompleteOpened = false
+    
     $scope.$on 'configurationTypesLoaded', (event, types)->
       $scope.knownTypes = types
 
@@ -1411,8 +1428,9 @@ $(
                   </div>
                 </div>
               </div>
-              <wl-entities on-select="onEntitySelected(textAnnotation, entityAnnotation)" text-annotation="textAnnotation"></wl-entities>
-
+              <div id="wl-entities-wrapper" ng-hide="autocompleteOpened">
+                <wl-entities on-select="onEntitySelected(textAnnotation, entityAnnotation)" text-annotation="textAnnotation"></wl-entities>
+              </div>
             </form>
             
             <wl-entity-input-boxes text-annotations="analysis.textAnnotations"></wl-entity-input-boxes>

@@ -37,13 +37,17 @@ angular.module('wordlift.tinymce.plugin.controllers',
       label: null
       type: null
     }
+
     # Toolbar
     $scope.activeToolbarTab = 'Search for entities'
     $scope.isActiveToolbarTab  = (tab)->
       $scope.activeToolbarTab is tab
     $scope.setActiveToolbarTab  = (tab)->
+      $scope.autocompleteOpened = false
       $scope.activeToolbarTab = tab
-      
+    
+    $scope.autocompleteOpened = false
+  
     # holds a reference to the knows types from AnalysisService
     $scope.knownTypes = null
     
@@ -112,6 +116,12 @@ angular.module('wordlift.tinymce.plugin.controllers',
     $scope.$on 'analysisReceived', (event, analysis) ->
       $scope.analysis = analysis
 
+    $scope.$on 'autocompleteOpened', (event) ->
+      $scope.autocompleteOpened = true
+
+    $scope.$on 'autocompleteClosed', (event) ->
+      $scope.autocompleteOpened = false
+    
     $scope.$on 'configurationTypesLoaded', (event, types)->
       $scope.knownTypes = types
 

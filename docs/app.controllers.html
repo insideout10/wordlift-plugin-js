@@ -256,7 +256,10 @@
     $scope.<span class="hljs-function"><span class="hljs-title">isActiveToolbarTab</span>  = <span class="hljs-params">(tab)</span>-&gt;</span>
       $scope.activeToolbarTab <span class="hljs-keyword">is</span> tab
     $scope.<span class="hljs-function"><span class="hljs-title">setActiveToolbarTab</span>  = <span class="hljs-params">(tab)</span>-&gt;</span>
-      $scope.activeToolbarTab = tab</pre></div></div>
+      $scope.autocompleteOpened = <span class="hljs-literal">false</span>
+      $scope.activeToolbarTab = tab
+    
+    $scope.autocompleteOpened = <span class="hljs-literal">false</span></pre></div></div>
             
         </li>
         
@@ -538,6 +541,12 @@
             <div class="content"><div class='highlight'><pre>    $scope.$<span class="hljs-literal">on</span> <span class="hljs-string">'analysisReceived'</span>, <span class="hljs-function"><span class="hljs-params">(event, analysis)</span> -&gt;</span>
       $scope.analysis = analysis
 
+    $scope.$<span class="hljs-literal">on</span> <span class="hljs-string">'autocompleteOpened'</span>, <span class="hljs-function"><span class="hljs-params">(event)</span> -&gt;</span>
+      $scope.autocompleteOpened = <span class="hljs-literal">true</span>
+
+    $scope.$<span class="hljs-literal">on</span> <span class="hljs-string">'autocompleteClosed'</span>, <span class="hljs-function"><span class="hljs-params">(event)</span> -&gt;</span>
+      $scope.autocompleteOpened = <span class="hljs-literal">false</span>
+    
     $scope.$<span class="hljs-literal">on</span> <span class="hljs-string">'configurationTypesLoaded'</span>, <span class="hljs-function"><span class="hljs-params">(event, types)</span>-&gt;</span>
       $scope.knownTypes = types</pre></div></div>
             

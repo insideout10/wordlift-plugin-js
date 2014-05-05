@@ -215,8 +215,9 @@
                   &lt;/div&gt;
                 &lt;/div&gt;
               &lt;/div&gt;
-              &lt;wl-entities on-select="onEntitySelected(textAnnotation, entityAnnotation)" text-annotation="textAnnotation"&gt;&lt;/wl-entities&gt;
-
+              &lt;div id="wl-entities-wrapper" ng-hide="autocompleteOpened"&gt;
+                &lt;wl-entities on-select="onEntitySelected(textAnnotation, entityAnnotation)" text-annotation="textAnnotation"&gt;&lt;/wl-entities&gt;
+              &lt;/div&gt;
             &lt;/form&gt;
             
             &lt;wl-entity-input-boxes text-annotations="analysis.textAnnotations"&gt;&lt;/wl-entity-input-boxes&gt;
