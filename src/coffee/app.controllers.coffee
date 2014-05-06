@@ -43,6 +43,8 @@ angular.module('wordlift.tinymce.plugin.controllers',
     $scope.isActiveToolbarTab  = (tab)->
       $scope.activeToolbarTab is tab
     $scope.setActiveToolbarTab  = (tab)->
+      if $scope.activeToolbarTab is tab
+        return 
       $scope.autocompleteOpened = false
       $scope.activeToolbarTab = tab
     

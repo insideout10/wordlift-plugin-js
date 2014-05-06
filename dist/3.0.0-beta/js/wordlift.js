@@ -1149,6 +1149,9 @@
         return $scope.activeToolbarTab === tab;
       };
       $scope.setActiveToolbarTab = function(tab) {
+        if ($scope.activeToolbarTab === tab) {
+          return;
+        }
         $scope.autocompleteOpened = false;
         return $scope.activeToolbarTab = tab;
       };

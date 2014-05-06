@@ -256,6 +256,8 @@
     $scope.<span class="hljs-function"><span class="hljs-title">isActiveToolbarTab</span>  = <span class="hljs-params">(tab)</span>-&gt;</span>
       $scope.activeToolbarTab <span class="hljs-keyword">is</span> tab
     $scope.<span class="hljs-function"><span class="hljs-title">setActiveToolbarTab</span>  = <span class="hljs-params">(tab)</span>-&gt;</span>
+      <span class="hljs-keyword">if</span> $scope.activeToolbarTab <span class="hljs-keyword">is</span> tab
+        <span class="hljs-keyword">return</span> 
       $scope.autocompleteOpened = <span class="hljs-literal">false</span>
       $scope.activeToolbarTab = tab
     
