@@ -44,7 +44,7 @@ $(
                 </div>
               </div>
               <div id="wl-entities-wrapper" ng-hide="autocompleteOpened">
-                <wl-entities on-select="onEntitySelected(textAnnotation, entityAnnotation)" text-annotation="textAnnotation"></wl-entities>
+                <wl-entities entity-types="knownTypes" on-select="onEntitySelected(textAnnotation, entityAnnotation)" text-annotation="textAnnotation"></wl-entities>
               </div>
             </form>
             

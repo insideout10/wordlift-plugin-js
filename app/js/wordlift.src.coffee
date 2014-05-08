@@ -224,9 +224,18 @@ angular.module('wordlift.tinymce.plugin.directives', ['wordlift.directives.wlEnt
     scope:
     # Get the text annotation from the text-annotation attribute.
       textAnnotation: '='
+      entityTypes: '='
       onSelect: '&'
     # Create the link function in order to bind to children elements events.
     link: (scope, element, attrs) ->
+
+      # Filter the type definition accordingly with current entity main known type
+      # It's used to set the type definition on wl-entity directive
+      scope.getCurrentTypeDefinition = (entityAnnotation) ->
+        scope.entityTypes.filter (entityType) ->
+          entityType.uri is entityAnnotation.entity?.type
+        .pop()
+
       scope.select = (item) ->
 
         # Set the selected flag on each annotation.
@@ -244,7 +253,7 @@ angular.module('wordlift.tinymce.plugin.directives', ['wordlift.directives.wlEnt
       <div>
         <ul>
           <li ng-repeat="entityAnnotation in textAnnotation.entityAnnotations | orderObjectBy:'confidence':true">
-            <wl-entity on-select="select(entityAnnotation)" entity-annotation="entityAnnotation"></wl-entity>
+            <wl-entity type-definition="getCurrentTypeDefinition(entityAnnotation)" on-select="select(entityAnnotation)" entity-annotation="entityAnnotation"></wl-entity>
           </li>
         </ul>
       </div>
@@ -252,23 +261,39 @@ angular.module('wordlift.tinymce.plugin.directives', ['wordlift.directives.wlEnt
   )
 # The wlEntity directive shows a tile for a provided entityAnnotation. When a tile is clicked the function provided
 # in the select attribute is called.
-.directive('wlEntity', ->
+.directive('wlEntity', ['$interpolate','$log', ($interpolate, $log)->
     restrict: 'E'
     scope:
+      typeDefinition: '='
       entityAnnotation: '='
       onSelect: '&'
+    # Create the link function in order to bind to children elements events.
+    link: (scope, element, attrs) ->
+      # Holds a reference to the current entity 
+      scope.entity = scope.entityAnnotation?.entity
+
+      # Render an entity property
+      # If the property is missing, look for the proper template in the typeDefinition
+      # and interpolate it using entity object as context
+      # If the template is missing log a warning message and returns a blank string
+      scope.renderEntityProperty = (propertyName) ->
+        return scope.entity[propertyName] if scope.entity?.hasOwnProperty(propertyName)
+        return $interpolate(scope.typeDefinition.templates[propertyName])(scope.entity) if scope.typeDefinition.templates.hasOwnProperty(propertyName)
+        # $log.warn "Cannot find template #{propertyName} for typeDefinition #{scope.typeDefinition.uri}"  
+        ""
+
     template: """
-      <div class="entity {{entityAnnotation.entity.css}}" ng-class="{selected: true==entityAnnotation.selected}" ng-click="onSelect()" ng-show="entityAnnotation.entity.label">
-        <div class="thumbnail" ng-show="entityAnnotation.entity.thumbnail" title="{{entityAnnotation.entity.id}}" ng-attr-style="background-image: url({{entityAnnotation.entity.thumbnail}})"></div>
-        <div class="thumbnail empty" ng-hide="entityAnnotation.entity.thumbnail" title="{{entityAnnotation.entity.id}}"></div>
+      <div class="entity {{entityAnnotation.entity.css}}" ng-class="{selected: true==entityAnnotation.selected}" ng-click="onSelect()" ng-show="entity.label">
+        <div class="thumbnail" ng-show="entity.thumbnail" title="{{entity.id}}" ng-attr-style="background-image: url({{entity.thumbnail}})"></div>
+        <div class="thumbnail empty" ng-hide="entity.thumbnail" title="{{entity.id}}"></div>
         <div class="confidence" ng-bind="entityAnnotation.confidence"></div>
-        <div class="label" ng-bind="entityAnnotation.entity.label"></div>
-        <div class="url" ng-bind="entityAnnotation.entity.id"></div>
+        <div class="label" ng-bind="renderEntityProperty('label')"></div>
+        <div class="url" ng-bind="renderEntityProperty('subtitle')"></div>
         <div class="type"></div>
-        <div class="source" ng-class="entityAnnotation.entity.source" ng-bind="entityAnnotation.entity.source"></div>
+        <div class="source" ng-class="entity.source" ng-bind="entity.source"></div>
       </div>
     """
-  )
+  ])
 # The wlEntityInputBoxes prints the inputs and textareas with entities data.
 .directive('wlEntityInputBoxes', ->
     restrict: 'E'
@@ -1431,7 +1456,7 @@ $(
                 </div>
               </div>
               <div id="wl-entities-wrapper" ng-hide="autocompleteOpened">
-                <wl-entities on-select="onEntitySelected(textAnnotation, entityAnnotation)" text-annotation="textAnnotation"></wl-entities>
+                <wl-entities entity-types="knownTypes" on-select="onEntitySelected(textAnnotation, entityAnnotation)" text-annotation="textAnnotation"></wl-entities>
               </div>
             </form>
             

@@ -14,33 +14,40 @@ t = [];
 t.push({
   css: "wl-creative-work",
   uri: "http:\/\/schema.org\/CreativeWork",
-  sameAs: ["http:\/\/schema.org\/MusicAlbum"]
+  sameAs: ["http:\/\/schema.org\/MusicAlbum"],
+  templates: []
 });
 t.push({
   css: "wl-event",
   uri: "http:\/\/schema.org\/Event",
-  sameAs: ["http:\/\/dbpedia.org\/ontology\/Event"]
+  sameAs: ["http:\/\/dbpedia.org\/ontology\/Event"],
+  templates: []
 });
 t.push({
   css: "wl-organization",
   uri: "http:\/\/schema.org\/Organization",
   sameAs: ["http:\/\/rdf.freebase.com\/ns\/organization.organization\r",
-           "http:\/\/rdf.freebase.com\/ns\/government.government\r", "http:\/\/schema.org\/Newspaper"]
+           "http:\/\/rdf.freebase.com\/ns\/government.government\r", "http:\/\/schema.org\/Newspaper"],
+  templates: []
 });
 t.push({
   css: "wl-person",
   uri: "http:\/\/schema.org\/Person",
-  sameAs: ["http:\/\/rdf.freebase.com\/ns\/people.person\r", "http:\/\/rdf.freebase.com\/ns\/music.artist"]
+  sameAs: ["http:\/\/rdf.freebase.com\/ns\/people.person\r", "http:\/\/rdf.freebase.com\/ns\/music.artist"],
+  templates: []
+
 });
 t.push({
   css: "wl-place",
   uri: "http:\/\/schema.org\/Place",
-  sameAs: ["http:\/\/rdf.freebase.com\/ns\/location.location\r", "http:\/\/www.opengis.net\/gml\/_Feature"]
+  sameAs: ["http:\/\/rdf.freebase.com\/ns\/location.location\r", "http:\/\/www.opengis.net\/gml\/_Feature"],
+  templates: []
 });
 t.push({
   css: "wl-thing",
   uri: "http:\/\/schema.org\/Thing",
-  sameAs: ["*"]
+  sameAs: ["*"],
+  templates: []
 });
 window.wordlift = {} if not window.wordlift?
 

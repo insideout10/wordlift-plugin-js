@@ -204,6 +204,7 @@
             <div class="content"><div class='highlight'><pre>    beforeEach inject<span class="hljs-function"><span class="hljs-params">(($rootScope) -&gt;
 
       scope = $rootScope.$<span class="hljs-keyword">new</span>()
+      scope.currentTypeDefinition = <span class="hljs-built_in">window</span>.wordlift.types[<span class="hljs-number">0</span>]
 
 </span></span></pre></div></div>
             
@@ -220,7 +221,7 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      element = angular.element <span class="hljs-string">'&lt;wl-entity on-select="select(entityAnnotation)" entity-annotation="entityAnnotation"&gt;&lt;/wl-entities&gt;'</span>
+            <div class="content"><div class='highlight'><pre>      element = angular.element <span class="hljs-string">'&lt;wl-entity type-definition="currentTypeDefinition" on-select="select(entityAnnotation)" entity-annotation="entityAnnotation"&gt;&lt;/wl-entities&gt;'</span>
     )
 
     it <span class="hljs-string">'fires the select method with the entityAnnotation'</span>, inject<span class="hljs-function"><span class="hljs-params">(($compile) -&gt;
@@ -354,7 +355,8 @@ scope.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      scope = $rootScope.$<span class="hljs-keyword">new</span>()</pre></div></div>
+            <div class="content"><div class='highlight'><pre>      scope = $rootScope.$<span class="hljs-keyword">new</span>()
+      scope.knowTypes = <span class="hljs-built_in">window</span>.wordlift.types</pre></div></div>
             
         </li>
         
@@ -384,7 +386,7 @@ scope.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      element = angular.element <span class="hljs-string">'&lt;wl-entities on-select="select(textAnnotation, entityAnnotation)" text-annotation="textAnnotation"&gt;&lt;/wl-entities&gt;'</span>
+            <div class="content"><div class='highlight'><pre>      element = angular.element <span class="hljs-string">'&lt;wl-entities entity-types="knowTypes" on-select="select(textAnnotation, entityAnnotation)" text-annotation="textAnnotation"&gt;&lt;/wl-entities&gt;'</span>
     )</pre></div></div>
             
         </li>

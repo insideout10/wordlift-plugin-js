@@ -18,9 +18,10 @@ describe 'directives', ->
     beforeEach inject(($rootScope) ->
 
       scope = $rootScope.$new()
+      scope.currentTypeDefinition = window.wordlift.types[0]
 
       # The wlEntities directive gets the annotation from the text-annotation attribute.
-      element = angular.element '<wl-entity on-select="select(entityAnnotation)" entity-annotation="entityAnnotation"></wl-entities>'
+      element = angular.element '<wl-entity type-definition="currentTypeDefinition" on-select="select(entityAnnotation)" entity-annotation="entityAnnotation"></wl-entities>'
     )
 
     it 'fires the select method with the entityAnnotation', inject(($compile) ->
@@ -55,12 +56,13 @@ describe 'directives', ->
       # as in the HTML the textAnnotation is passed using the 'textAnnotation' property of the EntitiesController
       # scope.
       scope = $rootScope.$new()
+      scope.knowTypes = window.wordlift.types
 
       # Create the EntitiesController with the new scope.
       EntitiesController = $controller 'EntitiesController', { $scope: scope }
 
       # The wlEntities directive gets the annotation from the text-annotation attribute.
-      element = angular.element '<wl-entities on-select="select(textAnnotation, entityAnnotation)" text-annotation="textAnnotation"></wl-entities>'
+      element = angular.element '<wl-entities entity-types="knowTypes" on-select="select(textAnnotation, entityAnnotation)" text-annotation="textAnnotation"></wl-entities>'
     )
 
     # Test for the entity to empty.
