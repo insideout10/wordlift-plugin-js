@@ -14,3 +14,6 @@ script:
   - ./node_modules/karma/bin/karma start config/karma.conf.js --no-auto-watch --single-run --reporters=dots --browsers=Firefox
 #  - webdriver-manager update
 #  - protractor config/protractor-conf.js --browser=firefox
+
+notifications:
+  slack: insideout10:NcslbQWVmD4YPInDq8TpBIno
