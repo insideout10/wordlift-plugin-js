@@ -183,16 +183,9 @@
       restrict: 'E',
       scope: {
         textAnnotation: '=',
-        entityTypes: '=',
         onSelect: '&'
       },
       link: function(scope, element, attrs) {
-        scope.getCurrentTypeDefinition = function(entityAnnotation) {
-          return scope.entityTypes.filter(function(entityType) {
-            var _ref;
-            return entityType.uri === ((_ref = entityAnnotation.entity) != null ? _ref.type : void 0);
-          }).pop();
-        };
         return scope.select = function(item) {
           var entityAnnotation, id, _ref;
           _ref = scope.textAnnotation.entityAnnotations;
@@ -206,32 +199,46 @@
           });
         };
       },
-      template: "<div>\n  <ul>\n    <li ng-repeat=\"entityAnnotation in textAnnotation.entityAnnotations | orderObjectBy:'confidence':true\">\n      <wl-entity type-definition=\"getCurrentTypeDefinition(entityAnnotation)\" on-select=\"select(entityAnnotation)\" entity-annotation=\"entityAnnotation\"></wl-entity>\n    </li>\n  </ul>\n</div>"
+      template: "<div>\n  <ul>\n    <li ng-repeat=\"entityAnnotation in textAnnotation.entityAnnotations | orderObjectBy:'confidence':true\">\n      <wl-entity on-select=\"select(entityAnnotation)\" entity-annotation=\"entityAnnotation\"></wl-entity>\n    </li>\n  </ul>\n</div>"
     };
   }).directive('wlEntity', [
-    '$interpolate', '$log', function($interpolate, $log) {
+    '$log', '$compile', function($log, $compile) {
       return {
         restrict: 'E',
         scope: {
-          typeDefinition: '=',
           entityAnnotation: '=',
           onSelect: '&'
         },
         link: function(scope, element, attrs) {
-          var _ref;
+          var template, _ref, _ref1;
           scope.entity = (_ref = scope.entityAnnotation) != null ? _ref.entity : void 0;
-          return scope.renderEntityProperty = function(propertyName) {
-            var _ref1;
-            if ((_ref1 = scope.entity) != null ? _ref1.hasOwnProperty(propertyName) : void 0) {
-              return scope.entity[propertyName];
+          template = "<div class=\"entity {{entityAnnotation.entity.css}}\" ng-class=\"{selected: true==entityAnnotation.selected}\" ng-click=\"onSelect()\" ng-show=\"entity.label\">\n  <div class=\"thumbnail\" ng-show=\"entity.thumbnail\" title=\"{{entity.id}}\" ng-attr-style=\"background-image: url({{entity.thumbnail}})\"></div>\n  <div class=\"thumbnail empty\" ng-hide=\"entity.thumbnail\" title=\"{{entity.id}}\"></div>\n  <div class=\"confidence\" ng-bind=\"entityAnnotation.confidence\"></div>\n  <div class=\"label\" ng-bind=\"entity.label\"></div>\n  <div class=\"" + ((_ref1 = scope.entity) != null ? _ref1.css : void 0) + "-info url\" entity=\"entity\"></div>\n  <div class=\"type\"></div>\n  <div class=\"source\" ng-class=\"entity.source\" ng-bind=\"entity.source\"></div>\n</div>";
+          element.html(template).show();
+          return $compile(element.contents())(scope);
+        }
+      };
+    }
+  ]).directive('wlEventInfo', [
+    '$interpolate', function($interpolate) {
+      return {
+        restrict: 'C',
+        scope: {
+          entity: '='
+        },
+        link: function(scope, element, attrs) {
+          var _ref, _ref1, _ref2, _ref3, _ref4;
+          scope.startDate = (_ref = scope.entity) != null ? (_ref1 = _ref.props['http://www.w3.org/2002/12/cal#dtstart']) != null ? _ref1[0] : void 0 : void 0;
+          scope.endDate = (_ref2 = scope.entity) != null ? (_ref3 = _ref2.props['http://www.w3.org/2002/12/cal#dtend']) != null ? _ref3[0] : void 0 : void 0;
+          scope.place = (_ref4 = scope.entity) != null ? _ref4.props['http://www.w3.org/2006/vcard/ns#locality'] : void 0;
+          return scope.renderDate = function() {
+            console.log(scope.startDate);
+            if (scope.startDate === scope.endDate) {
+              return scope.startDate;
             }
-            if (scope.typeDefinition.templates.hasOwnProperty(propertyName)) {
-              return $interpolate(scope.typeDefinition.templates[propertyName])(scope.entity);
-            }
-            return "";
+            return $interpolate('{{startDate}} - {{endDate}}', false, null, true)(scope);
           };
         },
-        template: "<div class=\"entity {{entityAnnotation.entity.css}}\" ng-class=\"{selected: true==entityAnnotation.selected}\" ng-click=\"onSelect()\" ng-show=\"entity.label\">\n  <div class=\"thumbnail\" ng-show=\"entity.thumbnail\" title=\"{{entity.id}}\" ng-attr-style=\"background-image: url({{entity.thumbnail}})\"></div>\n  <div class=\"thumbnail empty\" ng-hide=\"entity.thumbnail\" title=\"{{entity.id}}\"></div>\n  <div class=\"confidence\" ng-bind=\"entityAnnotation.confidence\"></div>\n  <div class=\"label\" ng-bind=\"renderEntityProperty('label')\"></div>\n  <div class=\"url\" ng-bind=\"renderEntityProperty('subtitle')\"></div>\n  <div class=\"type\"></div>\n  <div class=\"source\" ng-class=\"entity.source\" ng-bind=\"entity.source\"></div>\n</div>"
+        template: "<span class=\"place\" ng-bind=\"place\"></span> <span class=\"date\" ng-bind=\"renderDate()\" title=\"{{renderDate()}}\"></span>"
       };
     }
   ]).directive('wlEntityInputBoxes', function() {
@@ -1299,7 +1306,7 @@
 
   angular.module('wordlift.tinymce.plugin', ['wordlift.tinymce.plugin.controllers', 'wordlift.tinymce.plugin.directives']);
 
-  $(container = $('<div id="wl-app" class="wl-app">\n  <div id="wl-error-controller" class="wl-error-controller" ng-controller="ErrorController">\n    <p ng-bind="message"></p>\n  </div>\n  <div id="wordlift-disambiguation-popover" class="metabox-holder" ng-controller="EntitiesController">\n    <div class="postbox">\n      <div class="handlediv" title="Click to toggle"><br></div>\n      <h3 class="hndle"><span>Semantic Web</span></h3>\n      <div class="ui-widget toolbar">\n        <span class="wl-active-tab" ng-bind="activeToolbarTab" />\n        <i ng-class="{\'selected\' : isActiveToolbarTab(\'Search for entities\')}" ng-click="setActiveToolbarTab(\'Search for entities\')" class="wl-search-toolbar-icon" />\n        <i ng-class="{\'selected\' : isActiveToolbarTab(\'Add new entity\')}" ng-click="setActiveToolbarTab(\'Add new entity\')" class="wl-add-entity-toolbar-icon" />\n      </div>\n      <div class="inside">\n        <form role="form">\n          <div class="form-group">\n            <div ng-show="isActiveToolbarTab(\'Search for entities\')" class="tab">\n              <div class="ui-widget">\n                <input type="text" class="form-control" id="search" placeholder="search for entities" autocomplete on-select="onSearchedEntitySelected(entityAnnotation)" source="onSearch($viewValue)">\n              </div>       \n            </div>\n            <div ng-show="isActiveToolbarTab(\'Add new entity\')" class="tab">\n              <div class="ui-widget">\n                <input ng-model="newEntity.label" type="text" class="form-control" id="label" placeholder="label">\n              </div>\n              <div class="ui-widget">\n                <select ng-model="newEntity.type" ng-options="type.uri as type.label for type in knownTypes" placeholder="type">\n                  <option value="" disabled selected>Select the entity type</option>\n                </select>\n              </div>\n              <div class="ui-widget right">\n                <i class="wl-spinner" ng-show="isRunning"></i>\n                <button ng-click="onNewEntityCreate(newEntity)">Save the entity</button>\n              </div>\n            </div>\n          </div>\n          <div id="wl-entities-wrapper" ng-hide="autocompleteOpened">\n            <wl-entities entity-types="knownTypes" on-select="onEntitySelected(textAnnotation, entityAnnotation)" text-annotation="textAnnotation"></wl-entities>\n          </div>\n        </form>\n        \n        <wl-entity-input-boxes text-annotations="analysis.textAnnotations"></wl-entity-input-boxes>\n        <wl-entity-props text-annotations="analysis.textAnnotations"></wl-entity-props>\n      </div>\n    </div>\n  </div>\n</div>').appendTo('form[name=post]'), $('#wordlift-disambiguation-popover').css({
+  $(container = $('<div id="wl-app" class="wl-app">\n  <div id="wl-error-controller" class="wl-error-controller" ng-controller="ErrorController">\n    <p ng-bind="message"></p>\n  </div>\n  <div id="wordlift-disambiguation-popover" class="metabox-holder" ng-controller="EntitiesController">\n    <div class="postbox">\n      <div class="handlediv" title="Click to toggle"><br></div>\n      <h3 class="hndle"><span>Semantic Web</span></h3>\n      <div class="ui-widget toolbar">\n        <span class="wl-active-tab" ng-bind="activeToolbarTab" />\n        <i ng-class="{\'selected\' : isActiveToolbarTab(\'Search for entities\')}" ng-click="setActiveToolbarTab(\'Search for entities\')" class="wl-search-toolbar-icon" />\n        <i ng-class="{\'selected\' : isActiveToolbarTab(\'Add new entity\')}" ng-click="setActiveToolbarTab(\'Add new entity\')" class="wl-add-entity-toolbar-icon" />\n      </div>\n      <div class="inside">\n        <form role="form">\n          <div class="form-group">\n            <div ng-show="isActiveToolbarTab(\'Search for entities\')" class="tab">\n              <div class="ui-widget">\n                <input type="text" class="form-control" id="search" placeholder="search for entities" autocomplete on-select="onSearchedEntitySelected(entityAnnotation)" source="onSearch($viewValue)">\n              </div>       \n            </div>\n            <div ng-show="isActiveToolbarTab(\'Add new entity\')" class="tab">\n              <div class="ui-widget">\n                <input ng-model="newEntity.label" type="text" class="form-control" id="label" placeholder="label">\n              </div>\n              <div class="ui-widget">\n                <select ng-model="newEntity.type" ng-options="type.uri as type.label for type in knownTypes" placeholder="type">\n                  <option value="" disabled selected>Select the entity type</option>\n                </select>\n              </div>\n              <div class="ui-widget right">\n                <i class="wl-spinner" ng-show="isRunning"></i>\n                <button ng-click="onNewEntityCreate(newEntity)">Save the entity</button>\n              </div>\n            </div>\n          </div>\n          <div id="wl-entities-wrapper" ng-hide="autocompleteOpened">\n            <wl-entities on-select="onEntitySelected(textAnnotation, entityAnnotation)" text-annotation="textAnnotation"></wl-entities>\n          </div>\n        </form>\n        \n        <wl-entity-input-boxes text-annotations="analysis.textAnnotations"></wl-entity-input-boxes>\n        <wl-entity-props text-annotations="analysis.textAnnotations"></wl-entity-props>\n      </div>\n    </div>\n  </div>\n</div>').appendTo('form[name=post]'), $('#wordlift-disambiguation-popover').css({
     display: 'none',
     height: $('body').height() - $('#wpadminbar').height() + 12,
     top: $('#wpadminbar').height() - 1,

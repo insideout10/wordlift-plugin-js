@@ -207,7 +207,6 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>      <span class="hljs-attribute">textAnnotation</span>: <span class="hljs-string">'='</span>
-      <span class="hljs-attribute">entityTypes</span>: <span class="hljs-string">'='</span>
       <span class="hljs-attribute">onSelect</span>: <span class="hljs-string">'&amp;'</span></pre></div></div>
             
         </li>
@@ -223,7 +222,9 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">link</span>: <span class="hljs-function"><span class="hljs-params">(scope, element, attrs)</span> -&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">link</span>: <span class="hljs-function"><span class="hljs-params">(scope, element, attrs)</span> -&gt;</span>
+
+      scope.<span class="hljs-function"><span class="hljs-title">select</span> = <span class="hljs-params">(item)</span> -&gt;</span></pre></div></div>
             
         </li>
         
@@ -234,27 +235,6 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
-              <p>Filter the type definition accordingly with current entity main known type
-It’s used to set the type definition on wl-entity directive</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>      scope.<span class="hljs-function"><span class="hljs-title">getCurrentTypeDefinition</span> = <span class="hljs-params">(entityAnnotation)</span> -&gt;</span>
-        scope.entityTypes.filter <span class="hljs-function"><span class="hljs-params">(entityType)</span> -&gt;</span>
-          entityType.uri <span class="hljs-keyword">is</span> entityAnnotation.entity?.type
-        .pop()
-
-      scope.<span class="hljs-function"><span class="hljs-title">select</span> = <span class="hljs-params">(item)</span> -&gt;</span></pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-8">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-8">&#182;</a>
-              </div>
               <p>Set the selected flag on each annotation.</p>
 
             </div>
@@ -264,11 +244,11 @@ It’s used to set the type definition on wl-entity directive</p>
         </li>
         
         
-        <li id="section-9">
+        <li id="section-8">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-9">&#182;</a>
+                <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
               <p>The selected flag is set to false for each annotation which is not the selected one.
 For the selected one is set to true only if the entity is not selected already, otherwise it is deselected.</p>
@@ -280,11 +260,11 @@ For the selected one is set to true only if the entity is not selected already, 
         </li>
         
         
-        <li id="section-10">
+        <li id="section-9">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-10">&#182;</a>
+                <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
               <p>Call the select function with the textAnnotation and the selected entityAnnotation or null.</p>
 
@@ -298,12 +278,33 @@ For the selected one is set to true only if the entity is not selected already, 
       &lt;div&gt;
         &lt;ul&gt;
           &lt;li ng-repeat="entityAnnotation in textAnnotation.entityAnnotations | orderObjectBy:'confidence':true"&gt;
-            &lt;wl-entity type-definition="getCurrentTypeDefinition(entityAnnotation)" on-select="select(entityAnnotation)" entity-annotation="entityAnnotation"&gt;&lt;/wl-entity&gt;
+            &lt;wl-entity on-select="select(entityAnnotation)" entity-annotation="entityAnnotation"&gt;&lt;/wl-entity&gt;
           &lt;/li&gt;
         &lt;/ul&gt;
       &lt;/div&gt;
     """</span>
   )</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p>The wlEntity directive shows a tile for a provided entityAnnotation. 
+When a tile is clicked the function provided in the select attribute is called.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>.directive<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'wlEntity'</span>, [<span class="hljs-string">'$log'</span>,<span class="hljs-string">'$compile'</span>, ($log, $compile)-&gt;
+    restrict: <span class="hljs-string">'E'</span>
+    scope:
+      entityAnnotation: <span class="hljs-string">'='</span>
+      onSelect: <span class="hljs-string">'&amp;'</span>
+</span></span></pre></div></div>
             
         </li>
         
@@ -314,18 +315,11 @@ For the selected one is set to true only if the entity is not selected already, 
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
-              <p>The wlEntity directive shows a tile for a provided entityAnnotation. When a tile is clicked the function provided
-in the select attribute is called.</p>
+              <p>Create the link function in order to bind to children elements events.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>.directive<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'wlEntity'</span>, [<span class="hljs-string">'$interpolate'</span>,<span class="hljs-string">'$log'</span>, ($interpolate, $log)-&gt;
-    restrict: <span class="hljs-string">'E'</span>
-    scope:
-      typeDefinition: <span class="hljs-string">'='</span>
-      entityAnnotation: <span class="hljs-string">'='</span>
-      onSelect: <span class="hljs-string">'&amp;'</span>
-</span></span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">link</span>: <span class="hljs-function"><span class="hljs-params">(scope, element, attrs)</span> -&gt;</span></pre></div></div>
             
         </li>
         
@@ -336,11 +330,30 @@ in the select attribute is called.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
-              <p>Create the link function in order to bind to children elements events.</p>
+              <p>Holds a reference to the current entity </p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">link</span>: <span class="hljs-function"><span class="hljs-params">(scope, element, attrs)</span> -&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>      scope.entity = scope.entityAnnotation?.entity
+
+      template = <span class="hljs-string">"""
+        &lt;div class="entity {{entityAnnotation.entity.css}}" ng-class="{selected: true==entityAnnotation.selected}" ng-click="onSelect()" ng-show="entity.label"&gt;
+          &lt;div class="thumbnail" ng-show="entity.thumbnail" title="{{entity.id}}" ng-attr-style="background-image: url({{entity.thumbnail}})"&gt;&lt;/div&gt;
+          &lt;div class="thumbnail empty" ng-hide="entity.thumbnail" title="{{entity.id}}"&gt;&lt;/div&gt;
+          &lt;div class="confidence" ng-bind="entityAnnotation.confidence"&gt;&lt;/div&gt;
+          &lt;div class="label" ng-bind="entity.label"&gt;&lt;/div&gt;
+          &lt;div class="<span class="hljs-subst">#{scope.entity?.css}</span>-info url" entity="entity"&gt;&lt;/div&gt;
+          &lt;div class="type"&gt;&lt;/div&gt;
+          &lt;div class="source" ng-class="entity.source" ng-bind="entity.source"&gt;&lt;/div&gt;
+        &lt;/div&gt;
+      """</span>
+
+      element.html(template).show();
+      $compile(element.contents())(scope);
+
+  ])
+.directive<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'wlEventInfo'</span>, [<span class="hljs-string">'$interpolate'</span>, ($interpolate)-&gt;
+</span></span></pre></div></div>
             
         </li>
         
@@ -351,11 +364,13 @@ in the select attribute is called.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
-              <p>Holds a reference to the current entity </p>
+              <p>Restrict the usage to the class attribute</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      scope.entity = scope.entityAnnotation?.entity</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">restrict</span>: <span class="hljs-string">'C'</span>
+    <span class="hljs-attribute">scope</span>:
+      <span class="hljs-attribute">entity</span>: <span class="hljs-string">'='</span></pre></div></div>
             
         </li>
         
@@ -366,16 +381,11 @@ in the select attribute is called.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
-              <p>Render an entity property
-If the property is missing, look for the proper template in the typeDefinition
-and interpolate it using entity object as context
-If the template is missing log a warning message and returns a blank string</p>
+              <p>Create the link function in order to bind to children elements events.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      scope.<span class="hljs-function"><span class="hljs-title">renderEntityProperty</span> = <span class="hljs-params">(propertyName)</span> -&gt;</span>
-        <span class="hljs-keyword">return</span> scope.entity[propertyName] <span class="hljs-keyword">if</span> scope.entity?.hasOwnProperty(propertyName)
-        <span class="hljs-keyword">return</span> $interpolate(scope.typeDefinition.templates[propertyName])(scope.entity) <span class="hljs-keyword">if</span> scope.typeDefinition.templates.hasOwnProperty(propertyName)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">link</span>: <span class="hljs-function"><span class="hljs-params">(scope, element, attrs)</span> -&gt;</span></pre></div></div>
             
         </li>
         
@@ -386,22 +396,21 @@ If the template is missing log a warning message and returns a blank string</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
-              <p>$log.warn “Cannot find template #{propertyName} for typeDefinition #{scope.typeDefinition.uri}”  </p>
+              <p>TODO …</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-string">""</span>
+            <div class="content"><div class='highlight'><pre>      scope.startDate = scope.entity?.props[<span class="hljs-string">'http://www.w3.org/2002/12/cal#dtstart'</span>]?[<span class="hljs-number">0</span>]
+      scope.endDate = scope.entity?.props[<span class="hljs-string">'http://www.w3.org/2002/12/cal#dtend'</span>]?[<span class="hljs-number">0</span>]
+      scope.place = scope.entity?.props[<span class="hljs-string">'http://www.w3.org/2006/vcard/ns#locality'</span>]
+      
+      scope.<span class="hljs-function"><span class="hljs-title">renderDate</span> = <span class="hljs-params">()</span> -&gt;</span>
+        <span class="hljs-built_in">console</span>.log scope.startDate
+        <span class="hljs-keyword">return</span> scope.startDate <span class="hljs-keyword">if</span> scope.startDate <span class="hljs-keyword">is</span> scope.endDate
+        <span class="hljs-keyword">return</span> $interpolate(<span class="hljs-string">'{{startDate}} - {{endDate}}'</span>,<span class="hljs-literal">false</span>, <span class="hljs-literal">null</span>, <span class="hljs-literal">true</span>)(scope)
 
     <span class="hljs-attribute">template</span>: <span class="hljs-string">"""
-      &lt;div class="entity {{entityAnnotation.entity.css}}" ng-class="{selected: true==entityAnnotation.selected}" ng-click="onSelect()" ng-show="entity.label"&gt;
-        &lt;div class="thumbnail" ng-show="entity.thumbnail" title="{{entity.id}}" ng-attr-style="background-image: url({{entity.thumbnail}})"&gt;&lt;/div&gt;
-        &lt;div class="thumbnail empty" ng-hide="entity.thumbnail" title="{{entity.id}}"&gt;&lt;/div&gt;
-        &lt;div class="confidence" ng-bind="entityAnnotation.confidence"&gt;&lt;/div&gt;
-        &lt;div class="label" ng-bind="renderEntityProperty('label')"&gt;&lt;/div&gt;
-        &lt;div class="url" ng-bind="renderEntityProperty('subtitle')"&gt;&lt;/div&gt;
-        &lt;div class="type"&gt;&lt;/div&gt;
-        &lt;div class="source" ng-class="entity.source" ng-bind="entity.source"&gt;&lt;/div&gt;
-      &lt;/div&gt;
+      &lt;span class="place" ng-bind="place"&gt;&lt;/span&gt; &lt;span class="date" ng-bind="renderDate()" title="{{renderDate()}}"&gt;&lt;/span&gt;
     """</span>
   ])</pre></div></div>
             
