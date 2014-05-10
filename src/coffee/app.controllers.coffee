@@ -23,7 +23,7 @@ angular.module('wordlift.tinymce.plugin.controllers',
 
       filtered
   )
-.controller('EntitiesController', ['AnalysisService','EntityAnnotationService','EditorService', '$http', '$log', '$scope', (AnalysisService, EntityAnnotationService, EditorService, $http, $log, $scope) ->
+.controller('EntitiesController', ['AnalysisService','EntityAnnotationService','EditorService', '$http', '$log', '$scope', '$rootScope', (AnalysisService, EntityAnnotationService, EditorService, $http, $log, $scope, $rootScope) ->
 
     $scope.isRunning = false
     # holds a reference to the current analysis results.
@@ -105,7 +105,8 @@ angular.module('wordlift.tinymce.plugin.controllers',
 
     # Search for entities server side
     $scope.onSearchedEntitySelected = (entityAnnotation) ->
-      # Enhance current analysis with the selected entity if needed 
+      # Enhance current analysis with the selected entity if needed
+
       if AnalysisService.enhance($scope.analysis, $scope.textAnnotation, entityAnnotation) is true
         # Update the editor accordingly 
         $scope.$emit 'selectEntity', ta: $scope.textAnnotation, ea: entityAnnotation
@@ -127,6 +128,13 @@ angular.module('wordlift.tinymce.plugin.controllers',
     $scope.$on 'configurationTypesLoaded', (event, types)->
       $scope.knownTypes = types
 
+    # When a text annotation is added, open the disambiguation popover.
+    $scope.$on 'textAnnotationAdded', (event, textAnnotation) ->
+      unless $scope.analysis
+        $rootScope.$broadcast 'error', 'You must analyze the document before adding new entity ...'
+        return 
+      $scope.textAnnotation = AnalysisService.addTextAnnotation $scope.analysis, textAnnotation
+      
     # When a text annotation is clicked, open the disambiguation popover.
     $scope.$on 'textAnnotationClicked', (event, id, sourceElement) ->
 
@@ -136,7 +144,7 @@ angular.module('wordlift.tinymce.plugin.controllers',
       $scope.newEntity.label = $scope.textAnnotation?.text
 
       # hide the popover if there are no entities.
-      if not $scope.textAnnotation?.entityAnnotations? or 0 is Object.keys($scope.textAnnotation.entityAnnotations).length
+      if not $scope.textAnnotation?.entityAnnotations? #or 0 is Object.keys($scope.textAnnotation.entityAnnotations).length
         $('#wordlift-disambiguation-popover').hide()
         # show the popover.
       else
@@ -145,7 +153,6 @@ angular.module('wordlift.tinymce.plugin.controllers',
         pos = EditorService.getWinPos(sourceElement)
         # set the popover arrow to the element position.
         setArrowTop(pos.top - 50)
-
         # show the popover.
         $('#wordlift-disambiguation-popover').show()
 

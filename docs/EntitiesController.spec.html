@@ -410,14 +410,27 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
-              <p>Check that the disambiguation popover is visible.</p>
+              <p>TODO If entity annotations are missing it should be a user generated text annotation</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> <span class="hljs-number">0</span> <span class="hljs-keyword">is</span> entityAnnotations.length
-          expect($(<span class="hljs-string">'#wordlift-disambiguation-popover'</span>)).<span class="hljs-keyword">not</span>.toBeVisible()
-        <span class="hljs-keyword">else</span>
-          expect($(<span class="hljs-string">'#wordlift-disambiguation-popover'</span>)).toBeVisible()
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-17">&#182;</a>
+              </div>
+              <p>Check that the disambiguation popover is visible.
+if 0 is entityAnnotations.length
+ expect($(‘#wordlift-disambiguation-popover’)).not.toBeVisible()
+else</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        expect($(<span class="hljs-string">'#wordlift-disambiguation-popover'</span>)).toBeVisible()
   )</pre></div></div>
             
         </li>

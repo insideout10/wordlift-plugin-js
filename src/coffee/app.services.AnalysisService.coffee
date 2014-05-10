@@ -52,7 +52,12 @@ angular.module('AnalysisService',
           # Abort the analysis if an analysis is running and there's a reference to its promise.
           @promise.resolve() if @isRunning and @promise?
 
-        # Enhance analysis
+        # Enhance analysis with a new text annotation
+        service.addTextAnnotation = (analysis, textAnnotation)->
+          analysis.textAnnotations[textAnnotation.id] = textAnnotation
+          textAnnotation
+
+        # Enhance analysis with a new entity annotation
         service.enhance = (analysis, textAnnotation, entityAnnotation)->
           
           # Look for an existing entityAnnotation for the current uri
@@ -87,7 +92,7 @@ angular.module('AnalysisService',
             else
               # Retrieve entity from analysis or from the entity storage if needed
               entities = EntityService.find analysis.entities, uri: annotation.uri
-              #                entities = EntityService.find @_entities, uri: annotation.uri if 0 is entities.length
+              entities = EntityService.find @_entities, uri: annotation.uri if 0 is entities.length
 
               # If the entity is missing raise an excpetion!
               if 0 is entities.length

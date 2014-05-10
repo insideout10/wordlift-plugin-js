@@ -80,11 +80,13 @@ describe "EditorController tests", ->
         expect($scope.textAnnotation).toEqual textAnnotation
         entityAnnotations = Object.keys($scope.textAnnotation.entityAnnotations)
         expect(entityAnnotations.length).toBeGreaterThan -1
-
+        
+        # TODO If entity annotations are missing it should be a user generated text annotation
+        
         # Check that the disambiguation popover is visible.
-        if 0 is entityAnnotations.length
-          expect($('#wordlift-disambiguation-popover')).not.toBeVisible()
-        else
-          expect($('#wordlift-disambiguation-popover')).toBeVisible()
+        # if 0 is entityAnnotations.length
+        #  expect($('#wordlift-disambiguation-popover')).not.toBeVisible()
+        # else
+        expect($('#wordlift-disambiguation-popover')).toBeVisible()
   )
 

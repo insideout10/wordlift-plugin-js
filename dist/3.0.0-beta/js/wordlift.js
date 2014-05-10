@@ -1,5 +1,5 @@
 (function() {
-  var $, ANALYSIS_EVENT, CONFIGURATION_TYPES_EVENT, CONTENT_EDITABLE, CONTENT_IFRAME, CONTEXT, DBPEDIA, DBPEDIA_ORG, DBPEDIA_ORG_REGEX, DCTERMS, EDITOR_ID, FISE_ONT, FISE_ONT_CONFIDENCE, FISE_ONT_ENTITY_ANNOTATION, FISE_ONT_TEXT_ANNOTATION, FREEBASE, FREEBASE_COM, FREEBASE_NS, FREEBASE_NS_DESCRIPTION, GRAPH, MCE_WORDLIFT, RDFS, RDFS_COMMENT, RDFS_LABEL, RUNNING_CLASS, SCHEMA_ORG, SCHEMA_ORG_DESCRIPTION, TEXT_ANNOTATION, Traslator, VALUE, WGS84_POS, container, injector,
+  var $, ANALYSIS_EVENT, CONFIGURATION_TYPES_EVENT, CONTENT_EDITABLE, CONTENT_IFRAME, CONTEXT, DBPEDIA, DBPEDIA_ORG, DBPEDIA_ORG_REGEX, DCTERMS, EDITOR_ID, FISE_ONT, FISE_ONT_CONFIDENCE, FISE_ONT_ENTITY_ANNOTATION, FISE_ONT_TEXT_ANNOTATION, FREEBASE, FREEBASE_COM, FREEBASE_NS, FREEBASE_NS_DESCRIPTION, GRAPH, MCE_WORDLIFT, RDFS, RDFS_COMMENT, RDFS_LABEL, RUNNING_CLASS, SCHEMA_ORG, SCHEMA_ORG_DESCRIPTION, TEXT_ANNOTATION, TEXT_HTML_NODE_TYPE, Traslator, VALUE, WGS84_POS, container, injector,
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   Traslator = (function() {
@@ -166,6 +166,8 @@
 
   CONTENT_EDITABLE = 'contenteditable';
 
+  TEXT_HTML_NODE_TYPE = 3;
+
   angular.module('wordlift.tinymce.plugin.config', []);
 
   angular.module('wordlift.directives.wlEntityProps', []).directive('wlEntityProps', function() {
@@ -331,6 +333,10 @@
           return this.promise.resolve();
         }
       };
+      service.addTextAnnotation = function(analysis, textAnnotation) {
+        analysis.textAnnotations[textAnnotation.id] = textAnnotation;
+        return textAnnotation;
+      };
       service.enhance = function(analysis, textAnnotation, entityAnnotation) {
         var ea, entityAnnotations, id, _ref;
         entityAnnotations = EntityAnnotationService.find(textAnnotation.entityAnnotations, {
@@ -365,6 +371,11 @@
             entities = EntityService.find(analysis.entities, {
               uri: annotation.uri
             });
+            if (0 === entities.length) {
+              entities = EntityService.find(this._entities, {
+                uri: annotation.uri
+              });
+            }
             if (0 === entities.length) {
               $log.error("Missing entity in window.wordlift.entities collection!");
               $log.info(annotation);
@@ -515,8 +526,8 @@
   ]);
 
   angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tinymce.plugin.config', 'AnalysisService']).service('EditorService', [
-    'AnalysisService', 'EntityAnnotationService', '$rootScope', '$log', function(AnalysisService, EntityAnnotationService, $rootScope, $log) {
-      var editor, findEntities, service;
+    'AnalysisService', 'EntityAnnotationService', 'TextAnnotationService', '$rootScope', '$log', function(AnalysisService, EntityAnnotationService, TextAnnotationService, $rootScope, $log) {
+      var editor, findEntities, service, walkback;
       editor = function() {
         return tinyMCE.get(EDITOR_ID);
       };
@@ -535,7 +546,59 @@
         }
         return _results;
       };
+      walkback = function(node, stopAt) {
+        if (node.childNodes && node.childNodes.length) {
+          while (node && node.childNodes.length > 0) {
+            node = node.childNodes[node.childNodes.length - 1];
+          }
+        } else if (node.previousSibling) {
+          node = node.previousSibling;
+        } else if (node.parentNode) {
+          while (node && !node.previousSibling && node.parentNode) {
+            node = node.parentNode;
+          }
+          if (node === stopAt) {
+            return;
+          }
+          node = node.previousSibling;
+        } else {
+          return;
+        }
+        if (node) {
+          if (node.nodeType === TEXT_HTML_NODE_TYPE) {
+            return node;
+          }
+          if (node === stopAt) {
+            return;
+          }
+          return walkback(node, stopAt);
+        }
+      };
       service = {
+        createTextAnnotationFromCurrentSelection: function() {
+          var ed, end, node, selection, start, text, textAnnotation;
+          ed = editor();
+          selection = ed.getWin().getSelection();
+          text = selection.toString();
+          node = selection.anchorNode;
+          start = selection.anchorNode.nodeType === TEXT_HTML_NODE_TYPE ? selection.anchorOffset : 0;
+          while (node = walkback(node, ed.getBody())) {
+            start = start + node.data.length;
+          }
+          end = start + text.length;
+          textAnnotation = TextAnnotationService.create({
+            start: start,
+            end: end,
+            text: text
+          });
+          if (start === end) {
+            $log.warn("Invalid selection! The text annotation cannot be created");
+            $log.info(textAnnotation);
+            return;
+          }
+          ed.selection.setContent("<span id=\"" + textAnnotation.id + "\" class=\"" + TEXT_ANNOTATION + "\">" + textAnnotation.text + "</span>");
+          return $rootScope.$broadcast('textAnnotationAdded', textAnnotation);
+        },
         embedAnalysis: (function(_this) {
           return function(analysis) {
             var ed, element, entities, entity, entityAnnotations, html, isDirty, textAnnotation, textAnnotationId, traslator, _ref;
@@ -1165,7 +1228,7 @@
       return filtered;
     };
   }).controller('EntitiesController', [
-    'AnalysisService', 'EntityAnnotationService', 'EditorService', '$http', '$log', '$scope', function(AnalysisService, EntityAnnotationService, EditorService, $http, $log, $scope) {
+    'AnalysisService', 'EntityAnnotationService', 'EditorService', '$http', '$log', '$scope', '$rootScope', function(AnalysisService, EntityAnnotationService, EditorService, $http, $log, $scope, $rootScope) {
       var el, scroll, setArrowTop;
       $scope.isRunning = false;
       $scope.analysis = null;
@@ -1267,11 +1330,18 @@
       $scope.$on('configurationTypesLoaded', function(event, types) {
         return $scope.knownTypes = types;
       });
+      $scope.$on('textAnnotationAdded', function(event, textAnnotation) {
+        if (!$scope.analysis) {
+          $rootScope.$broadcast('error', 'You must analyze the document before adding new entity ...');
+          return;
+        }
+        return $scope.textAnnotation = AnalysisService.addTextAnnotation($scope.analysis, textAnnotation);
+      });
       return $scope.$on('textAnnotationClicked', function(event, id, sourceElement) {
         var pos, _ref, _ref1, _ref2;
         $scope.textAnnotation = (_ref = $scope.analysis) != null ? _ref.textAnnotations[id] : void 0;
         $scope.newEntity.label = (_ref1 = $scope.textAnnotation) != null ? _ref1.text : void 0;
-        if ((((_ref2 = $scope.textAnnotation) != null ? _ref2.entityAnnotations : void 0) == null) || 0 === Object.keys($scope.textAnnotation.entityAnnotations).length) {
+        if (((_ref2 = $scope.textAnnotation) != null ? _ref2.entityAnnotations : void 0) == null) {
           return $('#wordlift-disambiguation-popover').hide();
         } else {
           pos = EditorService.getWinPos(sourceElement);
@@ -1321,6 +1391,20 @@
       }
     }
   ]), tinymce.PluginManager.add('wordlift', function(editor, url) {
+    editor.addButton('wordlift_add_entity', {
+      classes: 'widget btn wordlift_add_entity',
+      text: '',
+      tooltip: 'Click to refer an entity to the selected text',
+      onclick: function() {
+        return injector.invoke([
+          'EditorService', '$rootScope', function(EditorService, $rootScope) {
+            return $rootScope.$apply(function() {
+              return EditorService.createTextAnnotationFromCurrentSelection();
+            });
+          }
+        ]);
+      }
+    });
     editor.addButton('wordlift', {
       classes: 'widget btn wordlift',
       text: '',

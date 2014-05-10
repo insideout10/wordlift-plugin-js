@@ -30,13 +30,56 @@
 
 // TinyMCE toolbar
 .wp_themeSkin .mceIcon.mce_wordlift, .mce-widget.mce-btn.mce-wordlift button {
-  background-position: center center;
-  background-repeat: no-repeat;
-  background-image: data-uri('../img/wordlift-logo-20x20.png');
-
+    background-position: center center;
+    background-repeat: no-repeat;
+    
+    &:before {
+      content: @fa-var-cogs; 
+    }
+    &:hover {
+      color:rgb(0,0,0) !important;
+    }
+    color:@wl-brand-color !important;
+    font-size:14px !important;   
+    
+    font-family: FontAwesome !important;
+    font-style: normal;
+    font-weight: normal;
+    line-height: 18px !important;
+    
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   &.running {
     background-image: data-uri('../img/spinner-20x20.gif');
+      &:before {
+        content: ''; 
+      }
   }
+}
+
+.wp_themeSkin .mceIcon.mce_wordlift_add_entity, .mce-widget.mce-btn.mce-wordlift_add_entity button {
+
+    &:before {
+      content: @fa-var-pencil; 
+    }
+
+    &:hover {
+      color:rgb(0,0,0) !important;
+    }
+
+    color:@wl-brand-color !important;
+    
+
+    font-size:18px !important;   
+    
+    font-family: FontAwesome !important;
+    font-style: normal;
+    font-weight: normal;
+    line-height: 18px !important;
+    
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
 }
 
 // Set a tile color background, foreground and icon.

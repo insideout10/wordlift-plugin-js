@@ -82,6 +82,21 @@ $(
   tinymce.PluginManager.add 'wordlift', (editor, url) ->
 
     # Add a WordLift button the TinyMCE editor.
+    # TODO Disable the new button as default
+    editor.addButton 'wordlift_add_entity',
+      classes: 'widget btn wordlift_add_entity'
+      text: ''
+      tooltip: 'Click to refer an entity to the selected text'
+      onclick: ->
+
+        injector.invoke(['EditorService','$rootScope', (EditorService, $rootScope) ->
+          # execute the following commands in the angular js context.
+          $rootScope.$apply(->
+            EditorService.createTextAnnotationFromCurrentSelection()
+          )
+        ])
+
+    # Add a WordLift button the TinyMCE editor.
     editor.addButton 'wordlift',
       classes: 'widget btn wordlift'
       text: ''

@@ -168,6 +168,7 @@ CONTENT_IFRAME = '#content_ifr'
 RUNNING_CLASS = 'running'
 MCE_WORDLIFT = '.mce_wordlift, .mce-wordlift button'
 CONTENT_EDITABLE = 'contenteditable'
+TEXT_HTML_NODE_TYPE = 3
 
 angular.module('wordlift.tinymce.plugin.config', [])
 #	.constant 'Configuration',
@@ -433,7 +434,12 @@ angular.module('AnalysisService',
           # Abort the analysis if an analysis is running and there's a reference to its promise.
           @promise.resolve() if @isRunning and @promise?
 
-        # Enhance analysis
+        # Enhance analysis with a new text annotation
+        service.addTextAnnotation = (analysis, textAnnotation)->
+          analysis.textAnnotations[textAnnotation.id] = textAnnotation
+          textAnnotation
+
+        # Enhance analysis with a new entity annotation
         service.enhance = (analysis, textAnnotation, entityAnnotation)->
           
           # Look for an existing entityAnnotation for the current uri
@@ -468,7 +474,7 @@ angular.module('AnalysisService',
             else
               # Retrieve entity from analysis or from the entity storage if needed
               entities = EntityService.find analysis.entities, uri: annotation.uri
-              #                entities = EntityService.find @_entities, uri: annotation.uri if 0 is entities.length
+              entities = EntityService.find @_entities, uri: annotation.uri if 0 is entities.length
 
               # If the entity is missing raise an excpetion!
               if 0 is entities.length
@@ -631,7 +637,7 @@ angular.module('AnalysisService',
 
 angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tinymce.plugin.config', 'AnalysisService'])
 .service('EditorService',
-    ['AnalysisService', 'EntityAnnotationService', '$rootScope', '$log', (AnalysisService, EntityAnnotationService, $rootScope, $log) ->
+    ['AnalysisService', 'EntityAnnotationService', 'TextAnnotationService', '$rootScope', '$log', (AnalysisService, EntityAnnotationService, TextAnnotationService, $rootScope, $log) ->
 
       editor = ->
         tinyMCE.get(EDITOR_ID)
@@ -655,10 +661,62 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
             label: match[3]
           }
         )
+      # Service method used to calculate the start offset for the current selection
+      # in createTextAnnotationFromCurrentSelection
+      walkback = (node, stopAt) ->
+
+        if node.childNodes and node.childNodes.length # go to last child
+          node = node.childNodes[node.childNodes.length - 1]  while node and node.childNodes.length > 0
+        else if node.previousSibling # else go to previous node
+          node = node.previousSibling
+        else if node.parentNode # else go to previous branch
+          node = node.parentNode while node and not node.previousSibling and node.parentNode
+          return if node is stopAt
+          node = node.previousSibling
+        else # nowhere to go
+          return
+        if node
+          return node if node.nodeType is TEXT_HTML_NODE_TYPE
+          return if node is stopAt
+          return walkback(node, stopAt)
+        return
 
       # Define the EditorService.
       service =
-      # Embed the provided analysis in the editor.
+        # Create a textAnnotation starting from the current selection
+        createTextAnnotationFromCurrentSelection: ()->
+          # A reference to the editor.
+          ed = editor()
+          # Retrieve the current selection
+          selection = ed.getWin().getSelection()
+          # Retrieve the selected text
+          text = selection.toString()
+          # Retrieve the current selection text node 
+          node = selection.anchorNode
+          # Calculate the initial offset relative to 'node'
+          start = if selection.anchorNode.nodeType is TEXT_HTML_NODE_TYPE then selection.anchorOffset else 0
+          # Calculate the start position
+          start = start + node.data.length while node = walkback(node, ed.getBody()) 
+          # Calculate the end position
+          end = start + text.length
+
+          # Create the text annotation
+          textAnnotation = TextAnnotationService.create { 
+            start: start
+            end: end
+            text: text
+          }
+          if start is end
+            $log.warn "Invalid selection! The text annotation cannot be created"
+            $log.info textAnnotation
+            return 
+          
+          ed.selection.setContent "<span id=\"#{textAnnotation.id}\" class=\"#{TEXT_ANNOTATION}\">#{textAnnotation.text}</span>"
+
+          # Send a message about the new textAnnotation.
+          $rootScope.$broadcast 'textAnnotationAdded', textAnnotation
+
+        # Embed the provided analysis in the editor.
         embedAnalysis: (analysis) =>
 
           # A reference to the editor.
@@ -1271,7 +1329,7 @@ angular.module('wordlift.tinymce.plugin.controllers',
 
       filtered
   )
-.controller('EntitiesController', ['AnalysisService','EntityAnnotationService','EditorService', '$http', '$log', '$scope', (AnalysisService, EntityAnnotationService, EditorService, $http, $log, $scope) ->
+.controller('EntitiesController', ['AnalysisService','EntityAnnotationService','EditorService', '$http', '$log', '$scope', '$rootScope', (AnalysisService, EntityAnnotationService, EditorService, $http, $log, $scope, $rootScope) ->
 
     $scope.isRunning = false
     # holds a reference to the current analysis results.
@@ -1353,7 +1411,8 @@ angular.module('wordlift.tinymce.plugin.controllers',
 
     # Search for entities server side
     $scope.onSearchedEntitySelected = (entityAnnotation) ->
-      # Enhance current analysis with the selected entity if needed 
+      # Enhance current analysis with the selected entity if needed
+
       if AnalysisService.enhance($scope.analysis, $scope.textAnnotation, entityAnnotation) is true
         # Update the editor accordingly 
         $scope.$emit 'selectEntity', ta: $scope.textAnnotation, ea: entityAnnotation
@@ -1375,6 +1434,13 @@ angular.module('wordlift.tinymce.plugin.controllers',
     $scope.$on 'configurationTypesLoaded', (event, types)->
       $scope.knownTypes = types
 
+    # When a text annotation is added, open the disambiguation popover.
+    $scope.$on 'textAnnotationAdded', (event, textAnnotation) ->
+      unless $scope.analysis
+        $rootScope.$broadcast 'error', 'You must analyze the document before adding new entity ...'
+        return 
+      $scope.textAnnotation = AnalysisService.addTextAnnotation $scope.analysis, textAnnotation
+      
     # When a text annotation is clicked, open the disambiguation popover.
     $scope.$on 'textAnnotationClicked', (event, id, sourceElement) ->
 
@@ -1384,7 +1450,7 @@ angular.module('wordlift.tinymce.plugin.controllers',
       $scope.newEntity.label = $scope.textAnnotation?.text
 
       # hide the popover if there are no entities.
-      if not $scope.textAnnotation?.entityAnnotations? or 0 is Object.keys($scope.textAnnotation.entityAnnotations).length
+      if not $scope.textAnnotation?.entityAnnotations? #or 0 is Object.keys($scope.textAnnotation.entityAnnotations).length
         $('#wordlift-disambiguation-popover').hide()
         # show the popover.
       else
@@ -1393,7 +1459,6 @@ angular.module('wordlift.tinymce.plugin.controllers',
         pos = EditorService.getWinPos(sourceElement)
         # set the popover arrow to the element position.
         setArrowTop(pos.top - 50)
-
         # show the popover.
         $('#wordlift-disambiguation-popover').show()
 
@@ -1500,6 +1565,21 @@ $(
 
   # Add WordLift as a plugin of the TinyMCE editor.
   tinymce.PluginManager.add 'wordlift', (editor, url) ->
+
+    # Add a WordLift button the TinyMCE editor.
+    # TODO Disable the new button as default
+    editor.addButton 'wordlift_add_entity',
+      classes: 'widget btn wordlift_add_entity'
+      text: ''
+      tooltip: 'Click to refer an entity to the selected text'
+      onclick: ->
+
+        injector.invoke(['EditorService','$rootScope', (EditorService, $rootScope) ->
+          # execute the following commands in the angular js context.
+          $rootScope.$apply(->
+            EditorService.createTextAnnotationFromCurrentSelection()
+          )
+        ])
 
     # Add a WordLift button the TinyMCE editor.
     editor.addButton 'wordlift',

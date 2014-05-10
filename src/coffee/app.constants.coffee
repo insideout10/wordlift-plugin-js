@@ -38,3 +38,4 @@ CONTENT_IFRAME = '#content_ifr'
 RUNNING_CLASS = 'running'
 MCE_WORDLIFT = '.mce_wordlift, .mce-wordlift button'
 CONTENT_EDITABLE = 'contenteditable'
+TEXT_HTML_NODE_TYPE = 3
