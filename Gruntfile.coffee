@@ -29,6 +29,9 @@ module.exports = (grunt) ->
             'src/coffee/app.controllers.coffee'
             'src/coffee/app.coffee'
           ]
+          'app/js/wordlift.ui.js': [
+            'src/coffee/ui/chord.coffee'
+          ]
 
     uglify:
       wordlift:
@@ -71,9 +74,10 @@ module.exports = (grunt) ->
         expand: true
         cwd: 'app/js/'
         src: [
-          'wordlift.js',
-          'wordlift.min.js',
+          'wordlift.js'
+          'wordlift.min.js'
           'wordlift.min.map'
+          'wordlift.ui.js'
         ]
         dest: 'dist/<%= pkg.version %>/js/'
         flatten: true
