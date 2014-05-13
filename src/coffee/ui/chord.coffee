@@ -172,7 +172,7 @@ buildChord = (data, params) ->
     .on('mouseout', (c) ->
       viz.selectAll('.relation')
         .filter( (d, i) -> d.source.index is c.index or d.target.index is c.index )
-        .style( 'opacity', 0.2)
+        .style( 'opacity', 0.2 )
 
         # Hide tooltip.
         tooltip.style('opacity', 0.0)
