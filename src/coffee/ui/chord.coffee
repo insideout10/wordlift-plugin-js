@@ -105,7 +105,9 @@ buildChord = (data, params) ->
     .data(chord.groups)
     .enter()
     .append('path')
-    .attr('class', 'entity')
+    .attr('class', (d) ->
+      return "entity #{data.entities[d.index].css_class}"
+    )
     .attr('d', arc)
     .attr('transform', translate(0.5, 0.5, size))
     .style('fill', (d) ->

@@ -355,10 +355,12 @@
     .data(chord.groups)
     .enter()
     .append(<span class="hljs-string">'path'</span>)
-    .attr(<span class="hljs-string">'class'</span>, <span class="hljs-string">'entity'</span>)
-    .attr(<span class="hljs-string">'d'</span>, arc)
-    .attr(<span class="hljs-string">'transform'</span>, translate(<span class="hljs-number">0.5</span>, <span class="hljs-number">0.5</span>, size))
-    .style<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'fill'</span>, (d) -&gt;
+    .attr<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'class'</span>, (d) -&gt;
+      <span class="hljs-keyword">return</span> <span class="hljs-string">"entity <span class="hljs-subst">#{data.entities[d.index].css_class}</span>"</span>
+    )</span>
+    .<span class="hljs-title">attr</span><span class="hljs-params">(<span class="hljs-string">'d'</span>, arc)</span>
+    .<span class="hljs-title">attr</span><span class="hljs-params">(<span class="hljs-string">'transform'</span>, translate(<span class="hljs-number">0.5</span>, <span class="hljs-number">0.5</span>, size))</span>
+    .<span class="hljs-title">style</span><span class="hljs-params">(<span class="hljs-string">'fill'</span>, (d) -&gt;
       baseColor = params.main_color;
       type = data.entities[d.index].type
       <span class="hljs-keyword">return</span> baseColor <span class="hljs-keyword">if</span>(type == <span class="hljs-string">'post'</span>)

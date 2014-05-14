@@ -51,6 +51,7 @@ module.exports = (grunt) ->
       development:
         files:
           'app/css/wordlift.css': ['src/less/wordlift.less']
+          'app/css/wordlift.ui.css': ['src/less/wordlift.ui.less']
       dist:
         options:
           cleancss: true
@@ -59,6 +60,8 @@ module.exports = (grunt) ->
         files:
           'app/css/wordlift.min.css': 'src/less/wordlift.less'
           'app/css/wordlift.<%= pkg.version %>.min.css': 'src/less/wordlift.less'
+          'app/css/wordlift.ui.min.css': 'src/less/wordlift.ui.less'
+          'app/css/wordlift.ui.<%= pkg.version %>.min.css': 'src/less/wordlift.ui.less'
 
     copy:
       fonts:
@@ -87,9 +90,12 @@ module.exports = (grunt) ->
         expand: true
         cwd: 'app/css/'
         src: [
-          'wordlift.css',
-          'wordlift.min.css',
+          'wordlift.css'
+          'wordlift.min.css'
           'wordlift.min.css.map'
+          'wordlift.ui.css'
+          'wordlift.ui.min.css'
+          'wordlift.ui.min.css.map'
         ]
         dest: 'dist/<%= pkg.version %>/css/'
         flatten: true
