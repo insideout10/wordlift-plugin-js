@@ -33,9 +33,6 @@ buildChord = (data, params) ->
     return txt.substring(0, 12) + '...' if txt.length > 12
     txt
 
-  # TODO: why?
-  debug = (d) -> console.log(d)
-
   colorLuminance = (hex, lum) ->
     # Validate hex string.
     hex = String(hex).replace(/[^0-9a-f]/gi, '')
@@ -64,15 +61,13 @@ buildChord = (data, params) ->
 # Build adiacency matrix.
   matrix = []
   matrix.push (0 for e in data.entities) for entity in data.entities
-  console.log "matrix"
-  console.log matrix
 
   for relation in data.relations
     x = getEntityIndex relation.s
     y = getEntityIndex relation.o
     matrix[x][y] = 1
     matrix[y][x] = 1
-
+  
   viz = d3.select('#' + params.widget_id ).append('svg')
   viz.attr('width', '100%').attr('height', '100%')
 
@@ -189,5 +184,14 @@ buildChord = (data, params) ->
       window.location = url
     )
 
-
-getChordData wl_chord_params
+$('.wl-chord-widget').each( () ->
+  # Get local params.
+  wl_local_chord_params = $(this).data()
+  wl_local_chord_params.widget_id = $(this).attr('id');
+  
+  # Merge local and global params.
+  $.extend wl_local_chord_params, wl_chord_params
+  
+  # Launch chord.
+  getChordData wl_local_chord_params
+);
