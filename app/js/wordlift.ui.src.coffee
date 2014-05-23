@@ -184,245 +184,50 @@ buildChord = (data, params) ->
       window.location = url
     )
 
-$('.wl-chord-widget').each( () ->
-  # Get local params.
-  wl_local_chord_params = $(this).data()
-  wl_local_chord_params.widget_id = $(this).attr('id');
-  
-  # Merge local and global params.
-  $.extend wl_local_chord_params, wl_chord_params
-  
-  # Launch chord.
-  getChordData wl_local_chord_params
-);
+$(document).ready ->
+  $('.wl-chord').each( () ->
+    # Get local params.
+    wl_local_chord_params = $(this).data()
+    wl_local_chord_params.widget_id = $(this).attr('id');
+    
+    # Merge local and global params.
+    $.extend wl_local_chord_params, wl_chord_params
+    
+    # Launch chord.
+    getChordData wl_local_chord_params
+  );
 $ = jQuery
 
-timelineData = timeline:
-  headline: "Sh*t People Say"
-  type: "default"
-  text: "People say stuff"
-  startDate: "2012,1,26"
-  date: [
-    {
-      startDate: "2011,12,12"
-      endDate: "2012,1,27"
-      headline: "Vine"
-      text: "<p>Vine Test</p>"
-      asset:
-        media: "https://vine.co/v/b55LOA1dgJU"
-        credit: ""
-        caption: ""
-    }
-    {
-      startDate: "2012,1,26"
-      endDate: "2012,1,27"
-      headline: "Sh*t Politicians Say"
-      text: "<p>In true political fashion, his character rattles off common jargon heard from people running for office.</p>"
-      asset:
-        media: "http://youtu.be/u4XpeU9erbg"
-        credit: ""
-        caption: ""
-    }
-    {
-      startDate: "2012,1,10"
-      headline: "Sh*t Nobody Says"
-      text: "<p>Have you ever heard someone say “can I burn a copy of your Nickelback CD?” or “my Bazooka gum still has flavor!” Nobody says that.</p>"
-      asset:
-        media: "http://youtu.be/f-x8t0JOnVw"
-        credit: ""
-        caption: ""
-    }
-    {
-      startDate: "2012,1,26"
-      headline: "Sh*t Chicagoans Say"
-      text: ""
-      asset:
-        media: "http://youtu.be/Ofy5gNkKGOo"
-        credit: ""
-        caption: ""
-    }
-    {
-      startDate: "2011,12,12"
-      headline: "Sh*t Girls Say"
-      text: ""
-      asset:
-        media: "http://youtu.be/u-yLGIH7W9Y"
-        credit: ""
-        caption: "Writers & Creators: Kyle Humphrey & Graydon Sheppard"
-    }
-    {
-      startDate: "2012,1,4"
-      headline: "Sh*t Broke People Say"
-      text: ""
-      asset:
-        media: "http://youtu.be/zyyalkHjSjo"
-        credit: ""
-        caption: ""
-    }
-    {
-      startDate: "2012,1,4"
-      headline: "Sh*t Silicon Valley Says"
-      text: ""
-      asset:
-        media: "http://youtu.be/BR8zFANeBGQ"
-        credit: ""
-        caption: "written, filmed, and edited by Kate Imbach & Tom Conrad"
-    }
-    {
-      startDate: "2011,12,25"
-      headline: "Sh*t Vegans Say"
-      text: ""
-      asset:
-        media: "http://youtu.be/OmWFnd-p0Lw"
-        credit: ""
-        caption: ""
-    }
-    {
-      startDate: "2012,1,23"
-      headline: "Sh*t Graphic Designers Say"
-      text: ""
-      asset:
-        media: "http://youtu.be/KsT3QTmsN5Q"
-        credit: ""
-        caption: ""
-    }
-    {
-      startDate: "2011,12,30"
-      headline: "Sh*t Wookiees Say"
-      text: ""
-      asset:
-        media: "http://youtu.be/vJpBCzzcSgA"
-        credit: ""
-        caption: ""
-    }
-    {
-      startDate: "2012,1,17"
-      headline: "Sh*t People Say About Sh*t People Say Videos"
-      text: ""
-      asset:
-        media: "http://youtu.be/c9ehQ7vO7c0"
-        credit: ""
-        caption: ""
-    }
-    {
-      startDate: "2012,1,20"
-      headline: "Sh*t Social Media Pros Say"
-      text: ""
-      asset:
-        media: "http://youtu.be/eRQe-BT9g_U"
-        credit: ""
-        caption: ""
-    }
-    {
-      startDate: "2012,1,11"
-      headline: "Sh*t Old People Say About Computers"
-      text: ""
-      asset:
-        media: "http://youtu.be/HRmc5uuoUzA"
-        credit: ""
-        caption: ""
-    }
-    {
-      startDate: "2012,1,11"
-      headline: "Sh*t College Freshmen Say"
-      text: ""
-      asset:
-        media: "http://youtu.be/rwozXzo0MZk"
-        credit: ""
-        caption: ""
-    }
-    {
-      startDate: "2011,12,16"
-      headline: "Sh*t Girls Say - Episode 2"
-      text: ""
-      asset:
-        media: "http://youtu.be/kbovd-e-hRg"
-        credit: ""
-        caption: "Writers & Creators: Kyle Humphrey & Graydon Sheppard"
-    }
-    {
-      startDate: "2011,12,24"
-      headline: "Sh*t Girls Say - Episode 3 Featuring Juliette Lewis"
-      text: ""
-      asset:
-        media: "http://youtu.be/bDHUhT71JN8"
-        credit: ""
-        caption: "Writers & Creators: Kyle Humphrey & Graydon Sheppard"
-    }
-    {
-      startDate: "2012,1,27"
-      headline: "Sh*t Web Designers Say"
-      text: ""
-      asset:
-        media: "http://youtu.be/MEOb_meSHhQ"
-        credit: ""
-        caption: ""
-    }
-    {
-      startDate: "2012,1,12"
-      headline: "Sh*t Hipsters Say"
-      text: "No meme is complete without a bit of hipster-bashing."
-      asset:
-        media: "http://youtu.be/FUhrSVyu0Kw"
-        credit: ""
-        caption: "Written, Directed, Conceptualized and Performed by Carrie Valentine and Jessica Katz"
-    }
-    {
-      startDate: "2012,1,6"
-      headline: "Sh*t Cats Say"
-      text: "No meme is complete without cats. This had to happen, obviously."
-      asset:
-        media: "http://youtu.be/MUX58Vi-YLg"
-        credit: ""
-        caption: ""
-    }
-    {
-      startDate: "2012,1,21"
-      headline: "Sh*t Cyclists Say"
-      text: ""
-      asset:
-        media: "http://youtu.be/GMCkuqL9IcM"
-        credit: ""
-        caption: "Video script, production, and editing by Allen Krughoff of Hardcastle Photography"
-    }
-    {
-      startDate: "2011,12,30"
-      headline: "Sh*t Yogis Say"
-      text: ""
-      asset:
-        media: "http://youtu.be/IMC1_RH_b3k"
-        credit: ""
-        caption: ""
-    }
-    {
-      startDate: "2012,1,18"
-      headline: "Sh*t New Yorkers Say"
-      text: ""
-      asset:
-        media: "http://youtu.be/yRvJylbSg7o"
-        credit: ""
-        caption: "Directed and Edited by Matt Mayer, Produced by Seth Keim, Written by Eliot Glazer. Featuring Eliot and Ilana Glazer, who are siblings, not married."
-    }
-  ]
-
 $(document).ready =>
-  createStoryJS =>
-      type:       'timeline'
-      width:      '800'
-      height:     '600'
-      source:     'path_to_json/or_link_to_googlespreadsheet'
-      embed_id:   'wl-timeline-11121221231231'  # ID of the DIV you want to load the timeline into
-  
-  
-  $('.wl-timeline-widget').each( () ->
+  $('.wl-timeline').each( (index) ->
+    
     # Get local params.
     wl_local_timeline_params = $(this).data()
     wl_local_timeline_params.widget_id = $(this).attr('id');
     
     # Merge local and global params.
-    $.extend wl_local_timeline_params, wl_chord_params
-    console.log wl_local_timeline_params
+    $.extend wl_local_timeline_params, wl_timeline_params
+    params = wl_local_timeline_params
     
-    # Launch chord.
-    #getChordData wl_local_chord_params
+    # Get data via AJAX
+    $.post params.ajax_url, {
+      action:  params.action
+      post_id: params.post_id
+      #depth:   params.depth
+    }, (response) ->
+      timelineData  = JSON.parse response
+      console.log timelineData
+      
+      if timelineData.timeline
+        createStoryJS
+          type:       'timeline'
+          width:      '100%'
+          height:     '600'
+          source:     timelineData
+          embed_id:   params.widget_id  # ID of the DIV you want to load the timeline into
+      else
+        id = '#' + params.widget_id;
+        $(id).html 'No data for the timeline.'
+             .height '30px'
+             .css 'background-color','red'
   );

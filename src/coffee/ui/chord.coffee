@@ -184,14 +184,15 @@ buildChord = (data, params) ->
       window.location = url
     )
 
-$('.wl-chord-widget').each( () ->
-  # Get local params.
-  wl_local_chord_params = $(this).data()
-  wl_local_chord_params.widget_id = $(this).attr('id');
-  
-  # Merge local and global params.
-  $.extend wl_local_chord_params, wl_chord_params
-  
-  # Launch chord.
-  getChordData wl_local_chord_params
-);
+$(document).ready ->
+  $('.wl-chord').each( () ->
+    # Get local params.
+    wl_local_chord_params = $(this).data()
+    wl_local_chord_params.widget_id = $(this).attr('id');
+    
+    # Merge local and global params.
+    $.extend wl_local_chord_params, wl_chord_params
+    
+    # Launch chord.
+    getChordData wl_local_chord_params
+  );
