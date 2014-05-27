@@ -124,33 +124,50 @@ buildChord = (data, params) ->
     .enter()
     .append('text')
     .attr('class', 'label')
-    .html( (d) ->
-      lab = data.entities[d.index].label
-      beautifyLabel(lab)
-    )
+#    .html( (d) ->
+#      lab = data.entities[d.index].label
+#      beautifyLabel(lab)
+#    )
     .attr('font-size', ->
       fontSize = parseInt( size/35 )
       fontSize = 8 if(fontSize < 8)
       fontSize + 'px'
     )
-    .attr('transform', (d) ->
-      alpha = d.startAngle - Math.PI/2 + Math.abs((d.endAngle - d.startAngle)/2)
-      labelWidth = 3
-      labelAngle
-      if(alpha > Math.PI/2)
-        labelAngle = alpha - Math.PI
-        labelWidth += d3.select(this)[0][0].clientWidth
-      else
-       labelAngle = alpha
+    .each( (d) ->
+      n = data.entities[d.index].label.split(/\s/)
 
-      labelAngle = rad2deg( labelAngle )
+      # get the current element
+      text = d3.select(this)
+        .attr("dy", n.length / 3 - (n.length-1) * 0.9 + 'em')
+        .html(n[0])
 
-      r = (outerRadius + labelWidth)/size
-      x = 0.5 + ( r * Math.cos(alpha) )
-      y = 0.5 + ( r * Math.sin(alpha) )
+      # now loop
+      for i in [1..n.length]
+        text.append("tspan")
+        .attr('x', 0)
+        .attr('dy', '1em')
+        .html(n[i])
 
-      translate(x, y, size) + rotate( labelAngle )
-    )
+      text.attr('transform', (d) ->
+        alpha = d.startAngle - Math.PI/2 + Math.abs((d.endAngle - d.startAngle)/2)
+        labelWidth = 3
+        labelAngle = undefined
+        if(alpha > Math.PI/2)
+          labelAngle = alpha - Math.PI
+          labelWidth += d3.select(this)[0][0].clientWidth
+        else
+          labelAngle = alpha
+
+        labelAngle = rad2deg( labelAngle )
+
+        r = (outerRadius + labelWidth)/size
+        x = 0.5 + ( r * Math.cos(alpha) )
+        y = 0.5 + ( r * Math.sin(alpha) )
+
+        translate(x, y, size) + rotate( labelAngle )
+      )
+
+  )
 
   # Creating an hidden tooltip.
   tooltip = d3.select('body').append('div')

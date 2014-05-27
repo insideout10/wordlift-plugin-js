@@ -387,36 +387,7 @@
     .data(chord.groups)
     .enter()
     .append(<span class="hljs-string">'text'</span>)
-    .attr(<span class="hljs-string">'class'</span>, <span class="hljs-string">'label'</span>)
-    .html<span class="hljs-function"><span class="hljs-params">( (d) -&gt;
-      lab = data.entities[d.index].label
-      beautifyLabel(lab)
-    )</span>
-    .<span class="hljs-title">attr</span><span class="hljs-params">(<span class="hljs-string">'font-size'</span>, -&gt;
-      fontSize = parseInt( size/<span class="hljs-number">35</span> )
-      fontSize = <span class="hljs-number">8</span> <span class="hljs-keyword">if</span>(fontSize &lt; <span class="hljs-number">8</span>)
-      fontSize + <span class="hljs-string">'px'</span>
-    )</span>
-    .<span class="hljs-title">attr</span><span class="hljs-params">(<span class="hljs-string">'transform'</span>, (d) -&gt;
-      alpha = d.startAngle - Math.PI/<span class="hljs-number">2</span> + Math.abs((d.endAngle - d.startAngle)/<span class="hljs-number">2</span>)
-      labelWidth = <span class="hljs-number">3</span>
-      labelAngle
-      <span class="hljs-keyword">if</span>(alpha &gt; Math.PI/<span class="hljs-number">2</span>)
-        labelAngle = alpha - Math.PI
-        labelWidth += d3.select(<span class="hljs-keyword">this</span>)[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>].clientWidth
-      <span class="hljs-keyword">else</span>
-       labelAngle = alpha
-
-      labelAngle = rad2deg( labelAngle )
-
-      r = (outerRadius + labelWidth)/size
-      x = <span class="hljs-number">0.5</span> + ( r * Math.cos(alpha) )
-      y = <span class="hljs-number">0.5</span> + ( r * Math.sin(alpha) )
-
-      translate(x, y, size) + rotate( labelAngle )
-    )</span>
-
-</span></pre></div></div>
+    .attr(<span class="hljs-string">'class'</span>, <span class="hljs-string">'label'</span>)</pre></div></div>
             
         </li>
         
@@ -426,6 +397,91 @@
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <p>   .html( (d) -&gt;
+     lab = data.entities[d.index].label
+     beautifyLabel(lab)
+   )</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    .attr(<span class="hljs-string">'font-size'</span>,<span class="hljs-function"> -&gt;</span>
+      fontSize = parseInt( size/<span class="hljs-number">35</span> )
+      fontSize = <span class="hljs-number">8</span> <span class="hljs-keyword">if</span>(fontSize &lt; <span class="hljs-number">8</span>)
+      fontSize + <span class="hljs-string">'px'</span>
+    )
+    .each<span class="hljs-function"><span class="hljs-params">( (d) -&gt;
+      n = data.entities[d.index].label.split(<span class="hljs-regexp">/\s/</span>)
+
+</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p>get the current element</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      text = d3.select(<span class="hljs-keyword">this</span>)
+        .attr(<span class="hljs-string">"dy"</span>, n.length / <span class="hljs-number">3</span> - (n.length-<span class="hljs-number">1</span>) * <span class="hljs-number">0.9</span> + <span class="hljs-string">'em'</span>)
+        .html(n[<span class="hljs-number">0</span>])</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <p>now loop</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">1.</span>.n.length]
+        text.append(<span class="hljs-string">"tspan"</span>)
+        .attr(<span class="hljs-string">'x'</span>, <span class="hljs-number">0</span>)
+        .attr(<span class="hljs-string">'dy'</span>, <span class="hljs-string">'1em'</span>)
+        .html(n[i])
+
+      text.attr<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'transform'</span>, (d) -&gt;
+        alpha = d.startAngle - Math.PI/<span class="hljs-number">2</span> + Math.abs((d.endAngle - d.startAngle)/<span class="hljs-number">2</span>)
+        labelWidth = <span class="hljs-number">3</span>
+        labelAngle = <span class="hljs-literal">undefined</span>
+        <span class="hljs-keyword">if</span>(alpha &gt; Math.PI/<span class="hljs-number">2</span>)
+          labelAngle = alpha - Math.PI
+          labelWidth += d3.select(<span class="hljs-keyword">this</span>)[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>].clientWidth
+        <span class="hljs-keyword">else</span>
+          labelAngle = alpha
+
+        labelAngle = rad2deg( labelAngle )
+
+        r = (outerRadius + labelWidth)/size
+        x = <span class="hljs-number">0.5</span> + ( r * Math.cos(alpha) )
+        y = <span class="hljs-number">0.5</span> + ( r * Math.sin(alpha) )
+
+        translate(x, y, size) + rotate( labelAngle )
+      )</span>
+
+  )
+
+</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
               <p>Creating an hidden tooltip.</p>
 
@@ -441,11 +497,11 @@
         </li>
         
         
-        <li id="section-12">
+        <li id="section-15">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-12">&#182;</a>
+                <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
               <p> Dynamic behavior for entities.</p>
 
@@ -463,11 +519,11 @@
         </li>
         
         
-        <li id="section-13">
+        <li id="section-16">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-13">&#182;</a>
+                <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
               <p>Show tooltip.</p>
 
@@ -485,11 +541,11 @@
         </li>
         
         
-        <li id="section-14">
+        <li id="section-17">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-14">&#182;</a>
+                <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
               <p>Hide tooltip.</p>
 
@@ -502,11 +558,11 @@
         </li>
         
         
-        <li id="section-15">
+        <li id="section-18">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-15">&#182;</a>
+                <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
               <p>Change tooltip position.</p>
 

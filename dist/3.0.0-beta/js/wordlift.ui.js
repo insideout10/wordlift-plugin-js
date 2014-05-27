@@ -124,33 +124,37 @@
       }
       return colorLuminance(baseColor, 0.5);
     });
-    viz.selectAll('arcs_labels').data(chord.groups).enter().append('text').attr('class', 'label').html(function(d) {
-      var lab;
-      lab = data.entities[d.index].label;
-      return beautifyLabel(lab);
-    }).attr('font-size', function() {
+    viz.selectAll('arcs_labels').data(chord.groups).enter().append('text').attr('class', 'label').attr('font-size', function() {
       var fontSize;
       fontSize = parseInt(size / 35);
       if (fontSize < 8) {
         fontSize = 8;
       }
       return fontSize + 'px';
-    }).attr('transform', function(d) {
-      var alpha, labelAngle, labelWidth, r;
-      alpha = d.startAngle - Math.PI / 2 + Math.abs((d.endAngle - d.startAngle) / 2);
-      labelWidth = 3;
-      labelAngle;
-      if (alpha > Math.PI / 2) {
-        labelAngle = alpha - Math.PI;
-        labelWidth += d3.select(this)[0][0].clientWidth;
-      } else {
-        labelAngle = alpha;
+    }).each(function(d) {
+      var i, n, text, _k, _ref2;
+      n = data.entities[d.index].label.split(/\s/);
+      text = d3.select(this).attr("dy", n.length / 3 - (n.length - 1) * 0.9 + 'em').html(n[0]);
+      for (i = _k = 1, _ref2 = n.length; 1 <= _ref2 ? _k <= _ref2 : _k >= _ref2; i = 1 <= _ref2 ? ++_k : --_k) {
+        text.append("tspan").attr('x', 0).attr('dy', '1em').html(n[i]);
       }
-      labelAngle = rad2deg(labelAngle);
-      r = (outerRadius + labelWidth) / size;
-      x = 0.5 + (r * Math.cos(alpha));
-      y = 0.5 + (r * Math.sin(alpha));
-      return translate(x, y, size) + rotate(labelAngle);
+      return text.attr('transform', function(d) {
+        var alpha, labelAngle, labelWidth, r;
+        alpha = d.startAngle - Math.PI / 2 + Math.abs((d.endAngle - d.startAngle) / 2);
+        labelWidth = 3;
+        labelAngle = void 0;
+        if (alpha > Math.PI / 2) {
+          labelAngle = alpha - Math.PI;
+          labelWidth += d3.select(this)[0][0].clientWidth;
+        } else {
+          labelAngle = alpha;
+        }
+        labelAngle = rad2deg(labelAngle);
+        r = (outerRadius + labelWidth) / size;
+        x = 0.5 + (r * Math.cos(alpha));
+        y = 0.5 + (r * Math.sin(alpha));
+        return translate(x, y, size) + rotate(labelAngle);
+      });
     });
     tooltip = d3.select('body').append('div').attr('class', 'tooltip').style('background-color', 'white').style('opacity', 0.0).style('position', 'absolute').style('z-index', 100);
     return viz.selectAll('.entity, .label').on('mouseover', function(c) {
