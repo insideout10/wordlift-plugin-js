@@ -1,6 +1,6 @@
-angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tinymce.plugin.config', 'AnalysisService'])
+angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tinymce.plugin.config', 'AnalysisService', 'LoggerService'])
 .service('EditorService',
-    ['AnalysisService', 'EntityAnnotationService', 'TextAnnotationService', '$rootScope', '$log', (AnalysisService, EntityAnnotationService, TextAnnotationService, $rootScope, $log) ->
+    ['AnalysisService', 'EntityAnnotationService', 'LoggerService', 'TextAnnotationService', '$rootScope', '$log', (AnalysisService, EntityAnnotationService, logger, TextAnnotationService, $rootScope, $log) ->
 
       editor = ->
         tinyMCE.get(EDITOR_ID)
@@ -198,6 +198,9 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
       # When an analysis is completed, remove the *running* class from the WordLift toolbar button.
       # (The button is set to running when [an analysis is called](#analyze).
       $rootScope.$on ANALYSIS_EVENT, (event, analysis) ->
+
+        logger.debug "EditorService : Analysis Event", analysis: analysis
+
         service.embedAnalysis analysis if analysis? and analysis.textAnnotations?
 
         # Remove the *running* class.

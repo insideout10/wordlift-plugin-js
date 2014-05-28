@@ -233,7 +233,6 @@
           scope.endDate = (_ref2 = scope.entity) != null ? (_ref3 = _ref2.props['http://www.w3.org/2002/12/cal#dtend']) != null ? _ref3[0] : void 0 : void 0;
           scope.place = (_ref4 = scope.entity) != null ? _ref4.props['http://www.w3.org/2006/vcard/ns#locality'] : void 0;
           return scope.renderDate = function() {
-            console.log(scope.startDate);
             if (scope.startDate === scope.endDate) {
               return scope.startDate;
             }
@@ -305,8 +304,47 @@
     }
   ]);
 
-  angular.module('AnalysisService', ['wordlift.tinymce.plugin.services.EntityService', 'wordlift.tinymce.plugin.services.Helpers']).service('AnalysisService', [
-    'EntityAnnotationService', 'EntityService', 'Helpers', 'TextAnnotationService', '$filter', '$http', '$q', '$rootScope', '$log', function(EntityAnnotationService, EntityService, h, TextAnnotationService, $filter, $http, $q, $rootScope, $log) {
+  angular.module('LoggerService', ['wordlift.tinymce.plugin.services.Helpers']).service('LoggerService', [
+    '$log', function($log) {
+      var getFunctionName, service;
+      service = {};
+      getFunctionName = function(caller) {
+        var match;
+        switch (match = /function ([^(]*)/i.exec(caller.toString())) {
+          case null:
+            return 'unknown';
+          default:
+            if ('' === match[1]) {
+              return 'anonymous';
+            } else {
+              return match[1];
+            }
+        }
+      };
+
+      /**
+       * Log an information.
+       *
+       * @param {string} The message to log.
+       */
+      service.debug = function(message, params) {
+        var key, value, _results;
+        $log.debug("" + (getFunctionName(arguments.callee.caller)) + " - " + message);
+        if (params != null) {
+          _results = [];
+          for (key in params) {
+            value = params[key];
+            _results.push(($log.debug("[ " + key + " :: "), $log.debug(value), $log.debug("]")));
+          }
+          return _results;
+        }
+      };
+      return service;
+    }
+  ]);
+
+  angular.module('AnalysisService', ['wordlift.tinymce.plugin.services.EntityService', 'wordlift.tinymce.plugin.services.Helpers', 'LoggerService']).service('AnalysisService', [
+    'EntityAnnotationService', 'EntityService', 'Helpers', 'LoggerService', 'TextAnnotationService', '$filter', '$http', '$q', '$rootScope', '$log', function(EntityAnnotationService, EntityService, h, logger, TextAnnotationService, $filter, $http, $q, $rootScope, $log) {
       var service;
       service = {
         _knownTypes: [],
@@ -472,6 +510,10 @@
           item = entities[id];
           entities[id] = EntityService.create(item, language, service._knownTypes, context);
         }
+        logger.debug("AnalysisService : merge", {
+          entity: entity,
+          entities: entities
+        });
         if (merge) {
           for (id in entities) {
             entity = entities[id];
@@ -525,8 +567,8 @@
     }
   ]);
 
-  angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tinymce.plugin.config', 'AnalysisService']).service('EditorService', [
-    'AnalysisService', 'EntityAnnotationService', 'TextAnnotationService', '$rootScope', '$log', function(AnalysisService, EntityAnnotationService, TextAnnotationService, $rootScope, $log) {
+  angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tinymce.plugin.config', 'AnalysisService', 'LoggerService']).service('EditorService', [
+    'AnalysisService', 'EntityAnnotationService', 'LoggerService', 'TextAnnotationService', '$rootScope', '$log', function(AnalysisService, EntityAnnotationService, logger, TextAnnotationService, $rootScope, $log) {
       var editor, findEntities, service, walkback;
       editor = function() {
         return tinyMCE.get(EDITOR_ID);
@@ -679,6 +721,9 @@
         return dom.setAttrib(id, 'itemid', itemid);
       });
       $rootScope.$on(ANALYSIS_EVENT, function(event, analysis) {
+        logger.debug("EditorService : Analysis Event", {
+          analysis: analysis
+        });
         if ((analysis != null) && (analysis.textAnnotations != null)) {
           service.embedAnalysis(analysis);
         }
@@ -776,8 +821,8 @@
     }
   ]);
 
-  angular.module('wordlift.tinymce.plugin.services.EntityService', ['wordlift.tinymce.plugin.services.Helpers']).service('EntityService', [
-    'Helpers', '$filter', function(h, $filter) {
+  angular.module('wordlift.tinymce.plugin.services.EntityService', ['wordlift.tinymce.plugin.services.Helpers', 'LoggerService']).service('EntityService', [
+    'Helpers', 'LoggerService', '$filter', function(h, logger, $filter) {
       var service;
       service = {};
       service.find = function(entities, filter) {
@@ -864,6 +909,15 @@
         }
         return entity;
       };
+
+      /**
+       * Merge the specified entity with the provided entities.
+       *
+       * @param {object} The entity to merge.
+       * @param {object} A collection of entities to use for merging.
+       *
+       * @return {object} The merged entity.
+       */
       service.merge = function(entity, entities) {
         var existing, sameAs, _i, _len, _ref;
         _ref = entity.sameAs;
@@ -871,9 +925,11 @@
           sameAs = _ref[_i];
           if ((entities[sameAs] != null) && entities[sameAs] !== entity) {
             existing = entities[sameAs];
+            logger.debug("EntityService.merge : found a match [ entity 1 :: " + entity.id + " ][ entity 2 :: " + existing.id + " ]");
             h.mergeUnique(entity.sameAs, existing.sameAs);
             h.mergeUnique(entity.thumbnails, existing.thumbnails);
             h.mergeUnique(entity.sources, existing.sources);
+            h.mergeUnique(entity.types, existing.types);
             if (entity.css == null) {
               entity.css = existing.css;
             }
@@ -891,6 +947,9 @@
             service.merge(entity, entities);
           }
         }
+        logger.debug("EntityService.merge [ id :: " + entity.id + " ]", {
+          entity: entity
+        });
         return entity;
       };
 
@@ -1199,7 +1258,7 @@
     }
   ]);
 
-  angular.module('wordlift.tinymce.plugin.services', ['wordlift.tinymce.plugin.config', 'wordlift.tinymce.plugin.services.EditorService', 'wordlift.tinymce.plugin.services.EntityService', 'wordlift.tinymce.plugin.services.EntityAnnotationService', 'wordlift.tinymce.plugin.services.TextAnnotationService', 'wordlift.tinymce.plugin.services.Helpers', 'AnalysisService']);
+  angular.module('wordlift.tinymce.plugin.services', ['wordlift.tinymce.plugin.config', 'LoggerService', 'wordlift.tinymce.plugin.services.EditorService', 'wordlift.tinymce.plugin.services.EntityService', 'wordlift.tinymce.plugin.services.EntityAnnotationService', 'wordlift.tinymce.plugin.services.TextAnnotationService', 'wordlift.tinymce.plugin.services.Helpers', 'AnalysisService']);
 
   angular.module('wordlift.tinymce.plugin.controllers', ['wordlift.tinymce.plugin.config', 'wordlift.tinymce.plugin.services']).filter('orderObjectBy', function() {
     return function(items, field, reverse) {

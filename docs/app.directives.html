@@ -74,6 +74,11 @@
               </a>
             
               
+              <a class="source" href="app.services.LoggerService.html">
+                app.services.LoggerService.coffee
+              </a>
+            
+              
               <a class="source" href="app.services.TextAnnotationService.html">
                 app.services.TextAnnotationService.coffee
               </a>
@@ -409,9 +414,22 @@ When a tile is clicked the function provided in the select attribute is called.<
       scope.endDate = scope.entity?.props[<span class="hljs-string">'http://www.w3.org/2002/12/cal#dtend'</span>]?[<span class="hljs-number">0</span>]
       scope.place = scope.entity?.props[<span class="hljs-string">'http://www.w3.org/2006/vcard/ns#locality'</span>]
       
-      scope.<span class="hljs-function"><span class="hljs-title">renderDate</span> = <span class="hljs-params">()</span> -&gt;</span>
-        <span class="hljs-built_in">console</span>.log scope.startDate
-        <span class="hljs-keyword">return</span> scope.startDate <span class="hljs-keyword">if</span> scope.startDate <span class="hljs-keyword">is</span> scope.endDate
+      scope.<span class="hljs-function"><span class="hljs-title">renderDate</span> = <span class="hljs-params">()</span> -&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <pre><code>   <span class="hljs-built_in">console</span>.log scope.startDate
+</code></pre>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">return</span> scope.startDate <span class="hljs-keyword">if</span> scope.startDate <span class="hljs-keyword">is</span> scope.endDate
         <span class="hljs-keyword">return</span> $interpolate(<span class="hljs-string">'{{startDate}} - {{endDate}}'</span>,<span class="hljs-literal">false</span>, <span class="hljs-literal">null</span>, <span class="hljs-literal">true</span>)(scope)
 
     <span class="hljs-attribute">template</span>: <span class="hljs-string">"""
@@ -422,11 +440,11 @@ When a tile is clicked the function provided in the select attribute is called.<
         </li>
         
         
-        <li id="section-16">
+        <li id="section-17">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-16">&#182;</a>
+                <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
               <p>The wlEntityInputBoxes prints the inputs and textareas with entities data.</p>
 
@@ -491,11 +509,11 @@ When a tile is clicked the function provided in the select attribute is called.<
         </li>
         
         
-        <li id="section-17">
+        <li id="section-18">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-17">&#182;</a>
+                <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
               <p>Set the higher priority for this item</p>
 
@@ -506,11 +524,11 @@ When a tile is clicked the function provided in the select attribute is called.<
         </li>
         
         
-        <li id="section-18">
+        <li id="section-19">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-18">&#182;</a>
+                <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
               <p>Reset autocomplete field &amp; hide results</p>
 
@@ -523,11 +541,11 @@ When a tile is clicked the function provided in the select attribute is called.<
         </li>
         
         
-        <li id="section-19">
+        <li id="section-20">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-19">&#182;</a>
+                <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
               <p>Call the onSelect callback</p>
 

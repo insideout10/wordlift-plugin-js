@@ -74,6 +74,11 @@
               </a>
             
               
+              <a class="source" href="app.services.LoggerService.html">
+                app.services.LoggerService.coffee
+              </a>
+            
+              
               <a class="source" href="app.services.TextAnnotationService.html">
                 app.services.TextAnnotationService.coffee
               </a>
@@ -169,12 +174,11 @@ The return is a structure like this:</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>
-angular.<span class="hljs-built_in">module</span>(<span class="hljs-string">'AnalysisService'</span>,
-  [<span class="hljs-string">'wordlift.tinymce.plugin.services.EntityService'</span>, <span class="hljs-string">'wordlift.tinymce.plugin.services.Helpers'</span>])
+angular.<span class="hljs-built_in">module</span>(<span class="hljs-string">'AnalysisService'</span>, [<span class="hljs-string">'wordlift.tinymce.plugin.services.EntityService'</span>, <span class="hljs-string">'wordlift.tinymce.plugin.services.Helpers'</span>, <span class="hljs-string">'LoggerService'</span>])
 .service(<span class="hljs-string">'AnalysisService'</span>,
-    [ <span class="hljs-string">'EntityAnnotationService'</span>, <span class="hljs-string">'EntityService'</span>, <span class="hljs-string">'Helpers'</span>, <span class="hljs-string">'TextAnnotationService'</span>, <span class="hljs-string">'$filter'</span>, <span class="hljs-string">'$http'</span>, <span class="hljs-string">'$q'</span>,
+    [ <span class="hljs-string">'EntityAnnotationService'</span>, <span class="hljs-string">'EntityService'</span>, <span class="hljs-string">'Helpers'</span>, <span class="hljs-string">'LoggerService'</span>, <span class="hljs-string">'TextAnnotationService'</span>, <span class="hljs-string">'$filter'</span>, <span class="hljs-string">'$http'</span>, <span class="hljs-string">'$q'</span>,
       <span class="hljs-string">'$rootScope'</span>, <span class="hljs-string">'$log'</span>,
-      <span class="hljs-function"><span class="hljs-params">(EntityAnnotationService, EntityService, h, TextAnnotationService, $filter, $http, $q, $rootScope, $log)</span> -&gt;</span>
+      <span class="hljs-function"><span class="hljs-params">(EntityAnnotationService, EntityService, h, logger, TextAnnotationService, $filter, $http, $q, $rootScope, $log)</span> -&gt;</span>
 
         service =
           <span class="hljs-attribute">_knownTypes</span>: []
@@ -1008,7 +1012,8 @@ If <em>merge</em> is set to true, entity annotations and entities with matching 
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          EntityService.merge(entity, entities) <span class="hljs-keyword">for</span> id, entity <span class="hljs-keyword">of</span> entities <span class="hljs-keyword">if</span> merge
+            <div class="content"><div class='highlight'><pre>          logger.debug <span class="hljs-string">"AnalysisService : merge"</span>, { <span class="hljs-attribute">entity</span>: entity, <span class="hljs-attribute">entities</span>: entities }
+          EntityService.merge(entity, entities) <span class="hljs-keyword">for</span> id, entity <span class="hljs-keyword">of</span> entities <span class="hljs-keyword">if</span> merge
           EntityService.merge(entity, entities) <span class="hljs-keyword">for</span> id, entity <span class="hljs-keyword">of</span> <span class="hljs-property">@_entities</span> <span class="hljs-keyword">if</span> merge</pre></div></div>
             
         </li>

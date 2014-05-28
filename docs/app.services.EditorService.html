@@ -74,6 +74,11 @@
               </a>
             
               
+              <a class="source" href="app.services.LoggerService.html">
+                app.services.LoggerService.coffee
+              </a>
+            
+              
               <a class="source" href="app.services.TextAnnotationService.html">
                 app.services.TextAnnotationService.coffee
               </a>
@@ -151,9 +156,9 @@
               
             </div>
             
-            <div class="content"><div class='highlight'><pre>angular.<span class="hljs-built_in">module</span>(<span class="hljs-string">'wordlift.tinymce.plugin.services.EditorService'</span>, [<span class="hljs-string">'wordlift.tinymce.plugin.config'</span>, <span class="hljs-string">'AnalysisService'</span>])
+            <div class="content"><div class='highlight'><pre>angular.<span class="hljs-built_in">module</span>(<span class="hljs-string">'wordlift.tinymce.plugin.services.EditorService'</span>, [<span class="hljs-string">'wordlift.tinymce.plugin.config'</span>, <span class="hljs-string">'AnalysisService'</span>, <span class="hljs-string">'LoggerService'</span>])
 .service(<span class="hljs-string">'EditorService'</span>,
-    [<span class="hljs-string">'AnalysisService'</span>, <span class="hljs-string">'EntityAnnotationService'</span>, <span class="hljs-string">'TextAnnotationService'</span>, <span class="hljs-string">'$rootScope'</span>, <span class="hljs-string">'$log'</span>, <span class="hljs-function"><span class="hljs-params">(AnalysisService, EntityAnnotationService, TextAnnotationService, $rootScope, $log)</span> -&gt;</span>
+    [<span class="hljs-string">'AnalysisService'</span>, <span class="hljs-string">'EntityAnnotationService'</span>, <span class="hljs-string">'LoggerService'</span>, <span class="hljs-string">'TextAnnotationService'</span>, <span class="hljs-string">'$rootScope'</span>, <span class="hljs-string">'$log'</span>, <span class="hljs-function"><span class="hljs-params">(AnalysisService, EntityAnnotationService, logger, TextAnnotationService, $rootScope, $log)</span> -&gt;</span>
 
       <span class="hljs-function"><span class="hljs-title">editor</span> = -&gt;</span>
         tinyMCE.get(EDITOR_ID)</pre></div></div>
@@ -950,6 +955,9 @@ When an analysis is completed, remove the <em>running</em> class from the WordLi
             </div>
             
             <div class="content"><div class='highlight'><pre>      $rootScope.$<span class="hljs-literal">on</span> ANALYSIS_EVENT, <span class="hljs-function"><span class="hljs-params">(event, analysis)</span> -&gt;</span>
+
+        logger.debug <span class="hljs-string">"EditorService : Analysis Event"</span>, <span class="hljs-attribute">analysis</span>: analysis
+
         service.embedAnalysis analysis <span class="hljs-keyword">if</span> analysis? <span class="hljs-keyword">and</span> analysis.textAnnotations?</pre></div></div>
             
         </li>

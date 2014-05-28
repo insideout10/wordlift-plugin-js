@@ -353,7 +353,7 @@ describe 'directives', ->
 
         # Check that there are no input boxes (no entities selected).
         fieldName1 = "wl_entities\\[#{entityAnnotation1.entity.id}\\]"
-        expect(element.find('input').length).toEqual 18
+        expect(element.find('input').length).toEqual 21
         expect(element.find('textarea').length).toEqual 1
 
         expect(element.find("input[name='#{fieldName1}\\[uri\\]']")[0].value).toEqual entityAnnotation1.entity.id
@@ -398,7 +398,7 @@ describe 'directives', ->
         scope.$digest()
 
         # Check that the number of inputs matches.
-        expect(element.find('input').length).toEqual 30
+        expect(element.find('input').length).toEqual 33
         expect(element.find('textarea').length).toEqual 2
 
         # Check that there are no input boxes (no entities selected).
@@ -555,7 +555,12 @@ describe 'directives', ->
 
         # Check that there are no input boxes (no entities selected).
         fieldName = "wl_entities\\[#{entityAnnotation.entity.id}\\]"
-        expect(element.find('input').length).toEqual 19
+
+#        inputs = element.find('input')
+#        for i in [0...inputs.length]
+#          dump "#{i} #{inputs[i].name} :: #{inputs[i].value}"
+
+        expect(element.find('input').length).toEqual 93
         expect(element.find('textarea').length).toEqual 1
 
         expect(element.find("input[name='#{fieldName}\\[uri\\]']")[0].value).toEqual entityAnnotation.entity.id
