@@ -233,7 +233,6 @@
           scope.endDate = (_ref2 = scope.entity) != null ? (_ref3 = _ref2.props['http://www.w3.org/2002/12/cal#dtend']) != null ? _ref3[0] : void 0 : void 0;
           scope.place = (_ref4 = scope.entity) != null ? _ref4.props['http://www.w3.org/2006/vcard/ns#locality'] : void 0;
           return scope.renderDate = function() {
-            console.log(scope.startDate);
             if (scope.startDate === scope.endDate) {
               return scope.startDate;
             }

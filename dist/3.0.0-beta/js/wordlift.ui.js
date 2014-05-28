@@ -86,8 +86,6 @@
         return _results;
       })());
     }
-    console.log("matrix");
-    console.log(matrix);
     _ref1 = data.relations;
     for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
       relation = _ref1[_j];
