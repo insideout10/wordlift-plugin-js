@@ -1,5 +1,6 @@
 angular.module('wordlift.tinymce.plugin.services', [
   'wordlift.tinymce.plugin.config'
+  'LoggerService'
   'wordlift.tinymce.plugin.services.EditorService'
   'wordlift.tinymce.plugin.services.EntityService'
   'wordlift.tinymce.plugin.services.EntityAnnotationService'

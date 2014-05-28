@@ -1,5 +1,5 @@
-angular.module('wordlift.tinymce.plugin.services.EntityService', ['wordlift.tinymce.plugin.services.Helpers'])
-.service('EntityService', [ 'Helpers', '$filter', (h, $filter) ->
+angular.module('wordlift.tinymce.plugin.services.EntityService', ['wordlift.tinymce.plugin.services.Helpers', 'LoggerService'])
+.service('EntityService', [ 'Helpers', 'LoggerService', '$filter', (h, logger, $filter) ->
     service = {}
 
     # Find an entity in the provided entities collection using the provided filters.
@@ -23,8 +23,6 @@ angular.module('wordlift.tinymce.plugin.services.EntityService', ['wordlift.tiny
 
       sameAs = h.get 'http://www.w3.org/2002/07/owl#sameAs', item, context
       sameAs = if angular.isArray sameAs then sameAs else [ sameAs ]
-
-      #        console.log "createEntity [ id :: #{id} ][ language :: #{language} ][ types :: #{types} ][ sameAs :: #{sameAs} ]"
 
       fn = (values) ->
         values = if angular.isArray values then values else [ values ]
@@ -97,14 +95,28 @@ angular.module('wordlift.tinymce.plugin.services.EntityService', ['wordlift.tiny
       #        console.log "createEntity [ entity id :: #{entity.id} ][ language :: #{language} ][ types :: #{types} ][ sameAs :: #{sameAs} ]"
       entity
 
+    ###*
+     * Merge the specified entity with the provided entities.
+     *
+     * @param {object} The entity to merge.
+     * @param {object} A collection of entities to use for merging.
+     *
+     * @return {object} The merged entity.
+     ###
     service.merge = (entity, entities) ->
+
       for sameAs in entity.sameAs
         if entities[sameAs]? and entities[sameAs] isnt entity
+
           existing = entities[sameAs]
+
+          logger.debug "EntityService.merge : found a match [ entity 1 :: #{entity.id} ][ entity 2 :: #{existing.id} ]"
+
           h.mergeUnique entity.sameAs, existing.sameAs
-          # console.log "[ entity id :: #{entity.id} ][ thumbnails :: #{entity.thumbnails} ][ existing :: #{existing.thumbnails} ]"
           h.mergeUnique entity.thumbnails, existing.thumbnails
           h.mergeUnique entity.sources, existing.sources
+          h.mergeUnique entity.types, existing.types
+
           entity.css = existing.css if not entity.css?
           entity.source = entity.sources.join(', ')
           # Prefer the DBpedia description.
@@ -116,6 +128,9 @@ angular.module('wordlift.tinymce.plugin.services.EntityService', ['wordlift.tiny
           # Delete the sameAs entity from the index.
           entities[sameAs] = entity
           service.merge entity, entities
+
+      logger.debug "EntityService.merge [ id :: #{entity.id} ]", entity: entity
+
       entity
 
 

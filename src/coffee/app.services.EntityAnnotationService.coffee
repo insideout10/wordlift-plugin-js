@@ -5,6 +5,7 @@ angular.module('wordlift.tinymce.plugin.services.EntityAnnotationService', [])
 
     # Create an entity annotation using the provided params.
     service.create = (params) ->
+
       defaults =
         id: 'uri:local-entity-annotation-' + h.uniqueId(32)
         label: ''

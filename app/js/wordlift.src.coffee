@@ -380,6 +380,34 @@ angular.module('wordlift.tinymce.plugin.directives', ['wordlift.directives.wlEnt
   ])
 
 
+angular.module('LoggerService', ['wordlift.tinymce.plugin.services.Helpers'])
+.service('LoggerService', [ '$log', ($log) ->
+
+    # Prepare the service instance.
+    service = {}
+
+    # Parse the function name.
+    getFunctionName = (caller) ->
+      switch match = /function ([^(]*)/i.exec caller.toString()
+        when null then 'unknown'
+        else
+          if '' is match[1] then 'anonymous' else match[1]
+
+    ###*
+     * Log an information.
+     *
+     * @param {string} The message to log.
+     ###
+    service.debug = (message, params) ->
+      $log.debug "#{getFunctionName(arguments.callee.caller)} - #{message}"
+
+      if params?
+        ($log.debug "[ #{key} :: "; $log.debug value; $log.debug "]") for key, value of params
+
+    # return the service
+    service
+  ])
+
 # The AnalysisService aim is to parse the Analysis response from an analysis process
 # and create a data structure that's is suitable for displaying in the UI.
 # The main method of the AnalysisService is parse. The parse method includes some
@@ -394,12 +422,11 @@ angular.module('wordlift.tinymce.plugin.directives', ['wordlift.directives.wlEnt
 #     * types      : a list of types as provided by the entity
 #     * thumbnails : URL to thumbnail images
 
-angular.module('AnalysisService',
-  ['wordlift.tinymce.plugin.services.EntityService', 'wordlift.tinymce.plugin.services.Helpers'])
+angular.module('AnalysisService', ['wordlift.tinymce.plugin.services.EntityService', 'wordlift.tinymce.plugin.services.Helpers', 'LoggerService'])
 .service('AnalysisService',
-    [ 'EntityAnnotationService', 'EntityService', 'Helpers', 'TextAnnotationService', '$filter', '$http', '$q',
+    [ 'EntityAnnotationService', 'EntityService', 'Helpers', 'LoggerService', 'TextAnnotationService', '$filter', '$http', '$q',
       '$rootScope', '$log',
-      (EntityAnnotationService, EntityService, h, TextAnnotationService, $filter, $http, $q, $rootScope, $log) ->
+      (EntityAnnotationService, EntityService, h, logger, TextAnnotationService, $filter, $http, $q, $rootScope, $log) ->
 
         service =
           _knownTypes: []
@@ -600,6 +627,7 @@ angular.module('AnalysisService',
           entities[id] = EntityService.create(item, language, service._knownTypes, context) for id, item of entities
 
           # Cycle in every entity.
+          logger.debug "AnalysisService : merge", { entity: entity, entities: entities }
           EntityService.merge(entity, entities) for id, entity of entities if merge
           EntityService.merge(entity, entities) for id, entity of @_entities if merge
 
@@ -635,9 +663,9 @@ angular.module('AnalysisService',
         service
     ])
 
-angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tinymce.plugin.config', 'AnalysisService'])
+angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tinymce.plugin.config', 'AnalysisService', 'LoggerService'])
 .service('EditorService',
-    ['AnalysisService', 'EntityAnnotationService', 'TextAnnotationService', '$rootScope', '$log', (AnalysisService, EntityAnnotationService, TextAnnotationService, $rootScope, $log) ->
+    ['AnalysisService', 'EntityAnnotationService', 'LoggerService', 'TextAnnotationService', '$rootScope', '$log', (AnalysisService, EntityAnnotationService, logger, TextAnnotationService, $rootScope, $log) ->
 
       editor = ->
         tinyMCE.get(EDITOR_ID)
@@ -835,6 +863,9 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
       # When an analysis is completed, remove the *running* class from the WordLift toolbar button.
       # (The button is set to running when [an analysis is called](#analyze).
       $rootScope.$on ANALYSIS_EVENT, (event, analysis) ->
+
+        logger.debug "EditorService : Analysis Event", analysis: analysis
+
         service.embedAnalysis analysis if analysis? and analysis.textAnnotations?
 
         # Remove the *running* class.
@@ -854,6 +885,7 @@ angular.module('wordlift.tinymce.plugin.services.EntityAnnotationService', [])
 
     # Create an entity annotation using the provided params.
     service.create = (params) ->
+
       defaults =
         id: 'uri:local-entity-annotation-' + h.uniqueId(32)
         label: ''
@@ -923,8 +955,8 @@ angular.module('wordlift.tinymce.plugin.services.EntityAnnotationService', [])
     # Return the service instance
     service
   ])
-angular.module('wordlift.tinymce.plugin.services.EntityService', ['wordlift.tinymce.plugin.services.Helpers'])
-.service('EntityService', [ 'Helpers', '$filter', (h, $filter) ->
+angular.module('wordlift.tinymce.plugin.services.EntityService', ['wordlift.tinymce.plugin.services.Helpers', 'LoggerService'])
+.service('EntityService', [ 'Helpers', 'LoggerService', '$filter', (h, logger, $filter) ->
     service = {}
 
     # Find an entity in the provided entities collection using the provided filters.
@@ -948,8 +980,6 @@ angular.module('wordlift.tinymce.plugin.services.EntityService', ['wordlift.tiny
 
       sameAs = h.get 'http://www.w3.org/2002/07/owl#sameAs', item, context
       sameAs = if angular.isArray sameAs then sameAs else [ sameAs ]
-
-      #        console.log "createEntity [ id :: #{id} ][ language :: #{language} ][ types :: #{types} ][ sameAs :: #{sameAs} ]"
 
       fn = (values) ->
         values = if angular.isArray values then values else [ values ]
@@ -1022,14 +1052,28 @@ angular.module('wordlift.tinymce.plugin.services.EntityService', ['wordlift.tiny
       #        console.log "createEntity [ entity id :: #{entity.id} ][ language :: #{language} ][ types :: #{types} ][ sameAs :: #{sameAs} ]"
       entity
 
+    ###*
+     * Merge the specified entity with the provided entities.
+     *
+     * @param {object} The entity to merge.
+     * @param {object} A collection of entities to use for merging.
+     *
+     * @return {object} The merged entity.
+     ###
     service.merge = (entity, entities) ->
+
       for sameAs in entity.sameAs
         if entities[sameAs]? and entities[sameAs] isnt entity
+
           existing = entities[sameAs]
+
+          logger.debug "EntityService.merge : found a match [ entity 1 :: #{entity.id} ][ entity 2 :: #{existing.id} ]"
+
           h.mergeUnique entity.sameAs, existing.sameAs
-          # console.log "[ entity id :: #{entity.id} ][ thumbnails :: #{entity.thumbnails} ][ existing :: #{existing.thumbnails} ]"
           h.mergeUnique entity.thumbnails, existing.thumbnails
           h.mergeUnique entity.sources, existing.sources
+          h.mergeUnique entity.types, existing.types
+
           entity.css = existing.css if not entity.css?
           entity.source = entity.sources.join(', ')
           # Prefer the DBpedia description.
@@ -1041,6 +1085,9 @@ angular.module('wordlift.tinymce.plugin.services.EntityService', ['wordlift.tiny
           # Delete the sameAs entity from the index.
           entities[sameAs] = entity
           service.merge entity, entities
+
+      logger.debug "EntityService.merge [ id :: #{entity.id} ]", entity: entity
+
       entity
 
 
@@ -1296,6 +1343,7 @@ angular.module('wordlift.tinymce.plugin.services.TextAnnotationService', [])
 
 angular.module('wordlift.tinymce.plugin.services', [
   'wordlift.tinymce.plugin.config'
+  'LoggerService'
   'wordlift.tinymce.plugin.services.EditorService'
   'wordlift.tinymce.plugin.services.EntityService'
   'wordlift.tinymce.plugin.services.EntityAnnotationService'

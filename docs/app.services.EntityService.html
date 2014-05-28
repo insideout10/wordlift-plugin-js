@@ -74,6 +74,11 @@
               </a>
             
               
+              <a class="source" href="app.services.LoggerService.html">
+                app.services.LoggerService.coffee
+              </a>
+            
+              
               <a class="source" href="app.services.TextAnnotationService.html">
                 app.services.TextAnnotationService.coffee
               </a>
@@ -151,8 +156,8 @@
               
             </div>
             
-            <div class="content"><div class='highlight'><pre>angular.<span class="hljs-built_in">module</span>(<span class="hljs-string">'wordlift.tinymce.plugin.services.EntityService'</span>, [<span class="hljs-string">'wordlift.tinymce.plugin.services.Helpers'</span>])
-.service<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'EntityService'</span>, [ <span class="hljs-string">'Helpers'</span>, <span class="hljs-string">'$filter'</span>, (h, $filter) -&gt;
+            <div class="content"><div class='highlight'><pre>angular.<span class="hljs-built_in">module</span>(<span class="hljs-string">'wordlift.tinymce.plugin.services.EntityService'</span>, [<span class="hljs-string">'wordlift.tinymce.plugin.services.Helpers'</span>, <span class="hljs-string">'LoggerService'</span>])
+.service<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'EntityService'</span>, [ <span class="hljs-string">'Helpers'</span>, <span class="hljs-string">'LoggerService'</span>, <span class="hljs-string">'$filter'</span>, (h, logger, $filter) -&gt;
     service = {}
 
 </span></span></pre></div></div>
@@ -240,22 +245,8 @@
         (h.expand(t, context) <span class="hljs-keyword">for</span> t <span class="hljs-keyword">in</span> ts)
 
       sameAs = h.get <span class="hljs-string">'http://www.w3.org/2002/07/owl#sameAs'</span>, item, context
-      sameAs = <span class="hljs-keyword">if</span> angular.isArray sameAs <span class="hljs-keyword">then</span> sameAs <span class="hljs-keyword">else</span> [ sameAs ]</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-7">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-7">&#182;</a>
-              </div>
-              <pre><code>   <span class="hljs-built_in">console</span>.log <span class="hljs-string">"createEntity [ id :: <span class="hljs-subst">#{id}</span> ][ language :: <span class="hljs-subst">#{language}</span> ][ types :: <span class="hljs-subst">#{types}</span> ][ sameAs :: <span class="hljs-subst">#{sameAs}</span> ]"</span>
-</code></pre>
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>
+      sameAs = <span class="hljs-keyword">if</span> angular.isArray sameAs <span class="hljs-keyword">then</span> sameAs <span class="hljs-keyword">else</span> [ sameAs ]
+
       <span class="hljs-function"><span class="hljs-title">fn</span> = <span class="hljs-params">(values)</span> -&gt;</span>
         values = <span class="hljs-keyword">if</span> angular.isArray values <span class="hljs-keyword">then</span> values <span class="hljs-keyword">else</span> [ values ]
         <span class="hljs-keyword">for</span> value <span class="hljs-keyword">in</span> values
@@ -267,11 +258,11 @@
         </li>
         
         
-        <li id="section-8">
+        <li id="section-7">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-8">&#182;</a>
+                <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
               <p>If it’s a Freebase URL normalize the link to the image.</p>
 
@@ -282,11 +273,11 @@
         </li>
         
         
-        <li id="section-9">
+        <li id="section-8">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-9">&#182;</a>
+                <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
               <p>Get all the thumbnails; for each thumbnail execute the provided function.</p>
 
@@ -297,11 +288,11 @@
         </li>
         
         
-        <li id="section-10">
+        <li id="section-9">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-10">&#182;</a>
+                <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
               <p>Get the known types.
            $log.info “AnalysisService.parse [ known types :: “
@@ -316,11 +307,11 @@
         </li>
         
         
-        <li id="section-11">
+        <li id="section-10">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-11">&#182;</a>
+                <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
               <p>Get the stylesheet classes.</p>
 
@@ -331,11 +322,11 @@
         </li>
         
         
-        <li id="section-12">
+        <li id="section-11">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-12">&#182;</a>
+                <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
               <p>create the entity model.</p>
 
@@ -363,11 +354,11 @@
         </li>
         
         
-        <li id="section-13">
+        <li id="section-12">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-13">&#182;</a>
+                <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
               <p>Add sources as an array.</p>
 
@@ -381,11 +372,11 @@
         </li>
         
         
-        <li id="section-14">
+        <li id="section-13">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-14">&#182;</a>
+                <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
               <p>Avoid null in entity description.</p>
 
@@ -402,11 +393,11 @@
         </li>
         
         
-        <li id="section-15">
+        <li id="section-14">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-15">&#182;</a>
+                <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
               <p>Check if thumbnails exists.
        if thumbnails? and angular.isArray thumbnails
@@ -423,24 +414,38 @@
         </li>
         
         
-        <li id="section-16">
+        <li id="section-15">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-16">&#182;</a>
+                <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
               <p>return the entity.
        console.log “createEntity [ entity id :: #{entity.id} ][ language :: #{language} ][ types :: #{types} ][ sameAs :: #{sameAs} ]”</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      entity
+            <div class="content"><div class='highlight'><pre>      entity</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <h2 id="-">*</h2>
 
-    service.<span class="hljs-function"><span class="hljs-title">merge</span> = <span class="hljs-params">(entity, entities)</span> -&gt;</span>
-      <span class="hljs-keyword">for</span> sameAs <span class="hljs-keyword">in</span> entity.sameAs
-        <span class="hljs-keyword">if</span> entities[sameAs]? <span class="hljs-keyword">and</span> entities[sameAs] <span class="hljs-keyword">isnt</span> entity
-          existing = entities[sameAs]
-          h.mergeUnique entity.sameAs, existing.sameAs</pre></div></div>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>     * Merge the specified entity <span class="hljs-reserved">with</span> the provided entities.
+     *
+     * <span class="hljs-property">@param</span> {object} The entity to merge.
+     * <span class="hljs-property">@param</span> {object} A collection <span class="hljs-keyword">of</span> entities to use <span class="hljs-keyword">for</span> merging.
+     *
+     * <span class="hljs-property">@return</span> {object} The merged entity.</pre></div></div>
             
         </li>
         
@@ -451,12 +456,24 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
-              <p>console.log “[ entity id :: #{entity.id} ][ thumbnails :: #{entity.thumbnails} ][ existing :: #{existing.thumbnails} ]”</p>
+              <h1 id="-">#</h1>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          h.mergeUnique entity.thumbnails, existing.thumbnails
+            <div class="content"><div class='highlight'><pre>    service.<span class="hljs-function"><span class="hljs-title">merge</span> = <span class="hljs-params">(entity, entities)</span> -&gt;</span>
+
+      <span class="hljs-keyword">for</span> sameAs <span class="hljs-keyword">in</span> entity.sameAs
+        <span class="hljs-keyword">if</span> entities[sameAs]? <span class="hljs-keyword">and</span> entities[sameAs] <span class="hljs-keyword">isnt</span> entity
+
+          existing = entities[sameAs]
+
+          logger.debug <span class="hljs-string">"EntityService.merge : found a match [ entity 1 :: <span class="hljs-subst">#{entity.id}</span> ][ entity 2 :: <span class="hljs-subst">#{existing.id}</span> ]"</span>
+
+          h.mergeUnique entity.sameAs, existing.sameAs
+          h.mergeUnique entity.thumbnails, existing.thumbnails
           h.mergeUnique entity.sources, existing.sources
+          h.mergeUnique entity.types, existing.types
+
           entity.css = existing.css <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> entity.css?
           entity.source = entity.sources.join(<span class="hljs-string">', '</span>)</pre></div></div>
             
@@ -493,6 +510,9 @@ TODO: have a user-set priority.</p>
             
             <div class="content"><div class='highlight'><pre>          entities[sameAs] = entity
           service.merge entity, entities
+
+      logger.debug <span class="hljs-string">"EntityService.merge [ id :: <span class="hljs-subst">#{entity.id}</span> ]"</span>, <span class="hljs-attribute">entity</span>: entity
+
       entity</pre></div></div>
             
         </li>

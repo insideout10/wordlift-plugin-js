@@ -12,12 +12,11 @@
 #     * types      : a list of types as provided by the entity
 #     * thumbnails : URL to thumbnail images
 
-angular.module('AnalysisService',
-  ['wordlift.tinymce.plugin.services.EntityService', 'wordlift.tinymce.plugin.services.Helpers'])
+angular.module('AnalysisService', ['wordlift.tinymce.plugin.services.EntityService', 'wordlift.tinymce.plugin.services.Helpers', 'LoggerService'])
 .service('AnalysisService',
-    [ 'EntityAnnotationService', 'EntityService', 'Helpers', 'TextAnnotationService', '$filter', '$http', '$q',
+    [ 'EntityAnnotationService', 'EntityService', 'Helpers', 'LoggerService', 'TextAnnotationService', '$filter', '$http', '$q',
       '$rootScope', '$log',
-      (EntityAnnotationService, EntityService, h, TextAnnotationService, $filter, $http, $q, $rootScope, $log) ->
+      (EntityAnnotationService, EntityService, h, logger, TextAnnotationService, $filter, $http, $q, $rootScope, $log) ->
 
         service =
           _knownTypes: []
@@ -218,6 +217,7 @@ angular.module('AnalysisService',
           entities[id] = EntityService.create(item, language, service._knownTypes, context) for id, item of entities
 
           # Cycle in every entity.
+          logger.debug "AnalysisService : merge", { entity: entity, entities: entities }
           EntityService.merge(entity, entities) for id, entity of entities if merge
           EntityService.merge(entity, entities) for id, entity of @_entities if merge
 
