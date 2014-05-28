@@ -1452,8 +1452,8 @@
   ]), tinymce.PluginManager.add('wordlift', function(editor, url) {
     editor.addButton('wordlift_add_entity', {
       classes: 'widget btn wordlift_add_entity',
-      text: '',
-      tooltip: 'Click to refer an entity to the selected text',
+      text: ' ',
+      tooltip: 'Insert entity',
       onclick: function() {
         return injector.invoke([
           'EditorService', '$rootScope', function(EditorService, $rootScope) {
@@ -1466,8 +1466,8 @@
     });
     editor.addButton('wordlift', {
       classes: 'widget btn wordlift',
-      text: '',
-      tooltip: 'Click to analyze the content',
+      text: ' ',
+      tooltip: 'Analyse',
       onclick: function() {
         return injector.invoke([
           'EditorService', '$rootScope', '$log', function(EditorService, $rootScope, $log) {

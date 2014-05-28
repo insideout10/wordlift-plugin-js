@@ -85,8 +85,8 @@ $(
     # TODO Disable the new button as default
     editor.addButton 'wordlift_add_entity',
       classes: 'widget btn wordlift_add_entity'
-      text: ''
-      tooltip: 'Click to refer an entity to the selected text'
+      text: ' '
+      tooltip: 'Insert entity'
       onclick: ->
 
         injector.invoke(['EditorService','$rootScope', (EditorService, $rootScope) ->
@@ -99,8 +99,8 @@ $(
     # Add a WordLift button the TinyMCE editor.
     editor.addButton 'wordlift',
       classes: 'widget btn wordlift'
-      text: ''
-      tooltip: 'Click to analyze the content'
+      text: ' '
+      tooltip: 'Analyse'
 
     # When the editor is clicked, the [EditorService.analyze](app.services.EditorService.html#analyze) method is invoked.
       onclick: ->
