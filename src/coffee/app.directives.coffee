@@ -76,7 +76,7 @@ angular.module('wordlift.tinymce.plugin.directives', ['wordlift.directives.wlEnt
       scope.place = scope.entity?.props['http://www.w3.org/2006/vcard/ns#locality']
       
       scope.renderDate = () ->
-        console.log scope.startDate
+#        console.log scope.startDate
         return scope.startDate if scope.startDate is scope.endDate
         return $interpolate('{{startDate}} - {{endDate}}',false, null, true)(scope)
 
