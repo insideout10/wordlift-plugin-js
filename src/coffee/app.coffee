@@ -85,7 +85,7 @@ $(
     # TODO Disable the new button as default
     editor.addButton 'wordlift_add_entity',
       classes: 'widget btn wordlift_add_entity'
-      text: ' '
+      text: ' ' # the space is necessary to avoid right spacing on TinyMCE 4
       tooltip: 'Insert entity'
       onclick: ->
 
@@ -99,7 +99,7 @@ $(
     # Add a WordLift button the TinyMCE editor.
     editor.addButton 'wordlift',
       classes: 'widget btn wordlift'
-      text: ' '
+      text: ' ' # the space is necessary to avoid right spacing on TinyMCE 4
       tooltip: 'Analyse'
 
     # When the editor is clicked, the [EditorService.analyze](app.services.EditorService.html#analyze) method is invoked.
