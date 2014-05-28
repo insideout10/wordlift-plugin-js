@@ -18,6 +18,7 @@ module.exports = (grunt) ->
             'src/coffee/app.config.coffee'
             'src/coffee/app.directives.wlEntityProps.coffee'
             'src/coffee/app.directives.coffee'
+            'src/coffee/app.services.LoggerService.coffee'
             'src/coffee/app.services.AnalysisService.coffee'
             'src/coffee/app.services.EditorService.coffee'
             'src/coffee/app.services.EntityAnnotationService.coffee'
@@ -78,6 +79,7 @@ module.exports = (grunt) ->
         cwd: 'app/js/'
         src: [
           'wordlift.js'
+          'wordlift.js.map'
           'wordlift.min.js'
           'wordlift.min.map'
           'wordlift.ui.js'
