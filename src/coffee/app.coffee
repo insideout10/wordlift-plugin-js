@@ -130,4 +130,28 @@ $(
       ])
 )
 
+$wlEntityDisplayAsSelect = $('#wl-entity-display-as-select')
+$wlEntityDisplayAsSelect.siblings('a.wl-edit-entity-display-as').click (event) ->
+  if $wlEntityDisplayAsSelect.is ':hidden'
+    $wlEntityDisplayAsSelect.slideDown('fast').find('select').focus()
+    $(this).hide()
 
+  event.preventDefault()
+
+$wlEntityDisplayAsSelect.find('.wl-save-entity-display-as').click (event) ->
+
+  $wlEntityDisplayAsSelect.slideUp('fast').siblings('a.wl-edit-entity-display-as').show()
+
+  $('#hidden_wl_entity_display_as').val $('#wl_entity_display_as').val()
+  $('#wl-entity-display-as').html $('#wl_entity_display_as option:selected').text()
+
+  event.preventDefault()
+
+
+$wlEntityDisplayAsSelect.find('.wl-cancel-entity-display-as').click ( event ) ->
+
+  $('#wl-entity-display-as-select').slideUp('fast').siblings( 'a.wl-edit-entity-display-as' ).show().focus()
+
+  $('#wl_entity_display_as').val( $('#hidden_wl_entity_display_as').val() )
+
+  event.preventDefault()

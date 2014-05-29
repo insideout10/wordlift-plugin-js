@@ -1,5 +1,5 @@
 (function() {
-  var $, ANALYSIS_EVENT, CONFIGURATION_TYPES_EVENT, CONTENT_EDITABLE, CONTENT_IFRAME, CONTEXT, DBPEDIA, DBPEDIA_ORG, DBPEDIA_ORG_REGEX, DCTERMS, EDITOR_ID, FISE_ONT, FISE_ONT_CONFIDENCE, FISE_ONT_ENTITY_ANNOTATION, FISE_ONT_TEXT_ANNOTATION, FREEBASE, FREEBASE_COM, FREEBASE_NS, FREEBASE_NS_DESCRIPTION, GRAPH, MCE_WORDLIFT, RDFS, RDFS_COMMENT, RDFS_LABEL, RUNNING_CLASS, SCHEMA_ORG, SCHEMA_ORG_DESCRIPTION, TEXT_ANNOTATION, TEXT_HTML_NODE_TYPE, Traslator, VALUE, WGS84_POS, container, injector,
+  var $, $wlEntityDisplayAsSelect, ANALYSIS_EVENT, CONFIGURATION_TYPES_EVENT, CONTENT_EDITABLE, CONTENT_IFRAME, CONTEXT, DBPEDIA, DBPEDIA_ORG, DBPEDIA_ORG_REGEX, DCTERMS, EDITOR_ID, FISE_ONT, FISE_ONT_CONFIDENCE, FISE_ONT_ENTITY_ANNOTATION, FISE_ONT_TEXT_ANNOTATION, FREEBASE, FREEBASE_COM, FREEBASE_NS, FREEBASE_NS_DESCRIPTION, GRAPH, MCE_WORDLIFT, RDFS, RDFS_COMMENT, RDFS_LABEL, RUNNING_CLASS, SCHEMA_ORG, SCHEMA_ORG_DESCRIPTION, TEXT_ANNOTATION, TEXT_HTML_NODE_TYPE, Traslator, VALUE, WGS84_POS, container, injector,
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   Traslator = (function() {
@@ -1493,6 +1493,29 @@
       ]);
     });
   }));
+
+  $wlEntityDisplayAsSelect = $('#wl-entity-display-as-select');
+
+  $wlEntityDisplayAsSelect.siblings('a.wl-edit-entity-display-as').click(function(event) {
+    if ($wlEntityDisplayAsSelect.is(':hidden')) {
+      $wlEntityDisplayAsSelect.slideDown('fast').find('select').focus();
+      $(this).hide();
+    }
+    return event.preventDefault();
+  });
+
+  $wlEntityDisplayAsSelect.find('.wl-save-entity-display-as').click(function(event) {
+    $wlEntityDisplayAsSelect.slideUp('fast').siblings('a.wl-edit-entity-display-as').show();
+    $('#hidden_wl_entity_display_as').val($('#wl_entity_display_as').val());
+    $('#wl-entity-display-as').html($('#wl_entity_display_as option:selected').text());
+    return event.preventDefault();
+  });
+
+  $wlEntityDisplayAsSelect.find('.wl-cancel-entity-display-as').click(function(event) {
+    $('#wl-entity-display-as-select').slideUp('fast').siblings('a.wl-edit-entity-display-as').show().focus();
+    $('#wl_entity_display_as').val($('#hidden_wl_entity_display_as').val());
+    return event.preventDefault();
+  });
 
 }).call(this);
 

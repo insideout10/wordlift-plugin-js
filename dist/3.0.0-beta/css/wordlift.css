@@ -1845,3 +1845,26 @@ body#tinymce[contenteditable=false] {
 .wl-event-info .place:before {
   content: "\f041" ' ';
 }
+/**
+ * The following rules apply to the *display as* element in the *publish* meta box.
+ *
+ * @see admin/wordlift_admin_entity_publish.php for the html.
+ */
+#wl-entity-display-as {
+  font-weight: 600;
+}
+#misc-publishing-actions label[for="wl_entity_display_as"]:before {
+  color: #888;
+  content: '\f116';
+  display: inline-block;
+  font: normal 20px/1 'dashicons';
+  speak: none;
+  left: -1px;
+  padding: 0 5px 0 0;
+  position: relative;
+  top: 0;
+  text-decoration: none !important;
+  vertical-align: top;
+  -webkit-font-smoothing: antialiased;
+}
+/**********************************************************************************************************************/

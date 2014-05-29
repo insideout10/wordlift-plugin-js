@@ -473,7 +473,33 @@ this event is raised when a textannotation is selected in the TinyMCE editor.</p
             <div class="content"><div class='highlight'><pre>          $rootScope.$broadcast <span class="hljs-string">'textAnnotationClicked'</span>, e.target.id, e
         )
       ])
-)</pre></div></div>
+)
+
+$wlEntityDisplayAsSelect = $(<span class="hljs-string">'#wl-entity-display-as-select'</span>)
+$wlEntityDisplayAsSelect.siblings<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'a.wl-edit-entity-display-as'</span>)</span>.<span class="hljs-title">click</span> <span class="hljs-params">(event)</span> -&gt;</span>
+  <span class="hljs-keyword">if</span> $wlEntityDisplayAsSelect.<span class="hljs-keyword">is</span> <span class="hljs-string">':hidden'</span>
+    $wlEntityDisplayAsSelect.slideDown(<span class="hljs-string">'fast'</span>).find(<span class="hljs-string">'select'</span>).focus()
+    $(<span class="hljs-keyword">this</span>).hide()
+
+  event.preventDefault()
+
+$wlEntityDisplayAsSelect.find<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'.wl-save-entity-display-as'</span>)</span>.<span class="hljs-title">click</span> <span class="hljs-params">(event)</span> -&gt;</span>
+
+  $wlEntityDisplayAsSelect.slideUp(<span class="hljs-string">'fast'</span>).siblings(<span class="hljs-string">'a.wl-edit-entity-display-as'</span>).show()
+
+  $(<span class="hljs-string">'#hidden_wl_entity_display_as'</span>).val $(<span class="hljs-string">'#wl_entity_display_as'</span>).val()
+  $(<span class="hljs-string">'#wl-entity-display-as'</span>).html $(<span class="hljs-string">'#wl_entity_display_as option:selected'</span>).text()
+
+  event.preventDefault()
+
+
+$wlEntityDisplayAsSelect.find<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'.wl-cancel-entity-display-as'</span>)</span>.<span class="hljs-title">click</span> <span class="hljs-params">( event )</span> -&gt;</span>
+
+  $(<span class="hljs-string">'#wl-entity-display-as-select'</span>).slideUp(<span class="hljs-string">'fast'</span>).siblings( <span class="hljs-string">'a.wl-edit-entity-display-as'</span> ).show().focus()
+
+  $(<span class="hljs-string">'#wl_entity_display_as'</span>).val( $(<span class="hljs-string">'#hidden_wl_entity_display_as'</span>).val() )
+
+  event.preventDefault()</pre></div></div>
             
         </li>
         
