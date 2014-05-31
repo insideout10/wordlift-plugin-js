@@ -61,6 +61,11 @@ buildChord = (data, params) ->
 # Build adiacency matrix.
   matrix = []
   matrix.push (0 for e in data.entities) for entity in data.entities
+<<<<<<< HEAD
+=======
+#  console.log "matrix"
+#  console.log matrix
+>>>>>>> a1c58e147459381c7e2d02ad8bb0f15ec3037634
 
   for relation in data.relations
     x = getEntityIndex relation.s

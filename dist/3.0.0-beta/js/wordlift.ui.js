@@ -16,7 +16,7 @@
   };
 
   buildChord = function(data, params) {
-    var arc, beautifyLabel, chord, colorLuminance, debug, e, entity, getEntityIndex, height, innerRadius, matrix, outerRadius, rad2deg, relation, rotate, sign, size, tooltip, translate, viz, width, x, y, _i, _j, _len, _len1, _ref, _ref1;
+    var arc, beautifyLabel, chord, colorLuminance, e, entity, getEntityIndex, height, innerRadius, matrix, outerRadius, rad2deg, relation, rotate, sign, size, tooltip, translate, viz, width, x, y, _i, _j, _len, _len1, _ref, _ref1;
     if (data.entities.length < 2) {
       return;
     }
@@ -41,9 +41,6 @@
         return txt.substring(0, 12) + '...';
       }
       return txt;
-    };
-    debug = function(d) {
-      return console.log(d);
     };
     colorLuminance = function(hex, lum) {
       var c, i, rgb, _i;
@@ -175,7 +172,49 @@
     });
   };
 
-  getChordData(wl_chord_params);
+  $(document).ready(function() {
+    return $('.wl-chord').each(function() {
+      var wl_local_chord_params;
+      wl_local_chord_params = $(this).data();
+      wl_local_chord_params.widget_id = $(this).attr('id');
+      $.extend(wl_local_chord_params, wl_chord_params);
+      return getChordData(wl_local_chord_params);
+    });
+  });
+
+  $ = jQuery;
+
+  $(document).ready((function(_this) {
+    return function() {
+      return $('.wl-timeline').each(function(index) {
+        var params, wl_local_timeline_params;
+        wl_local_timeline_params = $(this).data();
+        wl_local_timeline_params.widget_id = $(this).attr('id');
+        $.extend(wl_local_timeline_params, wl_timeline_params);
+        params = wl_local_timeline_params;
+        return $.post(params.ajax_url, {
+          action: params.action,
+          post_id: params.post_id
+        }, function(response) {
+          var id, timelineData;
+          timelineData = JSON.parse(response);
+          console.log(timelineData);
+          if (timelineData.timeline) {
+            return createStoryJS({
+              type: 'timeline',
+              width: '100%',
+              height: '600',
+              source: timelineData,
+              embed_id: params.widget_id
+            });
+          } else {
+            id = '#' + params.widget_id;
+            return $(id).html('No data for the timeline.').height('30px').css('background-color', 'red');
+          }
+        });
+      });
+    };
+  })(this));
 
 }).call(this);
 

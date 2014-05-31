@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>app.config.coffee</title>
+  <title>timeline.coffee</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="docco.css" />
@@ -146,7 +146,7 @@
         
           <li id="title">
               <div class="annotation">
-                  <h1>app.config.coffee</h1>
+                  <h1>timeline.coffee</h1>
               </div>
           </li>
         
@@ -161,7 +161,12 @@
               
             </div>
             
-            <div class="content"><div class='highlight'><pre>angular.<span class="hljs-built_in">module</span>(<span class="hljs-string">'wordlift.tinymce.plugin.config'</span>, [])</pre></div></div>
+            <div class="content"><div class='highlight'><pre>$ = jQuery
+
+$(<span class="hljs-built_in">document</span>).ready<span class="hljs-function"> =&gt;</span>
+  $<span class="hljs-function"><span class="hljs-params">(<span class="hljs-string">'.wl-timeline'</span>)</span>.<span class="hljs-title">each</span><span class="hljs-params">( (index) -&gt;
+    
+</span></span></pre></div></div>
             
         </li>
         
@@ -172,38 +177,76 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
-              <p>.constant ‘Configuration’,
-    supportedTypes: [
-        ‘schema:Place’
-        ‘schema:Event’
-        ‘schema:CreativeWork’
-        ‘schema:Product’
-        ‘schema:Person’
-        ‘schema:Organization’
-    ]
-    entityLabels:
-        ‘entityLabel’: ‘enhancer:entity-label’
-        ‘entityType’: ‘enhancer:entity-type’
-        ‘entityReference’: ‘enhancer:entity-reference’
-        ‘textAnnotation’: ‘enhancer:TextAnnotation’
-        ‘entityAnnotation’: ‘enhancer:EntityAnnotation’
-        ‘selectionPrefix’: ‘enhancer:selection-prefix’
-        ‘selectionSuffix’: ‘enhancer:selection-suffix’
-        ‘selectedText’: ‘enhancer:selected-text’
-        ‘confidence’: ‘enhancer:confidence’
-        ‘relation’:    ‘dc:relation’
-     ‘entityLabel’:      ‘entity-label’
-     ‘entityType’:       ‘entity-type’
-     ‘entityReference’:  ‘entity-reference’
-     ‘textAnnotation’:   ‘TextAnnotation’
-     ‘entityAnnotation’: ‘EntityAnnotation’
-     ‘selectionPrefix’:  ‘selection-prefix’
-     ‘selectionSuffix’:  ‘selection-suffix’
-     ‘selectedText’:     ‘selected-text’
-     ‘confidence’:       ‘confidence’
-     ‘relation’:            ‘relation’</p>
+              <p>Get local params.</p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre>    wl_local_timeline_params = $(<span class="hljs-keyword">this</span>).data()
+    wl_local_timeline_params.widget_id = $(<span class="hljs-keyword">this</span>).attr(<span class="hljs-string">'id'</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>Merge local and global params.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    $.extend wl_local_timeline_params, wl_timeline_params
+    params = wl_local_timeline_params</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>Get data via AJAX</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    $.post params.ajax_url, {
+      <span class="hljs-attribute">action</span>:  params.action
+      <span class="hljs-attribute">post_id</span>: params.post_id</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>depth:   params.depth</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    }, <span class="hljs-function"><span class="hljs-params">(response)</span> -&gt;</span>
+      timelineData  = JSON.parse response
+      <span class="hljs-built_in">console</span>.log timelineData
+      
+      <span class="hljs-keyword">if</span> timelineData.timeline
+        createStoryJS
+          <span class="hljs-attribute">type</span>:       <span class="hljs-string">'timeline'</span>
+          <span class="hljs-attribute">width</span>:      <span class="hljs-string">'100%'</span>
+          <span class="hljs-attribute">height</span>:     <span class="hljs-string">'600'</span>
+          <span class="hljs-attribute">source</span>:     timelineData
+          <span class="hljs-attribute">embed_id</span>:   params.widget_id  <span class="hljs-comment"># ID of the DIV you want to load the timeline into</span>
+      <span class="hljs-keyword">else</span>
+        id = <span class="hljs-string">'#'</span> + params.widget_id;
+        $(id).html <span class="hljs-string">'No data for the timeline.'</span>
+             .height <span class="hljs-string">'30px'</span>
+             .css <span class="hljs-string">'background-color'</span>,<span class="hljs-string">'red'</span>
+  );</pre></div></div>
             
         </li>
         
