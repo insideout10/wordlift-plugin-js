@@ -1,6 +1,5 @@
-$ = jQuery
+jQuery ($) ->
 
-$(document).ready =>
   $('.wl-timeline').each( (index) ->
     
     # Get local params.
