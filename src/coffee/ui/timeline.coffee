@@ -1,4 +1,4 @@
-jQuery.noConflict() ($) ->
+jQuery ($) ->
   $('.wl-timeline').each ->
 
     # Get local params.

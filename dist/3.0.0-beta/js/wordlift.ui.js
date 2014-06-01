@@ -6,11 +6,9 @@
   getChordData = function(params) {
     return $.post(params.ajax_url, {
       action: params.action,
-      post_id: params.post_id,
+      post_id: params.postId,
       depth: params.depth
-    }, function(response) {
-      var data;
-      data = JSON.parse(response);
+    }, function(data) {
       return buildChord(data, params);
     });
   };
@@ -109,7 +107,7 @@
       return "entity " + data.entities[d.index].css_class;
     }).attr('d', arc).attr('transform', translate(0.5, 0.5, size)).style('fill', function(d) {
       var baseColor, type;
-      baseColor = params.main_color;
+      baseColor = params.mainColor;
       type = data.entities[d.index].type;
       if (type === 'post') {
         return baseColor;
@@ -172,17 +170,17 @@
     });
   };
 
-  $(document).ready(function() {
+  jQuery(function($) {
     return $('.wl-chord').each(function() {
-      var wl_local_chord_params;
-      wl_local_chord_params = $(this).data();
-      wl_local_chord_params.widget_id = $(this).attr('id');
-      $.extend(wl_local_chord_params, wl_chord_params);
-      return getChordData(wl_local_chord_params);
+      var params;
+      params = $(this).data();
+      params.widget_id = $(this).attr('id');
+      $.extend(params, wl_chord_params);
+      return getChordData(params);
     });
   });
 
-  jQuery.noConflict()(function($) {
+  jQuery(function($) {
     return $('.wl-timeline').each(function() {
       var elemId, params;
       params = $(this).data();

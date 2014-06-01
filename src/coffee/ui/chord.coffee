@@ -1,12 +1,7 @@
 $ = jQuery
 
 getChordData = (params) ->
-  $.post params.ajax_url, {
-      action:  params.action
-      post_id: params.post_id
-      depth:   params.depth
-  	}, (response) ->
-    data  = JSON.parse response
+  $.post params.ajax_url, { action:  params.action, post_id: params.postId, depth:   params.depth }, (data) ->
     buildChord data, params
 
 buildChord = (data, params) ->
@@ -106,7 +101,7 @@ buildChord = (data, params) ->
     .attr('d', arc)
     .attr('transform', translate(0.5, 0.5, size))
     .style('fill', (d) ->
-      baseColor = params.main_color;
+      baseColor = params.mainColor;
       type = data.entities[d.index].type
       return baseColor if(type == 'post')
       return colorLuminance( baseColor, -0.5) if type is 'entity'
@@ -201,14 +196,14 @@ buildChord = (data, params) ->
       window.location = url
     )
 
-$(document).ready ->
+jQuery ($) ->
   $('.wl-chord').each ->
     # Get local params.
-    wl_local_chord_params = $(this).data()
-    wl_local_chord_params.widget_id = $(this).attr('id');
+    params = $(this).data()
+    params.widget_id = $(this).attr('id');
     
     # Merge local and global params.
-    $.extend wl_local_chord_params, wl_chord_params
+    $.extend params, wl_chord_params
     
     # Launch chord.
-    getChordData wl_local_chord_params
+    getChordData params
