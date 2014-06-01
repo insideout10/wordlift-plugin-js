@@ -32,6 +32,7 @@ module.exports = (grunt) ->
           ]
           'app/js/wordlift.ui.js': [
             'src/coffee/ui/chord.coffee'
+            'src/coffee/ui/timeline.coffee'
           ]
 
     uglify:
@@ -40,13 +41,25 @@ module.exports = (grunt) ->
           sourceMap: true
           sourceMapIn: 'app/js/wordlift.js.map'
           compress: true
-#            drop_console: true
+          drop_console: true
           dead_code: true
           mangle: true
           beautify: false
         files:
           'app/js/wordlift.min.js': 'app/js/wordlift.js'
           'app/js/wordlift.<%= pkg.version %>.min.js': 'app/js/wordlift.js'
+      'wordlift-ui':
+        options:
+          sourceMap: true
+          sourceMapIn: 'app/js/wordlift.ui.js.map'
+          compress: true
+          drop_console: true
+          dead_code: true
+          mangle: true
+          beautify: false
+        files:
+          'app/js/wordlift.ui.min.js': 'app/js/wordlift.ui.js'
+          'app/js/wordlift.ui.<%= pkg.version %>.min.js': 'app/js/wordlift.ui.js'
 
     less:
       development:
@@ -83,6 +96,9 @@ module.exports = (grunt) ->
           'wordlift.min.js'
           'wordlift.min.map'
           'wordlift.ui.js'
+          'wordlift.ui.js.map'
+          'wordlift.ui.min.js'
+          'wordlift.ui.min.map'
         ]
         dest: 'dist/<%= pkg.version %>/js/'
         flatten: true
