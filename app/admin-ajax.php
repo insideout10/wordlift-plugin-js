@@ -1,1 +1,0 @@
-# Just simulate a file to say: images exist
