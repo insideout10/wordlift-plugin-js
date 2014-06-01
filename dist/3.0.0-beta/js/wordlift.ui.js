@@ -182,16 +182,17 @@
     });
   });
 
-  jQuery(function($) {
-    return $('.wl-timeline').each(function(index) {
-      var params, wl_local_timeline_params;
-      wl_local_timeline_params = $(this).data();
-      wl_local_timeline_params.widget_id = $(this).attr('id');
-      $.extend(wl_local_timeline_params, wl_timeline_params);
-      params = wl_local_timeline_params;
+  $ = jQuery;
+
+  $.ready(function() {
+    return $('.wl-timeline').each(function() {
+      var params;
+      params = $(this).data();
+      params.widget_id = $(this).attr('id');
+      $.extend(params, wl_timeline_params);
       return $.post(params.ajax_url, {
         action: params.action,
-        post_id: params.post_id
+        post_id: params['post-id']
       }, function(response) {
         var id, timelineData;
         timelineData = JSON.parse(response);

@@ -214,23 +214,23 @@ $(document).ready ->
     getChordData wl_local_chord_params
   );
 
-jQuery ($) ->
+$ = jQuery
 
-  $('.wl-timeline').each( (index) ->
+$.ready ->
+
+  $('.wl-timeline').each ->
     
     # Get local params.
-    wl_local_timeline_params = $(this).data()
-    wl_local_timeline_params.widget_id = $(this).attr('id');
+    params = $(this).data()
+    params.widget_id = $(this).attr('id');
     
     # Merge local and global params.
-    $.extend wl_local_timeline_params, wl_timeline_params
-    params = wl_local_timeline_params
-    
+    $.extend params, wl_timeline_params
+
     # Get data via AJAX
     $.post params.ajax_url, {
       action:  params.action
-      post_id: params.post_id
-      #depth:   params.depth
+      post_id: params['post-id']
     }, (response) ->
       timelineData  = JSON.parse response
       console.log timelineData
@@ -247,4 +247,3 @@ jQuery ($) ->
         $(id).html 'No data for the timeline.'
              .height '30px'
              .css 'background-color','red'
-  );
