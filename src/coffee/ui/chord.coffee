@@ -202,7 +202,7 @@ buildChord = (data, params) ->
     )
 
 $(document).ready ->
-  $('.wl-chord').each( () ->
+  $('.wl-chord').each ->
     # Get local params.
     wl_local_chord_params = $(this).data()
     wl_local_chord_params.widget_id = $(this).attr('id');
@@ -212,4 +212,3 @@ $(document).ready ->
     
     # Launch chord.
     getChordData wl_local_chord_params
-  );

@@ -182,32 +182,27 @@
     });
   });
 
-  $ = jQuery;
-
-  $.ready(function() {
+  jQuery.noConflict()(function($) {
     return $('.wl-timeline').each(function() {
-      var params;
+      var elemId, params;
       params = $(this).data();
-      params.widget_id = $(this).attr('id');
+      elemId = $(this).attr('id');
       $.extend(params, wl_timeline_params);
       return $.post(params.ajax_url, {
         action: params.action,
-        post_id: params['post-id']
-      }, function(response) {
-        var id, timelineData;
-        timelineData = JSON.parse(response);
-        console.log(timelineData);
-        if (timelineData.timeline) {
+        post_id: params.postId
+      }, function(data) {
+        if (data.timeline != null) {
           return createStoryJS({
             type: 'timeline',
             width: '100%',
             height: '600',
-            source: timelineData,
-            embed_id: params.widget_id
+            source: data,
+            embed_id: elemId,
+            start_at_slide: data.startAtSlide
           });
         } else {
-          id = '#' + params.widget_id;
-          return $(id).html('No data for the timeline.').height('30px').css('background-color', 'red');
+          return $("#" + elemId).html('No data for the timeline.').height('30px').css('background-color', 'red');
         }
       });
     });
