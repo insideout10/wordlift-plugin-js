@@ -16,3 +16,33 @@ path.wl-event {
 path.wl-thing {
   fill: #c0c0c0;
 }
+.wl-person {
+  background-color: #f20f62;
+  color: #ffffff;
+  padding: 2px;
+}
+.wl-place {
+  background-color: #ff9a2e;
+  color: #000000;
+  padding: 2px;
+}
+.wl-creative-work {
+  background-color: #f9f81e;
+  color: #000000;
+  padding: 2px;
+}
+.wl-organization {
+  background-color: #8fd22a;
+  color: #000000;
+  padding: 2px;
+}
+.wl-event {
+  background-color: #642994;
+  color: #ffffff;
+  padding: 2px;
+}
+.wl-thing {
+  background-color: #c0c0c0;
+  color: #000000;
+  padding: 2px;
+}
