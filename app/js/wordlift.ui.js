@@ -1,5 +1,6 @@
 (function() {
-  var $, buildChord, getChordData;
+  var $, buildChord, buildGeomap, getChordData, getGeomapData,
+    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   $ = jQuery;
 
@@ -203,6 +204,38 @@
           return $("#" + elemId).html('No data for the timeline.').height('30px').css('background-color', 'red');
         }
       });
+    });
+  });
+
+  $ = jQuery;
+
+  getGeomapData = function(params) {
+    return $.post(params.ajax_url, {
+      action: params.action,
+      post_id: params.postId
+    }, function(data) {
+      return buildGeomap(data, params);
+    });
+  };
+
+  buildGeomap = function(data, params) {
+    if (__indexOf.call(data, 'entities') >= 0) {
+      if (data.entities.length < 2) {
+        return;
+      }
+    } else {
+      return;
+    }
+    return console.log(data, params);
+  };
+
+  jQuery(function($) {
+    return $('.wl-geomap').each(function() {
+      var params;
+      params = $(this).data();
+      params.widget_id = $(this).attr('id');
+      $.extend(params, wl_geomap_params);
+      return getGeomapData(params);
     });
   });
 

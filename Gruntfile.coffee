@@ -33,6 +33,7 @@ module.exports = (grunt) ->
           'app/js/wordlift.ui.js': [
             'src/coffee/ui/chord.coffee'
             'src/coffee/ui/timeline.coffee'
+            'src/coffee/ui/geomap.coffee'
           ]
 
     uglify:
