@@ -219,14 +219,37 @@
   };
 
   buildGeomap = function(data, params) {
-    if (__indexOf.call(data, 'entities') >= 0) {
-      if (data.entities.length < 2) {
-        return;
-      }
-    } else {
+    var error, map;
+    console.log(data, params);
+    if (__indexOf.call(data, 'features') >= 0) {
+      error = true;
+    }
+    if (data.features.length < 1) {
+      error = true;
+    }
+    if (error) {
+      $("#" + params.widget_id).html('No data for the geomap.').height('30px').css('background-color', 'red');
       return;
     }
-    return console.log(data, params);
+    map = L.map(params.widget_id);
+    if (data.features.length === 1) {
+      map.setView(data.features[0].geometry.coordinates, 13);
+    } else {
+      map.fitBounds(data.boundaries);
+    }
+    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+    return L.geoJson(data.features, {
+      pointToLayer: function(feature, latlng) {
+        return L.marker(latlng, {});
+      },
+      onEachFeature: function(feature, layer) {
+        if (feature.properties && feature.properties.popupContent) {
+          return layer.bindPopup(feature.properties.popupContent);
+        }
+      }
+    }).addTo(map);
   };
 
   jQuery(function($) {
