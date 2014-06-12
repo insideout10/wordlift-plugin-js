@@ -248,7 +248,7 @@ $.fn.extend
 
     # Merge default settings with options.
     settings = $.extend settings, options
-    # Create a reference to dom element
+    # Create a reference to dom wrapper element
     container = $( this )
 
     # Initialization method
@@ -265,8 +265,8 @@ $.fn.extend
     # Build a geoMap obj via Leaflet.js
     buildGeomap = (data) ->
         
-      # With no features set the container as hidden and log a warning
-      if data.features?.length is 0
+      # With features undefined or empty set the container as hidden and log a warning
+      if not data.features? or data.features?.length is 0
         container.hide()
         log "Features missing: geomap cannot be rendered"
         return
@@ -276,7 +276,7 @@ $.fn.extend
   
       # With a single feature sets the map center accordingly to feature coordinates.
       # With more than one feature sets baundaries instead.
-      if data.features.length is 1
+      if data.features?.length is 1
         map.setView data.features[0].geometry.coordinates, settings.zoom
       else
         map.fitBounds data.boundaries

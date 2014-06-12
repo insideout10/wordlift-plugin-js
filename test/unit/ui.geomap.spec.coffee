@@ -44,7 +44,6 @@ describe "GeoMap Ui Component Unit Test", ->
     expect(domElement.find('.leaflet-clickable').length).toEqual(0)
 
   it "fails to create a map with an undefined features array", ->
-
     fakeResponse = getJSONFixture("geomap_2.json")
     # Set a mock object to replace jquery Ajax POST with fake / mock results
     spyOn(jQuery, "ajax").and.callFake((request)->

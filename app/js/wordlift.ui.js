@@ -230,14 +230,14 @@
         });
       };
       buildGeomap = function(data) {
-        var map, _ref;
-        if (((_ref = data.features) != null ? _ref.length : void 0) === 0) {
+        var map, _ref, _ref1;
+        if ((data.features == null) || ((_ref = data.features) != null ? _ref.length : void 0) === 0) {
           container.hide();
           log("Features missing: geomap cannot be rendered");
           return;
         }
         map = L.map(container.attr('id'));
-        if (data.features.length === 1) {
+        if (((_ref1 = data.features) != null ? _ref1.length : void 0) === 1) {
           map.setView(data.features[0].geometry.coordinates, settings.zoom);
         } else {
           map.fitBounds(data.boundaries);
@@ -250,8 +250,8 @@
             return L.marker(latlng, {});
           },
           onEachFeature: function(feature, layer) {
-            var _ref1;
-            if ((_ref1 = feature.properties) != null ? _ref1.popupContent : void 0) {
+            var _ref2;
+            if ((_ref2 = feature.properties) != null ? _ref2.popupContent : void 0) {
               return layer.bindPopup(feature.properties.popupContent);
             }
           }
