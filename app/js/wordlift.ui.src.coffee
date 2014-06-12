@@ -238,33 +238,33 @@ $ = jQuery
 
 # Add a geomap plugin object to jQuery
 $.fn.extend
-  # Change pluginName to your plugin's name.
+# Change pluginName to your plugin's name.
   geomap: (options) ->
     # Default settings
     settings =
       url: ''
       debug: false
-      zoom: 13 
+      zoom: 13
 
     # Merge default settings with options.
     settings = $.extend settings, options
     # Create a reference to dom wrapper element
-    container = $( this )
+    container = $(@)
 
     # Initialization method
-    init = ()->
+    init = ->
       retrieveGeomapData()
 
     # Retrieve data from for map rendering
-    retrieveGeomapData = ()->
-      $.ajax(
+    retrieveGeomapData = ->
+      $.ajax
         url: settings.url
         success: (response) ->
           buildGeomap response
-      )
+
     # Build a geoMap obj via Leaflet.js
     buildGeomap = (data) ->
-        
+
       # With features undefined or empty set the container as hidden and log a warning
       if not data.features? or data.features?.length is 0
         container.hide()
@@ -273,7 +273,7 @@ $.fn.extend
 
       # Create a map
       map = L.map container.attr('id')
-  
+
       # With a single feature sets the map center accordingly to feature coordinates.
       # With more than one feature sets baundaries instead.
       if data.features?.length is 1
@@ -286,7 +286,7 @@ $.fn.extend
         attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
       ).addTo map
 
-      L.geoJson( data.features, {
+      L.geoJson(data.features,
         pointToLayer: (feature, latlng) ->
           # TODO: give marker style here
           L.marker latlng, {}
@@ -294,7 +294,7 @@ $.fn.extend
           # On each feature set popupContent if available
           if feature.properties?.popupContent
             layer.bindPopup feature.properties.popupContent
-      }).addTo map
+      ).addTo map
 
     # Simple logger 
     log = (msg) ->
@@ -304,15 +304,12 @@ $.fn.extend
 
 jQuery ($) ->
   $('.wl-geomap').each ->
-    element = $(this)
-    
+    element = $(@)
+
     params = element.data()
     $.extend params, wl_geomap_params
-    
-    url = "#{params.ajax_url}?#{$.param({ 'action': params.action, 'postId': params.postId })}"
-    
-    element.geomap(
+
+    url = "#{params.ajax_url}?" + $.param( 'action': params.action, 'postId': params.postId )
+
+    element.geomap
       url: url
-      )
-    
-  

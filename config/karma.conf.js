@@ -17,6 +17,7 @@ module.exports = function(config){
         {pattern: 'app/lib/tinymce/jscripts/tiny_mce/themes/**/*.png', watched: false, served: true, included: false },
         {pattern: 'app/lib/tinymce/jscripts/tiny_mce/langs/**/*.js', watched: false, served: true, included: false },
         {pattern: 'app/lib/jquery-ui-1.10.3/themes/base/images/*.png', watched: false, served: true, included: false },
+        {pattern: 'app/lib/leaflet-0.7.3/images/*.png', watched: false, served: true, included: false },
 
         // Serve HTML files.
         {pattern: 'app/**/*.html', watched: false, served: true, included: false },

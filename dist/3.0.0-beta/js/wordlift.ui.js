@@ -272,10 +272,10 @@
       element = $(this);
       params = element.data();
       $.extend(params, wl_geomap_params);
-      url = "" + params.ajax_url + "?" + ($.param({
+      url = ("" + params.ajax_url + "?") + $.param({
         'action': params.action,
         'postId': params.postId
-      }));
+      });
       return element.geomap({
         url: url
       });
