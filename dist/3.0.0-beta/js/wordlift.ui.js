@@ -1,6 +1,5 @@
 (function() {
-  var $, buildChord, buildGeomap, getChordData, getGeomapData,
-    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+  var $, buildChord, getChordData;
 
   $ = jQuery;
 
@@ -209,56 +208,77 @@
 
   $ = jQuery;
 
-  getGeomapData = function(params) {
-    return $.post(params.ajax_url, {
-      action: params.action,
-      post_id: params.postId
-    }, function(data) {
-      return buildGeomap(data, params);
-    });
-  };
-
-  buildGeomap = function(data, params) {
-    var error, map;
-    console.log(data, params);
-    if (__indexOf.call(data, 'features') >= 0) {
-      error = true;
-    }
-    if (data.features.length < 1) {
-      error = true;
-    }
-    if (error) {
-      $("#" + params.widget_id).html('No data for the geomap.').height('30px').css('background-color', 'red');
-      return;
-    }
-    map = L.map(params.widget_id);
-    if (data.features.length === 1) {
-      map.setView(data.features[0].geometry.coordinates, 13);
-    } else {
-      map.fitBounds(data.boundaries);
-    }
-    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
-    return L.geoJson(data.features, {
-      pointToLayer: function(feature, latlng) {
-        return L.marker(latlng, {});
-      },
-      onEachFeature: function(feature, layer) {
-        if (feature.properties && feature.properties.popupContent) {
-          return layer.bindPopup(feature.properties.popupContent);
+  $.fn.extend({
+    geomap: function(options) {
+      var buildGeomap, container, init, log, retrieveGeomapData, settings;
+      settings = {
+        url: '',
+        debug: false,
+        zoom: 13
+      };
+      settings = $.extend(settings, options);
+      container = $(this);
+      init = function() {
+        return retrieveGeomapData();
+      };
+      retrieveGeomapData = function() {
+        return $.ajax({
+          url: settings.url,
+          success: function(response) {
+            return buildGeomap(response);
+          }
+        });
+      };
+      buildGeomap = function(data) {
+        var map, _ref;
+        if (((_ref = data.features) != null ? _ref.length : void 0) === 0) {
+          container.hide();
+          log("Features missing: geomap cannot be rendered");
+          return;
         }
-      }
-    }).addTo(map);
-  };
+        map = L.map(container.attr('id'));
+        if (data.features.length === 1) {
+          map.setView(data.features[0].geometry.coordinates, settings.zoom);
+        } else {
+          map.fitBounds(data.boundaries);
+        }
+        L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        return L.geoJson(data.features, {
+          pointToLayer: function(feature, latlng) {
+            return L.marker(latlng, {});
+          },
+          onEachFeature: function(feature, layer) {
+            var _ref1;
+            if ((_ref1 = feature.properties) != null ? _ref1.popupContent : void 0) {
+              return layer.bindPopup(feature.properties.popupContent);
+            }
+          }
+        }).addTo(map);
+      };
+      log = function(msg) {
+        if (settings.debug) {
+          return typeof console !== "undefined" && console !== null ? console.log(msg) : void 0;
+        }
+      };
+      return init();
+    }
+  });
 
   jQuery(function($) {
     return $('.wl-geomap').each(function() {
-      var params;
-      params = $(this).data();
-      params.widget_id = $(this).attr('id');
+      var element, params, url;
+      element = $(this);
+      params = element.data();
       $.extend(params, wl_geomap_params);
-      return getGeomapData(params);
+      url = "" + params.ajax_url + "?" + ($.param({
+        'action': params.action,
+        'postId': params.postId
+      }));
+      return element.geomap({
+        url: url
+      });
     });
   });
 

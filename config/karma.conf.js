@@ -36,6 +36,9 @@ module.exports = function(config){
         'app/lib/tinymce/jscripts/tiny_mce/tiny_mce.js',
         'app/js/test.init.coffee',
         'app/js/wordlift.js',
+        'app/js/wordlift.ui.js',
+        'app/lib/leaflet-0.7.3/leaflet.js',
+        'app/lib/leaflet-0.7.3/leaflet.css',   
         'test/lib/angular/angular-mocks.js',
         'test/unit/**/*.coffee',
         'app/lib/jquery-ui-1.10.3/themes/base/*.css'
