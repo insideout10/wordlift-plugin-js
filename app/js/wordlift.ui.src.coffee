@@ -301,7 +301,7 @@ $.fn.extend
       console?.log msg if settings.debug
 
     init()
-
+# TODO we should think about how to initilize the whole wordlift ui layer
 jQuery ($) ->
   $('.wl-geomap').each ->
     element = $(@)
@@ -309,7 +309,7 @@ jQuery ($) ->
     params = element.data()
     $.extend params, wl_geomap_params
 
-    url = "#{params.ajax_url}?" + $.param( 'action': params.action, 'postId': params.postId )
+    url = "#{params.ajax_url}?" + $.param( 'action': params.action, 'post_id': params.postId )
 
     element.geomap
       url: url
