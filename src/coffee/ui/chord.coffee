@@ -1,7 +1,7 @@
 $ = jQuery
 
 getChordData = (params) ->
-  $.post params.ajax_url, { action:  params.action, post_id: params.postId, depth:   params.depth }, (data) ->
+  $.post params.ajax_url, { action: params.action, post_id: params.postId, depth: params.depth }, (data) ->
     buildChord data, params
 
 buildChord = (data, params) ->

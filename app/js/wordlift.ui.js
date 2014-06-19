@@ -206,6 +206,82 @@
     });
   });
 
+  $ = jQuery;
+
+  $.fn.extend({
+    geomap: function(options) {
+      var buildGeomap, container, init, log, retrieveGeomapData, settings;
+      settings = {
+        url: '',
+        debug: false,
+        zoom: 13
+      };
+      settings = $.extend(settings, options);
+      container = $(this);
+      init = function() {
+        return retrieveGeomapData();
+      };
+      retrieveGeomapData = function() {
+        return $.ajax({
+          url: settings.url,
+          success: function(response) {
+            return buildGeomap(response);
+          }
+        });
+      };
+      buildGeomap = function(data) {
+        var map, _ref, _ref1;
+        if ((data.features == null) || ((_ref = data.features) != null ? _ref.length : void 0) === 0) {
+          container.hide();
+          log("Features missing: geomap cannot be rendered");
+          return;
+        }
+        map = L.map(container.attr('id'));
+        if (((_ref1 = data.features) != null ? _ref1.length : void 0) === 1) {
+          map.setView(data.features[0].geometry.coordinates, settings.zoom);
+        } else {
+          map.fitBounds(data.boundaries);
+        }
+        L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        return L.geoJson(data.features, {
+          pointToLayer: function(feature, latlng) {
+            return L.marker(latlng, {});
+          },
+          onEachFeature: function(feature, layer) {
+            var _ref2;
+            if ((_ref2 = feature.properties) != null ? _ref2.popupContent : void 0) {
+              return layer.bindPopup(feature.properties.popupContent);
+            }
+          }
+        }).addTo(map);
+      };
+      log = function(msg) {
+        if (settings.debug) {
+          return typeof console !== "undefined" && console !== null ? console.log(msg) : void 0;
+        }
+      };
+      return init();
+    }
+  });
+
+  jQuery(function($) {
+    return $('.wl-geomap').each(function() {
+      var element, params, url;
+      element = $(this);
+      params = element.data();
+      $.extend(params, wl_geomap_params);
+      url = ("" + params.ajax_url + "?") + $.param({
+        'action': params.action,
+        'post_id': params.postId
+      });
+      return element.geomap({
+        url: url
+      });
+    });
+  });
+
 }).call(this);
 
 //# sourceMappingURL=wordlift.ui.js.map

@@ -10,7 +10,6 @@ jQuery ($) ->
 
     # Get data via AJAX
     $.post params.ajax_url, { action: params.action, post_id: params.postId }, (data) ->
-
       if data.timeline?
         createStoryJS
           type: 'timeline'
