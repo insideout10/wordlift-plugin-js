@@ -6,7 +6,10 @@
   $.fn.extend({
     chord: function(options) {
       var buildChord, getChordData, init, settings;
-      settings = {};
+      settings = {
+        mainColor: '#777',
+        depth: 5
+      };
       settings = $.extend(settings, options);
       init = function() {
         return getChordData();
@@ -22,7 +25,8 @@
       };
       buildChord = function(data) {
         var arc, beautifyLabel, chord, colorLuminance, e, entity, getEntityIndex, height, innerRadius, matrix, outerRadius, rad2deg, relation, rotate, sign, size, tooltip, translate, viz, width, x, y, _i, _j, _len, _len1, _ref, _ref1;
-        if (data.entities.length < 2) {
+        if ((data.entities == null) || data.entities.length < 2) {
+          console.log('No data found for the chord.');
           return;
         }
         translate = function(x, y, size) {
@@ -202,29 +206,44 @@
     });
   });
 
+  $ = jQuery;
+
+  $.fn.extend({
+    timeline: function(options) {
+      var init, settings;
+      settings = {};
+      settings = $.extend(settings, options);
+      init = function() {
+        return $.post(settings.ajax_url, {
+          action: settings.action,
+          post_id: settings.postId
+        }, function(data) {
+          if (data.timeline != null) {
+            return createStoryJS({
+              type: 'timeline',
+              width: '100%',
+              height: '600',
+              source: data,
+              embed_id: settings.elemId,
+              start_at_slide: data.startAtSlide
+            });
+          } else {
+            return console.log('No data for the timeline.');
+          }
+        });
+      };
+      return init();
+    }
+  });
+
   jQuery(function($) {
     return $('.wl-timeline').each(function() {
       var elemId, params;
       params = $(this).data();
       elemId = $(this).attr('id');
+      params.elemId = elemId;
       $.extend(params, wl_timeline_params);
-      return $.post(params.ajax_url, {
-        action: params.action,
-        post_id: params.postId
-      }, function(data) {
-        if (data.timeline != null) {
-          return createStoryJS({
-            type: 'timeline',
-            width: '100%',
-            height: '600',
-            source: data,
-            embed_id: elemId,
-            start_at_slide: data.startAtSlide
-          });
-        } else {
-          return $("#" + elemId).html('No data for the timeline.').height('30px').css('background-color', 'red');
-        }
-      });
+      return $(this).timeline(params);
     });
   });
 

@@ -4,8 +4,10 @@ $ = jQuery
 $.fn.extend
   chord: (options) ->
     
-    # Default settings
-    settings = {}
+    settings = {
+      mainColor: '#777'
+      depth: 5
+    }
 
     # Merge default settings with options.
     settings = $.extend settings, options
@@ -19,8 +21,12 @@ $.fn.extend
         buildChord data
     
     buildChord = (data) ->
-      return if data.entities.length < 2
-    
+      if not data.entities? or data.entities.length < 2
+        console.log 'No data found for the chord.'
+        return
+      
+      # define some service functions, then build the chord
+      
       translate = (x, y, size) -> 'translate(' + x * size + ',' + y * size + ')'
     
       rotate = (x) -> "rotate(#{x})"
