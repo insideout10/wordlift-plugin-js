@@ -23,7 +23,7 @@ $.fn.extend
             embed_id: settings.elemId  # ID of the DIV you want to load the timeline into
             start_at_slide: data.startAtSlide 
         else
-          console.log 'No data for the timeline.'
+          console.log 'Timeline not built.'
 
 
     init()
