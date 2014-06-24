@@ -6,11 +6,14 @@ $.fn.extend
     
     settings = {
       mainColor: '#777'
-      depth: 5
+      depth: 2
     }
 
     # Merge default settings with options.
     settings = $.extend settings, options
+    
+    # Create a reference to dom wrapper element
+    container = $(@)
 
     # Initialization method
     init = ->
@@ -22,6 +25,7 @@ $.fn.extend
     
     buildChord = (data) ->
       if not data.entities? or data.entities.length < 2
+        container.hide()
         console.log 'No data found for the chord.'
         return
       

@@ -9,6 +9,9 @@ $.fn.extend
 
     # Merge default settings with options.
     settings = $.extend settings, options
+    
+    # Create a reference to dom wrapper element
+    container = $(@)
 
     # Initialization method
     init = ->
@@ -23,6 +26,7 @@ $.fn.extend
             embed_id: settings.elemId  # ID of the DIV you want to load the timeline into
             start_at_slide: data.startAtSlide 
         else
+          container.hide()
           console.log 'Timeline not built.'
 
 

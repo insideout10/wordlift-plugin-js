@@ -5,12 +5,13 @@
 
   $.fn.extend({
     chord: function(options) {
-      var buildChord, getChordData, init, settings;
+      var buildChord, container, getChordData, init, settings;
       settings = {
         mainColor: '#777',
-        depth: 5
+        depth: 2
       };
       settings = $.extend(settings, options);
+      container = $(this);
       init = function() {
         return getChordData();
       };
@@ -26,6 +27,7 @@
       buildChord = function(data) {
         var arc, beautifyLabel, chord, colorLuminance, e, entity, getEntityIndex, height, innerRadius, matrix, outerRadius, rad2deg, relation, rotate, sign, size, tooltip, translate, viz, width, x, y, _i, _j, _len, _len1, _ref, _ref1;
         if ((data.entities == null) || data.entities.length < 2) {
+          container.hide();
           console.log('No data found for the chord.');
           return;
         }
@@ -210,9 +212,10 @@
 
   $.fn.extend({
     timeline: function(options) {
-      var init, settings;
+      var container, init, settings;
       settings = {};
       settings = $.extend(settings, options);
+      container = $(this);
       init = function() {
         return $.post(settings.ajax_url, {
           action: settings.action,
@@ -228,7 +231,8 @@
               start_at_slide: data.startAtSlide
             });
           } else {
-            return console.log('No data for the timeline.');
+            container.hide();
+            return console.log('Timeline not built.');
           }
         });
       };

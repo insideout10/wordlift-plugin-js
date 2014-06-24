@@ -4,7 +4,7 @@ describe "Chord Ui Component Unit Test", ->
   # Tests set-up.
   beforeEach inject(->
     jasmine.getJSONFixtures().fixturesPath = "base/app/assets/"
-    domElement = $('<div class="wl-chord"></div>')
+    domElement = $('<div class="wl_chord" id="wl_chord_global"></div>')
     $(document.body).append $(domElement)
   )
 
@@ -20,11 +20,13 @@ describe "Chord Ui Component Unit Test", ->
       request.success fakeResponse
     )
     # Initialize the plugin
-    domElement.chord()
+    domElement.chord
+      widget_id: "wl_chord_global"
 
     # Jquery post() has been called during the initialization
     expect(jQuery.ajax).toHaveBeenCalled()
-
+    # HTML container is hidden
+    expect(domElement.is(":visible")).not.toBeTruthy()
     # Check that there are no entities in the chord
     expect(domElement.find('.entity').length).toEqual(0)
 
@@ -34,8 +36,10 @@ describe "Chord Ui Component Unit Test", ->
     spyOn(jQuery, "ajax").and.callFake((request)->
       request.success fakeResponse
     )
+        
     # Initialize the plugin
-    domElement.chord()
+    domElement.chord
+      widget_id: "wl_chord_global"
 
     # Jquery post() has been called during the initialization
     expect(jQuery.ajax).toHaveBeenCalled()
