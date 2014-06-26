@@ -213,7 +213,9 @@
   $.fn.extend({
     timeline: function(options) {
       var container, init, settings;
-      settings = {};
+      settings = {
+        elemId: $(this).attr('id')
+      };
       settings = $.extend(settings, options);
       container = $(this);
       init = function() {

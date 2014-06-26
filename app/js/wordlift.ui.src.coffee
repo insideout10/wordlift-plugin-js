@@ -247,8 +247,11 @@ $ = jQuery
 $.fn.extend
 
   timeline: (options) ->
+    
     # Default settings
-    settings = {}
+    settings = {
+      elemId: $(@).attr('id');
+    }
 
     # Merge default settings with options.
     settings = $.extend settings, options
@@ -271,7 +274,6 @@ $.fn.extend
         else
           container.hide()
           console.log 'Timeline not built.'
-
 
     init()
 

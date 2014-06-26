@@ -41,7 +41,9 @@ module.exports = function(config){
         'app/lib/leaflet-0.7.3/leaflet.js',
         'app/lib/leaflet-0.7.3/leaflet.css',
         'app/lib/d3/d3.js',
-        // include also timeline js  
+        'app/lib/TimelineJS.build/build/js/timeline-min.js',
+        'app/lib/TimelineJS.build/build/js/storyjs-embed.js',
+        'app/lib/TimelineJS.build/build/css/timeline.css',
         'test/lib/angular/angular-mocks.js',
         'test/unit/**/*.coffee',
         'app/lib/jquery-ui-1.10.3/themes/base/*.css'
