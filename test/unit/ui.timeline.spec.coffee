@@ -30,7 +30,6 @@ describe "Timeline Ui Component Unit Test", ->
   it "create a timeline with three events", ->
 
     fakeResponse = getJSONFixture("timeline_1.json")
-    console.log fakeResponse
     # Set a mock object to replace jquery Ajax POST with fake / mock results
     spyOn(jQuery, "ajax").and.callFake((request)->
       request.success fakeResponse
@@ -42,3 +41,4 @@ describe "Timeline Ui Component Unit Test", ->
     expect(jQuery.ajax).toHaveBeenCalled()
     # HTML container is hidden
     expect(domElement.is(":visible")).toBeTruthy()
+    console.log domElement.find("#timeline")

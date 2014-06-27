@@ -4,7 +4,7 @@ describe "Chord Ui Component Unit Test", ->
   # Tests set-up.
   beforeEach inject(->
     jasmine.getJSONFixtures().fixturesPath = "base/app/assets/"
-    domElement = $('<div class="wl_chord" id="wl_chord_global"></div>')
+    domElement = $('<div class="wl_chord" id="wl_chord_global" style="width:500px;height:500px"></div>')
     $(document.body).append $(domElement)
   )
 
@@ -28,7 +28,7 @@ describe "Chord Ui Component Unit Test", ->
     # HTML container is hidden
     expect(domElement.is(":visible")).not.toBeTruthy()
     # Check that there are no entities in the chord
-    expect(domElement.find('.entity').length).toEqual(0)
+    expect( d3.selectAll(".entity")[0].length ).toEqual(0)
 
   it "creates successfully a chord with three entities and three relations", ->
     fakeResponse = getJSONFixture("chord_1.json")
@@ -45,7 +45,9 @@ describe "Chord Ui Component Unit Test", ->
     expect(jQuery.ajax).toHaveBeenCalled()
     # HTML container is visible
     expect(domElement.is(":visible")).toBeTruthy()
-    # Check the presence fo three relations and three entities
-    #expect(domElement.find('.entity').length).toEqual(3)
-    #expect(domElement.find('.relation').length).toEqual(3)
+    # Check the presence of three relations and three entities
+    relations = d3.selectAll(".relation")[0].length
+    expect( relations ).toEqual(3)
+    entities = d3.selectAll(".entity")[0].length
+    expect( entities ).toEqual(3)
  
