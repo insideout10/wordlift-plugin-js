@@ -29,6 +29,7 @@ module.exports = (grunt) ->
             'src/coffee/app.services.coffee'
             'src/coffee/app.controllers.coffee'
             'src/coffee/app.coffee'
+            'src/coffee/chordDialog.coffee'
           ]
           'app/js/wordlift.ui.js': [
             'src/coffee/ui/chord.coffee'
