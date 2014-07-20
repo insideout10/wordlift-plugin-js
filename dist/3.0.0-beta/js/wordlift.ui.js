@@ -5,30 +5,34 @@
 
   $.fn.extend({
     chord: function(options) {
-      var buildChord, container, getChordData, init, settings;
+      var buildChord, container, init, log, retrieveChordData, settings;
       settings = {
+        dataEndpoint: void 0,
         mainColor: '#777',
-        depth: 2
+        depth: 2,
+        maxLabelLength: 30,
+        maxWordLength: 5,
+        debug: false
       };
       settings = $.extend(settings, options);
       container = $(this);
-      init = function() {
-        return getChordData();
-      };
-      getChordData = function() {
-        return $.post(settings.ajax_url, {
-          action: settings.action,
-          post_id: settings.postId,
-          depth: settings.depth
-        }, function(data) {
-          return buildChord(data);
+      retrieveChordData = function() {
+        return $.ajax({
+          type: 'GET',
+          url: settings.dataEndpoint,
+          data: {
+            depth: settings.depth
+          },
+          success: function(response) {
+            return buildChord(response);
+          }
         });
       };
       buildChord = function(data) {
         var arc, beautifyLabel, chord, colorLuminance, e, entity, getEntityIndex, height, innerRadius, matrix, outerRadius, rad2deg, relation, rotate, sign, size, tooltip, translate, viz, width, x, y, _i, _j, _len, _len1, _ref, _ref1;
         if ((data.entities == null) || data.entities.length < 2) {
           container.hide();
-          console.log('No data found for the chord.');
+          log("No data found for the chord.");
           return;
         }
         translate = function(x, y, size) {
@@ -48,16 +52,14 @@
           }
         };
         beautifyLabel = function(words) {
-          var maxLabelLenght, maxWordLength, n, w, _i, _ref;
-          maxLabelLenght = 30;
-          if (words.length > maxLabelLenght) {
-            words = words.substring(0, maxLabelLenght) + '...';
+          var n, w, _i, _ref;
+          if (words.length > settings.maxLabelLength) {
+            words = words.substring(0, settings.maxLabelLength) + '...';
           }
           words = words.split(/\s/);
           n = [];
-          maxWordLength = 5;
           for (w = _i = 0, _ref = words.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; w = 0 <= _ref ? ++_i : --_i) {
-            if (words[w].length > maxWordLength || w === words.length - 1) {
+            if (words[w].length > settings.maxWordLength || w === words.length - 1) {
               n.push(words[w]);
             } else {
               words[w + 1] = words[w] + ' ' + words[w + 1];
@@ -114,7 +116,7 @@
           matrix[x][y] = 1;
           matrix[y][x] = 1;
         }
-        viz = d3.select('#' + settings.widget_id).append('svg');
+        viz = d3.select('#' + container.attr('id')).append('svg');
         viz.attr('width', '100%').attr('height', '100%');
         width = parseInt(viz.style('width'));
         height = parseInt(viz.style('height'));
@@ -194,17 +196,33 @@
           return window.location = url;
         });
       };
+      init = function() {
+        return retrieveChordData();
+      };
+      log = function(msg) {
+        if (settings.debug) {
+          return typeof console !== "undefined" && console !== null ? console.log(msg) : void 0;
+        }
+      };
       return init();
     }
   });
 
   jQuery(function($) {
     return $('.wl-chord').each(function() {
-      var params;
-      params = $(this).data();
-      params.widget_id = $(this).attr('id');
+      var element, params, url;
+      element = $(this);
+      params = element.data();
       $.extend(params, wl_chord_params);
-      return $(this).chord(params);
+      url = ("" + params.ajax_url + "?") + $.param({
+        'action': params.action,
+        'post_id': params.postId
+      });
+      return element.chord({
+        dataEndpoint: url,
+        depth: params.depth,
+        mainColor: params.mainColor
+      });
     });
   });
 
@@ -212,31 +230,46 @@
 
   $.fn.extend({
     timeline: function(options) {
-      var container, init, settings;
+      var buildTimeline, container, init, log, retrieveTimelineData, settings;
       settings = {
-        elemId: $(this).attr('id')
+        dataEndpoint: void 0,
+        width: '100%',
+        height: '600',
+        debug: false
       };
       settings = $.extend(settings, options);
       container = $(this);
-      init = function() {
-        return $.post(settings.ajax_url, {
-          action: settings.action,
-          post_id: settings.postId
-        }, function(data) {
-          if (data.timeline != null) {
-            return createStoryJS({
-              type: 'timeline',
-              width: '100%',
-              height: '600',
-              source: data,
-              embed_id: settings.elemId,
-              start_at_slide: data.startAtSlide
-            });
-          } else {
-            container.hide();
-            return console.log('Timeline not built.');
+      retrieveTimelineData = function() {
+        return $.ajax({
+          type: 'GET',
+          url: settings.dataEndpoint,
+          success: function(response) {
+            return buildTimeline(response);
           }
         });
+      };
+      buildTimeline = function(data) {
+        if (data.timeline != null) {
+          return createStoryJS({
+            type: 'timeline',
+            width: settings.width,
+            height: settings.height,
+            source: data,
+            embed_id: container.attr('id'),
+            start_at_slide: data.startAtSlide
+          });
+        } else {
+          container.hide();
+          log("Timeline data missing: timeline cannot be rendered");
+        }
+      };
+      init = function() {
+        return retrieveTimelineData();
+      };
+      log = function(msg) {
+        if (settings.debug) {
+          return typeof console !== "undefined" && console !== null ? console.log(msg) : void 0;
+        }
       };
       return init();
     }
@@ -244,12 +277,17 @@
 
   jQuery(function($) {
     return $('.wl-timeline').each(function() {
-      var elemId, params;
-      params = $(this).data();
-      elemId = $(this).attr('id');
-      params.elemId = elemId;
+      var element, params, url;
+      element = $(this);
+      params = element.data();
       $.extend(params, wl_timeline_params);
-      return $(this).timeline(params);
+      url = ("" + params.ajax_url + "?") + $.param({
+        'action': params.action,
+        'post_id': params.postId
+      });
+      return $(this).timeline({
+        dataEndpoint: url
+      });
     });
   });
 
@@ -259,9 +297,9 @@
     geomap: function(options) {
       var buildGeomap, container, init, log, retrieveGeomapData, settings;
       settings = {
-        url: '',
-        debug: false,
-        zoom: 13
+        dataEndpoint: void 0,
+        zoom: 13,
+        debug: false
       };
       settings = $.extend(settings, options);
       container = $(this);
@@ -270,7 +308,8 @@
       };
       retrieveGeomapData = function() {
         return $.ajax({
-          url: settings.url,
+          type: 'GET',
+          url: settings.dataEndpoint,
           success: function(response) {
             return buildGeomap(response);
           }
@@ -324,7 +363,7 @@
         'post_id': params.postId
       });
       return element.geomap({
-        url: url
+        dataEndpoint: url
       });
     });
   });

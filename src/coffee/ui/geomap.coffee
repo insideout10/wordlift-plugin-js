@@ -6,9 +6,9 @@ $.fn.extend
   geomap: (options) ->
     # Default settings
     settings =
-      url: ''
-      debug: false
+      dataEndpoint: undefined
       zoom: 13
+      debug: false
 
     # Merge default settings with options.
     settings = $.extend settings, options
@@ -22,11 +22,13 @@ $.fn.extend
     # Retrieve data from for map rendering
     retrieveGeomapData = ->
       $.ajax
-        url: settings.url
+        type: 'GET'
+        url: settings.dataEndpoint
         success: (response) ->
           buildGeomap response
 
     # Build a geoMap obj via Leaflet.js
+    # See: https://github.com/Leaflet/Leaflet
     buildGeomap = (data) ->
 
       # With features undefined or empty set the container as hidden and log a warning
@@ -76,4 +78,4 @@ jQuery ($) ->
     url = "#{params.ajax_url}?" + $.param( 'action': params.action, 'post_id': params.postId )
 
     element.geomap
-      url: url
+      dataEndpoint: url

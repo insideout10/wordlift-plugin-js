@@ -7,7 +7,10 @@ $.fn.extend
     
     # Default settings
     settings = {
-      elemId: $(@).attr('id');
+      dataEndpoint: undefined
+      width: '100%'
+      height: '600'
+      debug: false
     }
 
     # Merge default settings with options.
@@ -16,32 +19,48 @@ $.fn.extend
     # Create a reference to dom wrapper element
     container = $(@)
 
+    # Retrieve data from for timeline rendering
+    retrieveTimelineData = ->
+      $.ajax
+        type: 'GET'
+        url: settings.dataEndpoint
+        success: (response) ->
+          buildTimeline response
+
+    # Build a Timeline obj via TimelineJS
+    # See: https://github.com/NUKnightLab/TimelineJS
+    buildTimeline = (data) ->
+      if data.timeline?
+        createStoryJS
+          type: 'timeline'
+          width: settings.width
+          height: settings.height
+          source: data
+          embed_id: container.attr('id')
+          start_at_slide: data.startAtSlide 
+      else
+        container.hide()
+        log "Timeline data missing: timeline cannot be rendered"
+        return
+
     # Initialization method
     init = ->
-      # Get data via AJAX
-      $.post settings.ajax_url, { action: settings.action, post_id: settings.postId }, (data) ->
-        if data.timeline?
-          createStoryJS
-            type: 'timeline'
-            width: '100%'
-            height: '600'
-            source: data
-            embed_id: settings.elemId  # ID of the DIV you want to load the timeline into
-            start_at_slide: data.startAtSlide 
-        else
-          container.hide()
-          console.log 'Timeline not built.'
+      retrieveTimelineData()
+
+    # Simple logger 
+    log = (msg) ->
+      console?.log msg if settings.debug
 
     init()
 
 jQuery ($) ->
   $('.wl-timeline').each ->
-    # Get local params.
-    params = $(this).data()
-    elemId = $(this).attr('id')
-    params.elemId = elemId
-
-    # Merge local and global params.
+    element = $(@)
+    
+    params = element.data()
     $.extend params, wl_timeline_params
+    
+    url = "#{params.ajax_url}?" + $.param( 'action': params.action, 'post_id': params.postId )
 
-    $(this).timeline params
+    $(this).timeline
+      dataEndpoint: url

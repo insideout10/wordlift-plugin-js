@@ -48,6 +48,9 @@ window.wordlift = {} if not window.wordlift?
 window.wordlift.types = t;
 window.wordlift.entities = {}
 
+# Declared to be compliant with wordpress color picker
+wpColorPickerL10n = {}
+
 tinymce.init
 # General options
   mode: 'exact'

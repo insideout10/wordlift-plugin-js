@@ -1518,7 +1518,7 @@
   });
 
   jQuery(function($) {
-    $("body").append('<div id="wordlift_chord_dialog">' + '<form>' + '<p>' + '<input value="2" id="wordlift_chord_depth_field" readonly size="3">' + 'Depth: Max degree of separtation between entities.' + '<div id="wordlift_chord_depth_slider"></div>' + '</p><br>' + '<p>' + 'Base to generate the color palette of the Graph.<br>' + '<input type="text" value="#22f" id="wordlift_chord_color_field" size="4">' + '</p><br>' + '<p>' + '<input value="500" id="wordlift_chord_width_field" size="4">' + 'Width of the Graph in pixels.' + '</p><br>' + '<p>' + '<input value="500" id="wordlift_chord_height_field" size="4">' + 'Height of the Graph in pixels.' + '</p><br>' + '<p>' + '<input id="wordlift_chord_dialog_ok" type="button" value="Ok" width="100">' + '</p>' + '</form>' + '</div>');
+    $("body").append('<div id="wordlift_chord_dialog">\n<form>\n<p>    \n  <input value="2" id="wordlift_chord_depth_field" readonly size="3"> \n  Depth: Max degree of separtation between entities.\n</p>\n<div id="wordlift_chord_depth_slider"></div>\n<p>\n  Base to generate the color palette of the Graph.<br />\n  <input type="text" value="#22f" id="wordlift_chord_color_field" size="4">\n</p>\n<p>\n  <input value="500" id="wordlift_chord_width_field" size="4">\n  Width of the Graph in pixels\n</p>\n<p>\n  <input value="520" id="wordlift_chord_height_field" size="4">\n  Height of the Graph in pixels.\n</p>\n<p>\n  <input id="wordlift_chord_dialog_ok" type="button" value="Ok" width="100">\n</p>\n</form>\n</div>');
     $("#wordlift_chord_color_field").wpColorPicker({
       hide: true
     });
@@ -1538,7 +1538,7 @@
       height = $("#wordlift_chord_height_field").val();
       main_color = $("#wordlift_chord_color_field").val();
       depth = $("#wordlift_chord_depth_field").val();
-      shortcode_text = "[wl-chord width=" + width + "px" + " height=" + height + "px" + " main_color=" + main_color + " depth=" + depth + "]";
+      shortcode_text = "[wl-chord width=" + width + "px height= " + height + "px main_color=" + main_color + " depth=" + depth + "]";
       top.tinymce.activeEditor.execCommand("mceInsertContent", false, shortcode_text);
       $("#wordlift_chord_dialog").dialog("close");
     });

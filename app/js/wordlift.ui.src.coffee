@@ -5,8 +5,12 @@ $.fn.extend
   chord: (options) ->
     
     settings = {
+      dataEndpoint: undefined
       mainColor: '#777'
       depth: 2
+      maxLabelLength: 30
+      maxWordLength: 5
+      debug: false
     }
 
     # Merge default settings with options.
@@ -14,19 +18,20 @@ $.fn.extend
     
     # Create a reference to dom wrapper element
     container = $(@)
-
-    # Initialization method
-    init = ->
-      getChordData()
   
-    getChordData = ->
-      $.post settings.ajax_url, { action: settings.action, post_id: settings.postId, depth: settings.depth }, (data) ->
-        buildChord data
+    retrieveChordData = ->
+      $.ajax
+        type: 'GET'
+        url: settings.dataEndpoint
+        data:
+          depth: settings.depth
+        success: (response) ->
+          buildChord response
     
     buildChord = (data) ->
       if not data.entities? or data.entities.length < 2
         container.hide()
-        console.log 'No data found for the chord.'
+        log "No data found for the chord."
         return
       
       # define some service functions, then build the chord
@@ -42,18 +47,16 @@ $.fn.extend
       beautifyLabel = (words) ->
         # when labels are way too long, show only the first part of them
         # (the whole label will be displayed in the tooltip at mouseover) 
-        maxLabelLenght = 30
-        if words.length > maxLabelLenght
-          words = words.substring(0, maxLabelLenght) + '...'
+        if words.length > settings.maxLabelLength 
+          words = words.substring(0, settings.maxLabelLength) + '...'
         
         # split in words
         words = words.split(/\s/)
         
         # group shortest words
         n = []
-        maxWordLength = 5;
         for w in [0..words.length-1]
-          if words[w].length > maxWordLength or w is words.length-1
+          if words[w].length > settings.maxWordLength or w is words.length-1
             n.push words[w]
           else
             words[w+1] = words[w] + ' ' + words[w+1]
@@ -95,7 +98,7 @@ $.fn.extend
         matrix[x][y] = 1
         matrix[y][x] = 1
       
-      viz = d3.select('#' + settings.widget_id ).append('svg')
+      viz = d3.select('#' + container.attr('id') ).append('svg')
       viz.attr('width', '100%').attr('height', '100%')
     
       # Getting dimensions in pixels.
@@ -226,20 +229,32 @@ $.fn.extend
           window.location = url
         )
      
+     # Initialization method
+     init = ->
+      retrieveChordData()
+
+     # Simple logger 
+     log = (msg) ->
+      console?.log msg if settings.debug
+     
      # start chord operations   
      init()
 
 jQuery ($) ->
   $('.wl-chord').each ->
-    # Get local params.
-    params = $(this).data()
-    params.widget_id = $(this).attr('id');
     
-    # Merge local and global params.
+    element = $(@)
+    
+    params = element.data()
     $.extend params, wl_chord_params
     
+    url = "#{params.ajax_url}?" + $.param( 'action': params.action, 'post_id': params.postId )
+
     # Launch chord.
-    $(this).chord params
+    element.chord
+      dataEndpoint: url
+      depth: params.depth
+      mainColor: params.mainColor
 
 $ = jQuery
 
@@ -250,7 +265,10 @@ $.fn.extend
     
     # Default settings
     settings = {
-      elemId: $(@).attr('id');
+      dataEndpoint: undefined
+      width: '100%'
+      height: '600'
+      debug: false
     }
 
     # Merge default settings with options.
@@ -259,35 +277,51 @@ $.fn.extend
     # Create a reference to dom wrapper element
     container = $(@)
 
+    # Retrieve data from for timeline rendering
+    retrieveTimelineData = ->
+      $.ajax
+        type: 'GET'
+        url: settings.dataEndpoint
+        success: (response) ->
+          buildTimeline response
+
+    # Build a Timeline obj via TimelineJS
+    # See: https://github.com/NUKnightLab/TimelineJS
+    buildTimeline = (data) ->
+      if data.timeline?
+        createStoryJS
+          type: 'timeline'
+          width: settings.width
+          height: settings.height
+          source: data
+          embed_id: container.attr('id')
+          start_at_slide: data.startAtSlide 
+      else
+        container.hide()
+        log "Timeline data missing: timeline cannot be rendered"
+        return
+
     # Initialization method
     init = ->
-      # Get data via AJAX
-      $.post settings.ajax_url, { action: settings.action, post_id: settings.postId }, (data) ->
-        if data.timeline?
-          createStoryJS
-            type: 'timeline'
-            width: '100%'
-            height: '600'
-            source: data
-            embed_id: settings.elemId  # ID of the DIV you want to load the timeline into
-            start_at_slide: data.startAtSlide 
-        else
-          container.hide()
-          console.log 'Timeline not built.'
+      retrieveTimelineData()
+
+    # Simple logger 
+    log = (msg) ->
+      console?.log msg if settings.debug
 
     init()
 
 jQuery ($) ->
   $('.wl-timeline').each ->
-    # Get local params.
-    params = $(this).data()
-    elemId = $(this).attr('id')
-    params.elemId = elemId
-
-    # Merge local and global params.
+    element = $(@)
+    
+    params = element.data()
     $.extend params, wl_timeline_params
+    
+    url = "#{params.ajax_url}?" + $.param( 'action': params.action, 'post_id': params.postId )
 
-    $(this).timeline params
+    $(this).timeline
+      dataEndpoint: url
 $ = jQuery
 
 # Add a geomap plugin object to jQuery
@@ -296,9 +330,9 @@ $.fn.extend
   geomap: (options) ->
     # Default settings
     settings =
-      url: ''
-      debug: false
+      dataEndpoint: undefined
       zoom: 13
+      debug: false
 
     # Merge default settings with options.
     settings = $.extend settings, options
@@ -312,11 +346,13 @@ $.fn.extend
     # Retrieve data from for map rendering
     retrieveGeomapData = ->
       $.ajax
-        url: settings.url
+        type: 'GET'
+        url: settings.dataEndpoint
         success: (response) ->
           buildGeomap response
 
     # Build a geoMap obj via Leaflet.js
+    # See: https://github.com/Leaflet/Leaflet
     buildGeomap = (data) ->
 
       # With features undefined or empty set the container as hidden and log a warning
@@ -366,4 +402,4 @@ jQuery ($) ->
     url = "#{params.ajax_url}?" + $.param( 'action': params.action, 'post_id': params.postId )
 
     element.geomap
-      url: url
+      dataEndpoint: url

@@ -8,7 +8,7 @@ describe "GeoMap Ui Component Unit Test", ->
     $(document.body).append $(domElement)
   )
 
-  afterEach inject(->
+  afterEach inject(-> 
     $( "#map" ).remove()
   )
 

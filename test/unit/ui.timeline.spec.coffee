@@ -41,4 +41,4 @@ describe "Timeline Ui Component Unit Test", ->
     expect(jQuery.ajax).toHaveBeenCalled()
     # HTML container is hidden
     expect(domElement.is(":visible")).toBeTruthy()
-    console.log domElement.find("#timeline")
+    
