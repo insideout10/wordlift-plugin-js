@@ -739,7 +739,7 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
             $log.info textAnnotation
             return 
           
-          ed.selection.setContent "<span id=\"#{textAnnotation.id}\" class=\"#{TEXT_ANNOTATION}\">#{textAnnotation.text}</span>"
+          ed.selection.setContent "<span id=\"#{textAnnotation.id}\" class=\"#{TEXT_ANNOTATION}\">#{ed.selection.getContent()}</span>"
 
           # Send a message about the new textAnnotation.
           $rootScope.$broadcast 'textAnnotationAdded', textAnnotation
