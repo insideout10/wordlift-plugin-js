@@ -125,7 +125,7 @@ $(
         # execute the following commands in the angular js context.
         $rootScope.$apply(->
           # send a message about the currently clicked annotation.
-          $rootScope.$broadcast 'textAnnotationClicked', e.target.id, e
+          $rootScope.$broadcast 'textAnnotationClicked', e.target.id
         )
       ])
 )

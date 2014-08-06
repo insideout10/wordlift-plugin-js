@@ -373,7 +373,16 @@
       };
       service.addTextAnnotation = function(analysis, textAnnotation) {
         analysis.textAnnotations[textAnnotation.id] = textAnnotation;
-        return textAnnotation;
+        return analysis;
+      };
+      service.createAnEmptyAnalysis = function() {
+        return {
+          language: '',
+          entities: {},
+          entityAnnotations: {},
+          textAnnotations: {},
+          languages: []
+        };
       };
       service.enhance = function(analysis, textAnnotation, entityAnnotation) {
         var ea, entityAnnotations, id, _ref;
@@ -691,13 +700,13 @@
           editor().getBody().setAttribute(CONTENT_EDITABLE, false);
           return AnalysisService.analyze(content, true);
         },
-        getWinPos: function(elem) {
-          var ed, el;
+        getWinPos: function(textAnnotationId) {
+          var ed, textAnnotationPos;
           ed = editor();
-          el = elem.target;
+          textAnnotationPos = ed.dom.getPos(textAnnotationId);
           return {
-            top: $(CONTENT_IFRAME).offset().top - $('body').scrollTop() + el.offsetTop - $(ed.getBody()).scrollTop(),
-            left: $(CONTENT_IFRAME).offset().left - $('body').scrollLeft() + el.offsetLeft - $(ed.getBody()).scrollLeft()
+            top: $(CONTENT_IFRAME).offset().top - $('body').scrollTop() + textAnnotationPos.y - $(ed.getBody()).scrollTop(),
+            left: $(CONTENT_IFRAME).offset().left - $('body').scrollLeft() + textAnnotationPos.x - $(ed.getBody()).scrollLeft()
           };
         }
       };
@@ -1290,14 +1299,14 @@
     'AnalysisService', 'EntityAnnotationService', 'EditorService', '$http', '$log', '$scope', '$rootScope', function(AnalysisService, EntityAnnotationService, EditorService, $http, $log, $scope, $rootScope) {
       var el, scroll, setArrowTop;
       $scope.isRunning = false;
-      $scope.analysis = null;
+      $scope.analysis = AnalysisService.createAnEmptyAnalysis();
       $scope.textAnnotation = null;
       $scope.textAnnotationSpan = null;
       $scope.newEntity = {
         label: null,
         type: null
       };
-      $scope.activeToolbarTab = 'Search for entities';
+      $scope.activeToolbarTab = 'Add new entity';
       $scope.isActiveToolbarTab = function(tab) {
         return $scope.activeToolbarTab === tab;
       };
@@ -1390,20 +1399,17 @@
         return $scope.knownTypes = types;
       });
       $scope.$on('textAnnotationAdded', function(event, textAnnotation) {
-        if (!$scope.analysis) {
-          $rootScope.$broadcast('error', 'You must analyze the document before adding new entity ...');
-          return;
-        }
-        return $scope.textAnnotation = AnalysisService.addTextAnnotation($scope.analysis, textAnnotation);
+        AnalysisService.addTextAnnotation($scope.analysis, textAnnotation);
+        return $scope.$broadcast('textAnnotationClicked', textAnnotation.id);
       });
-      return $scope.$on('textAnnotationClicked', function(event, id, sourceElement) {
+      return $scope.$on('textAnnotationClicked', function(event, textAnnotationId) {
         var pos, _ref, _ref1, _ref2;
-        $scope.textAnnotation = (_ref = $scope.analysis) != null ? _ref.textAnnotations[id] : void 0;
+        $scope.textAnnotation = (_ref = $scope.analysis) != null ? _ref.textAnnotations[textAnnotationId] : void 0;
         $scope.newEntity.label = (_ref1 = $scope.textAnnotation) != null ? _ref1.text : void 0;
         if (((_ref2 = $scope.textAnnotation) != null ? _ref2.entityAnnotations : void 0) == null) {
           return $('#wordlift-disambiguation-popover').hide();
         } else {
-          pos = EditorService.getWinPos(sourceElement);
+          pos = EditorService.getWinPos(textAnnotationId);
           setArrowTop(pos.top - 50);
           return $('#wordlift-disambiguation-popover').show();
         }
@@ -1487,7 +1493,7 @@
       return injector.invoke([
         '$rootScope', function($rootScope) {
           return $rootScope.$apply(function() {
-            return $rootScope.$broadcast('textAnnotationClicked', e.target.id, e);
+            return $rootScope.$broadcast('textAnnotationClicked', e.target.id);
           });
         }
       ]);

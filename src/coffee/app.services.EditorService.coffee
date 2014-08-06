@@ -149,15 +149,15 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
 
       # get the window position of an element inside the editor.
       # @param element elem The element.
-        getWinPos: (elem) ->
+        getWinPos: (textAnnotationId) ->
           # get a reference to the editor and its body
           ed = editor()
-          el = elem.target
-
+          # Calculate textAnnotation absolute position within the editor
+          textAnnotationPos = ed.dom.getPos(textAnnotationId)
           # Return the coordinates.
           {
-            top: $(CONTENT_IFRAME).offset().top - $('body').scrollTop() + el.offsetTop - $(ed.getBody()).scrollTop()
-            left: $(CONTENT_IFRAME).offset().left - $('body').scrollLeft() + el.offsetLeft - $(ed.getBody()).scrollLeft()
+            top: $(CONTENT_IFRAME).offset().top - $('body').scrollTop() + textAnnotationPos.y - $(ed.getBody()).scrollTop()
+            left: $(CONTENT_IFRAME).offset().left - $('body').scrollLeft() + textAnnotationPos.x - $(ed.getBody()).scrollLeft()
           }
 
 

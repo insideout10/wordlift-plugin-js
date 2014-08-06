@@ -54,7 +54,17 @@ angular.module('AnalysisService', ['wordlift.tinymce.plugin.services.EntityServi
         # Enhance analysis with a new text annotation
         service.addTextAnnotation = (analysis, textAnnotation)->
           analysis.textAnnotations[textAnnotation.id] = textAnnotation
-          textAnnotation
+          analysis
+        
+        # Create a fake analysis
+        service.createAnEmptyAnalysis = ()->
+          {
+          language: ''
+          entities: {}
+          entityAnnotations: {}
+          textAnnotations: {}
+          languages: []
+          }
 
         # Enhance analysis with a new entity annotation
         service.enhance = (analysis, textAnnotation, entityAnnotation)->

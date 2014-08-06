@@ -464,7 +464,17 @@ angular.module('AnalysisService', ['wordlift.tinymce.plugin.services.EntityServi
         # Enhance analysis with a new text annotation
         service.addTextAnnotation = (analysis, textAnnotation)->
           analysis.textAnnotations[textAnnotation.id] = textAnnotation
-          textAnnotation
+          analysis
+        
+        # Create a fake analysis
+        service.createAnEmptyAnalysis = ()->
+          {
+          language: ''
+          entities: {}
+          entityAnnotations: {}
+          textAnnotations: {}
+          languages: []
+          }
 
         # Enhance analysis with a new entity annotation
         service.enhance = (analysis, textAnnotation, entityAnnotation)->
@@ -814,15 +824,15 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
 
       # get the window position of an element inside the editor.
       # @param element elem The element.
-        getWinPos: (elem) ->
+        getWinPos: (textAnnotationId) ->
           # get a reference to the editor and its body
           ed = editor()
-          el = elem.target
-
+          # Calculate textAnnotation absolute position within the editor
+          textAnnotationPos = ed.dom.getPos(textAnnotationId)
           # Return the coordinates.
           {
-            top: $(CONTENT_IFRAME).offset().top - $('body').scrollTop() + el.offsetTop - $(ed.getBody()).scrollTop()
-            left: $(CONTENT_IFRAME).offset().left - $('body').scrollLeft() + el.offsetLeft - $(ed.getBody()).scrollLeft()
+            top: $(CONTENT_IFRAME).offset().top - $('body').scrollTop() + textAnnotationPos.y - $(ed.getBody()).scrollTop()
+            left: $(CONTENT_IFRAME).offset().left - $('body').scrollLeft() + textAnnotationPos.x - $(ed.getBody()).scrollLeft()
           }
 
 
@@ -1381,7 +1391,7 @@ angular.module('wordlift.tinymce.plugin.controllers',
 
     $scope.isRunning = false
     # holds a reference to the current analysis results.
-    $scope.analysis = null
+    $scope.analysis = AnalysisService.createAnEmptyAnalysis()
     # holds a reference to the selected text annotation.
     $scope.textAnnotation = null
     # holds a reference to the selected text annotation span.
@@ -1393,7 +1403,7 @@ angular.module('wordlift.tinymce.plugin.controllers',
     }
 
     # Toolbar
-    $scope.activeToolbarTab = 'Search for entities'
+    $scope.activeToolbarTab = 'Add new entity'
     $scope.isActiveToolbarTab  = (tab)->
       $scope.activeToolbarTab is tab
     $scope.setActiveToolbarTab  = (tab)->
@@ -1482,29 +1492,30 @@ angular.module('wordlift.tinymce.plugin.controllers',
     $scope.$on 'configurationTypesLoaded', (event, types)->
       $scope.knownTypes = types
 
-    # When a text annotation is added, open the disambiguation popover.
+    # When a text annotation is added, enhance current analysis 
+    # and open the disambiguation popover.
     $scope.$on 'textAnnotationAdded', (event, textAnnotation) ->
-      unless $scope.analysis
-        $rootScope.$broadcast 'error', 'You must analyze the document before adding new entity ...'
-        return 
-      $scope.textAnnotation = AnalysisService.addTextAnnotation $scope.analysis, textAnnotation
-      
+      # Add the text annotation to the current analysis
+      AnalysisService.addTextAnnotation $scope.analysis, textAnnotation
+      # Simulate a text annotation click event in order to open the popover
+      $scope.$broadcast 'textAnnotationClicked', textAnnotation.id
+     
     # When a text annotation is clicked, open the disambiguation popover.
-    $scope.$on 'textAnnotationClicked', (event, id, sourceElement) ->
+    $scope.$on 'textAnnotationClicked', (event, textAnnotationId) ->
 
       # Set the current text annotation to the one specified.
-      $scope.textAnnotation = $scope.analysis?.textAnnotations[id]
+      $scope.textAnnotation = $scope.analysis?.textAnnotations[textAnnotationId]
       # Set default new entity label accordingly to the current textAnnotation Text
       $scope.newEntity.label = $scope.textAnnotation?.text
 
       # hide the popover if there are no entities.
-      if not $scope.textAnnotation?.entityAnnotations? #or 0 is Object.keys($scope.textAnnotation.entityAnnotations).length
+      if not $scope.textAnnotation?.entityAnnotations? 
         $('#wordlift-disambiguation-popover').hide()
         # show the popover.
       else
 
         # get the position of the clicked element.
-        pos = EditorService.getWinPos(sourceElement)
+        pos = EditorService.getWinPos(textAnnotationId)
         # set the popover arrow to the element position.
         setArrowTop(pos.top - 50)
         # show the popover.
@@ -1658,7 +1669,7 @@ $(
         # execute the following commands in the angular js context.
         $rootScope.$apply(->
           # send a message about the currently clicked annotation.
-          $rootScope.$broadcast 'textAnnotationClicked', e.target.id, e
+          $rootScope.$broadcast 'textAnnotationClicked', e.target.id
         )
       ])
 )
