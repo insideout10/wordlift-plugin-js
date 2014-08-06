@@ -21,6 +21,13 @@ describe "EditorController tests", ->
     AnalysisService.setKnownTypes window.wordlift.types
   )
 
+  it "loads an empty analysis object on bootstrap", inject((AnalysisService) ->
+    # Expect the current analysis id not undefined
+    expect($scope.analysis).not.toBe undefined
+    # Expect the current analysis is an empty analysis object
+    expect($scope.analysis).toEqual AnalysisService.createAnEmptyAnalysis() 
+  )
+
   it "loads an analysis", inject((AnalysisService, $httpBackend, $rootScope) ->
 
     $.ajax('base/app/assets/english.json', async: false).done (data) ->
@@ -90,3 +97,22 @@ describe "EditorController tests", ->
         expect($('#wordlift-disambiguation-popover')).toBeVisible()
   )
 
+  it "add a new text annotation to the current analysis object", inject((AnalysisService, $rootScope) ->
+    # Define a fake textAnnotation object
+    textAnnotation = { 
+      id: 'foo' 
+      start: 10
+      end: 20
+    }
+    
+    # Check that there are no text annotations in the current analysis with the given id
+    expect($scope.analysis.textAnnotations['foo']).toBe undefined   
+    # Simulate the EditorService behaviour
+    $rootScope.$broadcast 'textAnnotationAdded', textAnnotation
+    # Check if the current analysis has been properly enhanced
+    expect($scope.analysis.textAnnotations['foo']).not.toBe undefined
+    expect($scope.analysis.textAnnotations['foo']).toEqual textAnnotation
+    # Check if textAnnotationAdded event is properly fired
+    expect($scope.$broadcast).toHaveBeenCalledWith 'textAnnotationClicked',  textAnnotation.id 
+        
+  )
