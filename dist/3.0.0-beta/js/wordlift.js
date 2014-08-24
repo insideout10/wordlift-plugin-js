@@ -39,10 +39,8 @@
         textPost = htmlPost;
         textLength += textPre.length;
         htmlLength += htmlPre.length + htmlElem.length;
-        if (0 < htmlPost.length) {
-          this._htmlPositions.push(htmlLength);
-          this._textPositions.push(textLength);
-        }
+        this._htmlPositions.push(htmlLength);
+        this._textPositions.push(textLength);
         textLength += textPost.length;
         htmlLength += htmlPost.length;
         this._text += textPre + textPost;

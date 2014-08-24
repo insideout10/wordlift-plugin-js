@@ -48,10 +48,9 @@ class Traslator
       # For html add the length of the html element.
       htmlLength += htmlPre.length + htmlElem.length
 
-      # If there's a text after the elem, add the position, otherwise skip this one.
-      if 0 < htmlPost.length
-        @_htmlPositions.push htmlLength
-        @_textPositions.push textLength
+      # Add the position.
+      @_htmlPositions.push htmlLength
+      @_textPositions.push textLength
 
       textLength += textPost.length
       htmlLength += htmlPost.length
@@ -90,6 +89,8 @@ class Traslator
 
   # Get the text position, given an html position.
   html2text: (pos) ->
+#    dump @_htmlPositions
+#    dump @_textPositions
 
     # Return 0 if the specified html position is less than the first HTML position.
     return 0 if pos < @_htmlPositions[0]
