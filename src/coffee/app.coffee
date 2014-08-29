@@ -39,7 +39,7 @@ $(
                   </div>
                   <div class="ui-widget right">
                     <i class="wl-spinner" ng-show="isRunning"></i>
-                    <button ng-click="onNewEntityCreate(newEntity)">Save the entity</button>
+                    <button ng-click="onNewEntityCreate(newEntity)">Save Entity</button>
                   </div>
                 </div>
               </div>
