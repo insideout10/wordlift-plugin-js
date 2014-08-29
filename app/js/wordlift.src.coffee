@@ -1559,7 +1559,7 @@ $(
       <div id="wordlift-disambiguation-popover" class="metabox-holder" ng-controller="EntitiesController">
         <div class="postbox">
           <div class="handlediv" title="Click to toggle"><br></div>
-          <h3 class="hndle"><span>Semantic Web</span></h3>
+          <h3 class="hndle"><span>Entity Reconciliation</span></h3>
           <div class="ui-widget toolbar">
             <span class="wl-active-tab" ng-bind="activeToolbarTab" />
             <i ng-class="{'selected' : isActiveToolbarTab('Search for entities')}" ng-click="setActiveToolbarTab('Search for entities')" class="wl-search-toolbar-icon" />
