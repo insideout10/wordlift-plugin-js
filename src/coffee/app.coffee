@@ -80,7 +80,11 @@ $(
 
   # Add WordLift as a plugin of the TinyMCE editor.
   tinymce.PluginManager.add 'wordlift', (editor, url) ->
-
+    editor.onLoadContent.add((ed, o) ->
+      injector.invoke(['EditorService', (EditorService) ->
+        EditorService.createDefaultAnalysis()
+      ])
+    )
     # Add a WordLift button the TinyMCE editor.
     # TODO Disable the new button as default
     editor.addButton 'wordlift_add_entity',

@@ -446,6 +446,9 @@ angular.module('AnalysisService', ['wordlift.tinymce.plugin.services.EntityServi
         # Set the local entity collection.
         service.setEntities = (entities) ->
           @_entities = entities
+        # Get the local entity collection.
+        service.getEntities = () ->
+          @_entities
 
         # Set the known types.
         service.setKnownTypes = (types) ->
@@ -676,7 +679,7 @@ angular.module('AnalysisService', ['wordlift.tinymce.plugin.services.EntityServi
 
 angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tinymce.plugin.config', 'AnalysisService', 'LoggerService'])
 .service('EditorService',
-    ['AnalysisService', 'EntityAnnotationService', 'LoggerService', 'TextAnnotationService', '$rootScope', '$log', (AnalysisService, EntityAnnotationService, logger, TextAnnotationService, $rootScope, $log) ->
+    ['AnalysisService', 'EntityService', 'EntityAnnotationService', 'LoggerService', 'TextAnnotationService', '$rootScope', '$log', (AnalysisService, EntityService, EntityAnnotationService, logger, TextAnnotationService, $rootScope, $log) ->
 
       editor = ->
         tinyMCE.get(EDITOR_ID)
@@ -755,15 +758,40 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
           # Send a message about the new textAnnotation.
           $rootScope.$broadcast 'textAnnotationAdded', textAnnotation
 
+        # Create an analysis obj representing disambiguated entities in the editor text
+        createDefaultAnalysis: ()->
+
+          # A reference to the editor.
+          ed = editor()
+          # Get the TinyMCE editor html content.
+          html = ed.getContent format: 'raw'
+          # Create an empty analysis analysis
+          analysis = AnalysisService.createAnEmptyAnalysis()
+          # Hold a reference to local entity storage
+          entities = AnalysisService.getEntities()
+          # For each entity detected in the editor text ...
+          for inTextEntity in findEntities(html)
+            # Add a text annotation to the analysis
+            ta = TextAnnotationService.findOrCreate analysis.textAnnotations, inTextEntity
+            # Retrieve related entity obj from the storage
+            localEntities = EntityService.find entities, uri: inTextEntity.uri              
+            # Create an entity annotation 
+            ea = EntityAnnotationService.create { 'entity': localEntities[0] }
+            # Enhance current analysis properly 
+            AnalysisService.enhance(analysis, ta, ea) 
+
+          # Fire analysis to controller 
+          $rootScope.$broadcast ANALYSIS_EVENT, analysis
+          # Return the analysis
+          analysis
+
         # Embed the provided analysis in the editor.
         embedAnalysis: (analysis) =>
 
           # A reference to the editor.
           ed = editor()
-
           # Get the TinyMCE editor html content.
           html = ed.getContent format: 'raw'
-
           # Find existing entities.
           entities = findEntities html
 
@@ -1625,7 +1653,11 @@ $(
 
   # Add WordLift as a plugin of the TinyMCE editor.
   tinymce.PluginManager.add 'wordlift', (editor, url) ->
-
+    editor.onLoadContent.add((ed, o) ->
+      injector.invoke(['EditorService', (EditorService) ->
+        EditorService.createDefaultAnalysis()
+      ])
+    )
     # Add a WordLift button the TinyMCE editor.
     # TODO Disable the new button as default
     editor.addButton 'wordlift_add_entity',

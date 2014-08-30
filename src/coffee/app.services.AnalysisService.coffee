@@ -35,6 +35,9 @@ angular.module('AnalysisService', ['wordlift.tinymce.plugin.services.EntityServi
         # Set the local entity collection.
         service.setEntities = (entities) ->
           @_entities = entities
+        # Get the local entity collection.
+        service.getEntities = () ->
+          @_entities
 
         # Set the known types.
         service.setKnownTypes = (types) ->

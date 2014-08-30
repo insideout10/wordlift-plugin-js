@@ -356,6 +356,9 @@
       service.setEntities = function(entities) {
         return this._entities = entities;
       };
+      service.getEntities = function() {
+        return this._entities;
+      };
       service.setKnownTypes = function(types) {
         this._knownTypes = types;
         $rootScope.$broadcast(CONFIGURATION_TYPES_EVENT, types);
@@ -575,7 +578,7 @@
   ]);
 
   angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tinymce.plugin.config', 'AnalysisService', 'LoggerService']).service('EditorService', [
-    'AnalysisService', 'EntityAnnotationService', 'LoggerService', 'TextAnnotationService', '$rootScope', '$log', function(AnalysisService, EntityAnnotationService, logger, TextAnnotationService, $rootScope, $log) {
+    'AnalysisService', 'EntityService', 'EntityAnnotationService', 'LoggerService', 'TextAnnotationService', '$rootScope', '$log', function(AnalysisService, EntityService, EntityAnnotationService, logger, TextAnnotationService, $rootScope, $log) {
       var editor, findEntities, service, walkback;
       editor = function() {
         return tinyMCE.get(EDITOR_ID);
@@ -647,6 +650,29 @@
           }
           ed.selection.setContent("<span id=\"" + textAnnotation.id + "\" class=\"" + TEXT_ANNOTATION + "\">" + (ed.selection.getContent()) + "</span>");
           return $rootScope.$broadcast('textAnnotationAdded', textAnnotation);
+        },
+        createDefaultAnalysis: function() {
+          var analysis, ea, ed, entities, html, inTextEntity, localEntities, ta, _i, _len, _ref;
+          ed = editor();
+          html = ed.getContent({
+            format: 'raw'
+          });
+          analysis = AnalysisService.createAnEmptyAnalysis();
+          entities = AnalysisService.getEntities();
+          _ref = findEntities(html);
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            inTextEntity = _ref[_i];
+            ta = TextAnnotationService.findOrCreate(analysis.textAnnotations, inTextEntity);
+            localEntities = EntityService.find(entities, {
+              uri: inTextEntity.uri
+            });
+            ea = EntityAnnotationService.create({
+              'entity': localEntities[0]
+            });
+            AnalysisService.enhance(analysis, ta, ea);
+          }
+          $rootScope.$broadcast(ANALYSIS_EVENT, analysis);
+          return analysis;
         },
         embedAnalysis: (function(_this) {
           return function(analysis) {
@@ -1454,6 +1480,13 @@
       }
     }
   ]), tinymce.PluginManager.add('wordlift', function(editor, url) {
+    editor.onLoadContent.add(function(ed, o) {
+      return injector.invoke([
+        'EditorService', function(EditorService) {
+          return EditorService.createDefaultAnalysis();
+        }
+      ]);
+    });
     editor.addButton('wordlift_add_entity', {
       classes: 'widget btn wordlift_add_entity',
       text: ' ',
