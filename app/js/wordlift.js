@@ -579,7 +579,7 @@
 
   angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tinymce.plugin.config', 'AnalysisService', 'LoggerService']).service('EditorService', [
     'AnalysisService', 'EntityService', 'EntityAnnotationService', 'LoggerService', 'TextAnnotationService', '$rootScope', '$log', function(AnalysisService, EntityService, EntityAnnotationService, logger, TextAnnotationService, $rootScope, $log) {
-      var editor, findEntities, service, walkback;
+      var editor, findEntities, service;
       editor = function() {
         return tinyMCE.get(EDITOR_ID);
       };
@@ -598,57 +598,30 @@
         }
         return _results;
       };
-      walkback = function(node, stopAt) {
-        if (node.childNodes && node.childNodes.length) {
-          while (node && node.childNodes.length > 0) {
-            node = node.childNodes[node.childNodes.length - 1];
-          }
-        } else if (node.previousSibling) {
-          node = node.previousSibling;
-        } else if (node.parentNode) {
-          while (node && !node.previousSibling && node.parentNode) {
-            node = node.parentNode;
-          }
-          if (node === stopAt) {
-            return;
-          }
-          node = node.previousSibling;
-        } else {
-          return;
-        }
-        if (node) {
-          if (node.nodeType === TEXT_HTML_NODE_TYPE) {
-            return node;
-          }
-          if (node === stopAt) {
-            return;
-          }
-          return walkback(node, stopAt);
-        }
-      };
       service = {
         createTextAnnotationFromCurrentSelection: function() {
-          var ed, end, node, selection, start, text, textAnnotation;
+          var content, ed, htmlPosition, text, textAnnotation, textAnnotationSpan, textPosition, traslator;
           ed = editor();
-          selection = ed.getWin().getSelection();
-          text = selection.toString();
-          node = selection.anchorNode;
-          start = selection.anchorNode.nodeType === TEXT_HTML_NODE_TYPE ? selection.anchorOffset : 0;
-          while (node = walkback(node, ed.getBody())) {
-            start = start + node.data.length;
-          }
-          end = start + text.length;
-          textAnnotation = TextAnnotationService.create({
-            start: start,
-            end: end,
-            text: text
-          });
-          if (start === end) {
+          if (ed.selection.isCollapsed()) {
             $log.warn("Invalid selection! The text annotation cannot be created");
-            $log.info(textAnnotation);
             return;
           }
-          ed.selection.setContent("<span id=\"" + textAnnotation.id + "\" class=\"" + TEXT_ANNOTATION + "\">" + (ed.selection.getContent()) + "</span>");
+          text = "" + (ed.selection.getSel());
+          textAnnotation = TextAnnotationService.create({
+            text: text
+          });
+          textAnnotationSpan = "<span id=\"" + textAnnotation.id + "\" class=\"" + TEXT_ANNOTATION + "\">" + (ed.selection.getContent()) + "</span>";
+          ed.selection.setContent(textAnnotationSpan);
+          content = ed.getContent({
+            format: "html"
+          });
+          traslator = Traslator.create(content);
+          htmlPosition = content.indexOf(textAnnotationSpan);
+          textPosition = traslator.html2text(htmlPosition);
+          textAnnotation.start = textPosition;
+          textAnnotation.end = textAnnotation.start + text.length;
+          $log.debug("New text annotation created!");
+          $log.debug(textAnnotation);
           return $rootScope.$broadcast('textAnnotationAdded', textAnnotation);
         },
         createDefaultAnalysis: function() {

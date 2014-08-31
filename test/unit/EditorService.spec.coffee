@@ -34,10 +34,8 @@ describe "EditorService tests", ->
    expect($rootScope.$broadcast).toHaveBeenCalledWith 'textAnnotationAdded', jasmine.any(Object)
    # Retrieve the textAnnotation
    textAnnotation = $rootScope.$broadcast.calls.mostRecent().args[1]
-   # Check if the TextAnnotation is configured properly
-   # TO DO - Check on Firefox
-   # expect(textAnnotation.start).toBe 25
-   # expect(textAnnotation.end).toBe 33
+   expect(textAnnotation.start).toBe 25
+   expect(textAnnotation.end).toBe 33
    expect(textAnnotation.text).toBe 'New York'
    # Check if the editor content is properly updated
    expect(ed.getContent()).toBe "<p>Just a simple text about <span id=\"#{textAnnotation.id}\" class=\"textannotation\"><em>#{textAnnotation.text}</em></span> and <em>Los Angeles</em></p>"

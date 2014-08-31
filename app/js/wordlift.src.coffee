@@ -703,25 +703,6 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
             label: match[3]
           }
         )
-      # Service method used to calculate the start offset for the current selection
-      # in createTextAnnotationFromCurrentSelection
-      walkback = (node, stopAt) ->
-
-        if node.childNodes and node.childNodes.length # go to last child
-          node = node.childNodes[node.childNodes.length - 1]  while node and node.childNodes.length > 0
-        else if node.previousSibling # else go to previous node
-          node = node.previousSibling
-        else if node.parentNode # else go to previous branch
-          node = node.parentNode while node and not node.previousSibling and node.parentNode
-          return if node is stopAt
-          node = node.previousSibling
-        else # nowhere to go
-          return
-        if node
-          return node if node.nodeType is TEXT_HTML_NODE_TYPE
-          return if node is stopAt
-          return walkback(node, stopAt)
-        return
 
       # Define the EditorService.
       service =
@@ -729,32 +710,37 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
         createTextAnnotationFromCurrentSelection: ()->
           # A reference to the editor.
           ed = editor()
-          # Retrieve the current selection
-          selection = ed.getWin().getSelection()
+          # If the current selection is collapsed / blank, then nothing to do
+          if ed.selection.isCollapsed()
+            $log.warn "Invalid selection! The text annotation cannot be created"
+            return 
           # Retrieve the selected text
-          text = selection.toString()
-          # Retrieve the current selection text node 
-          node = selection.anchorNode
-          # Calculate the initial offset relative to 'node'
-          start = if selection.anchorNode.nodeType is TEXT_HTML_NODE_TYPE then selection.anchorOffset else 0
-          # Calculate the start position
-          start = start + node.data.length while node = walkback(node, ed.getBody()) 
-          # Calculate the end position
-          end = start + text.length
-
+          # Notice that toString() method of browser native selection obj is used
+          text = "#{ed.selection.getSel()}"
           # Create the text annotation
           textAnnotation = TextAnnotationService.create { 
-            start: start
-            end: end
             text: text
           }
-          if start is end
-            $log.warn "Invalid selection! The text annotation cannot be created"
-            $log.info textAnnotation
-            return 
+          # Prepare span wrapper for the new text annotation
+          textAnnotationSpan = "<span id=\"#{textAnnotation.id}\" class=\"#{TEXT_ANNOTATION}\">#{ed.selection.getContent()}</span>"
+          # Update the content within the editor
+          ed.selection.setContent(textAnnotationSpan)
+          # Retrieve the current heml content
+          content = ed.getContent({format: "html"})
+          # Create a Traslator instance
+          traslator =  Traslator.create content
+          # Retrieve the index position of the new span
+          htmlPosition = content.indexOf(textAnnotationSpan);
+          # Detect the coresponding text position
+          textPosition = traslator.html2text(htmlPosition)
           
-          ed.selection.setContent "<span id=\"#{textAnnotation.id}\" class=\"#{TEXT_ANNOTATION}\">#{ed.selection.getContent()}</span>"
-
+          # Set start & end text annotation properties
+          textAnnotation.start = textPosition 
+          textAnnotation.end = textAnnotation.start + text.length
+          
+          $log.debug "New text annotation created!"
+          $log.debug textAnnotation
+          
           # Send a message about the new textAnnotation.
           $rootScope.$broadcast 'textAnnotationAdded', textAnnotation
 
