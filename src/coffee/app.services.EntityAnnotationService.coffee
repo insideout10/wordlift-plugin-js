@@ -1,6 +1,6 @@
 angular.module('wordlift.tinymce.plugin.services.EntityAnnotationService', [])
-.service('EntityAnnotationService', [ 'Helpers', (h) ->
-
+.service('EntityAnnotationService', [ 'EntityAnnotationConfidenceService', 'Helpers', 'LoggerService', (EntityAnnotationConfidenceService, h, LoggerService) ->
+      
     service = {}
 
     # Create an entity annotation using the provided params.
@@ -9,7 +9,7 @@ angular.module('wordlift.tinymce.plugin.services.EntityAnnotationService', [])
       defaults =
         id: 'uri:local-entity-annotation-' + h.uniqueId(32)
         label: ''
-        confidence: 0.0
+        confidence: EntityAnnotationConfidenceService.getDefault()
         entity: null
         relation: null
         selected: false
@@ -19,7 +19,11 @@ angular.module('wordlift.tinymce.plugin.services.EntityAnnotationService', [])
       params.entity.label = params.label if params.entity? and not params.entity.label?
 
       # Merge the params with the default settings.
-      h.merge defaults, params
+      entityAnnotation = h.merge defaults, params
+      # Enhance confidence rate depending on related entity properties
+      EntityAnnotationConfidenceService.enhanceConfidenceFor entityAnnotation
+
+      entityAnnotation
 
     ###*
      * Create an entity annotation. An entity annotation is created for each related text-annotation.
@@ -60,7 +64,7 @@ angular.module('wordlift.tinymce.plugin.services.EntityAnnotationService', [])
         # Accumulate the annotations.
         annotations.push entityAnnotation
 
-      # Return the  entity annotations.
+      # Return the entity annotations.
       annotations
 
     # Find an entity annotation with the provided filters.

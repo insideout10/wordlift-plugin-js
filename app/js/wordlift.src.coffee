@@ -160,6 +160,8 @@ DBPEDIA = 'dbpedia'
 DBPEDIA_ORG = "http://#{DBPEDIA}.org/"
 DBPEDIA_ORG_REGEX = "http://(\\w{2}\\.)?#{DBPEDIA}.org/"
 
+WORDLIFT = 'wordlift'
+
 WGS84_POS = 'http://www.w3.org/2003/01/geo/wgs84_pos#'
 
 # Define some constants for commonly used strings.
@@ -170,6 +172,8 @@ RUNNING_CLASS = 'running'
 MCE_WORDLIFT = '.mce_wordlift, .mce-wordlift button'
 CONTENT_EDITABLE = 'contenteditable'
 TEXT_HTML_NODE_TYPE = 3
+
+DEFAULT_ENTITY_ANNOTATION_CONFIDENCE_LEVEL = 1.0
 
 angular.module('wordlift.tinymce.plugin.config', [])
 #	.constant 'Configuration',
@@ -273,7 +277,7 @@ angular.module('wordlift.tinymce.plugin.directives', ['wordlift.directives.wlEnt
           <div class="label" ng-bind="entity.label"></div>
           <div class="#{scope.entity?.css}-info url" entity="entity"></div>
           <div class="type"></div>
-          <div class="source" ng-class="entity.source" ng-bind="entity.source"></div>
+          <div class="source" ng-class="entity.source" ng-bind="entity.source"></div>     
         </div>
       """
 
@@ -904,8 +908,8 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
     ])
 
 angular.module('wordlift.tinymce.plugin.services.EntityAnnotationService', [])
-.service('EntityAnnotationService', [ 'Helpers', (h) ->
-
+.service('EntityAnnotationService', [ 'EntityAnnotationConfidenceService', 'Helpers', 'LoggerService', (EntityAnnotationConfidenceService, h, LoggerService) ->
+      
     service = {}
 
     # Create an entity annotation using the provided params.
@@ -914,7 +918,7 @@ angular.module('wordlift.tinymce.plugin.services.EntityAnnotationService', [])
       defaults =
         id: 'uri:local-entity-annotation-' + h.uniqueId(32)
         label: ''
-        confidence: 0.0
+        confidence: EntityAnnotationConfidenceService.getDefault()
         entity: null
         relation: null
         selected: false
@@ -924,7 +928,11 @@ angular.module('wordlift.tinymce.plugin.services.EntityAnnotationService', [])
       params.entity.label = params.label if params.entity? and not params.entity.label?
 
       # Merge the params with the default settings.
-      h.merge defaults, params
+      entityAnnotation = h.merge defaults, params
+      # Enhance confidence rate depending on related entity properties
+      EntityAnnotationConfidenceService.enhanceConfidenceFor entityAnnotation
+
+      entityAnnotation
 
     ###*
      * Create an entity annotation. An entity annotation is created for each related text-annotation.
@@ -965,7 +973,7 @@ angular.module('wordlift.tinymce.plugin.services.EntityAnnotationService', [])
         # Accumulate the annotations.
         annotations.push entityAnnotation
 
-      # Return the  entity annotations.
+      # Return the entity annotations.
       annotations
 
     # Find an entity annotation with the provided filters.
@@ -980,6 +988,44 @@ angular.module('wordlift.tinymce.plugin.services.EntityAnnotationService', [])
     # Return the service instance
     service
   ])
+angular.module('wordlift.tinymce.plugin.services.EntityAnnotationConfidenceService', [])
+.service('EntityAnnotationConfidenceService', [ 'EntityService','Helpers', '$log', (EntityService, h, $log) ->
+  
+  service = 
+  	_entities: {}
+
+  # Set the local entity collection.
+  service.setEntities = (entities) ->
+  	@_entities = entities
+
+  service.getDefault = ()->
+  	DEFAULT_ENTITY_ANNOTATION_CONFIDENCE_LEVEL
+
+  # Enhanche entity annotation confidence following these criteria:
+  # Add x if the related entity is described in more than 1 vocabulary
+  # Add x if the related entity is described within Wordlift vocabulary
+  # Add x if the related entity is described only within Wordlift vocabulary
+  # Add x if the related entity is related to the current post 
+  service.enhanceConfidenceFor = (entityAnnotation)->
+
+  	delta = 0
+  	
+  	if entityAnnotation.entity.sources.length > 1
+      delta += 0.20
+    if WORDLIFT in entityAnnotation.entity.sources
+      delta += 0.20
+    if entityAnnotation.entity.source is WORDLIFT 
+      delta += 1.0
+    if EntityService.checkIfIsIncluded(@_entities, uri: entityAnnotation.entity.id) is true
+      delta += 1.0
+
+    $log.debug "Entity annotation #{entityAnnotation.id} enhancement: going to add #{delta} to confidence #{entityAnnotation.confidence}"
+    entityAnnotation.confidence += delta
+    $log.debug entityAnnotation
+    entityAnnotation
+  
+  service
+])
 angular.module('wordlift.tinymce.plugin.services.EntityService', ['wordlift.tinymce.plugin.services.Helpers', 'LoggerService'])
 .service('EntityService', [ 'Helpers', 'LoggerService', '$filter', (h, logger, $filter) ->
     service = {}
@@ -988,6 +1034,11 @@ angular.module('wordlift.tinymce.plugin.services.EntityService', ['wordlift.tiny
     service.find = (entities, filter) ->
       if filter.uri?
         return (entity for entityId, entity of entities when filter.uri is entity?.id or filter.uri in entity?.sameAs)
+
+    # Find first entity in the provided entities collection using the provided filters.
+    service.checkIfIsIncluded = (entities, filter) ->
+      entities = @find(entities, filter)
+      if entities.length > 0 then return true else false
 
     ###*
      * Create an entity using the provided data and context.
@@ -1372,6 +1423,7 @@ angular.module('wordlift.tinymce.plugin.services', [
   'wordlift.tinymce.plugin.services.EditorService'
   'wordlift.tinymce.plugin.services.EntityService'
   'wordlift.tinymce.plugin.services.EntityAnnotationService'
+  'wordlift.tinymce.plugin.services.EntityAnnotationConfidenceService'
   'wordlift.tinymce.plugin.services.TextAnnotationService'
   'wordlift.tinymce.plugin.services.Helpers'
   'AnalysisService'
@@ -1472,8 +1524,6 @@ angular.module('wordlift.tinymce.plugin.controllers',
         $scope.isRunning = false
         # Create a fake entity annotation for each entity
         entityAnnotation = EntityAnnotationService.create { 'entity': data }
-        # Set the higher priority for this annotation
-        entityAnnotation.confidence = 1.0
         # Enhance current analysis with the selected entity if needed 
         if AnalysisService.enhance($scope.analysis, $scope.textAnnotation, entityAnnotation) is true
           # Update the editor accordingly 
@@ -1631,10 +1681,11 @@ $(
 
   # Declare the whole document as bootstrap scope.
   injector = angular.bootstrap $('#wl-app'), ['wordlift.tinymce.plugin']
-  injector.invoke ['AnalysisService', (AnalysisService) ->
+  injector.invoke ['AnalysisService', 'EntityAnnotationConfidenceService', (AnalysisService, EntityAnnotationConfidenceService) ->
     if window.wordlift?
       AnalysisService.setKnownTypes window.wordlift.types
       AnalysisService.setEntities window.wordlift.entities
+      EntityAnnotationConfidenceService.setEntities window.wordlift.entities
   ]
 
   # Add WordLift as a plugin of the TinyMCE editor.

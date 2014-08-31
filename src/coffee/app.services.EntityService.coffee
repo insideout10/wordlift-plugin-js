@@ -7,6 +7,11 @@ angular.module('wordlift.tinymce.plugin.services.EntityService', ['wordlift.tiny
       if filter.uri?
         return (entity for entityId, entity of entities when filter.uri is entity?.id or filter.uri in entity?.sameAs)
 
+    # Find first entity in the provided entities collection using the provided filters.
+    service.checkIfIsIncluded = (entities, filter) ->
+      entities = @find(entities, filter)
+      if entities.length > 0 then return true else false
+
     ###*
      * Create an entity using the provided data and context.
      * @param {object} An item object containing the entity raw data.

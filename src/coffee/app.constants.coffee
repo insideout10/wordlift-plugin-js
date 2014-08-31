@@ -29,6 +29,8 @@ DBPEDIA = 'dbpedia'
 DBPEDIA_ORG = "http://#{DBPEDIA}.org/"
 DBPEDIA_ORG_REGEX = "http://(\\w{2}\\.)?#{DBPEDIA}.org/"
 
+WORDLIFT = 'wordlift'
+
 WGS84_POS = 'http://www.w3.org/2003/01/geo/wgs84_pos#'
 
 # Define some constants for commonly used strings.
@@ -39,3 +41,5 @@ RUNNING_CLASS = 'running'
 MCE_WORDLIFT = '.mce_wordlift, .mce-wordlift button'
 CONTENT_EDITABLE = 'contenteditable'
 TEXT_HTML_NODE_TYPE = 3
+
+DEFAULT_ENTITY_ANNOTATION_CONFIDENCE_LEVEL = 1.0

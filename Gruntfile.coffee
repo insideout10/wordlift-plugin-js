@@ -22,6 +22,7 @@ module.exports = (grunt) ->
             'src/coffee/app.services.AnalysisService.coffee'
             'src/coffee/app.services.EditorService.coffee'
             'src/coffee/app.services.EntityAnnotationService.coffee'
+            'src/coffee/app.services.EntityAnnotationConfidenceService.coffee'
             'src/coffee/app.services.EntityService.coffee'
             'src/coffee/app.services.SearchService.coffee'
             'src/coffee/app.services.Helpers.coffee'

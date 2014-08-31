@@ -54,7 +54,7 @@ angular.module('wordlift.tinymce.plugin.directives', ['wordlift.directives.wlEnt
           <div class="label" ng-bind="entity.label"></div>
           <div class="#{scope.entity?.css}-info url" entity="entity"></div>
           <div class="type"></div>
-          <div class="source" ng-class="entity.source" ng-bind="entity.source"></div>
+          <div class="source" ng-class="entity.source" ng-bind="entity.source"></div>     
         </div>
       """
 

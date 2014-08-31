@@ -110,7 +110,7 @@ describe 'directives', ->
         expect(entitiesElems.length).toEqual 7
 
         # Set the ID of the entity annotations (from the mock file).
-        id1 = 'urn:enhancement-916d5d56-42b5-fc61-eae9-c282233d8b5f'
+        id1 = 'urn:enhancement-9e5931fc-7a09-567d-65ff-05d34638b8e5'
         id2 = 'urn:enhancement-3ca7b689-4704-25e0-6e9f-b8cad136be17'
 
 #        for e in entitiesElems
@@ -118,6 +118,7 @@ describe 'directives', ->
 
         # Click the first entity.
         entitiesElems[1].click()
+        
         expect(scope.textAnnotation.entityAnnotations[id1].selected).toBe true
         expect(scope.textAnnotation.entityAnnotations[id2].selected).toBe false
         # Check that the select event has been called.

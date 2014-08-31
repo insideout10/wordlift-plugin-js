@@ -1,5 +1,5 @@
 (function() {
-  var $, $wlEntityDisplayAsSelect, ANALYSIS_EVENT, CONFIGURATION_TYPES_EVENT, CONTENT_EDITABLE, CONTENT_IFRAME, CONTEXT, DBPEDIA, DBPEDIA_ORG, DBPEDIA_ORG_REGEX, DCTERMS, EDITOR_ID, FISE_ONT, FISE_ONT_CONFIDENCE, FISE_ONT_ENTITY_ANNOTATION, FISE_ONT_TEXT_ANNOTATION, FREEBASE, FREEBASE_COM, FREEBASE_NS, FREEBASE_NS_DESCRIPTION, GRAPH, MCE_WORDLIFT, RDFS, RDFS_COMMENT, RDFS_LABEL, RUNNING_CLASS, SCHEMA_ORG, SCHEMA_ORG_DESCRIPTION, TEXT_ANNOTATION, TEXT_HTML_NODE_TYPE, Traslator, VALUE, WGS84_POS, container, injector,
+  var $, $wlEntityDisplayAsSelect, ANALYSIS_EVENT, CONFIGURATION_TYPES_EVENT, CONTENT_EDITABLE, CONTENT_IFRAME, CONTEXT, DBPEDIA, DBPEDIA_ORG, DBPEDIA_ORG_REGEX, DCTERMS, DEFAULT_ENTITY_ANNOTATION_CONFIDENCE_LEVEL, EDITOR_ID, FISE_ONT, FISE_ONT_CONFIDENCE, FISE_ONT_ENTITY_ANNOTATION, FISE_ONT_TEXT_ANNOTATION, FREEBASE, FREEBASE_COM, FREEBASE_NS, FREEBASE_NS_DESCRIPTION, GRAPH, MCE_WORDLIFT, RDFS, RDFS_COMMENT, RDFS_LABEL, RUNNING_CLASS, SCHEMA_ORG, SCHEMA_ORG_DESCRIPTION, TEXT_ANNOTATION, TEXT_HTML_NODE_TYPE, Traslator, VALUE, WGS84_POS, WORDLIFT, container, injector,
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   Traslator = (function() {
@@ -150,6 +150,8 @@
 
   DBPEDIA_ORG_REGEX = "http://(\\w{2}\\.)?" + DBPEDIA + ".org/";
 
+  WORDLIFT = 'wordlift';
+
   WGS84_POS = 'http://www.w3.org/2003/01/geo/wgs84_pos#';
 
   EDITOR_ID = 'content';
@@ -165,6 +167,8 @@
   CONTENT_EDITABLE = 'contenteditable';
 
   TEXT_HTML_NODE_TYPE = 3;
+
+  DEFAULT_ENTITY_ANNOTATION_CONFIDENCE_LEVEL = 1.0;
 
   angular.module('wordlift.tinymce.plugin.config', []);
 
@@ -212,7 +216,7 @@
         link: function(scope, element, attrs) {
           var template, _ref, _ref1;
           scope.entity = (_ref = scope.entityAnnotation) != null ? _ref.entity : void 0;
-          template = "<div class=\"entity {{entityAnnotation.entity.css}}\" ng-class=\"{selected: true==entityAnnotation.selected}\" ng-click=\"onSelect()\" ng-show=\"entity.label\">\n  <div class=\"thumbnail\" ng-show=\"entity.thumbnail\" title=\"{{entity.id}}\" ng-attr-style=\"background-image: url({{entity.thumbnail}})\"></div>\n  <div class=\"thumbnail empty\" ng-hide=\"entity.thumbnail\" title=\"{{entity.id}}\"></div>\n  <div class=\"confidence\" ng-bind=\"entityAnnotation.confidence\"></div>\n  <div class=\"label\" ng-bind=\"entity.label\"></div>\n  <div class=\"" + ((_ref1 = scope.entity) != null ? _ref1.css : void 0) + "-info url\" entity=\"entity\"></div>\n  <div class=\"type\"></div>\n  <div class=\"source\" ng-class=\"entity.source\" ng-bind=\"entity.source\"></div>\n</div>";
+          template = "<div class=\"entity {{entityAnnotation.entity.css}}\" ng-class=\"{selected: true==entityAnnotation.selected}\" ng-click=\"onSelect()\" ng-show=\"entity.label\">\n  <div class=\"thumbnail\" ng-show=\"entity.thumbnail\" title=\"{{entity.id}}\" ng-attr-style=\"background-image: url({{entity.thumbnail}})\"></div>\n  <div class=\"thumbnail empty\" ng-hide=\"entity.thumbnail\" title=\"{{entity.id}}\"></div>\n  <div class=\"confidence\" ng-bind=\"entityAnnotation.confidence\"></div>\n  <div class=\"label\" ng-bind=\"entity.label\"></div>\n  <div class=\"" + ((_ref1 = scope.entity) != null ? _ref1.css : void 0) + "-info url\" entity=\"entity\"></div>\n  <div class=\"type\"></div>\n  <div class=\"source\" ng-class=\"entity.source\" ng-bind=\"entity.source\"></div>     \n</div>";
           element.html(template).show();
           return $compile(element.contents())(scope);
         }
@@ -741,15 +745,15 @@
   ]);
 
   angular.module('wordlift.tinymce.plugin.services.EntityAnnotationService', []).service('EntityAnnotationService', [
-    'Helpers', function(h) {
+    'EntityAnnotationConfidenceService', 'Helpers', 'LoggerService', function(EntityAnnotationConfidenceService, h, LoggerService) {
       var service;
       service = {};
       service.create = function(params) {
-        var defaults;
+        var defaults, entityAnnotation;
         defaults = {
           id: 'uri:local-entity-annotation-' + h.uniqueId(32),
           label: '',
-          confidence: 0.0,
+          confidence: EntityAnnotationConfidenceService.getDefault(),
           entity: null,
           relation: null,
           selected: false,
@@ -758,7 +762,9 @@
         if ((params.entity != null) && (params.entity.label == null)) {
           params.entity.label = params.label;
         }
-        return h.merge(defaults, params);
+        entityAnnotation = h.merge(defaults, params);
+        EntityAnnotationConfidenceService.enhanceConfidenceFor(entityAnnotation);
+        return entityAnnotation;
       };
 
       /**
@@ -827,6 +833,44 @@
     }
   ]);
 
+  angular.module('wordlift.tinymce.plugin.services.EntityAnnotationConfidenceService', []).service('EntityAnnotationConfidenceService', [
+    'EntityService', 'Helpers', '$log', function(EntityService, h, $log) {
+      var service;
+      service = {
+        _entities: {}
+      };
+      service.setEntities = function(entities) {
+        return this._entities = entities;
+      };
+      service.getDefault = function() {
+        return DEFAULT_ENTITY_ANNOTATION_CONFIDENCE_LEVEL;
+      };
+      service.enhanceConfidenceFor = function(entityAnnotation) {
+        var delta;
+        delta = 0;
+        if (entityAnnotation.entity.sources.length > 1) {
+          delta += 0.20;
+        }
+        if (__indexOf.call(entityAnnotation.entity.sources, WORDLIFT) >= 0) {
+          delta += 0.20;
+        }
+        if (entityAnnotation.entity.source === WORDLIFT) {
+          delta += 1.0;
+        }
+        if (EntityService.checkIfIsIncluded(this._entities, {
+          uri: entityAnnotation.entity.id
+        }) === true) {
+          delta += 1.0;
+        }
+        $log.debug("Entity annotation " + entityAnnotation.id + " enhancement: going to add " + delta + " to confidence " + entityAnnotation.confidence);
+        entityAnnotation.confidence += delta;
+        $log.debug(entityAnnotation);
+        return entityAnnotation;
+      };
+      return service;
+    }
+  ]);
+
   angular.module('wordlift.tinymce.plugin.services.EntityService', ['wordlift.tinymce.plugin.services.Helpers', 'LoggerService']).service('EntityService', [
     'Helpers', 'LoggerService', '$filter', function(h, logger, $filter) {
       var service;
@@ -845,6 +889,14 @@
             }
             return _results;
           })();
+        }
+      };
+      service.checkIfIsIncluded = function(entities, filter) {
+        entities = this.find(entities, filter);
+        if (entities.length > 0) {
+          return true;
+        } else {
+          return false;
         }
       };
 
@@ -1264,7 +1316,7 @@
     }
   ]);
 
-  angular.module('wordlift.tinymce.plugin.services', ['wordlift.tinymce.plugin.config', 'LoggerService', 'wordlift.tinymce.plugin.services.EditorService', 'wordlift.tinymce.plugin.services.EntityService', 'wordlift.tinymce.plugin.services.EntityAnnotationService', 'wordlift.tinymce.plugin.services.TextAnnotationService', 'wordlift.tinymce.plugin.services.Helpers', 'AnalysisService']);
+  angular.module('wordlift.tinymce.plugin.services', ['wordlift.tinymce.plugin.config', 'LoggerService', 'wordlift.tinymce.plugin.services.EditorService', 'wordlift.tinymce.plugin.services.EntityService', 'wordlift.tinymce.plugin.services.EntityAnnotationService', 'wordlift.tinymce.plugin.services.EntityAnnotationConfidenceService', 'wordlift.tinymce.plugin.services.TextAnnotationService', 'wordlift.tinymce.plugin.services.Helpers', 'AnalysisService']);
 
   angular.module('wordlift.tinymce.plugin.controllers', ['wordlift.tinymce.plugin.config', 'wordlift.tinymce.plugin.services']).filter('orderObjectBy', function() {
     return function(items, field, reverse) {
@@ -1357,7 +1409,6 @@
           entityAnnotation = EntityAnnotationService.create({
             'entity': data
           });
-          entityAnnotation.confidence = 1.0;
           if (AnalysisService.enhance($scope.analysis, $scope.textAnnotation, entityAnnotation) === true) {
             return $scope.$emit('selectEntity', {
               ta: $scope.textAnnotation,
@@ -1446,10 +1497,11 @@
   }).draggable(), $('#wordlift-disambiguation-popover .handlediv').click(function(e) {
     return $('#wordlift-disambiguation-popover').hide();
   }), injector = angular.bootstrap($('#wl-app'), ['wordlift.tinymce.plugin']), injector.invoke([
-    'AnalysisService', function(AnalysisService) {
+    'AnalysisService', 'EntityAnnotationConfidenceService', function(AnalysisService, EntityAnnotationConfidenceService) {
       if (window.wordlift != null) {
         AnalysisService.setKnownTypes(window.wordlift.types);
-        return AnalysisService.setEntities(window.wordlift.entities);
+        AnalysisService.setEntities(window.wordlift.entities);
+        return EntityAnnotationConfidenceService.setEntities(window.wordlift.entities);
       }
     }
   ]), tinymce.PluginManager.add('wordlift', function(editor, url) {

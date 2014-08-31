@@ -93,8 +93,6 @@ angular.module('wordlift.tinymce.plugin.controllers',
         $scope.isRunning = false
         # Create a fake entity annotation for each entity
         entityAnnotation = EntityAnnotationService.create { 'entity': data }
-        # Set the higher priority for this annotation
-        entityAnnotation.confidence = 1.0
         # Enhance current analysis with the selected entity if needed 
         if AnalysisService.enhance($scope.analysis, $scope.textAnnotation, entityAnnotation) is true
           # Update the editor accordingly 

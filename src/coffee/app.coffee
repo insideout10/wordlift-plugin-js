@@ -72,10 +72,11 @@ $(
 
   # Declare the whole document as bootstrap scope.
   injector = angular.bootstrap $('#wl-app'), ['wordlift.tinymce.plugin']
-  injector.invoke ['AnalysisService', (AnalysisService) ->
+  injector.invoke ['AnalysisService', 'EntityAnnotationConfidenceService', (AnalysisService, EntityAnnotationConfidenceService) ->
     if window.wordlift?
       AnalysisService.setKnownTypes window.wordlift.types
       AnalysisService.setEntities window.wordlift.entities
+      EntityAnnotationConfidenceService.setEntities window.wordlift.entities
   ]
 
   # Add WordLift as a plugin of the TinyMCE editor.
