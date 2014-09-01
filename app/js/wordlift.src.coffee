@@ -1646,7 +1646,7 @@ $(
                       <option value="" disabled selected>Select the entity type</option>
                     </select>
                   </div>
-                  <div class="ui-widget right">
+                  <div class="ui-widget button-container">
                     <i class="wl-spinner" ng-show="isRunning"></i>
                     <button ng-click="onNewEntityCreate(newEntity)">Save Entity</button>
                   </div>
