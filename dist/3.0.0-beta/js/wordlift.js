@@ -429,7 +429,7 @@
               });
             }
             if (0 === entities.length) {
-              $log.error("Missing entity in window.wordlift.entities collection!");
+              $log.warn("Missing entity in window.wordlift.entities collection!");
               $log.info(annotation);
               continue;
             }
@@ -639,14 +639,19 @@
           _ref = findEntities(html);
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             inTextEntity = _ref[_i];
-            ta = TextAnnotationService.findOrCreate(analysis.textAnnotations, inTextEntity);
             localEntities = EntityService.find(entities, {
               uri: inTextEntity.uri
             });
-            ea = EntityAnnotationService.create({
-              'entity': localEntities[0]
-            });
-            AnalysisService.enhance(analysis, ta, ea);
+            if (localEntities.length > 0) {
+              ta = TextAnnotationService.findOrCreate(analysis.textAnnotations, inTextEntity);
+              ea = EntityAnnotationService.create({
+                'entity': localEntities[0]
+              });
+              AnalysisService.enhance(analysis, ta, ea);
+            } else {
+              $log.warn("Missing entity in wordlift.entities collection matching text annotation " + inTextEntity.uri);
+              $log.debug(inTextEntity);
+            }
           }
           $rootScope.$broadcast(ANALYSIS_EVENT, analysis);
           return analysis;

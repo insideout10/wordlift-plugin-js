@@ -106,11 +106,10 @@ angular.module('AnalysisService', ['wordlift.tinymce.plugin.services.EntityServi
               entities = EntityService.find analysis.entities, uri: annotation.uri
               entities = EntityService.find @_entities, uri: annotation.uri if 0 is entities.length
 
-              # If the entity is missing raise an excpetion!
+              # If the entity is missing skip the current text annotation
               if 0 is entities.length
-                $log.error "Missing entity in window.wordlift.entities collection!"
+                $log.warn "Missing entity in window.wordlift.entities collection!"
                 $log.info annotation
-                # TODO: wouldn't it be better to continue here instead of throwing an exception?
                 continue
 
               # Use the first found entity

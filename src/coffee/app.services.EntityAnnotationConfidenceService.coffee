@@ -17,10 +17,10 @@ angular.module('wordlift.tinymce.plugin.services.EntityAnnotationConfidenceServi
   # Add x if the related entity is described only within Wordlift vocabulary
   # Add x if the related entity is related to the current post 
   service.enhanceConfidenceFor = (entityAnnotation)->
-
-  	delta = 0
-  	
-  	if entityAnnotation.entity.sources.length > 1
+    
+    delta = 0
+ 	
+    if entityAnnotation.entity.sources.length > 1
       delta += 0.20
     if WORDLIFT in entityAnnotation.entity.sources
       delta += 0.20
@@ -33,6 +33,6 @@ angular.module('wordlift.tinymce.plugin.services.EntityAnnotationConfidenceServi
     entityAnnotation.confidence += delta
     $log.debug entityAnnotation
     entityAnnotation
-  
+    
   service
 ])

@@ -521,11 +521,10 @@ angular.module('AnalysisService', ['wordlift.tinymce.plugin.services.EntityServi
               entities = EntityService.find analysis.entities, uri: annotation.uri
               entities = EntityService.find @_entities, uri: annotation.uri if 0 is entities.length
 
-              # If the entity is missing raise an excpetion!
+              # If the entity is missing skip the current text annotation
               if 0 is entities.length
-                $log.error "Missing entity in window.wordlift.entities collection!"
+                $log.warn "Missing entity in window.wordlift.entities collection!"
                 $log.info annotation
-                # TODO: wouldn't it be better to continue here instead of throwing an exception?
                 continue
 
               # Use the first found entity
@@ -761,14 +760,19 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
           entities = AnalysisService.getEntities()
           # For each entity detected in the editor text ...
           for inTextEntity in findEntities(html)
-            # Add a text annotation to the analysis
-            ta = TextAnnotationService.findOrCreate analysis.textAnnotations, inTextEntity
             # Retrieve related entity obj from the storage
             localEntities = EntityService.find entities, uri: inTextEntity.uri              
-            # Create an entity annotation 
-            ea = EntityAnnotationService.create { 'entity': localEntities[0] }
-            # Enhance current analysis properly 
-            AnalysisService.enhance(analysis, ta, ea) 
+            # Check if the current text annotation has its coresponding entity within wordlift.entities local storage
+            if localEntities.length > 0
+              # Add a text annotation to the analysis
+              ta = TextAnnotationService.findOrCreate analysis.textAnnotations, inTextEntity
+              # Create an entity annotation 
+              ea = EntityAnnotationService.create { 'entity': localEntities[0] }
+              # Enhance current analysis properly 
+              AnalysisService.enhance(analysis, ta, ea)
+            else
+              $log.warn "Missing entity in wordlift.entities collection matching text annotation #{inTextEntity.uri}" 
+              $log.debug inTextEntity
 
           # Fire analysis to controller 
           $rootScope.$broadcast ANALYSIS_EVENT, analysis
@@ -777,7 +781,7 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
 
         # Embed the provided analysis in the editor.
         embedAnalysis: (analysis) =>
-
+          #return true
           # A reference to the editor.
           ed = editor()
           # Get the TinyMCE editor html content.
@@ -1007,10 +1011,10 @@ angular.module('wordlift.tinymce.plugin.services.EntityAnnotationConfidenceServi
   # Add x if the related entity is described only within Wordlift vocabulary
   # Add x if the related entity is related to the current post 
   service.enhanceConfidenceFor = (entityAnnotation)->
-
-  	delta = 0
-  	
-  	if entityAnnotation.entity.sources.length > 1
+    
+    delta = 0
+ 	
+    if entityAnnotation.entity.sources.length > 1
       delta += 0.20
     if WORDLIFT in entityAnnotation.entity.sources
       delta += 0.20
@@ -1023,7 +1027,7 @@ angular.module('wordlift.tinymce.plugin.services.EntityAnnotationConfidenceServi
     entityAnnotation.confidence += delta
     $log.debug entityAnnotation
     entityAnnotation
-  
+    
   service
 ])
 angular.module('wordlift.tinymce.plugin.services.EntityService', ['wordlift.tinymce.plugin.services.Helpers', 'LoggerService'])

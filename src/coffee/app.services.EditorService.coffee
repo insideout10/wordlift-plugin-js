@@ -78,14 +78,19 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
           entities = AnalysisService.getEntities()
           # For each entity detected in the editor text ...
           for inTextEntity in findEntities(html)
-            # Add a text annotation to the analysis
-            ta = TextAnnotationService.findOrCreate analysis.textAnnotations, inTextEntity
             # Retrieve related entity obj from the storage
             localEntities = EntityService.find entities, uri: inTextEntity.uri              
-            # Create an entity annotation 
-            ea = EntityAnnotationService.create { 'entity': localEntities[0] }
-            # Enhance current analysis properly 
-            AnalysisService.enhance(analysis, ta, ea) 
+            # Check if the current text annotation has its coresponding entity within wordlift.entities local storage
+            if localEntities.length > 0
+              # Add a text annotation to the analysis
+              ta = TextAnnotationService.findOrCreate analysis.textAnnotations, inTextEntity
+              # Create an entity annotation 
+              ea = EntityAnnotationService.create { 'entity': localEntities[0] }
+              # Enhance current analysis properly 
+              AnalysisService.enhance(analysis, ta, ea)
+            else
+              $log.warn "Missing entity in wordlift.entities collection matching text annotation #{inTextEntity.uri}" 
+              $log.debug inTextEntity
 
           # Fire analysis to controller 
           $rootScope.$broadcast ANALYSIS_EVENT, analysis
@@ -94,7 +99,7 @@ angular.module('wordlift.tinymce.plugin.services.EditorService', ['wordlift.tiny
 
         # Embed the provided analysis in the editor.
         embedAnalysis: (analysis) =>
-
+          #return true
           # A reference to the editor.
           ed = editor()
           # Get the TinyMCE editor html content.
