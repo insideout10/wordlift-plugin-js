@@ -32,6 +32,10 @@ module.exports = (grunt) ->
             'src/coffee/app.coffee'
             'src/coffee/chordDialog.coffee'
           ]
+          'app/mockup/js/wordlift-reloaded.js': [
+            'src/coffee/traslator.coffee'
+            'src/coffee/core.app.coffee'
+          ]
           'app/js/wordlift.ui.js': [
             'src/coffee/ui/chord.coffee'
             'src/coffee/ui/timeline.coffee'
@@ -39,7 +43,7 @@ module.exports = (grunt) ->
           ]
 
     uglify:
-      wordlift:
+      'wordlift':
         options:
           sourceMap: true
           sourceMapIn: 'app/js/wordlift.js.map'
@@ -63,12 +67,24 @@ module.exports = (grunt) ->
         files:
           'app/js/wordlift.ui.min.js': 'app/js/wordlift.ui.js'
           'app/js/wordlift.ui.<%= pkg.version %>.min.js': 'app/js/wordlift.ui.js'
-
+      'wordlift-reloaded':
+        options:
+          sourceMap: true
+          sourceMapIn: 'app/mockup/js/wordlift-reloaded.js.map'
+          compress: true
+          drop_console: true
+          dead_code: true
+          mangle: true
+          beautify: false
+        files:
+          'app/mockup/js/wordlift-reloaded.min.js': 'app/mockup/js/wordlift-reloaded.js'
+          'app/mockup/js/wordlift-reloaded.<%= pkg.version %>.min.js': 'app/mockup/js/wordlift-reloaded.js'
     less:
       development:
         files:
           'app/css/wordlift.css': ['src/less/wordlift.less']
           'app/css/wordlift.ui.css': ['src/less/wordlift.ui.less']
+          'app/mockup/css/wordlift-reloaded.css': ['src/less/wordlift-reloaded.less']
       dist:
         options:
           cleancss: true

@@ -1,0 +1,233 @@
+class Traslator
+
+  # Hold the html and textual positions.
+  _htmlPositions: []
+  _textPositions: []
+
+  # Hold the html and text contents.
+  _html: ''
+  _text: ''
+
+  # Create an instance of the traslator.
+  @create: (html) ->
+    traslator = new Traslator(html)
+    traslator.parse()
+    traslator
+
+  constructor: (html) ->
+    @_html = html
+
+  parse: ->
+    @_htmlPositions = []
+    @_textPositions = []
+    @_text = ''
+
+    # TODO: the pattern should consider that HTML has also HTML entities.
+    # Remove non-breaking spaces.
+    @_html = @_html.replace /&nbsp;/gim, ' '
+
+    pattern = /([^<]*)(<[^>]*>)([^<]*)/gim
+
+    textLength = 0
+    htmlLength = 0
+
+    while match = pattern.exec @_html
+
+      # Get the text pre/post and the html element
+      htmlPre = match[1]
+      htmlElem = match[2]
+      htmlPost = match[3]
+
+      # Get the text pre/post w/o new lines.
+      textPre = htmlPre + (if '</p>' is htmlElem.toLowerCase() then '\n\n' else '')
+#      dump "[ htmlPre length :: #{htmlPre.length} ][ textPre length :: #{textPre.length} ]"
+      textPost = htmlPost
+
+      # Sum the lengths to the existing lengths.
+      textLength += textPre.length
+      # For html add the length of the html element.
+      htmlLength += htmlPre.length + htmlElem.length
+
+      # Add the position.
+      @_htmlPositions.push htmlLength
+      @_textPositions.push textLength
+
+      textLength += textPost.length
+      htmlLength += htmlPost.length
+
+      # Add the textual parts to the text.
+      @_text += textPre + textPost
+
+
+    # In case the regex didn't find any tag, copy the html over the text.
+    @_text = new String(@_html) if '' is @_text and '' isnt @_html
+
+    # Add text position 0 if it's not already set.
+    if 0 is @_textPositions.length or 0 isnt @_textPositions[0]
+      @_htmlPositions.unshift 0
+      @_textPositions.unshift 0
+
+#    console.log '=============================='
+#    console.log @_html
+#    console.log @_text
+#    console.log @_htmlPositions
+#    console.log @_textPositions
+#    console.log '=============================='
+
+  # Get the html position, given a text position.
+  text2html: (pos) ->
+    htmlPos = 0
+    textPos = 0
+
+    for i in [0...@_textPositions.length]
+      break if pos < @_textPositions[i]
+      htmlPos = @_htmlPositions[i]
+      textPos = @_textPositions[i]
+
+    #    dump "#{htmlPos} + #{pos} - #{textPos}"
+    htmlPos + pos - textPos
+
+  # Get the text position, given an html position.
+  html2text: (pos) ->
+#    dump @_htmlPositions
+#    dump @_textPositions
+
+    # Return 0 if the specified html position is less than the first HTML position.
+    return 0 if pos < @_htmlPositions[0]
+
+    htmlPos = 0
+    textPos = 0
+
+    for i in [0...@_htmlPositions.length]
+      break if pos < @_htmlPositions[i]
+      htmlPos = @_htmlPositions[i]
+      textPos = @_textPositions[i]
+
+#    console.log "#{textPos} + #{pos} - #{htmlPos}"
+    textPos + pos - htmlPos
+
+  # Insert an Html fragment at the specified location.
+  insertHtml: (fragment, pos) ->
+
+#    dump @_htmlPositions
+#    dump @_textPositions
+#    console.log "[ fragment :: #{fragment} ][ pos text :: #{pos.text} ]"
+
+    htmlPos = @text2html pos.text
+
+    @_html = @_html.substring(0, htmlPos) + fragment + @_html.substring(htmlPos)
+
+    # Reparse
+    @parse()
+
+  # Return the html.
+  getHtml: ->
+    @_html
+
+  # Return the text.
+  getText: ->
+    @_text
+
+window.Traslator = Traslator
+# Set the well-known $ reference to jQuery.
+$ = jQuery
+
+# Create the main AngularJS module, and set it dependent on controllers and directives.
+angular.module('wordlift.core', [])
+
+# Manage redlink analysis responses
+.service('AnalysisService', [ '$log', '$http', '$rootScope', ($log, $http, $rootScope)-> 
+	
+  service = 
+    _currentAnalysis = {}
+
+  service.parse = (data) ->
+    
+    for id, entity of data.entities
+      entity.occurrences = 0
+    for id, annotation of data.annotations
+      for match in annotation.entityMatches
+      	data.entities[ match.entityId ][ 'occurrences' ] += 1
+    
+    data
+
+  service.perform = ()->
+  	$http(
+      method: 'get'
+      url: 'assets/sample-response.json'
+    )
+    # If successful, broadcast an *analysisReceived* event.
+    .success (data) ->
+       $rootScope.$broadcast "analysisPerformed", service.parse( data )
+
+  service
+
+])
+
+# Manage redlink analysis responses
+.service('ConfigurationService', [ '$log', '$http', '$rootScope', ($log, $http, $rootScope)-> 
+	
+  service = 
+    _configuration = {}
+
+  service.loadConfiguration = ()->
+  	$http(
+      method: 'get'
+      url: 'assets/sample-widget-configuration.json'
+    )
+    .success (data) ->
+      $rootScope.$broadcast "configurationLoaded", data
+  service
+
+])
+
+# Manage redlink analysis responses
+.controller('coreController', [ '$log', '$scope', '$rootScope', ($log, $scope, $rootScope)-> 
+
+  $scope.configuration = []
+  $scope.analysis = {}
+  $scope.entitySelection = {}
+  $scope.occurences = {}
+
+  $scope.$on "configurationLoaded", (event, configuration) ->
+    for box in configuration.classificationBoxes
+      $scope.entitySelection[ box.id ] = []
+    $scope.configuration = configuration
+
+  $scope.$on "analysisPerformed", (event, analysis) ->
+    $log.debug analysis
+    $scope.analysis = analysis
+
+  $scope.onSelectedEntityTile = (entityId, scope)->
+  	$log.debug "Entity tile selected for entity #{entityId} within '#{scope}' scope"
+  	if entityId not in $scope.entitySelection[ scope ]
+  	  $scope.entitySelection[ scope ].push entityId
+  	
+])
+
+$(
+  container = $('''
+  	<div id="wordlift-edit-post-wrapper" ng-controller="coreController">
+  		<ul ng-repeat="box in configuration.classificationBoxes" class="classification-box">
+  			<li>{{box.label}}</li>
+  			<ul ng-repeat="(entityId, entity) in analysis.entities">
+  				<li ng-click="onSelectedEntityTile( entityId, box.id )" ng-class="'wl-' + entity.mainType">{{entity.label}} <small>({{entity.occurrences}})</small></li>
+  			</ul>
+  		</ul>
+  		<hr />
+  		<div ng-repeat="(box, ids) in entitySelection">
+  			<span>{{ box }}</span> - <span>{{ ids }}</span> 
+  		</div>
+  	</div>
+  ''')
+  .appendTo('#dx')
+)
+
+injector = angular.bootstrap $('#wordlift-edit-post-wrapper'), ['wordlift.core']
+injector.invoke(['ConfigurationService', 'AnalysisService','$rootScope', (ConfigurationService, AnalysisService, $rootScope) ->
+	# execute the following commands in the angular js context.
+    $rootScope.$apply(->
+    	AnalysisService.perform()
+    	ConfigurationService.loadConfiguration()
+    )
+])

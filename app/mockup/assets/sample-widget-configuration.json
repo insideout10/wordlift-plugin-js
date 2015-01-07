@@ -1,0 +1,16 @@
+{
+ 	"classificationBoxes": [
+ 		{
+ 			"id": "what",
+ 			"label": "Di cosa parla?",
+ 			"availableTypes": [ "event", "organization", "person", "place" ],
+ 			"registeredWidgets": [ "imageSuggestor"]
+ 		},
+ 		{
+	 		"id": "who",
+	 		"label": "Chi è coinvolto?",
+ 			"availableTypes": [ "organization", "person" ],
+ 			"registeredWidgets": [ "imageSuggestor"]
+ 		}
+ 	]
+}
