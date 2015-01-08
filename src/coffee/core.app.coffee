@@ -75,22 +75,30 @@ angular.module('wordlift.core', [])
     restrict: 'E'
     scope: true
     template: """
-    	<div class="classification-box" ng-hide="isEmpty">
+    	<div class="classification-box">
     		<h4 class="box-header">{{box.label}}</h4>
   			<wl-entity notify="onSelectedEntityTile(entity.id, box.id)" entity="entity" ng-repeat="entity in entities"></wl-entity>
-  		</div>		
+  		</div>
+  		<p>-- {{openedEntityTile}}</p>		
     """
     link: ($scope, $element, $attrs, $ctrl) ->  	  
   	  
   	  $scope.entities = {}
+  	
   	  for id, entity of $scope.analysis.entities
-  	    if entity.mainType in $scope.box.registeredTypes then $scope.entities[ id ] = entity 
+  	    if entity.mainType in $scope.box.registeredTypes 
+  	      $scope.entities[ id ] = entity 
 
     controller: ($scope, $element, $attrs) ->
-      $scope.isEmpty = true
+      
+      $scope.openedEntityTile = undefined
+      $scope.tiles = []
       ctrl =
-      	containerNotEmpty: ()->
-          $scope.isEmpty = false
+      	addTile: (tile)->
+          $scope.tiles.push tile
+        closeTiles: ()->
+          for tile in $scope.tiles
+          	tile.isOpened = false
       ctrl
   ])
 .directive('wlEntity', ['$log', ($log)->
@@ -101,16 +109,19 @@ angular.module('wordlift.core', [])
     template: """
   	  <div ng-click="" ng-class="'wl-' + entity.mainType">
   	    {{entity.label}}<small ng-show="entity.occurrences > 0">({{entity.occurrences}})</small>
-  	    <small class="toggle-button" ng-hide="isOpened" ng-click="toggle()">[+]</small>
-  	  	<small class="toggle-button" ng-show="isOpened" ng-click="toggle()">[-]</small>
+  	    <small class="toggle-button" ng-hide="isOpened" ng-click="toggle()">+</small>
+  	  	<small class="toggle-button" ng-show="isOpened" ng-click="toggle()">+</small>
   	  </div>
   	  <div class="details" ng-show="isOpened">{{entity.description}}</div>
   	"""
-    link: ($scope, $element, $attrs, $ctrl) ->
-				      
-      $ctrl.containerNotEmpty()
+    link: ($scope, $element, $attrs, $ctrl) ->				      
+      
       $scope.isOpened = false
+      
+      $ctrl.addTile $scope
+
       $scope.toggle = ()->
+      	$ctrl.closeTiles()
       	$scope.isOpened = !$scope.isOpened
   ])
 $(

@@ -15,7 +15,7 @@
  		{
 	 		"id": "when",
 	 		"label": "Dai cazzo",
- 			"registeredTypes": [ "event", "person" ],
+ 			"registeredTypes": [ "event" ],
  			"registeredWidgets": [ "imageSuggestor"]
  		}
  	]
