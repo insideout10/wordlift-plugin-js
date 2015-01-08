@@ -111,7 +111,7 @@ angular.module('wordlift.core', [])
         $log.debug "annotation #{annotationId}"
         return if not annotationId?
         for tile in $scope.tiles
-          tile.visible = tile.entity.isRelatedToAnnotation( annotationId )
+          tile.isVisible = tile.entity.isRelatedToAnnotation( annotationId )
 
       ctrl =
       	onSelectedTile: (tile)->
@@ -129,12 +129,18 @@ angular.module('wordlift.core', [])
     scope:
       entity: '='
     template: """
-  	  <div ng-class="'wl-' + entity.mainType" ng-show="visible">
-  	    <span ng-click="select()">{{entity.label}}</span><small ng-show="entity.occurrences > 0">({{entity.occurrences}})</small>
-  	    <small class="toggle-button" ng-hide="isOpened" ng-click="toggle()">+</small>
+  	  <div ng-class="'wl-' + entity.mainType" ng-show="isVisible">
+  	    
+        <span ng-click="select()">{{entity.label}}</span>
+        <small ng-show="entity.occurrences > 0">({{entity.occurrences}})</small>
+  	    
+        <small class="toggle-button" ng-hide="isOpened" ng-click="toggle()">+</small>
   	  	<small class="toggle-button" ng-show="isOpened" ng-click="toggle()">-</small>
   	  </div>
-  	  <div class="details" ng-show="isOpened">{{entity.description}}</div>
+  	  <div class="details" ng-show="isOpened">
+        <p><img ng-src="{{ entity.images[0] }}" />
+        <p>{{entity.description}}</p>
+      </div>
   	"""
     link: ($scope, $element, $attrs, $ctrl) ->				      
       
@@ -142,7 +148,7 @@ angular.module('wordlift.core', [])
       $ctrl.addTile $scope
 
       $scope.isOpened = false
-      $scope.visible = true
+      $scope.isVisible = true
       
       $scope.open = ()->
       	$scope.isOpened = true

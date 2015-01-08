@@ -227,7 +227,7 @@
             _results = [];
             for (_i = 0, _len = _ref.length; _i < _len; _i++) {
               tile = _ref[_i];
-              _results.push(tile.visible = tile.entity.isRelatedToAnnotation(annotationId));
+              _results.push(tile.isVisible = tile.entity.isRelatedToAnnotation(annotationId));
             }
             return _results;
           });
@@ -261,11 +261,11 @@
         scope: {
           entity: '='
         },
-        template: "<div ng-class=\"'wl-' + entity.mainType\" ng-show=\"visible\">\n  <span ng-click=\"select()\">{{entity.label}}</span><small ng-show=\"entity.occurrences > 0\">({{entity.occurrences}})</small>\n  <small class=\"toggle-button\" ng-hide=\"isOpened\" ng-click=\"toggle()\">+</small>\n	<small class=\"toggle-button\" ng-show=\"isOpened\" ng-click=\"toggle()\">-</small>\n</div>\n<div class=\"details\" ng-show=\"isOpened\">{{entity.description}}</div>",
+        template: "<div ng-class=\"'wl-' + entity.mainType\" ng-show=\"isVisible\">\n  \n        <span ng-click=\"select()\">{{entity.label}}</span>\n        <small ng-show=\"entity.occurrences > 0\">({{entity.occurrences}})</small>\n  \n        <small class=\"toggle-button\" ng-hide=\"isOpened\" ng-click=\"toggle()\">+</small>\n	<small class=\"toggle-button\" ng-show=\"isOpened\" ng-click=\"toggle()\">-</small>\n</div>\n<div class=\"details\" ng-show=\"isOpened\">\n        <p><img ng-src=\"{{ entity.images[0] }}\" />\n        <p>{{entity.description}}</p>\n      </div>",
         link: function($scope, $element, $attrs, $ctrl) {
           $ctrl.addTile($scope);
           $scope.isOpened = false;
-          $scope.visible = true;
+          $scope.isVisible = true;
           $scope.open = function() {
             return $scope.isOpened = true;
           };
