@@ -152,12 +152,13 @@
       $scope.analysis = {};
       $scope.entitySelection = {};
       $scope.occurences = {};
+      $scope.annotation = void 0;
       $scope.$on("configurationLoaded", function(event, configuration) {
         var box, _i, _len, _ref;
         _ref = configuration.classificationBoxes;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           box = _ref[_i];
-          $scope.entitySelection[box.id] = [];
+          $scope.entitySelection[box.id] = {};
         }
         return $scope.configuration = configuration;
       });
@@ -165,10 +166,13 @@
         $log.debug(analysis);
         return $scope.analysis = analysis;
       });
-      return $scope.onSelectedEntityTile = function(entityId, scope) {
-        $log.debug("Entity tile selected for entity " + entityId + " within '" + scope + "' scope");
-        if (__indexOf.call($scope.entitySelection[scope], entityId) < 0) {
-          return $scope.entitySelection[scope].push(entityId);
+      return $scope.onSelectedEntityTile = function(entity, scope) {
+        $log.debug("Entity tile selected for entity " + entity.id + " within '" + scope + "' scope");
+        if ($scope.entitySelection[scope][entity.id] == null) {
+          $scope.entitySelection[scope][entity.id] = entity;
+          return $log.debug($scope.entitySelection);
+        } else {
+          return $scope.entitySelection[scope][entity.id] = void 0;
         }
       };
     }
@@ -197,6 +201,9 @@
           var ctrl;
           $scope.tiles = [];
           ctrl = {
+            onSelectedTile: function(tile) {
+              return $scope.onSelectedEntityTile(tile.entity, $scope.box.id);
+            },
             addTile: function(tile) {
               return $scope.tiles.push(tile);
             },
@@ -223,26 +230,29 @@
         scope: {
           entity: '='
         },
-        template: "<div ng-click=\"\" ng-class=\"'wl-' + entity.mainType\">\n  {{entity.label}}<small ng-show=\"entity.occurrences > 0\">({{entity.occurrences}})</small>\n  <small class=\"toggle-button\" ng-hide=\"isOpened\" ng-click=\"toggle()\">+</small>\n	<small class=\"toggle-button\" ng-show=\"isOpened\" ng-click=\"toggle()\">-</small>\n</div>\n<div class=\"details\" ng-show=\"isOpened\">{{entity.description}}</div>",
+        template: "<div ng-class=\"'wl-' + entity.mainType\">\n  <span ng-click=\"select()\">{{entity.label}}</span><small ng-show=\"entity.occurrences > 0\">({{entity.occurrences}})</small>\n  <small class=\"toggle-button\" ng-hide=\"isOpened\" ng-click=\"toggle()\">+</small>\n	<small class=\"toggle-button\" ng-show=\"isOpened\" ng-click=\"toggle()\">-</small>\n</div>\n<div class=\"details\" ng-show=\"isOpened\">{{entity.description}}</div>",
         link: function($scope, $element, $attrs, $ctrl) {
-          $scope.isOpened = false;
           $ctrl.addTile($scope);
+          $scope.isOpened = false;
           $scope.open = function() {
             return $scope.isOpened = true;
           };
           $scope.close = function() {
             return $scope.isOpened = false;
           };
-          return $scope.toggle = function() {
+          $scope.toggle = function() {
             $ctrl.closeTiles();
             return $scope.isOpened = !$scope.isOpened;
+          };
+          return $scope.select = function() {
+            return $ctrl.onSelectedTile($scope);
           };
         }
       };
     }
   ]);
 
-  $(container = $("<div id=\"wordlift-edit-post-wrapper\" ng-controller=\"coreController\">\n	<wl-classification-box ng-repeat=\"box in configuration.classificationBoxes\"></wl-classification-box>\n	<hr />\n	<div ng-repeat=\"(box, ids) in entitySelection\">\n		<span>{{ box }}</span> - <span>{{ ids }}</span> \n	</div>\n</div>").appendTo('#dx'));
+  $(container = $("<div id=\"wordlift-edit-post-wrapper\" ng-controller=\"coreController\">\n	<wl-classification-box ng-repeat=\"box in configuration.classificationBoxes\"></wl-classification-box>\n	<hr />\n	<div ng-repeat=\"(box, e) in entitySelection\">\n		<span>{{ box }}</span> - <span>{{ e }}</span> \n	</div>\n</div>").appendTo('#dx'));
 
   injector = angular.bootstrap($('#wordlift-edit-post-wrapper'), ['wordlift.core']);
 

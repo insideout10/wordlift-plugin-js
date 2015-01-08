@@ -186,20 +186,27 @@ angular.module('wordlift.core', [])
   $scope.analysis = {}
   $scope.entitySelection = {}
   $scope.occurences = {}
+  $scope.annotation = undefined
 
   $scope.$on "configurationLoaded", (event, configuration) ->
     for box in configuration.classificationBoxes
-      $scope.entitySelection[ box.id ] = []
+      $scope.entitySelection[ box.id ] = {}
     $scope.configuration = configuration
 
   $scope.$on "analysisPerformed", (event, analysis) ->
     $log.debug analysis
     $scope.analysis = analysis
 
-  $scope.onSelectedEntityTile = (entityId, scope)->
-  	$log.debug "Entity tile selected for entity #{entityId} within '#{scope}' scope"
-  	if entityId not in $scope.entitySelection[ scope ]
-  	  $scope.entitySelection[ scope ].push entityId
+  $scope.onSelectedEntityTile = (entity, scope)->
+  	$log.debug "Entity tile selected for entity #{entity.id} within '#{scope}' scope"
+  	if not $scope.entitySelection[ scope ][ entity.id ]?
+
+  	  $scope.entitySelection[ scope ][ entity.id ] = entity
+  	  $log.debug $scope.entitySelection
+  	  # TODO All related annotations has to be disambiguated accordingly
+  	else
+  	  $scope.entitySelection[ scope ][ entity.id ] = undefined
+  	  # TODO Any related annotation has to be reset just if this is the last related instance 
   	
 ])
 .directive('wlClassificationBox', ['$log', ($log)->
@@ -222,9 +229,12 @@ angular.module('wordlift.core', [])
     controller: ($scope, $element, $attrs) ->
       
       # Mantain a reference to nested entity tiles $scope
+      # TODO manage on scope distruction event
       $scope.tiles = []
       
       ctrl =
+      	onSelectedTile: (tile)->
+      	  $scope.onSelectedEntityTile tile.entity, $scope.box.id
       	addTile: (tile)->
           $scope.tiles.push tile
         closeTiles: ()->
@@ -238,8 +248,8 @@ angular.module('wordlift.core', [])
     scope:
       entity: '='
     template: """
-  	  <div ng-click="" ng-class="'wl-' + entity.mainType">
-  	    {{entity.label}}<small ng-show="entity.occurrences > 0">({{entity.occurrences}})</small>
+  	  <div ng-class="'wl-' + entity.mainType">
+  	    <span ng-click="select()">{{entity.label}}</span><small ng-show="entity.occurrences > 0">({{entity.occurrences}})</small>
   	    <small class="toggle-button" ng-hide="isOpened" ng-click="toggle()">+</small>
   	  	<small class="toggle-button" ng-show="isOpened" ng-click="toggle()">-</small>
   	  </div>
@@ -247,27 +257,29 @@ angular.module('wordlift.core', [])
   	"""
     link: ($scope, $element, $attrs, $ctrl) ->				      
       
-      $scope.isOpened = false
-      
+      # Add tile to related container scope
       $ctrl.addTile $scope
 
+      $scope.isOpened = false
+      
       $scope.open = ()->
       	$scope.isOpened = true
-
       $scope.close = ()->
-      	$scope.isOpened = false
-      	
+      	$scope.isOpened = false  	
       $scope.toggle = ()->
       	$ctrl.closeTiles()
       	$scope.isOpened = !$scope.isOpened
+
+      $scope.select = ()-> 
+        $ctrl.onSelectedTile $scope
   ])
 $(
   container = $("""
   	<div id="wordlift-edit-post-wrapper" ng-controller="coreController">
   		<wl-classification-box ng-repeat="box in configuration.classificationBoxes"></wl-classification-box>
   		<hr />
-  		<div ng-repeat="(box, ids) in entitySelection">
-  			<span>{{ box }}</span> - <span>{{ ids }}</span> 
+  		<div ng-repeat="(box, e) in entitySelection">
+  			<span>{{ box }}</span> - <span>{{ e }}</span> 
   		</div>
   	</div>
   """)
