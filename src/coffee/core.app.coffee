@@ -15,6 +15,13 @@ angular.module('wordlift.core', [])
     for id, entity of data.entities
       entity.occurrences = 0
       entity.id = id
+      entity.annotations = {}
+      entity.isRelatedToAnnotation = (annotationId)->
+        if @.annotations[ annotationId ]? then true else false
+
+    for id, annotation of data.annotations
+      for ea in annotation.entityMatches
+      	data.entities[ ea.entityId ].annotations[ id ] = annotation
 
     data
 
@@ -84,23 +91,28 @@ angular.module('wordlift.core', [])
     template: """
     	<div class="classification-box">
     		<h4 class="box-header">{{box.label}}</h4>
-  			<wl-entity notify="onSelectedEntityTile(entity.id, box.id)" entity="entity" ng-repeat="entity in entities"></wl-entity>
+  			<wl-entity-tile notify="onSelectedEntityTile(entity.id, box.id)" entity="entity" ng-repeat="entity in entities"></wl-entity>
   		</div>	
     """
     link: ($scope, $element, $attrs, $ctrl) ->  	  
   	  
-  	  $scope.entities = {}
-  	
-  	  for id, entity of $scope.analysis.entities
-  	    if entity.mainType in $scope.box.registeredTypes 
-  	      $scope.entities[ id ] = entity 
+      $scope.entities = {}
+      for id, entity of $scope.analysis.entities
+        if entity.mainType in $scope.box.registeredTypes
+          $scope.entities[ id ] = entity
 
     controller: ($scope, $element, $attrs) ->
       
       # Mantain a reference to nested entity tiles $scope
       # TODO manage on scope distruction event
       $scope.tiles = []
-      
+
+      $scope.$watch "annotation", (annotationId) ->
+        $log.debug "annotation #{annotationId}"
+        return if not annotationId?
+        for tile in $scope.tiles
+          tile.visible = tile.entity.isRelatedToAnnotation( annotationId )
+
       ctrl =
       	onSelectedTile: (tile)->
       	  $scope.onSelectedEntityTile tile.entity, $scope.box.id
@@ -111,13 +123,13 @@ angular.module('wordlift.core', [])
           	tile.close()
       ctrl
   ])
-.directive('wlEntity', ['$log', ($log)->
+.directive('wlEntityTile', ['$log', ($log)->
     require: '^wlClassificationBox'
     restrict: 'E'
     scope:
       entity: '='
     template: """
-  	  <div ng-class="'wl-' + entity.mainType">
+  	  <div ng-class="'wl-' + entity.mainType" ng-show="visible">
   	    <span ng-click="select()">{{entity.label}}</span><small ng-show="entity.occurrences > 0">({{entity.occurrences}})</small>
   	    <small class="toggle-button" ng-hide="isOpened" ng-click="toggle()">+</small>
   	  	<small class="toggle-button" ng-show="isOpened" ng-click="toggle()">-</small>
@@ -130,6 +142,7 @@ angular.module('wordlift.core', [])
       $ctrl.addTile $scope
 
       $scope.isOpened = false
+      $scope.visible = true
       
       $scope.open = ()->
       	$scope.isOpened = true
@@ -150,6 +163,7 @@ $(
   		<div ng-repeat="(box, e) in entitySelection">
   			<span>{{ box }}</span> - <span>{{ e }}</span> 
   		</div>
+  		<button ng-click="annotation = 'urn:enhancement-1f83847a-95c2-c81b-cba9-f958aed45b34'"></button>
   	</div>
   """)
   .appendTo('#dx')
