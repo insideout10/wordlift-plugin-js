@@ -78,8 +78,7 @@ angular.module('wordlift.core', [])
     	<div class="classification-box">
     		<h4 class="box-header">{{box.label}}</h4>
   			<wl-entity notify="onSelectedEntityTile(entity.id, box.id)" entity="entity" ng-repeat="entity in entities"></wl-entity>
-  		</div>
-  		<p>-- {{openedEntityTile}}</p>		
+  		</div>	
     """
     link: ($scope, $element, $attrs, $ctrl) ->  	  
   	  
@@ -91,14 +90,15 @@ angular.module('wordlift.core', [])
 
     controller: ($scope, $element, $attrs) ->
       
-      $scope.openedEntityTile = undefined
+      # Mantain a reference to nested entity tiles $scope
       $scope.tiles = []
+      
       ctrl =
       	addTile: (tile)->
           $scope.tiles.push tile
         closeTiles: ()->
           for tile in $scope.tiles
-          	tile.isOpened = false
+          	tile.close()
       ctrl
   ])
 .directive('wlEntity', ['$log', ($log)->
@@ -110,7 +110,7 @@ angular.module('wordlift.core', [])
   	  <div ng-click="" ng-class="'wl-' + entity.mainType">
   	    {{entity.label}}<small ng-show="entity.occurrences > 0">({{entity.occurrences}})</small>
   	    <small class="toggle-button" ng-hide="isOpened" ng-click="toggle()">+</small>
-  	  	<small class="toggle-button" ng-show="isOpened" ng-click="toggle()">+</small>
+  	  	<small class="toggle-button" ng-show="isOpened" ng-click="toggle()">-</small>
   	  </div>
   	  <div class="details" ng-show="isOpened">{{entity.description}}</div>
   	"""
@@ -120,6 +120,12 @@ angular.module('wordlift.core', [])
       
       $ctrl.addTile $scope
 
+      $scope.open = ()->
+      	$scope.isOpened = true
+
+      $scope.close = ()->
+      	$scope.isOpened = false
+      	
       $scope.toggle = ()->
       	$ctrl.closeTiles()
       	$scope.isOpened = !$scope.isOpened

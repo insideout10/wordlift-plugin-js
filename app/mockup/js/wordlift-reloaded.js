@@ -177,7 +177,7 @@
       return {
         restrict: 'E',
         scope: true,
-        template: "    	<div class=\"classification-box\">\n    		<h4 class=\"box-header\">{{box.label}}</h4>\n	<wl-entity notify=\"onSelectedEntityTile(entity.id, box.id)\" entity=\"entity\" ng-repeat=\"entity in entities\"></wl-entity>\n</div>\n<p>-- {{openedEntityTile}}</p>		",
+        template: "    	<div class=\"classification-box\">\n    		<h4 class=\"box-header\">{{box.label}}</h4>\n	<wl-entity notify=\"onSelectedEntityTile(entity.id, box.id)\" entity=\"entity\" ng-repeat=\"entity in entities\"></wl-entity>\n</div>	",
         link: function($scope, $element, $attrs, $ctrl) {
           var entity, id, _ref, _ref1, _results;
           $scope.entities = {};
@@ -195,7 +195,6 @@
         },
         controller: function($scope, $element, $attrs) {
           var ctrl;
-          $scope.openedEntityTile = void 0;
           $scope.tiles = [];
           ctrl = {
             addTile: function(tile) {
@@ -207,7 +206,7 @@
               _results = [];
               for (_i = 0, _len = _ref.length; _i < _len; _i++) {
                 tile = _ref[_i];
-                _results.push(tile.isOpened = false);
+                _results.push(tile.close());
               }
               return _results;
             }
@@ -224,10 +223,16 @@
         scope: {
           entity: '='
         },
-        template: "<div ng-click=\"\" ng-class=\"'wl-' + entity.mainType\">\n  {{entity.label}}<small ng-show=\"entity.occurrences > 0\">({{entity.occurrences}})</small>\n  <small class=\"toggle-button\" ng-hide=\"isOpened\" ng-click=\"toggle()\">+</small>\n	<small class=\"toggle-button\" ng-show=\"isOpened\" ng-click=\"toggle()\">+</small>\n</div>\n<div class=\"details\" ng-show=\"isOpened\">{{entity.description}}</div>",
+        template: "<div ng-click=\"\" ng-class=\"'wl-' + entity.mainType\">\n  {{entity.label}}<small ng-show=\"entity.occurrences > 0\">({{entity.occurrences}})</small>\n  <small class=\"toggle-button\" ng-hide=\"isOpened\" ng-click=\"toggle()\">+</small>\n	<small class=\"toggle-button\" ng-show=\"isOpened\" ng-click=\"toggle()\">-</small>\n</div>\n<div class=\"details\" ng-show=\"isOpened\">{{entity.description}}</div>",
         link: function($scope, $element, $attrs, $ctrl) {
           $scope.isOpened = false;
           $ctrl.addTile($scope);
+          $scope.open = function() {
+            return $scope.isOpened = true;
+          };
+          $scope.close = function() {
+            return $scope.isOpened = false;
+          };
           return $scope.toggle = function() {
             $ctrl.closeTiles();
             return $scope.isOpened = !$scope.isOpened;
