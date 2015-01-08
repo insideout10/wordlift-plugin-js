@@ -3,13 +3,19 @@
  		{
  			"id": "what",
  			"label": "Di cosa parla?",
- 			"availableTypes": [ "event", "organization", "person", "place" ],
+ 			"registeredTypes": [ "event", "organization", "person", "place" ],
  			"registeredWidgets": [ "imageSuggestor"]
  		},
  		{
 	 		"id": "who",
 	 		"label": "Chi è coinvolto?",
- 			"availableTypes": [ "organization", "person" ],
+ 			"registeredTypes": [ "organization", "person" ],
+ 			"registeredWidgets": [ "imageSuggestor"]
+ 		},
+ 		{
+	 		"id": "when",
+	 		"label": "Dai cazzo",
+ 			"registeredTypes": [ "event", "person" ],
  			"registeredWidgets": [ "imageSuggestor"]
  		}
  	]

@@ -14,10 +14,8 @@ angular.module('wordlift.core', [])
     
     for id, entity of data.entities
       entity.occurrences = 0
-    for id, annotation of data.annotations
-      for match in annotation.entityMatches
-      	data.entities[ match.entityId ][ 'occurrences' ] += 1
-    
+      entity.id = id
+
     data
 
   service.perform = ()->
@@ -73,22 +71,58 @@ angular.module('wordlift.core', [])
   	  $scope.entitySelection[ scope ].push entityId
   	
 ])
+.directive('wlClassificationBox', ['$log', ($log)->
+    restrict: 'E'
+    scope: true
+    template: """
+    	<div class="classification-box" ng-hide="isEmpty">
+    		<h4 class="box-header">{{box.label}}</h4>
+  			<wl-entity notify="onSelectedEntityTile(entity.id, box.id)" entity="entity" ng-repeat="entity in entities"></wl-entity>
+  		</div>		
+    """
+    link: ($scope, $element, $attrs, $ctrl) ->  	  
+  	  
+  	  $scope.entities = {}
+  	  for id, entity of $scope.analysis.entities
+  	    if entity.mainType in $scope.box.registeredTypes then $scope.entities[ id ] = entity 
 
+    controller: ($scope, $element, $attrs) ->
+      $scope.isEmpty = true
+      ctrl =
+      	containerNotEmpty: ()->
+          $scope.isEmpty = false
+      ctrl
+  ])
+.directive('wlEntity', ['$log', ($log)->
+    require: '^wlClassificationBox'
+    restrict: 'E'
+    scope:
+      entity: '='
+    template: """
+  	  <div ng-click="" ng-class="'wl-' + entity.mainType">
+  	    {{entity.label}}<small ng-show="entity.occurrences > 0">({{entity.occurrences}})</small>
+  	    <small class="toggle-button" ng-hide="isOpened" ng-click="toggle()">[+]</small>
+  	  	<small class="toggle-button" ng-show="isOpened" ng-click="toggle()">[-]</small>
+  	  </div>
+  	  <div class="details" ng-show="isOpened">{{entity.description}}</div>
+  	"""
+    link: ($scope, $element, $attrs, $ctrl) ->
+				      
+      $ctrl.containerNotEmpty()
+      $scope.isOpened = false
+      $scope.toggle = ()->
+      	$scope.isOpened = !$scope.isOpened
+  ])
 $(
-  container = $('''
+  container = $("""
   	<div id="wordlift-edit-post-wrapper" ng-controller="coreController">
-  		<ul ng-repeat="box in configuration.classificationBoxes" class="classification-box">
-  			<li>{{box.label}}</li>
-  			<ul ng-repeat="(entityId, entity) in analysis.entities">
-  				<li ng-click="onSelectedEntityTile( entityId, box.id )" ng-class="'wl-' + entity.mainType">{{entity.label}} <small>({{entity.occurrences}})</small></li>
-  			</ul>
-  		</ul>
+  		<wl-classification-box ng-repeat="box in configuration.classificationBoxes"></wl-classification-box>
   		<hr />
   		<div ng-repeat="(box, ids) in entitySelection">
   			<span>{{ box }}</span> - <span>{{ ids }}</span> 
   		</div>
   	</div>
-  ''')
+  """)
   .appendTo('#dx')
 )
 

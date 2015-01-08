@@ -113,20 +113,12 @@
       var service, _currentAnalysis;
       service = _currentAnalysis = {};
       service.parse = function(data) {
-        var annotation, entity, id, match, _i, _len, _ref, _ref1, _ref2;
+        var entity, id, _ref;
         _ref = data.entities;
         for (id in _ref) {
           entity = _ref[id];
           entity.occurrences = 0;
-        }
-        _ref1 = data.annotations;
-        for (id in _ref1) {
-          annotation = _ref1[id];
-          _ref2 = annotation.entityMatches;
-          for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
-            match = _ref2[_i];
-            data.entities[match.entityId]['occurrences'] += 1;
-          }
+          entity.id = id;
         }
         return data;
       };
@@ -180,9 +172,60 @@
         }
       };
     }
+  ]).directive('wlClassificationBox', [
+    '$log', function($log) {
+      return {
+        restrict: 'E',
+        scope: true,
+        template: "    	<div class=\"classification-box\" ng-hide=\"isEmpty\">\n    		<h4 class=\"box-header\">{{box.label}}</h4>\n	<wl-entity notify=\"onSelectedEntityTile(entity.id, box.id)\" entity=\"entity\" ng-repeat=\"entity in entities\"></wl-entity>\n</div>		",
+        link: function($scope, $element, $attrs, $ctrl) {
+          var entity, id, _ref, _ref1, _results;
+          $scope.entities = {};
+          _ref = $scope.analysis.entities;
+          _results = [];
+          for (id in _ref) {
+            entity = _ref[id];
+            if (_ref1 = entity.mainType, __indexOf.call($scope.box.registeredTypes, _ref1) >= 0) {
+              _results.push($scope.entities[id] = entity);
+            } else {
+              _results.push(void 0);
+            }
+          }
+          return _results;
+        },
+        controller: function($scope, $element, $attrs) {
+          var ctrl;
+          $scope.isEmpty = true;
+          ctrl = {
+            containerNotEmpty: function() {
+              return $scope.isEmpty = false;
+            }
+          };
+          return ctrl;
+        }
+      };
+    }
+  ]).directive('wlEntity', [
+    '$log', function($log) {
+      return {
+        require: '^wlClassificationBox',
+        restrict: 'E',
+        scope: {
+          entity: '='
+        },
+        template: "<div ng-click=\"\" ng-class=\"'wl-' + entity.mainType\">\n  {{entity.label}}<small ng-show=\"entity.occurrences > 0\">({{entity.occurrences}})</small>\n  <small class=\"toggle-button\" ng-hide=\"isOpened\" ng-click=\"toggle()\">[+]</small>\n	<small class=\"toggle-button\" ng-show=\"isOpened\" ng-click=\"toggle()\">[-]</small>\n</div>\n<div class=\"details\" ng-show=\"isOpened\">{{entity.description}}</div>",
+        link: function($scope, $element, $attrs, $ctrl) {
+          $ctrl.containerNotEmpty();
+          $scope.isOpened = false;
+          return $scope.toggle = function() {
+            return $scope.isOpened = !$scope.isOpened;
+          };
+        }
+      };
+    }
   ]);
 
-  $(container = $('<div id="wordlift-edit-post-wrapper" ng-controller="coreController">\n	<ul ng-repeat="box in configuration.classificationBoxes" class="classification-box">\n		<li>{{box.label}}</li>\n		<ul ng-repeat="(entityId, entity) in analysis.entities">\n			<li ng-click="onSelectedEntityTile( entityId, box.id )" ng-class="\'wl-\' + entity.mainType">{{entity.label}} <small>({{entity.occurrences}})</small></li>\n		</ul>\n	</ul>\n	<hr />\n	<div ng-repeat="(box, ids) in entitySelection">\n		<span>{{ box }}</span> - <span>{{ ids }}</span> \n	</div>\n</div>').appendTo('#dx'));
+  $(container = $("<div id=\"wordlift-edit-post-wrapper\" ng-controller=\"coreController\">\n	<wl-classification-box ng-repeat=\"box in configuration.classificationBoxes\"></wl-classification-box>\n	<hr />\n	<div ng-repeat=\"(box, ids) in entitySelection\">\n		<span>{{ box }}</span> - <span>{{ ids }}</span> \n	</div>\n</div>").appendTo('#dx'));
 
   injector = angular.bootstrap($('#wordlift-edit-post-wrapper'), ['wordlift.core']);
 
