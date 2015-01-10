@@ -63,6 +63,7 @@ angular.module('wordlift.core', [])
   $scope.entitySelection = {}
   $scope.occurences = {}
   $scope.annotation = undefined
+  $scope.boxes = []
 
   $scope.$on "configurationLoaded", (event, configuration) ->
     for box in configuration.classificationBoxes
@@ -117,6 +118,7 @@ angular.module('wordlift.core', [])
       	onSelectedTile: (tile)->
       	  $scope.onSelectedEntityTile tile.entity, $scope.box.id
       	addTile: (tile)->
+          $log.debug "Adding tile with id #{tile.$id}"
           $scope.tiles.push tile
         closeTiles: ()->
           for tile in $scope.tiles
@@ -129,18 +131,18 @@ angular.module('wordlift.core', [])
     scope:
       entity: '='
     template: """
-  	  <div ng-class="'wl-' + entity.mainType" ng-show="isVisible">
-  	    
-        <span ng-click="select()">{{entity.label}}</span>
+  	  <div ng-class="wrapperCssClasses" ng-show="isVisible">
+  	    <i class="type"></i>
+        <span class="label" ng-click="select()">{{entity.label}}</span>
         <small ng-show="entity.occurrences > 0">({{entity.occurrences}})</small>
-  	    
-        <small class="toggle-button" ng-hide="isOpened" ng-click="toggle()">+</small>
+  	    <small class="toggle-button" ng-hide="isOpened" ng-click="toggle()">+</small>
   	  	<small class="toggle-button" ng-show="isOpened" ng-click="toggle()">-</small>
+        <div class="details" ng-show="isOpened">
+          <p><img class="thumbnail" ng-src="{{ entity.images[0] }}" />
+          <p>{{entity.description}}</p>
+        </div>
   	  </div>
-  	  <div class="details" ng-show="isOpened">
-        <p><img ng-src="{{ entity.images[0] }}" />
-        <p>{{entity.description}}</p>
-      </div>
+
   	"""
     link: ($scope, $element, $attrs, $ctrl) ->				      
       
@@ -149,15 +151,18 @@ angular.module('wordlift.core', [])
 
       $scope.isOpened = false
       $scope.isVisible = true
-      
+
+      $scope.wrapperCssClasses = [ "entity", "wl-#{$scope.entity.mainType}" ]
+
       $scope.open = ()->
       	$scope.isOpened = true
       $scope.close = ()->
       	$scope.isOpened = false  	
       $scope.toggle = ()->
-      	$ctrl.closeTiles()
-      	$scope.isOpened = !$scope.isOpened
-
+        if !$scope.isOpened 
+          $ctrl.closeTiles()    
+        $scope.isOpened = !$scope.isOpened
+        
       $scope.select = ()-> 
         $ctrl.onSelectedTile $scope
   ])
@@ -165,17 +170,18 @@ $(
   container = $("""
   	<div id="wordlift-edit-post-wrapper" ng-controller="coreController">
   		<wl-classification-box ng-repeat="box in configuration.classificationBoxes"></wl-classification-box>
-  		<hr />
-  		<div ng-repeat="(box, e) in entitySelection">
-  			<span>{{ box }}</span> - <span>{{ e }}</span> 
-  		</div>
-  		<button ng-click="annotation = 'urn:enhancement-1f83847a-95c2-c81b-cba9-f958aed45b34'"></button>
-  	</div>
+    <hr />
+    <div ng-repeat="(box, e) in entitySelection">
+      <span>{{ box }}</span> - <span>{{ e }}</span> 
+    </div>
+    <button ng-click="annotation = 'urn:enhancement-1f83847a-95c2-c81b-cba9-f958aed45b34'"></button>
+    </div>
+
   """)
   .appendTo('#dx')
 )
 
-injector = angular.bootstrap $('#wordlift-edit-post-wrapper'), ['wordlift.core']
+injector = angular.bootstrap $('body'), ['wordlift.core']
 injector.invoke(['ConfigurationService', 'AnalysisService','$rootScope', (ConfigurationService, AnalysisService, $rootScope) ->
 	# execute the following commands in the angular js context.
     $rootScope.$apply(->

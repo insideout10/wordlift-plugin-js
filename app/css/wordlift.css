@@ -1546,7 +1546,7 @@
   color: #000000;
 }
 .entity.wl-thing {
-  border-color: #c0c0c0;
+  border-color: #000000;
   color: black;
 }
 .entity.wl-thing .type:before {
@@ -1554,12 +1554,12 @@
 }
 .entity.wl-thing:hover,
 .entity.wl-thing.selected {
-  background-color: #c0c0c0;
-  color: #000000;
+  background-color: #000000;
+  color: #ffffff;
 }
 .entity.wl-thing .thumbnail {
-  background-color: #c0c0c0;
-  color: #000000;
+  background-color: #000000;
+  color: #ffffff;
 }
 .entity .source {
   position: absolute;
@@ -1774,8 +1774,8 @@ body#tinymce .textannotation.wl-place {
 }
 body#tinymce .textannotation.wl-thing {
   border: 0 !important;
-  color: #000000;
-  background-color: #c0c0c0;
+  color: #ffffff;
+  background-color: #000000;
   vertical-align: center;
 }
 body#tinymce .textannotation .textannotation {

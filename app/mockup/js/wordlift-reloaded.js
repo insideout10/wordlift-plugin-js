@@ -170,6 +170,7 @@
       $scope.entitySelection = {};
       $scope.occurences = {};
       $scope.annotation = void 0;
+      $scope.boxes = [];
       $scope.$on("configurationLoaded", function(event, configuration) {
         var box, _i, _len, _ref;
         _ref = configuration.classificationBoxes;
@@ -236,6 +237,7 @@
               return $scope.onSelectedEntityTile(tile.entity, $scope.box.id);
             },
             addTile: function(tile) {
+              $log.debug("Adding tile with id " + tile.$id);
               return $scope.tiles.push(tile);
             },
             closeTiles: function() {
@@ -261,11 +263,12 @@
         scope: {
           entity: '='
         },
-        template: "<div ng-class=\"'wl-' + entity.mainType\" ng-show=\"isVisible\">\n  \n        <span ng-click=\"select()\">{{entity.label}}</span>\n        <small ng-show=\"entity.occurrences > 0\">({{entity.occurrences}})</small>\n  \n        <small class=\"toggle-button\" ng-hide=\"isOpened\" ng-click=\"toggle()\">+</small>\n	<small class=\"toggle-button\" ng-show=\"isOpened\" ng-click=\"toggle()\">-</small>\n</div>\n<div class=\"details\" ng-show=\"isOpened\">\n        <p><img ng-src=\"{{ entity.images[0] }}\" />\n        <p>{{entity.description}}</p>\n      </div>",
+        template: "<div ng-class=\"wrapperCssClasses\" ng-show=\"isVisible\">\n  <i class=\"type\"></i>\n        <span class=\"label\" ng-click=\"select()\">{{entity.label}}</span>\n        <small ng-show=\"entity.occurrences > 0\">({{entity.occurrences}})</small>\n  <small class=\"toggle-button\" ng-hide=\"isOpened\" ng-click=\"toggle()\">+</small>\n	<small class=\"toggle-button\" ng-show=\"isOpened\" ng-click=\"toggle()\">-</small>\n        <div class=\"details\" ng-show=\"isOpened\">\n          <p><img class=\"thumbnail\" ng-src=\"{{ entity.images[0] }}\" />\n          <p>{{entity.description}}</p>\n        </div>\n</div>\n",
         link: function($scope, $element, $attrs, $ctrl) {
           $ctrl.addTile($scope);
           $scope.isOpened = false;
           $scope.isVisible = true;
+          $scope.wrapperCssClasses = ["entity", "wl-" + $scope.entity.mainType];
           $scope.open = function() {
             return $scope.isOpened = true;
           };
@@ -273,7 +276,9 @@
             return $scope.isOpened = false;
           };
           $scope.toggle = function() {
-            $ctrl.closeTiles();
+            if (!$scope.isOpened) {
+              $ctrl.closeTiles();
+            }
             return $scope.isOpened = !$scope.isOpened;
           };
           return $scope.select = function() {
@@ -284,9 +289,9 @@
     }
   ]);
 
-  $(container = $("<div id=\"wordlift-edit-post-wrapper\" ng-controller=\"coreController\">\n	<wl-classification-box ng-repeat=\"box in configuration.classificationBoxes\"></wl-classification-box>\n	<hr />\n	<div ng-repeat=\"(box, e) in entitySelection\">\n		<span>{{ box }}</span> - <span>{{ e }}</span> \n	</div>\n	<button ng-click=\"annotation = 'urn:enhancement-1f83847a-95c2-c81b-cba9-f958aed45b34'\"></button>\n</div>").appendTo('#dx'));
+  $(container = $("<div id=\"wordlift-edit-post-wrapper\" ng-controller=\"coreController\">\n	<wl-classification-box ng-repeat=\"box in configuration.classificationBoxes\"></wl-classification-box>\n    <hr />\n    <div ng-repeat=\"(box, e) in entitySelection\">\n      <span>{{ box }}</span> - <span>{{ e }}</span> \n    </div>\n    <button ng-click=\"annotation = 'urn:enhancement-1f83847a-95c2-c81b-cba9-f958aed45b34'\"></button>\n    </div>\n").appendTo('#dx'));
 
-  injector = angular.bootstrap($('#wordlift-edit-post-wrapper'), ['wordlift.core']);
+  injector = angular.bootstrap($('body'), ['wordlift.core']);
 
   injector.invoke([
     'ConfigurationService', 'AnalysisService', '$rootScope', function(ConfigurationService, AnalysisService, $rootScope) {
