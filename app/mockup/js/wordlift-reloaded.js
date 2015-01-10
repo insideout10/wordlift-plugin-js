@@ -199,7 +199,7 @@
       return {
         restrict: 'E',
         scope: true,
-        template: "    	<div class=\"classification-box\">\n    		<h4 class=\"box-header\">{{box.label}}</h4>\n	<wl-entity-tile notify=\"onSelectedEntityTile(entity.id, box.id)\" entity=\"entity\" ng-repeat=\"entity in entities\"></wl-entity>\n</div>	",
+        template: "    	<div class=\"classification-box\">\n    		<div class=\"box-header\">\n          <span class=\"label\">{{box.label}}</span>\n        </div>\n	<wl-entity-tile notify=\"onSelectedEntityTile(entity.id, box.id)\" entity=\"entity\" ng-repeat=\"entity in entities\"></wl-entity>\n</div>	",
         link: function($scope, $element, $attrs, $ctrl) {
           var entity, id, _ref, _ref1, _results;
           $scope.entities = {};
@@ -263,7 +263,7 @@
         scope: {
           entity: '='
         },
-        template: "<div ng-class=\"wrapperCssClasses\" ng-show=\"isVisible\">\n  <i class=\"type\"></i>\n        <span class=\"label\" ng-click=\"select()\">{{entity.label}}</span>\n        <small ng-show=\"entity.occurrences > 0\">({{entity.occurrences}})</small>\n  <small class=\"toggle-button\" ng-hide=\"isOpened\" ng-click=\"toggle()\">+</small>\n	<small class=\"toggle-button\" ng-show=\"isOpened\" ng-click=\"toggle()\">-</small>\n        <div class=\"details\" ng-show=\"isOpened\">\n          <p><img class=\"thumbnail\" ng-src=\"{{ entity.images[0] }}\" />\n          <p>{{entity.description}}</p>\n        </div>\n</div>\n",
+        template: "<div ng-class=\"wrapperCssClasses\" ng-show=\"isVisible\">\n  <i class=\"type\"></i>\n        <span class=\"label\" ng-click=\"select()\">{{entity.label}}</span>\n        <small ng-show=\"entity.occurrences > 0\">({{entity.occurrences}})</small>\n        <i ng-class=\"{ 'wl-more': isOpened == false, 'wl-less': isOpened == true }\" ng-click=\"toggle()\"></i>\n  <div class=\"details\" ng-show=\"isOpened\">\n          <p><img class=\"thumbnail\" ng-src=\"{{ entity.images[0] }}\" />{{entity.description}}</p>\n        </div>\n</div>\n",
         link: function($scope, $element, $attrs, $ctrl) {
           $ctrl.addTile($scope);
           $scope.isOpened = false;

@@ -2,19 +2,25 @@
  	"classificationBoxes": [
  		{
  			"id": "what",
- 			"label": "Di cosa parla?",
+ 			"label": "About",
  			"registeredTypes": [ "event", "organization", "person", "place" ],
  			"registeredWidgets": [ "imageSuggestor"]
  		},
  		{
 	 		"id": "who",
-	 		"label": "Chi è coinvolto?",
+	 		"label": "Who",
  			"registeredTypes": [ "organization", "person" ],
  			"registeredWidgets": [ "imageSuggestor"]
  		},
  		{
+	 		"id": "where",
+	 		"label": "Where",
+ 			"registeredTypes": [ "place" ],
+ 			"registeredWidgets": [ "imageSuggestor"]
+ 		},
+ 		{
 	 		"id": "when",
-	 		"label": "Dai cazzo",
+	 		"label": "When",
  			"registeredTypes": [ "event" ],
  			"registeredWidgets": [ "imageSuggestor"]
  		}

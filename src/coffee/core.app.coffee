@@ -91,13 +91,16 @@ angular.module('wordlift.core', [])
     scope: true
     template: """
     	<div class="classification-box">
-    		<h4 class="box-header">{{box.label}}</h4>
+    		<div class="box-header">
+          <span class="label">{{box.label}}</span>
+        </div>
   			<wl-entity-tile notify="onSelectedEntityTile(entity.id, box.id)" entity="entity" ng-repeat="entity in entities"></wl-entity>
   		</div>	
     """
     link: ($scope, $element, $attrs, $ctrl) ->  	  
   	  
       $scope.entities = {}
+      
       for id, entity of $scope.analysis.entities
         if entity.mainType in $scope.box.registeredTypes
           $scope.entities[ id ] = entity
@@ -135,11 +138,9 @@ angular.module('wordlift.core', [])
   	    <i class="type"></i>
         <span class="label" ng-click="select()">{{entity.label}}</span>
         <small ng-show="entity.occurrences > 0">({{entity.occurrences}})</small>
-  	    <small class="toggle-button" ng-hide="isOpened" ng-click="toggle()">+</small>
-  	  	<small class="toggle-button" ng-show="isOpened" ng-click="toggle()">-</small>
-        <div class="details" ng-show="isOpened">
-          <p><img class="thumbnail" ng-src="{{ entity.images[0] }}" />
-          <p>{{entity.description}}</p>
+        <i ng-class="{ 'wl-more': isOpened == false, 'wl-less': isOpened == true }" ng-click="toggle()"></i>
+  	    <div class="details" ng-show="isOpened">
+          <p><img class="thumbnail" ng-src="{{ entity.images[0] }}" />{{entity.description}}</p>
         </div>
   	  </div>
 
