@@ -1570,12 +1570,94 @@ body {
   overflow: auto;
 }
 #wordlift-edit-post-wrapper .classification-box .box-header {
-  background-color: #e2e2e2;
   padding: 3px;
   font-size: 0.8em;
+  text-transform: capitalize;
 }
 #wordlift-edit-post-wrapper .classification-box .box-header .label {
+  text-transform: uppercase;
   font-weight: bold;
+  margin: 5px 0px;
+}
+#wordlift-edit-post-wrapper .classification-box .box-header .wl-selected-item.wl-person {
+  padding: 3px 3px 3px 6px;
+  margin-right: 5px;
+  font-size: 0.8em;
+  color: #333;
+  border: #f20f62 1px solid;
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  border-radius: 6px;
+  text-align: center;
+}
+#wordlift-edit-post-wrapper .classification-box .box-header .wl-selected-item.wl-place {
+  padding: 3px 3px 3px 6px;
+  margin-right: 5px;
+  font-size: 0.8em;
+  color: #333;
+  border: #ff9a2e 1px solid;
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  border-radius: 6px;
+  text-align: center;
+}
+#wordlift-edit-post-wrapper .classification-box .box-header .wl-selected-item.wl-thing {
+  padding: 3px 3px 3px 6px;
+  margin-right: 5px;
+  font-size: 0.8em;
+  color: #333;
+  border: #000000 1px solid;
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  border-radius: 6px;
+  text-align: center;
+}
+#wordlift-edit-post-wrapper .classification-box .box-header .wl-selected-item.wl-creative-work {
+  padding: 3px 3px 3px 6px;
+  margin-right: 5px;
+  font-size: 0.8em;
+  color: #333;
+  border: #f9f81e 1px solid;
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  border-radius: 6px;
+  text-align: center;
+}
+#wordlift-edit-post-wrapper .classification-box .box-header .wl-selected-item.wl-event {
+  padding: 3px 3px 3px 6px;
+  margin-right: 5px;
+  font-size: 0.8em;
+  color: #333;
+  border: #642994 1px solid;
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  border-radius: 6px;
+  text-align: center;
+}
+#wordlift-edit-post-wrapper .classification-box .box-header .wl-selected-item.wl-organization {
+  padding: 3px 3px 3px 6px;
+  margin-right: 5px;
+  font-size: 0.8em;
+  color: #333;
+  border: #8fd22a 1px solid;
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  border-radius: 6px;
+  text-align: center;
+}
+#wordlift-edit-post-wrapper .classification-box .box-header .wl-selected-item .wl-deselect-item {
+  font-family: FontAwesome;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 14px;
+  padding: 0px 3px;
+  font-size: 0.9em;
+}
+#wordlift-edit-post-wrapper .classification-box .box-header .wl-selected-item .wl-deselect-item:before {
+  content: "\f00d";
 }
 #wordlift-edit-post-wrapper .wl-spinner {
   font-family: FontAwesome;

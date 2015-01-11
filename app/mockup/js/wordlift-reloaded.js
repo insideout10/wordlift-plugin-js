@@ -190,7 +190,7 @@
           $scope.entitySelection[scope][entity.id] = entity;
           return $log.debug($scope.entitySelection);
         } else {
-          return $scope.entitySelection[scope][entity.id] = void 0;
+          return delete $scope.entitySelection[scope][entity.id];
         }
       };
     }
@@ -199,7 +199,7 @@
       return {
         restrict: 'E',
         scope: true,
-        template: "    	<div class=\"classification-box\">\n    		<div class=\"box-header\">\n          <span class=\"label\">{{box.label}}</span>\n        </div>\n	<wl-entity-tile notify=\"onSelectedEntityTile(entity.id, box.id)\" entity=\"entity\" ng-repeat=\"entity in entities\"></wl-entity>\n</div>	",
+        template: "    	<div class=\"classification-box\">\n    		<div class=\"box-header\">\n          <h5 class=\"label\">{{box.label}}</h5>\n          <span ng-class=\"'wl-' + entity.mainType\" ng-repeat=\"(id, entity) in entitySelection[box.id]\" class=\"wl-selected-item\">\n            {{ entity.label}}\n            <i class=\"wl-deselect-item\" ng-click=\"onSelectedEntityTile(entity, box.id)\"></i>\n          </span>\n        </div>\n	<wl-entity-tile notify=\"onSelectedEntityTile(entity.id, box.id)\" entity=\"entity\" ng-repeat=\"entity in entities\"></wl-entity>\n</div>	",
         link: function($scope, $element, $attrs, $ctrl) {
           var entity, id, _ref, _ref1, _results;
           $scope.entities = {};
@@ -289,7 +289,7 @@
     }
   ]);
 
-  $(container = $("<div id=\"wordlift-edit-post-wrapper\" ng-controller=\"coreController\">\n	<wl-classification-box ng-repeat=\"box in configuration.classificationBoxes\"></wl-classification-box>\n    <hr />\n    <div ng-repeat=\"(box, e) in entitySelection\">\n      <span>{{ box }}</span> - <span>{{ e }}</span> \n    </div>\n    <button ng-click=\"annotation = 'urn:enhancement-1f83847a-95c2-c81b-cba9-f958aed45b34'\"></button>\n    </div>\n").appendTo('#dx'));
+  $(container = $("<div id=\"wordlift-edit-post-wrapper\" ng-controller=\"coreController\">\n	<wl-classification-box ng-repeat=\"box in configuration.classificationBoxes\"></wl-classification-box>\n    <hr />\n    <h3>{{box}}</h3>\n    <div ng-repeat=\"(b, e) in entitySelection['what']\">      \n      <span>{{ e.label}}</span>\n    </div>\n    <button ng-click=\"annotation = 'urn:enhancement-1f83847a-95c2-c81b-cba9-f958aed45b34'\"></button>\n    </div>\n").appendTo('#dx'));
 
   injector = angular.bootstrap($('body'), ['wordlift.core']);
 

@@ -213,7 +213,7 @@ angular.module('wordlift.core', [])
   	  $log.debug $scope.entitySelection
   	  # TODO All related annotations has to be disambiguated accordingly
   	else
-  	  $scope.entitySelection[ scope ][ entity.id ] = undefined
+  	  delete $scope.entitySelection[ scope ][ entity.id ]
   	  # TODO Any related annotation has to be reset just if this is the last related instance 
   	
 ])
@@ -223,7 +223,11 @@ angular.module('wordlift.core', [])
     template: """
     	<div class="classification-box">
     		<div class="box-header">
-          <span class="label">{{box.label}}</span>
+          <h5 class="label">{{box.label}}</h5>
+          <span ng-class="'wl-' + entity.mainType" ng-repeat="(id, entity) in entitySelection[box.id]" class="wl-selected-item">
+            {{ entity.label}}
+            <i class="wl-deselect-item" ng-click="onSelectedEntityTile(entity, box.id)"></i>
+          </span>
         </div>
   			<wl-entity-tile notify="onSelectedEntityTile(entity.id, box.id)" entity="entity" ng-repeat="entity in entities"></wl-entity>
   		</div>	
@@ -303,8 +307,9 @@ $(
   	<div id="wordlift-edit-post-wrapper" ng-controller="coreController">
   		<wl-classification-box ng-repeat="box in configuration.classificationBoxes"></wl-classification-box>
     <hr />
-    <div ng-repeat="(box, e) in entitySelection">
-      <span>{{ box }}</span> - <span>{{ e }}</span> 
+    <h3>{{box}}</h3>
+    <div ng-repeat="(b, e) in entitySelection['what']">      
+      <span>{{ e.label}}</span>
     </div>
     <button ng-click="annotation = 'urn:enhancement-1f83847a-95c2-c81b-cba9-f958aed45b34'"></button>
     </div>
