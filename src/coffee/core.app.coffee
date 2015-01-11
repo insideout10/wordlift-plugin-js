@@ -56,18 +56,20 @@ angular.module('wordlift.core', [])
 ])
 
 # Manage redlink analysis responses
-.controller('coreController', [ '$log', '$scope', '$rootScope', ($log, $scope, $rootScope)-> 
+.controller('EditPostWidgetController', [ '$log', '$scope', '$rootScope', ($log, $scope, $rootScope)-> 
 
   $scope.configuration = []
   $scope.analysis = {}
-  $scope.entitySelection = {}
-  $scope.occurences = {}
+  $scope.selectedEntities = {}
   $scope.annotation = undefined
   $scope.boxes = []
 
+  $scope.addBox = (scope, id)->
+    $scope.boxes[id] = scope
+  
   $scope.$on "configurationLoaded", (event, configuration) ->
     for box in configuration.classificationBoxes
-      $scope.entitySelection[ box.id ] = {}
+      $scope.selectedEntities[ box.id ] = {}
     $scope.configuration = configuration
 
   $scope.$on "analysisPerformed", (event, analysis) ->
@@ -76,15 +78,16 @@ angular.module('wordlift.core', [])
 
   $scope.onSelectedEntityTile = (entity, scope)->
   	$log.debug "Entity tile selected for entity #{entity.id} within '#{scope}' scope"
-  	if not $scope.entitySelection[ scope ][ entity.id ]?
+  	if not $scope.selectedEntities[ scope ][ entity.id ]?
 
-  	  $scope.entitySelection[ scope ][ entity.id ] = entity
-  	  $log.debug $scope.entitySelection
+  	  $scope.selectedEntities[ scope ][ entity.id ] = entity
+  	  $log.debug $scope.selectedEntities
   	  # TODO All related annotations has to be disambiguated accordingly
   	else
-  	  delete $scope.entitySelection[ scope ][ entity.id ]
-  	  # TODO Any related annotation has to be reset just if this is the last related instance 
-  	
+      # TODO Any related annotation has to be reset just if this is the last related instance 
+      delete $scope.selectedEntities[ scope ][ entity.id ]
+      $scope.boxes[ scope ].deselect entity
+      
 ])
 .directive('wlClassificationBox', ['$log', ($log)->
     restrict: 'E'
@@ -93,7 +96,7 @@ angular.module('wordlift.core', [])
     	<div class="classification-box">
     		<div class="box-header">
           <h5 class="label">{{box.label}}</h5>
-          <span ng-class="'wl-' + entity.mainType" ng-repeat="(id, entity) in entitySelection[box.id]" class="wl-selected-item">
+          <span ng-class="'wl-' + entity.mainType" ng-repeat="(id, entity) in selectedEntities[box.id]" class="wl-selected-item">
             {{ entity.label}}
             <i class="wl-deselect-item" ng-click="onSelectedEntityTile(entity, box.id)"></i>
           </span>
@@ -115,6 +118,12 @@ angular.module('wordlift.core', [])
       # TODO manage on scope distruction event
       $scope.tiles = []
 
+      $scope.addBox $scope, $scope.box.id
+
+      $scope.deselect = (entity)->
+        for tile in $scope.tiles
+          tile.isSelected = false if tile.entity.id is entity.id
+
       $scope.$watch "annotation", (annotationId) ->
         $log.debug "annotation #{annotationId}"
         return if not annotationId?
@@ -122,9 +131,10 @@ angular.module('wordlift.core', [])
           tile.isVisible = tile.entity.isRelatedToAnnotation( annotationId )
 
       ctrl =
-      	onSelectedTile: (tile)->
-      	  $scope.onSelectedEntityTile tile.entity, $scope.box.id
-      	addTile: (tile)->
+        onSelectedTile: (tile)->
+          tile.isSelected = !tile.isSelected
+          $scope.onSelectedEntityTile tile.entity, $scope.box.id
+        addTile: (tile)->
           $log.debug "Adding tile with id #{tile.$id}"
           $scope.tiles.push tile
         closeTiles: ()->
@@ -139,7 +149,8 @@ angular.module('wordlift.core', [])
       entity: '='
     template: """
   	  <div ng-class="wrapperCssClasses" ng-show="isVisible">
-  	    <i class="type"></i>
+  	    <i ng-class="{ 'wl-selected' : isSelected, 'wl-unselected' : !isSelected }"></i>
+        <i class="type"></i>
         <span class="label" ng-click="select()">{{entity.label}}</span>
         <small ng-show="entity.occurrences > 0">({{entity.occurrences}})</small>
         <i ng-class="{ 'wl-more': isOpened == false, 'wl-less': isOpened == true }" ng-click="toggle()"></i>
@@ -156,6 +167,7 @@ angular.module('wordlift.core', [])
 
       $scope.isOpened = false
       $scope.isVisible = true
+      $scope.isSelected = false
 
       $scope.wrapperCssClasses = [ "entity", "wl-#{$scope.entity.mainType}" ]
 
@@ -173,11 +185,11 @@ angular.module('wordlift.core', [])
   ])
 $(
   container = $("""
-  	<div id="wordlift-edit-post-wrapper" ng-controller="coreController">
+  	<div id="wordlift-edit-post-wrapper" ng-controller="EditPostWidgetController">
   		<wl-classification-box ng-repeat="box in configuration.classificationBoxes"></wl-classification-box>
     <hr />
     <h3>{{box}}</h3>
-    <div ng-repeat="(b, e) in entitySelection['what']">      
+    <div ng-repeat="(b, e) in selectedEntities['what']">      
       <span>{{ e.label}}</span>
     </div>
     <button ng-click="annotation = 'urn:enhancement-1f83847a-95c2-c81b-cba9-f958aed45b34'"></button>

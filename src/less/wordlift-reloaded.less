@@ -112,11 +112,8 @@
   }
 
 
-  .type, .more {
-    bottom: 0px;
-    right: 0px;
+  .type {
     font-family: FontAwesome;
-
     font-style: normal;
     font-weight: normal;
     line-height: 14px;
@@ -225,7 +222,6 @@ body {
     position: absolute;
     right:0px;
     top:0px;
-    color: #999;
   }
   .wl-less { 
     .fa-icon(@fa-var-minus-square-o);
@@ -233,6 +229,29 @@ body {
     right:0px;
     top:0px;
   }
+  .wl-selected { 
+    .fa-icon(@fa-var-check-circle-o);
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    line-height: 14px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-size: 14px;
+    padding: 4px 0px;
+  }
+  .wl-unselected { 
+    .fa-icon(@fa-var-circle-o);
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    line-height: 14px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-size: 14px;
+    padding: 4px 0px;
+
+  }  
 
 }
 

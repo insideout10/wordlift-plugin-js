@@ -1408,10 +1408,7 @@
   height: auto;
   float: right;
 }
-.entity .type,
-.entity .more {
-  bottom: 0px;
-  right: 0px;
+.entity .type {
   font-family: FontAwesome;
   font-style: normal;
   font-weight: normal;
@@ -1689,7 +1686,6 @@ body {
   position: absolute;
   right: 0px;
   top: 0px;
-  color: #999;
 }
 #wordlift-edit-post-wrapper .wl-more:before {
   content: "\f196";
@@ -1709,6 +1705,34 @@ body {
 }
 #wordlift-edit-post-wrapper .wl-less:before {
   content: "\f147";
+}
+#wordlift-edit-post-wrapper .wl-selected {
+  padding: 0px 3px;
+  font-family: FontAwesome;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 14px;
+  padding: 4px 0px;
+}
+#wordlift-edit-post-wrapper .wl-selected:before {
+  content: "\f05d";
+}
+#wordlift-edit-post-wrapper .wl-unselected {
+  padding: 0px 3px;
+  font-family: FontAwesome;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 14px;
+  padding: 4px 0px;
+}
+#wordlift-edit-post-wrapper .wl-unselected:before {
+  content: "\f10c";
 }
 #wpadminbar .ab-top-menu > li#wp-admin-bar-wordlift {
   float: right;
