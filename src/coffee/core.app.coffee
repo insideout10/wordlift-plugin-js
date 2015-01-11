@@ -187,17 +187,10 @@ $(
   container = $("""
   	<div id="wordlift-edit-post-wrapper" ng-controller="EditPostWidgetController">
   		<wl-classification-box ng-repeat="box in configuration.classificationBoxes"></wl-classification-box>
-    <hr />
-    <h3>{{box}}</h3>
-    <div ng-repeat="(b, e) in selectedEntities['what']">      
-      <span>{{ e.label}}</span>
-    </div>
-    <button ng-click="annotation = 'urn:enhancement-1f83847a-95c2-c81b-cba9-f958aed45b34'"></button>
     </div>
 
   """)
   .appendTo('#dx')
-)
 
 injector = angular.bootstrap $('body'), ['wordlift.core']
 injector.invoke(['ConfigurationService', 'AnalysisService','$rootScope', (ConfigurationService, AnalysisService, $rootScope) ->
@@ -207,3 +200,59 @@ injector.invoke(['ConfigurationService', 'AnalysisService','$rootScope', (Config
     	ConfigurationService.loadConfiguration()
     )
 ])
+
+# Add WordLift as a plugin of the TinyMCE editor.
+  tinymce.PluginManager.add 'wordlift', (editor, url) ->
+    editor.onLoadContent.add((ed, o) ->
+      #injector.invoke(['EditorService', (EditorService) ->
+        #EditorService.createDefaultAnalysis()
+      #])
+    )
+    # Add a WordLift button the TinyMCE editor.
+    # TODO Disable the new button as default
+    editor.addButton 'wordlift_add_entity',
+      classes: 'widget btn wordlift_add_entity'
+      text: ' ' # the space is necessary to avoid right spacing on TinyMCE 4
+      tooltip: 'Insert entity'
+      onclick: ->
+
+        #injector.invoke(['EditorService','$rootScope', (EditorService, $rootScope) ->
+          # execute the following commands in the angular js context.
+        #  $rootScope.$apply(->
+            #EditorService.createTextAnnotationFromCurrentSelection()
+        #  )
+        #])
+
+    # Add a WordLift button the TinyMCE editor.
+    editor.addButton 'wordlift',
+      classes: 'widget btn wordlift'
+      text: ' ' # the space is necessary to avoid right spacing on TinyMCE 4
+      tooltip: 'Analyse'
+
+    # When the editor is clicked, the [EditorService.analyze](app.services.EditorService.html#analyze) method is invoked.
+      onclick: ->
+        #injector.invoke(['EditorService', '$rootScope', '$log', (EditorService, $rootScope, $log) ->
+        #  $rootScope.$apply(->
+            # Get the html content of the editor.
+            #html = editor.getContent format: 'raw'
+
+            # Get the text content from the Html.
+            #text = Traslator.create(html).getText()
+
+            # $log.info "onclick [ html :: #{html} ][ text :: #{text} ]"
+            # Send the text content for analysis.
+            #EditorService.analyze text
+        #  )
+        #])
+
+    # TODO: move this outside of this method.
+    # this event is raised when a textannotation is selected in the TinyMCE editor.
+    editor.onClick.add (editor, e) ->
+      #injector.invoke(['$rootScope', ($rootScope) ->
+        # execute the following commands in the angular js context.
+      #  $rootScope.$apply(->
+          # send a message about the currently clicked annotation.
+          #$rootScope.$broadcast 'textAnnotationClicked', e.target.id
+      #  )
+      #])
+)
