@@ -1812,11 +1812,22 @@ div.wp-menu-image:before #adminmenu .toplevel_page_wordlift-admin-entities.wp-me
   border-bottom: 10px solid transparent;
   border-right: 10px solid blue;
 }
+body#tinymce {
+  font-family: "Open Sans", sans-serif;
+  font-size: 0.9em;
+  line-height: 1.4em;
+}
 body#tinymce .textannotation {
-  border-bottom: 2px solid #2b2b2b;
+  border-bottom: #999 2px solid;
   padding: 2px;
   cursor: pointer;
   cursor: hand;
+}
+body#tinymce .textannotation.selected {
+  border: 0 !important;
+  color: #ffffff;
+  background-color: #8c8c8c;
+  vertical-align: center;
 }
 body#tinymce .textannotation.wl-creative-work {
   border: 0 !important;

@@ -17,24 +17,15 @@
 	},
 	"annotations": {
 			"urn:enhancement-1f83847a-95c2-c81b-cba9-f958aed45b34" : {
-				"start": 789,
-				"end": 803,
+				"start": 791,
+				"end": 805,
 				"entityMatches" : [
 					{ "entityId": "http://dbpedia.org/resource/Alexis_Tsipras", "confidence": 1 }
 				]
 			},
 			"urn:enhancement-afe6a8de-56cf-6dca-d307-d890993297fa" : {
-				"start":766,
-				"end":771,
-				"text":"Atene",
-				"entityMatches":[
-					{ "confidence":1, "entityId": "http://dbpedia.org/resource/Athens" },
-					{ "confidence":0.96666664, "entityId": "http://dbpedia.org/resource/Athens_Prefecture" }
-				]
-			}, 
-			"urn:enhancement-afe6a8de-56cf-6dca-d307-d890993297fb" : {
-				"start":866,
-				"end":871,
+				"start":768,
+				"end":773,
 				"text":"Atene",
 				"entityMatches":[
 					{ "confidence":1, "entityId": "http://dbpedia.org/resource/Athens" },

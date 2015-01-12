@@ -108,7 +108,53 @@
 
   $ = jQuery;
 
-  angular.module('wordlift.core', []).service('AnalysisService', [
+  angular.module('wordlift.core', []).service('EditorService', [
+    '$log', '$http', '$rootScope', function($log, $http, $rootScope) {
+      var editor, service;
+      editor = function() {
+        return tinyMCE.get('content');
+      };
+      $rootScope.$on("analysisPerformed", function(event, analysis) {
+        console.log("Going to embed analysis");
+        if ((analysis != null) && (analysis.annotations != null)) {
+          return service.embedAnalysis(analysis);
+        }
+      });
+      service = {
+        embedAnalysis: (function(_this) {
+          return function(analysis) {
+            var annotation, annotationId, ed, element, entity, html, isDirty, traslator, _ref;
+            ed = editor();
+            html = ed.getContent({
+              format: 'raw'
+            });
+            while (html.match(/<(\w+)[^>]*\sclass="textannotation[^"]*"[^>]*>([^<]+)<\/\1>/gim, '$2')) {
+              html = html.replace(/<(\w+)[^>]*\sclass="textannotation[^"]*"[^>]*>([^<]+)<\/\1>/gim, '$2');
+            }
+            traslator = Traslator.create(html);
+            _ref = analysis.annotations;
+            for (annotationId in _ref) {
+              annotation = _ref[annotationId];
+              entity = analysis.entities[ annotation.entityMatches[0].entityId];
+              element = "<span id=\"" + annotationId + "\" class=\"textannotation\">";
+              traslator.insertHtml(element, {
+                text: annotation.start
+              });
+              traslator.insertHtml('</span>', {
+                text: annotation.end
+              });
+            }
+            isDirty = ed.isDirty();
+            ed.setContent(traslator.getHtml(), {
+              format: 'raw'
+            });
+            return ed.isNotDirty = !isDirty;
+          };
+        })(this)
+      };
+      return service;
+    }
+  ]).service('AnalysisService', [
     '$log', '$http', '$rootScope', function($log, $http, $rootScope) {
       var service, _currentAnalysis;
       service = _currentAnalysis = {};
@@ -182,8 +228,11 @@
         }
         return $scope.configuration = configuration;
       });
+      $scope.$on("textAnnotationClicked", function(event, annotationId) {
+        $log.debug("click on " + annotationId);
+        return $scope.annotation = annotationId;
+      });
       $scope.$on("analysisPerformed", function(event, analysis) {
-        $log.debug(analysis);
         return $scope.analysis = analysis;
       });
       return $scope.onSelectedEntityTile = function(entity, scope) {
@@ -238,15 +287,11 @@
           };
           $scope.$watch("annotation", function(annotationId) {
             var tile, _i, _len, _ref, _results;
-            $log.debug("annotation " + annotationId);
-            if (annotationId == null) {
-              return;
-            }
             _ref = $scope.tiles;
             _results = [];
             for (_i = 0, _len = _ref.length; _i < _len; _i++) {
               tile = _ref[_i];
-              _results.push(tile.isVisible = tile.entity.isRelatedToAnnotation(annotationId));
+              _results.push(tile.isVisible = annotationId != null ? tile.entity.isRelatedToAnnotation(annotationId) : true);
             }
             return _results;
           });
@@ -309,15 +354,17 @@
     }
   ]);
 
-  $(container = $("<div id=\"wordlift-edit-post-wrapper\" ng-controller=\"EditPostWidgetController\">\n	<wl-classification-box ng-repeat=\"box in configuration.classificationBoxes\"></wl-classification-box>\n    </div>\n").appendTo('#dx'), injector = angular.bootstrap($('body'), ['wordlift.core']), injector.invoke([
-    'ConfigurationService', 'AnalysisService', '$rootScope', function(ConfigurationService, AnalysisService, $rootScope) {
-      return $rootScope.$apply(function() {
-        AnalysisService.perform();
-        return ConfigurationService.loadConfiguration();
-      });
-    }
-  ]), tinymce.PluginManager.add('wordlift', function(editor, url) {
-    editor.onLoadContent.add(function(ed, o) {});
+  $(container = $("<div id=\"wordlift-edit-post-wrapper\" ng-controller=\"EditPostWidgetController\">\n	<wl-classification-box ng-repeat=\"box in configuration.classificationBoxes\"></wl-classification-box>\n    </div>\n").appendTo('#dx'), injector = angular.bootstrap($('body'), ['wordlift.core']), tinymce.PluginManager.add('wordlift', function(editor, url) {
+    editor.onLoadContent.add(function(ed, o) {
+      return injector.invoke([
+        'ConfigurationService', 'AnalysisService', 'EditorService', '$rootScope', function(ConfigurationService, AnalysisService, EditorService, $rootScope) {
+          return $rootScope.$apply(function() {
+            AnalysisService.perform();
+            return ConfigurationService.loadConfiguration();
+          });
+        }
+      ]);
+    });
     editor.addButton('wordlift_add_entity', {
       classes: 'widget btn wordlift_add_entity',
       text: ' ',
@@ -330,7 +377,32 @@
       tooltip: 'Analyse',
       onclick: function() {}
     });
-    return editor.onClick.add(function(editor, e) {});
+    return editor.onClick.add(function(editor, e) {
+      return injector.invoke([
+        '$rootScope', function($rootScope) {
+          return $rootScope.$apply(function() {
+            var annotation, _i, _len, _ref, _results;
+            _ref = editor.dom.select("span.textannotation");
+            _results = [];
+            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+              annotation = _ref[_i];
+              if (annotation.id === e.target.id) {
+                if (editor.dom.hasClass(annotation.id, "selected")) {
+                  editor.dom.removeClass(annotation.id, "selected");
+                  _results.push($rootScope.$broadcast('textAnnotationClicked', void 0));
+                } else {
+                  editor.dom.addClass(annotation.id, "selected");
+                  _results.push($rootScope.$broadcast('textAnnotationClicked', e.target.id));
+                }
+              } else {
+                _results.push(editor.dom.removeClass(annotation.id, "selected"));
+              }
+            }
+            return _results;
+          });
+        }
+      ]);
+    });
   }));
 
 }).call(this);

@@ -347,6 +347,11 @@ div.wp-menu-image:before
 }
 
 body#tinymce {
+
+  font-family: "Open Sans",sans-serif;
+  font-size: 0.9em;
+  line-height: 1.4em;
+
   .annotation_(@type, @icon, @hover-color) {
     border-color: @type;
 
@@ -368,10 +373,14 @@ body#tinymce {
   }
 
   .textannotation {
-    border-bottom: 2px solid #2b2b2b;
+    border-bottom:#999 2px solid;
     padding: 2px;
     cursor: pointer;
     cursor: hand;
+
+    &.selected {
+      .highlight(@wl-default-color)
+    }
 
     &.wl-creative-work { .highlight(@wl-creative-work-color) }
     &.wl-event { .highlight(@wl-event-color) }

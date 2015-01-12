@@ -35,7 +35,6 @@ module.exports = (grunt) ->
           'app/js/wordlift-reloaded.js': [
             'src/coffee/traslator.coffee'
             'src/coffee/core.app.coffee'
-            'app.services.EditorService.coffee'
           ]
           'app/js/wordlift.ui.js': [
             'src/coffee/ui/chord.coffee'

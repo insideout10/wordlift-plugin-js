@@ -134,7 +134,53 @@ $ = jQuery
 
 # Create the main AngularJS module, and set it dependent on controllers and directives.
 angular.module('wordlift.core', [])
+# Manage redlink analysis responses
+.service('EditorService', [ '$log', '$http', '$rootScope', ($log, $http, $rootScope)-> 
+  
+  editor = ->
+    tinyMCE.get('content')
 
+  $rootScope.$on "analysisPerformed", (event, analysis) ->
+    console.log "Going to embed analysis"
+    service.embedAnalysis analysis if analysis? and analysis.annotations?
+
+  service =
+    # Embed the provided analysis in the editor.
+    embedAnalysis: (analysis) =>
+      # A reference to the editor.
+      ed = editor()
+      # Get the TinyMCE editor html content.
+      html = ed.getContent format: 'raw'
+      # Find existing entities.
+      # entities = findEntities html
+
+      # Preselect entities found in html.
+      # AnalysisService.preselect analysis, entities
+
+      # Remove existing text annotations (the while-match is necessary to remove nested spans).
+      while html.match(/<(\w+)[^>]*\sclass="textannotation[^"]*"[^>]*>([^<]+)<\/\1>/gim, '$2')
+        html = html.replace(/<(\w+)[^>]*\sclass="textannotation[^"]*"[^>]*>([^<]+)<\/\1>/gim, '$2')
+
+      # Prepare a traslator instance that will traslate Html and Text positions.
+      traslator = Traslator.create html
+
+      # Add text annotations to the html (skip those text annotations that don't have entity annotations).
+      for annotationId, annotation of analysis.annotations # when 0 < Object.keys(textAnnotation.entityAnnotations).length
+        
+        entity = analysis.entities[ annotation.entityMatches[0].entityId ]
+        element = "<span id=\"#{annotationId}\" class=\"textannotation\">"
+        
+        # Finally insert the HTML code.
+        traslator.insertHtml element, text: annotation.start
+        traslator.insertHtml '</span>', text: annotation.end
+
+      # Update the editor Html code.
+      isDirty = ed.isDirty()
+      ed.setContent traslator.getHtml(), format: 'raw'
+      ed.isNotDirty = not isDirty
+
+  service
+])
 # Manage redlink analysis responses
 .service('AnalysisService', [ '$log', '$http', '$rootScope', ($log, $http, $rootScope)-> 
 	
@@ -203,8 +249,11 @@ angular.module('wordlift.core', [])
       $scope.selectedEntities[ box.id ] = {}
     $scope.configuration = configuration
 
+  $scope.$on "textAnnotationClicked", (event, annotationId) ->
+    $log.debug "click on #{annotationId}"
+    $scope.annotation = annotationId
+
   $scope.$on "analysisPerformed", (event, analysis) ->
-    $log.debug analysis
     $scope.analysis = analysis
 
   $scope.onSelectedEntityTile = (entity, scope)->
@@ -256,10 +305,8 @@ angular.module('wordlift.core', [])
           tile.isSelected = false if tile.entity.id is entity.id
 
       $scope.$watch "annotation", (annotationId) ->
-        $log.debug "annotation #{annotationId}"
-        return if not annotationId?
         for tile in $scope.tiles
-          tile.isVisible = tile.entity.isRelatedToAnnotation( annotationId )
+          tile.isVisible = if annotationId? then tile.entity.isRelatedToAnnotation( annotationId ) else true
 
       ctrl =
         onSelectedTile: (tile)->
@@ -324,20 +371,21 @@ $(
   .appendTo('#dx')
 
 injector = angular.bootstrap $('body'), ['wordlift.core']
-injector.invoke(['ConfigurationService', 'AnalysisService','$rootScope', (ConfigurationService, AnalysisService, $rootScope) ->
-	# execute the following commands in the angular js context.
-    $rootScope.$apply(->
-    	AnalysisService.perform()
-    	ConfigurationService.loadConfiguration()
-    )
-])
+
 
 # Add WordLift as a plugin of the TinyMCE editor.
   tinymce.PluginManager.add 'wordlift', (editor, url) ->
+    # Perform analysis once tinymce is loaded
     editor.onLoadContent.add((ed, o) ->
-      #injector.invoke(['EditorService', (EditorService) ->
-        #EditorService.createDefaultAnalysis()
-      #])
+      injector.invoke(['ConfigurationService', 'AnalysisService', 'EditorService', '$rootScope',
+       (ConfigurationService, AnalysisService, EditorService, $rootScope) ->
+        # execute the following commands in the angular js context.
+        $rootScope.$apply(->
+          
+          AnalysisService.perform()
+          ConfigurationService.loadConfiguration()
+        )
+      ])
     )
     # Add a WordLift button the TinyMCE editor.
     # TODO Disable the new button as default
@@ -379,11 +427,22 @@ injector.invoke(['ConfigurationService', 'AnalysisService','$rootScope', (Config
     # TODO: move this outside of this method.
     # this event is raised when a textannotation is selected in the TinyMCE editor.
     editor.onClick.add (editor, e) ->
-      #injector.invoke(['$rootScope', ($rootScope) ->
+      injector.invoke(['$rootScope', ($rootScope) ->
         # execute the following commands in the angular js context.
-      #  $rootScope.$apply(->
-          # send a message about the currently clicked annotation.
-          #$rootScope.$broadcast 'textAnnotationClicked', e.target.id
-      #  )
-      #])
+        $rootScope.$apply(->
+          
+          for annotation in editor.dom.select "span.textannotation"
+            if annotation.id is e.target.id
+              if editor.dom.hasClass annotation.id, "selected"
+                editor.dom.removeClass annotation.id, "selected"
+                # send a message to clear current text annotation scope
+                $rootScope.$broadcast 'textAnnotationClicked', undefined
+              else
+                editor.dom.addClass annotation.id, "selected"
+                # send a message about the currently clicked annotation.
+                $rootScope.$broadcast 'textAnnotationClicked', e.target.id
+            else 
+             editor.dom.removeClass annotation.id, "selected"          
+        )
+      ])
 )
