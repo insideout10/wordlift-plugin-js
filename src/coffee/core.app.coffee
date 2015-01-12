@@ -8,11 +8,51 @@ angular.module('wordlift.core', [])
   
   editor = ->
     tinyMCE.get('content')
+  disambiguate = ( annotation, entity )->
+    ed = editor()
+    ed.dom.addClass annotation.id, "disambiguated"
+    ed.dom.addClass annotation.id, "wl-#{entity.mainType}"
+    ed.dom.setAttrib annotation.id, "itemid", entity.id
+    
+  dedisambiguate = ( annotation, entity )->
+    ed = editor()
+    ed.dom.removeClass annotation.id, "disambiguated"
+    ed.dom.removeClass annotation.id, "wl-#{entity.mainType}"
+    ed.dom.setAttrib annotation.id, "itemid", ""
+
+  currentOccurencesForEntity = (entity) ->
+    ed = editor()
+    count = 0    
+    annotations = ed.dom.select "span.textannotation"
+    for annotation in annotations
+      entityId = ed.dom.getAttrib annotation.id, "itemid"
+      $log.debug "going to matach #{entityId}"
+      count += 1 if entityId is entity.id
+    count
 
   $rootScope.$on "analysisPerformed", (event, analysis) ->
-    console.log "Going to embed analysis"
     service.embedAnalysis analysis if analysis? and analysis.annotations?
+  
+  $rootScope.$on "entitySelected", (event, entity, annotationId) ->
+    if annotationId?
+      disambiguate entity.annotations[ annotationId ], entity
+      return   
+    for id, annotation of entity.annotations
+      disambiguate annotation, entity
 
+    entity.occurrences = currentOccurencesForEntity entity
+      
+  $rootScope.$on "entityDeselected", (event, entity, annotationId) ->
+    if annotationId?
+      dedisambiguate entity.annotations[ annotationId ], entity
+      return   
+    for id, annotation of entity.annotations
+      dedisambiguate annotation, entity
+      
+    entity.occurrences = currentOccurencesForEntity entity
+    if entity.occurrences is 0
+      $rootScope.$broadcast "noOccurencesForEntity", entity
+        
   service =
     # Embed the provided analysis in the editor.
     embedAnalysis: (analysis) =>
@@ -69,6 +109,9 @@ angular.module('wordlift.core', [])
       for ea in annotation.entityMatches
       	data.entities[ ea.entityId ].annotations[ id ] = annotation
 
+    for id, annotation of data.annotations
+      annotation.id = id
+
     data
 
   service.perform = ()->
@@ -112,7 +155,12 @@ angular.module('wordlift.core', [])
 
   $scope.addBox = (scope, id)->
     $scope.boxes[id] = scope
-  
+    
+  $scope.$on "noOccurencesForEntity", (event, entity) ->
+    for box, entities of $scope.selectedEntities
+      delete $scope.selectedEntities[ box ][ entity.id ]
+      $scope.boxes[ box ].deselect entity
+
   $scope.$on "configurationLoaded", (event, configuration) ->
     for box in configuration.classificationBoxes
       $scope.selectedEntities[ box.id ] = {}
@@ -128,12 +176,12 @@ angular.module('wordlift.core', [])
   $scope.onSelectedEntityTile = (entity, scope)->
   	$log.debug "Entity tile selected for entity #{entity.id} within '#{scope}' scope"
   	if not $scope.selectedEntities[ scope ][ entity.id ]?
-
-  	  $scope.selectedEntities[ scope ][ entity.id ] = entity
-  	  $log.debug $scope.selectedEntities
-  	  # TODO All related annotations has to be disambiguated accordingly
+      $scope.selectedEntities[ scope ][ entity.id ] = entity
+      # Emit an event to communicate with the EditorService
+      $scope.$emit "entitySelected", entity, $scope.annotation
   	else
       # TODO Any related annotation has to be reset just if this is the last related instance 
+      $scope.$emit "entityDeselected", entity, $scope.annotation  
       delete $scope.selectedEntities[ scope ][ entity.id ]
       $scope.boxes[ scope ].deselect entity
       

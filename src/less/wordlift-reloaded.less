@@ -372,6 +372,10 @@ body#tinymce {
     vertical-align: center;
   }
 
+  .disambiguate(@color) {
+    border-color: @color !important;
+  }
+
   .textannotation {
     border-bottom:#999 2px solid;
     padding: 2px;
@@ -379,15 +383,23 @@ body#tinymce {
     cursor: hand;
 
     &.selected {
-      .highlight(@wl-default-color)
+      .highlight(@wl-default-color);
+
+      &.wl-creative-work { .highlight(@wl-creative-work-color) }
+      &.wl-event { .highlight(@wl-event-color) }
+      &.wl-organization { .highlight(@wl-organization-color) }
+      &.wl-person { .highlight(@wl-person-color) }
+      &.wl-place { .highlight(@wl-place-color) }
+      &.wl-thing { .highlight(@wl-thing-color) }
+
     }
 
-    &.wl-creative-work { .highlight(@wl-creative-work-color) }
-    &.wl-event { .highlight(@wl-event-color) }
-    &.wl-organization { .highlight(@wl-organization-color) }
-    &.wl-person { .highlight(@wl-person-color) }
-    &.wl-place { .highlight(@wl-place-color) }
-    &.wl-thing { .highlight(@wl-thing-color) }
+    &.wl-creative-work { .disambiguate(@wl-creative-work-color) }
+    &.wl-event { .disambiguate(@wl-event-color) }
+    &.wl-organization { .disambiguate(@wl-organization-color) }
+    &.wl-person { .disambiguate(@wl-person-color) }
+    &.wl-place { .disambiguate(@wl-place-color) }
+    &.wl-thing { .disambiguate(@wl-thing-color) }
 
     .textannotation {
       border: 0;

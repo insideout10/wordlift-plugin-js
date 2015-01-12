@@ -1829,41 +1829,59 @@ body#tinymce .textannotation.selected {
   background-color: #8c8c8c;
   vertical-align: center;
 }
-body#tinymce .textannotation.wl-creative-work {
+body#tinymce .textannotation.selected.wl-creative-work {
   border: 0 !important;
   color: #000000;
   background-color: #f9f81e;
   vertical-align: center;
 }
-body#tinymce .textannotation.wl-event {
+body#tinymce .textannotation.selected.wl-event {
   border: 0 !important;
   color: #ffffff;
   background-color: #642994;
   vertical-align: center;
 }
-body#tinymce .textannotation.wl-organization {
+body#tinymce .textannotation.selected.wl-organization {
   border: 0 !important;
   color: #000000;
   background-color: #8fd22a;
   vertical-align: center;
 }
-body#tinymce .textannotation.wl-person {
+body#tinymce .textannotation.selected.wl-person {
   border: 0 !important;
   color: #ffffff;
   background-color: #f20f62;
   vertical-align: center;
 }
-body#tinymce .textannotation.wl-place {
+body#tinymce .textannotation.selected.wl-place {
   border: 0 !important;
   color: #000000;
   background-color: #ff9a2e;
   vertical-align: center;
 }
-body#tinymce .textannotation.wl-thing {
+body#tinymce .textannotation.selected.wl-thing {
   border: 0 !important;
   color: #ffffff;
   background-color: #000000;
   vertical-align: center;
+}
+body#tinymce .textannotation.wl-creative-work {
+  border-color: #f9f81e !important;
+}
+body#tinymce .textannotation.wl-event {
+  border-color: #642994 !important;
+}
+body#tinymce .textannotation.wl-organization {
+  border-color: #8fd22a !important;
+}
+body#tinymce .textannotation.wl-person {
+  border-color: #f20f62 !important;
+}
+body#tinymce .textannotation.wl-place {
+  border-color: #ff9a2e !important;
+}
+body#tinymce .textannotation.wl-thing {
+  border-color: #000000 !important;
 }
 body#tinymce .textannotation .textannotation {
   border: 0;

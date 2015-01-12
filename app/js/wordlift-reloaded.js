@@ -110,14 +110,71 @@
 
   angular.module('wordlift.core', []).service('EditorService', [
     '$log', '$http', '$rootScope', function($log, $http, $rootScope) {
-      var editor, service;
+      var currentOccurencesForEntity, dedisambiguate, disambiguate, editor, service;
       editor = function() {
         return tinyMCE.get('content');
       };
+      disambiguate = function(annotation, entity) {
+        var ed;
+        ed = editor();
+        ed.dom.addClass(annotation.id, "disambiguated");
+        ed.dom.addClass(annotation.id, "wl-" + entity.mainType);
+        return ed.dom.setAttrib(annotation.id, "itemid", entity.id);
+      };
+      dedisambiguate = function(annotation, entity) {
+        var ed;
+        ed = editor();
+        ed.dom.removeClass(annotation.id, "disambiguated");
+        ed.dom.removeClass(annotation.id, "wl-" + entity.mainType);
+        return ed.dom.setAttrib(annotation.id, "itemid", "");
+      };
+      currentOccurencesForEntity = function(entity) {
+        var annotation, annotations, count, ed, entityId, _i, _len;
+        ed = editor();
+        count = 0;
+        annotations = ed.dom.select("span.textannotation");
+        for (_i = 0, _len = annotations.length; _i < _len; _i++) {
+          annotation = annotations[_i];
+          entityId = ed.dom.getAttrib(annotation.id, "itemid");
+          $log.debug("going to matach " + entityId);
+          if (entityId === entity.id) {
+            count += 1;
+          }
+        }
+        return count;
+      };
       $rootScope.$on("analysisPerformed", function(event, analysis) {
-        console.log("Going to embed analysis");
         if ((analysis != null) && (analysis.annotations != null)) {
           return service.embedAnalysis(analysis);
+        }
+      });
+      $rootScope.$on("entitySelected", function(event, entity, annotationId) {
+        var annotation, id, _ref;
+        if (annotationId != null) {
+          disambiguate(entity.annotations[annotationId], entity);
+          return;
+        }
+        _ref = entity.annotations;
+        for (id in _ref) {
+          annotation = _ref[id];
+          disambiguate(annotation, entity);
+        }
+        return entity.occurrences = currentOccurencesForEntity(entity);
+      });
+      $rootScope.$on("entityDeselected", function(event, entity, annotationId) {
+        var annotation, id, _ref;
+        if (annotationId != null) {
+          dedisambiguate(entity.annotations[annotationId], entity);
+          return;
+        }
+        _ref = entity.annotations;
+        for (id in _ref) {
+          annotation = _ref[id];
+          dedisambiguate(annotation, entity);
+        }
+        entity.occurrences = currentOccurencesForEntity(entity);
+        if (entity.occurrences === 0) {
+          return $rootScope.$broadcast("noOccurencesForEntity", entity);
         }
       });
       service = {
@@ -159,7 +216,7 @@
       var service, _currentAnalysis;
       service = _currentAnalysis = {};
       service.parse = function(data) {
-        var annotation, ea, entity, id, _i, _len, _ref, _ref1, _ref2;
+        var annotation, ea, entity, id, _i, _len, _ref, _ref1, _ref2, _ref3;
         _ref = data.entities;
         for (id in _ref) {
           entity = _ref[id];
@@ -182,6 +239,11 @@
             ea = _ref2[_i];
             data.entities[ea.entityId].annotations[id] = annotation;
           }
+        }
+        _ref3 = data.annotations;
+        for (id in _ref3) {
+          annotation = _ref3[id];
+          annotation.id = id;
         }
         return data;
       };
@@ -219,6 +281,17 @@
       $scope.addBox = function(scope, id) {
         return $scope.boxes[id] = scope;
       };
+      $scope.$on("noOccurencesForEntity", function(event, entity) {
+        var box, entities, _ref, _results;
+        _ref = $scope.selectedEntities;
+        _results = [];
+        for (box in _ref) {
+          entities = _ref[box];
+          delete $scope.selectedEntities[box][entity.id];
+          _results.push($scope.boxes[box].deselect(entity));
+        }
+        return _results;
+      });
       $scope.$on("configurationLoaded", function(event, configuration) {
         var box, _i, _len, _ref;
         _ref = configuration.classificationBoxes;
@@ -239,8 +312,9 @@
         $log.debug("Entity tile selected for entity " + entity.id + " within '" + scope + "' scope");
         if ($scope.selectedEntities[scope][entity.id] == null) {
           $scope.selectedEntities[scope][entity.id] = entity;
-          return $log.debug($scope.selectedEntities);
+          return $scope.$emit("entitySelected", entity, $scope.annotation);
         } else {
+          $scope.$emit("entityDeselected", entity, $scope.annotation);
           delete $scope.selectedEntities[scope][entity.id];
           return $scope.boxes[scope].deselect(entity);
         }
