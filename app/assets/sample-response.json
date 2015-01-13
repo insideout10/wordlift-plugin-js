@@ -18,6 +18,7 @@
 	"annotations": {
 			"urn:enhancement-1f83847a-95c2-c81b-cba9-f958aed45b34" : {
 				"start": 791,
+				"text": "Alexīs Tsipras",
 				"end": 805,
 				"entityMatches" : [
 					{ "entityId": "http://dbpedia.org/resource/Alexis_Tsipras", "confidence": 1 }
