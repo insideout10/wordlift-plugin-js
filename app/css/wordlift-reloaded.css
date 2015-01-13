@@ -1557,6 +1557,28 @@ body {
   font-family: "Open Sans", sans-serif;
   background-color: white;
 }
+#wordlift-edit-post-wrapper .wl-annotation-label {
+  border-bottom: #ccc 1px solid;
+  margin: 0px;
+  padding: 4px;
+}
+#wordlift-edit-post-wrapper .wl-annotation-label .wl-annotation-label-icon {
+  padding: 0px 3px;
+  font-family: FontAwesome;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 14px;
+  padding: 4px 0px;
+}
+#wordlift-edit-post-wrapper .wl-annotation-label .wl-annotation-label-icon:before {
+  content: "\f040";
+}
+#wordlift-edit-post-wrapper .wl-annotation-label small {
+  font-weight: normal;
+}
 #wordlift-edit-post-wrapper .classification-box .box-header {
   padding: 3px;
   font-size: 0.8em;

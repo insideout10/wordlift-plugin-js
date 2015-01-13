@@ -457,7 +457,13 @@ angular.module('wordlift.core', [])
 $(
   container = $("""
   	<div id="wordlift-edit-post-wrapper" ng-controller="EditPostWidgetController">
-  		<wl-classification-box ng-repeat="box in configuration.classificationBoxes"></wl-classification-box>
+  		<div ng-show="annotation">
+        <h4 class="wl-annotation-label">
+          <i class="wl-annotation-label-icon"></i>
+          {{ analysis.annotations[ annotation ].text }}
+          <small>[ {{ analysis.annotations[ annotation ].start }}, {{ analysis.annotations[ annotation ].end }} ]</small>
+        </h4></div>
+      <wl-classification-box ng-repeat="box in configuration.classificationBoxes"></wl-classification-box>
     </div>
 
   """)
