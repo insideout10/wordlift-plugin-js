@@ -133,21 +133,21 @@
         return discardedItemId;
       };
       currentOccurencesForEntity = function(entityId) {
-        var annotation, annotations, count, ed, itemId, _i, _len;
+        var annotation, annotations, ed, itemId, occurrences, _i, _len;
         ed = editor();
-        count = 0;
+        occurrences = [];
         if (entityId === "") {
-          return count;
+          return occurrences;
         }
         annotations = ed.dom.select("span.textannotation");
         for (_i = 0, _len = annotations.length; _i < _len; _i++) {
           annotation = annotations[_i];
           itemId = ed.dom.getAttrib(annotation.id, "itemid");
           if (itemId === entityId) {
-            count += 1;
+            occurrences.push(annotation.id);
           }
         }
-        return count;
+        return occurrences;
       };
       $rootScope.$on("analysisPerformed", function(event, analysis) {
         if ((analysis != null) && (analysis.annotations != null)) {
@@ -304,14 +304,21 @@
         return $scope.boxes[id] = scope;
       };
       $scope.$on("updateOccurencesForEntity", function(event, entityId, occurrences) {
-        var box, entities, _ref, _results;
-        $log.debug("Occurences " + occurrences + " for " + entityId);
+        var box, entities, _ref, _ref1, _results;
+        $log.debug("Occurrences " + occurrences.length + " for " + entityId);
         $scope.analysis.entities[entityId].occurrences = occurrences;
-        if (occurrences === 0) {
+        if ($scope.annotation != null) {
           _ref = $scope.selectedEntities;
-          _results = [];
           for (box in _ref) {
             entities = _ref[box];
+            $scope.boxes[box].relink($scope.analysis.entities[entityId], $scope.annotation);
+          }
+        }
+        if (occurrences.length === 0) {
+          _ref1 = $scope.selectedEntities;
+          _results = [];
+          for (box in _ref1) {
+            entities = _ref1[box];
             delete $scope.selectedEntities[box][entityId];
             _results.push($scope.boxes[box].deselect($scope.analysis.entities[entityId]));
           }
@@ -385,13 +392,35 @@
             }
             return _results;
           };
-          $scope.$watch("annotation", function(annotationId) {
+          $scope.relink = function(entity, annotationId) {
             var tile, _i, _len, _ref, _results;
             _ref = $scope.tiles;
             _results = [];
             for (_i = 0, _len = _ref.length; _i < _len; _i++) {
               tile = _ref[_i];
-              _results.push(tile.isVisible = annotationId != null ? tile.entity.isRelatedToAnnotation(annotationId) : true);
+              if (tile.entity.id === entity.id) {
+                _results.push(tile.isLinked = (__indexOf.call(tile.entity.occurrences, annotationId) >= 0));
+              } else {
+                _results.push(void 0);
+              }
+            }
+            return _results;
+          };
+          $scope.$watch("annotation", function(annotationId) {
+            var analysis, tile, _i, _len, _ref, _results;
+            _ref = $scope.tiles;
+            _results = [];
+            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+              tile = _ref[_i];
+              if (analysis = annotationId != null) {
+                tile.isVisible = tile.entity.isRelatedToAnnotation(annotationId);
+                tile.annotationModeOn = true;
+                _results.push(tile.isLinked = (__indexOf.call(tile.entity.occurrences, annotationId) >= 0));
+              } else {
+                tile.isVisible = true;
+                tile.isLinked = false;
+                _results.push(tile.annotationModeOn = false);
+              }
             }
             return _results;
           });
@@ -426,12 +455,14 @@
         scope: {
           entity: '='
         },
-        template: "<div ng-class=\"wrapperCssClasses\" ng-show=\"isVisible\">\n  <i ng-class=\"{ 'wl-selected' : isSelected, 'wl-unselected' : !isSelected }\"></i>\n        <i class=\"type\"></i>\n        <span class=\"label\" ng-click=\"select()\">{{entity.label}}</span>\n        <small ng-show=\"entity.occurrences > 0\">({{entity.occurrences}})</small>\n        <i ng-class=\"{ 'wl-more': isOpened == false, 'wl-less': isOpened == true }\" ng-click=\"toggle()\"></i>\n  <div class=\"details\" ng-show=\"isOpened\">\n          <p><img class=\"thumbnail\" ng-src=\"{{ entity.images[0] }}\" />{{entity.description}}</p>\n        </div>\n</div>\n",
+        template: "<div ng-class=\"wrapperCssClasses\" ng-show=\"isVisible\">\n  <i ng-show=\"annotationModeOn\" ng-class=\"{ 'wl-linked' : isLinked, 'wl-unlinked' : !isLinked }\"></i>\n        <i ng-hide=\"annotationModeOn\" ng-class=\"{ 'wl-selected' : isSelected, 'wl-unselected' : !isSelected }\"></i>\n        <i class=\"type\"></i>\n        <span class=\"label\" ng-click=\"select()\">{{entity.label}}</span>\n        <small ng-show=\"entity.occurrences.length > 0\">({{entity.occurrences.length}})</small>\n        <i ng-class=\"{ 'wl-more': isOpened == false, 'wl-less': isOpened == true }\" ng-click=\"toggle()\"></i>\n  <div class=\"details\" ng-show=\"isOpened\">\n          <p><img class=\"thumbnail\" ng-src=\"{{ entity.images[0] }}\" />{{entity.description}}</p>\n        </div>\n</div>\n",
         link: function($scope, $element, $attrs, $ctrl) {
           $ctrl.addTile($scope);
           $scope.isOpened = false;
           $scope.isVisible = true;
           $scope.isSelected = false;
+          $scope.isLinked = false;
+          $scope.annotationModeOn = false;
           $scope.wrapperCssClasses = ["entity", "wl-" + $scope.entity.mainType];
           $scope.open = function() {
             return $scope.isOpened = true;

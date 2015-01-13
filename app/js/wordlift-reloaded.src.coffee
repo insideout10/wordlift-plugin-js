@@ -155,20 +155,27 @@ angular.module('wordlift.core', [])
     ed.dom.setAttrib annotation.id, "itemid", ""
     discardedItemId
 
+  # TODO refactoring with regex
   currentOccurencesForEntity = (entityId) ->
     ed = editor()
-    count = 0    
-    return count if entityId is ""
+    occurrences = []    
+    return occurrences if entityId is ""
     annotations = ed.dom.select "span.textannotation"
     for annotation in annotations
       itemId = ed.dom.getAttrib annotation.id, "itemid"
-      count += 1 if itemId is entityId
-    count
+      occurrences.push annotation.id  if itemId is entityId
+    occurrences
 
   $rootScope.$on "analysisPerformed", (event, analysis) ->
     service.embedAnalysis analysis if analysis? and analysis.annotations?
   
   $rootScope.$on "entitySelected", (event, entity, annotationId) ->
+    # per tutte le annotazioni o solo per quella corrente 
+    # recupero dal testo una struttura del tipo entityId: [ annotationId ]
+    # non considero solo la entity principale, ma anche le entity modificate
+    # il numero di elementi dell'array corrisponde alle occurences
+    # l'intero oggetto va salvato sulla proprietà likendAnnotations delle entity
+    # o potrebbe sostituire occurences? Fatto questo posso gestire lo stato linked /
     discarded = []
     if annotationId?
       discarded.push disambiguate entity.annotations[ annotationId ], entity
@@ -305,12 +312,17 @@ angular.module('wordlift.core', [])
     $scope.boxes[id] = scope
     
   $scope.$on "updateOccurencesForEntity", (event, entityId, occurrences) ->
-    $log.debug "Occurences #{occurrences} for #{entityId}"
+    $log.debug "Occurrences #{occurrences.length} for #{entityId}"
     $scope.analysis.entities[ entityId ].occurrences = occurrences
-    if occurrences is 0
+    if $scope.annotation?
+      for box, entities of $scope.selectedEntities
+        $scope.boxes[ box ].relink $scope.analysis.entities[ entityId ], $scope.annotation
+        
+    if occurrences.length is 0
       for box, entities of $scope.selectedEntities
         delete $scope.selectedEntities[ box ][ entityId ]
         $scope.boxes[ box ].deselect $scope.analysis.entities[ entityId ]
+        
 
   $scope.$on "configurationLoaded", (event, configuration) ->
     for box in configuration.classificationBoxes
@@ -371,11 +383,22 @@ angular.module('wordlift.core', [])
       $scope.deselect = (entity)->
         for tile in $scope.tiles
           tile.isSelected = false if tile.entity.id is entity.id
-
+      
+      $scope.relink = (entity, annotationId)->
+        for tile in $scope.tiles
+          tile.isLinked = (annotationId in tile.entity.occurrences) if tile.entity.id is entity.id
+           
       $scope.$watch "annotation", (annotationId) ->
         for tile in $scope.tiles
-          tile.isVisible = if annotationId? then tile.entity.isRelatedToAnnotation( annotationId ) else true
-
+          if analysis = annotationId?
+            tile.isVisible = tile.entity.isRelatedToAnnotation( annotationId ) 
+            tile.annotationModeOn = true
+            tile.isLinked = (annotationId in tile.entity.occurrences)
+          else
+            tile.isVisible = true
+            tile.isLinked = false
+            tile.annotationModeOn = false
+            
       ctrl =
         onSelectedTile: (tile)->
           tile.isSelected = !tile.isSelected
@@ -394,10 +417,11 @@ angular.module('wordlift.core', [])
       entity: '='
     template: """
   	  <div ng-class="wrapperCssClasses" ng-show="isVisible">
-  	    <i ng-class="{ 'wl-selected' : isSelected, 'wl-unselected' : !isSelected }"></i>
+  	    <i ng-show="annotationModeOn" ng-class="{ 'wl-linked' : isLinked, 'wl-unlinked' : !isLinked }"></i>
+        <i ng-hide="annotationModeOn" ng-class="{ 'wl-selected' : isSelected, 'wl-unselected' : !isSelected }"></i>
         <i class="type"></i>
         <span class="label" ng-click="select()">{{entity.label}}</span>
-        <small ng-show="entity.occurrences > 0">({{entity.occurrences}})</small>
+        <small ng-show="entity.occurrences.length > 0">({{entity.occurrences.length}})</small>
         <i ng-class="{ 'wl-more': isOpened == false, 'wl-less': isOpened == true }" ng-click="toggle()"></i>
   	    <div class="details" ng-show="isOpened">
           <p><img class="thumbnail" ng-src="{{ entity.images[0] }}" />{{entity.description}}</p>
@@ -413,6 +437,8 @@ angular.module('wordlift.core', [])
       $scope.isOpened = false
       $scope.isVisible = true
       $scope.isSelected = false
+      $scope.isLinked = false
+      $scope.annotationModeOn = false
 
       $scope.wrapperCssClasses = [ "entity", "wl-#{$scope.entity.mainType}" ]
 
