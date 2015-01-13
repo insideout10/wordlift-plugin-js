@@ -2,7 +2,7 @@
  	"classificationBoxes": [
  		{
  			"id": "what",
- 			"label": "About",
+ 			"label": "What",
  			"registeredTypes": [ "event", "organization", "person", "place" ],
  			"registeredWidgets": [ "imageSuggestor"]
  		},
