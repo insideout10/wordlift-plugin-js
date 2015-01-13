@@ -143,46 +143,63 @@ angular.module('wordlift.core', [])
     ed = editor()
     ed.dom.addClass annotation.id, "disambiguated"
     ed.dom.addClass annotation.id, "wl-#{entity.mainType}"
+    discardedItemId = ed.dom.getAttrib annotation.id, "itemid"
     ed.dom.setAttrib annotation.id, "itemid", entity.id
-    
+    discardedItemId
+
   dedisambiguate = ( annotation, entity )->
     ed = editor()
     ed.dom.removeClass annotation.id, "disambiguated"
     ed.dom.removeClass annotation.id, "wl-#{entity.mainType}"
+    discardedItemId = ed.dom.getAttrib annotation.id, "itemid"
     ed.dom.setAttrib annotation.id, "itemid", ""
+    discardedItemId
 
-  currentOccurencesForEntity = (entity) ->
+  currentOccurencesForEntity = (entityId) ->
     ed = editor()
     count = 0    
+    return count if entityId is ""
     annotations = ed.dom.select "span.textannotation"
     for annotation in annotations
-      entityId = ed.dom.getAttrib annotation.id, "itemid"
-      $log.debug "going to matach #{entityId}"
-      count += 1 if entityId is entity.id
+      itemId = ed.dom.getAttrib annotation.id, "itemid"
+      count += 1 if itemId is entityId
     count
 
   $rootScope.$on "analysisPerformed", (event, analysis) ->
     service.embedAnalysis analysis if analysis? and analysis.annotations?
   
   $rootScope.$on "entitySelected", (event, entity, annotationId) ->
+    discarded = []
     if annotationId?
-      disambiguate entity.annotations[ annotationId ], entity
-      return   
-    for id, annotation of entity.annotations
-      disambiguate annotation, entity
+      discarded.push disambiguate entity.annotations[ annotationId ], entity
+    else    
+      for id, annotation of entity.annotations
+        $log.debug "Going to disambiguate annotation #{id}"
+        discarded.push disambiguate annotation, entity
+    
+    for entityId in discarded
+      if entityId
+        occurrences = currentOccurencesForEntity entityId
+        $rootScope.$broadcast "updateOccurencesForEntity", entityId, occurrences
 
-    entity.occurrences = currentOccurencesForEntity entity
+    occurrences = currentOccurencesForEntity entity.id
+    $rootScope.$broadcast "updateOccurencesForEntity", entity.id, occurrences
       
   $rootScope.$on "entityDeselected", (event, entity, annotationId) ->
+    discarded = []
     if annotationId?
       dedisambiguate entity.annotations[ annotationId ], entity
-      return   
-    for id, annotation of entity.annotations
-      dedisambiguate annotation, entity
-      
-    entity.occurrences = currentOccurencesForEntity entity
-    if entity.occurrences is 0
-      $rootScope.$broadcast "noOccurencesForEntity", entity
+    else   
+      for id, annotation of entity.annotations
+        dedisambiguate annotation, entity
+    
+    for entityId in discarded
+      if entityId
+        occurrences = currentOccurencesForEntity entityId
+        $rootScope.$broadcast "updateOccurencesForEntity", entityId, occurrences
+        
+    occurrences = currentOccurencesForEntity entity
+    $rootScope.$broadcast "updateOccurencesForEntity", entity.id, occurrences
         
   service =
     # Embed the provided analysis in the editor.
@@ -287,10 +304,13 @@ angular.module('wordlift.core', [])
   $scope.addBox = (scope, id)->
     $scope.boxes[id] = scope
     
-  $scope.$on "noOccurencesForEntity", (event, entity) ->
-    for box, entities of $scope.selectedEntities
-      delete $scope.selectedEntities[ box ][ entity.id ]
-      $scope.boxes[ box ].deselect entity
+  $scope.$on "updateOccurencesForEntity", (event, entityId, occurrences) ->
+    $log.debug "Occurences #{occurrences} for #{entityId}"
+    $scope.analysis.entities[ entityId ].occurrences = occurrences
+    if occurrences is 0
+      for box, entities of $scope.selectedEntities
+        delete $scope.selectedEntities[ box ][ entityId ]
+        $scope.boxes[ box ].deselect $scope.analysis.entities[ entityId ]
 
   $scope.$on "configurationLoaded", (event, configuration) ->
     for box in configuration.classificationBoxes
@@ -361,7 +381,6 @@ angular.module('wordlift.core', [])
           tile.isSelected = !tile.isSelected
           $scope.onSelectedEntityTile tile.entity, $scope.box.id
         addTile: (tile)->
-          $log.debug "Adding tile with id #{tile.$id}"
           $scope.tiles.push tile
         closeTiles: ()->
           for tile in $scope.tiles

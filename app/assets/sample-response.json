@@ -31,6 +31,15 @@
 					{ "confidence":1, "entityId": "http://dbpedia.org/resource/Athens" },
 					{ "confidence":0.96666664, "entityId": "http://dbpedia.org/resource/Athens_Prefecture" }
 				]
+			},
+			"urn:enhancement-afe6a8de-56cf-6dca-d307-d890993297fb" : {
+				"start":9,
+				"end":14,
+				"text":"Atene",
+				"entityMatches":[
+					{ "confidence":1, "entityId": "http://dbpedia.org/resource/Athens" },
+					{ "confidence":0.96666664, "entityId": "http://dbpedia.org/resource/Athens_Prefecture" }
+				]
 			}
 		}
 }

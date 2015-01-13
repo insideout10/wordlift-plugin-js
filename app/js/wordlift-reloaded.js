@@ -115,29 +115,35 @@
         return tinyMCE.get('content');
       };
       disambiguate = function(annotation, entity) {
-        var ed;
+        var discardedItemId, ed;
         ed = editor();
         ed.dom.addClass(annotation.id, "disambiguated");
         ed.dom.addClass(annotation.id, "wl-" + entity.mainType);
-        return ed.dom.setAttrib(annotation.id, "itemid", entity.id);
+        discardedItemId = ed.dom.getAttrib(annotation.id, "itemid");
+        ed.dom.setAttrib(annotation.id, "itemid", entity.id);
+        return discardedItemId;
       };
       dedisambiguate = function(annotation, entity) {
-        var ed;
+        var discardedItemId, ed;
         ed = editor();
         ed.dom.removeClass(annotation.id, "disambiguated");
         ed.dom.removeClass(annotation.id, "wl-" + entity.mainType);
-        return ed.dom.setAttrib(annotation.id, "itemid", "");
+        discardedItemId = ed.dom.getAttrib(annotation.id, "itemid");
+        ed.dom.setAttrib(annotation.id, "itemid", "");
+        return discardedItemId;
       };
-      currentOccurencesForEntity = function(entity) {
-        var annotation, annotations, count, ed, entityId, _i, _len;
+      currentOccurencesForEntity = function(entityId) {
+        var annotation, annotations, count, ed, itemId, _i, _len;
         ed = editor();
         count = 0;
+        if (entityId === "") {
+          return count;
+        }
         annotations = ed.dom.select("span.textannotation");
         for (_i = 0, _len = annotations.length; _i < _len; _i++) {
           annotation = annotations[_i];
-          entityId = ed.dom.getAttrib(annotation.id, "itemid");
-          $log.debug("going to matach " + entityId);
-          if (entityId === entity.id) {
+          itemId = ed.dom.getAttrib(annotation.id, "itemid");
+          if (itemId === entityId) {
             count += 1;
           }
         }
@@ -149,33 +155,49 @@
         }
       });
       $rootScope.$on("entitySelected", function(event, entity, annotationId) {
-        var annotation, id, _ref;
+        var annotation, discarded, entityId, id, occurrences, _i, _len, _ref;
+        discarded = [];
         if (annotationId != null) {
-          disambiguate(entity.annotations[annotationId], entity);
-          return;
+          discarded.push(disambiguate(entity.annotations[annotationId], entity));
+        } else {
+          _ref = entity.annotations;
+          for (id in _ref) {
+            annotation = _ref[id];
+            $log.debug("Going to disambiguate annotation " + id);
+            discarded.push(disambiguate(annotation, entity));
+          }
         }
-        _ref = entity.annotations;
-        for (id in _ref) {
-          annotation = _ref[id];
-          disambiguate(annotation, entity);
+        for (_i = 0, _len = discarded.length; _i < _len; _i++) {
+          entityId = discarded[_i];
+          if (entityId) {
+            occurrences = currentOccurencesForEntity(entityId);
+            $rootScope.$broadcast("updateOccurencesForEntity", entityId, occurrences);
+          }
         }
-        return entity.occurrences = currentOccurencesForEntity(entity);
+        occurrences = currentOccurencesForEntity(entity.id);
+        return $rootScope.$broadcast("updateOccurencesForEntity", entity.id, occurrences);
       });
       $rootScope.$on("entityDeselected", function(event, entity, annotationId) {
-        var annotation, id, _ref;
+        var annotation, discarded, entityId, id, occurrences, _i, _len, _ref;
+        discarded = [];
         if (annotationId != null) {
           dedisambiguate(entity.annotations[annotationId], entity);
-          return;
+        } else {
+          _ref = entity.annotations;
+          for (id in _ref) {
+            annotation = _ref[id];
+            dedisambiguate(annotation, entity);
+          }
         }
-        _ref = entity.annotations;
-        for (id in _ref) {
-          annotation = _ref[id];
-          dedisambiguate(annotation, entity);
+        for (_i = 0, _len = discarded.length; _i < _len; _i++) {
+          entityId = discarded[_i];
+          if (entityId) {
+            occurrences = currentOccurencesForEntity(entityId);
+            $rootScope.$broadcast("updateOccurencesForEntity", entityId, occurrences);
+          }
         }
-        entity.occurrences = currentOccurencesForEntity(entity);
-        if (entity.occurrences === 0) {
-          return $rootScope.$broadcast("noOccurencesForEntity", entity);
-        }
+        occurrences = currentOccurencesForEntity(entity);
+        return $rootScope.$broadcast("updateOccurencesForEntity", entity.id, occurrences);
       });
       service = {
         embedAnalysis: (function(_this) {
@@ -281,16 +303,20 @@
       $scope.addBox = function(scope, id) {
         return $scope.boxes[id] = scope;
       };
-      $scope.$on("noOccurencesForEntity", function(event, entity) {
+      $scope.$on("updateOccurencesForEntity", function(event, entityId, occurrences) {
         var box, entities, _ref, _results;
-        _ref = $scope.selectedEntities;
-        _results = [];
-        for (box in _ref) {
-          entities = _ref[box];
-          delete $scope.selectedEntities[box][entity.id];
-          _results.push($scope.boxes[box].deselect(entity));
+        $log.debug("Occurences " + occurrences + " for " + entityId);
+        $scope.analysis.entities[entityId].occurrences = occurrences;
+        if (occurrences === 0) {
+          _ref = $scope.selectedEntities;
+          _results = [];
+          for (box in _ref) {
+            entities = _ref[box];
+            delete $scope.selectedEntities[box][entityId];
+            _results.push($scope.boxes[box].deselect($scope.analysis.entities[entityId]));
+          }
+          return _results;
         }
-        return _results;
       });
       $scope.$on("configurationLoaded", function(event, configuration) {
         var box, _i, _len, _ref;
@@ -375,7 +401,6 @@
               return $scope.onSelectedEntityTile(tile.entity, $scope.box.id);
             },
             addTile: function(tile) {
-              $log.debug("Adding tile with id " + tile.$id);
               return $scope.tiles.push(tile);
             },
             closeTiles: function() {
