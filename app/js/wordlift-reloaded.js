@@ -395,12 +395,15 @@
       return {
         restrict: 'E',
         scope: true,
-        template: "<div class=\"classification-box\">\n	<div class=\"box-header\">\n          <h5 class=\"label\">{{box.label}}\n            <span class=\"wl-suggestion-tools\">\n            <i ng-class=\"'wl-' + widget\" ng-click=\"toggleWidget(widget)\" ng-repeat=\"widget in box.registeredWidgets\" class=\"wl-widget-icon\"></i>\n            </span>  \n          </h5>\n\n          <span ng-class=\"'wl-' + entity.mainType\" ng-repeat=\"(id, entity) in selectedEntities[box.id]\" class=\"wl-selected-item\">\n            {{ entity.label}}\n            <i class=\"wl-deselect-item\" ng-click=\"onSelectedEntityTile(entity, box)\"></i>\n          </span>\n        </div>\n        <div ng-show=\"isWidgetOpened\" class=\"box-widgets\">\n            <div ng-show=\"currentWidget == widget\" ng-repeat=\"widget in box.registeredWidgets\">\n              <img ng-click=\"embedImageInEditor(item.uri)\"ng-src=\"{{ item.uri }}\" ng-repeat=\"item in widgets[ box.id ][ widget ]\" />\n            </div>\n        </div>\n  			<div ng-hide=\"isWidgetOpened\" class=\"box-tiles\">\n        <wl-entity-tile notify=\"onSelectedEntityTile(entity.id, box)\" entity=\"entity\" ng-repeat=\"entity in entities\"></wl-entity>\n  		  </div>\n      </div>	",
+        template: "<div class=\"classification-box\">\n	<div class=\"box-header\">\n          <h5 class=\"label\">{{box.label}}\n            <span class=\"wl-suggestion-tools\" ng-show=\"hasSelectedEntities()\">\n              <i ng-class=\"'wl-' + widget\" title=\"{{widget}}\" ng-click=\"toggleWidget(widget)\" ng-repeat=\"widget in box.registeredWidgets\" class=\"wl-widget-icon\"></i>\n            </span>  \n          </h5>\n          <span ng-class=\"'wl-' + entity.mainType\" ng-repeat=\"(id, entity) in selectedEntities[box.id]\" class=\"wl-selected-item\">\n            {{ entity.label}}\n            <i class=\"wl-deselect-item\" ng-click=\"onSelectedEntityTile(entity, box)\"></i>\n          </span>\n        </div>\n        \n        <div ng-show=\"isWidgetOpened\" class=\"box-widgets\">\n          <div ng-show=\"currentWidget == widget\" ng-repeat=\"widget in box.registeredWidgets\">\n            <img ng-click=\"embedImageInEditor(item.uri)\"ng-src=\"{{ item.uri }}\" ng-repeat=\"item in widgets[ box.id ][ widget ]\" />\n          </div>\n        </div>\n\n  			<div ng-hide=\"isWidgetOpened\" class=\"box-tiles\">\n        <wl-entity-tile notify=\"onSelectedEntityTile(entity.id, box)\" entity=\"entity\" ng-repeat=\"entity in entities\"></wl-entity>\n  		  </div>\n      </div>	",
         link: function($scope, $element, $attrs, $ctrl) {
           var entity, id, _ref, _ref1, _results;
           $scope.entities = {};
           $scope.currentWidget = void 0;
           $scope.isWidgetOpened = false;
+          $scope.hasSelectedEntities = function() {
+            return Object.keys($scope.selectedEntities[$scope.box.id]).length > 0;
+          };
           $scope.embedImageInEditor = function(image) {
             return $scope.$emit("embedImageInEditor", image);
           };

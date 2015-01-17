@@ -257,21 +257,22 @@ angular.module('wordlift.core', [])
     	<div class="classification-box">
     		<div class="box-header">
           <h5 class="label">{{box.label}}
-            <span class="wl-suggestion-tools">
-            <i ng-class="'wl-' + widget" ng-click="toggleWidget(widget)" ng-repeat="widget in box.registeredWidgets" class="wl-widget-icon"></i>
+            <span class="wl-suggestion-tools" ng-show="hasSelectedEntities()">
+              <i ng-class="'wl-' + widget" title="{{widget}}" ng-click="toggleWidget(widget)" ng-repeat="widget in box.registeredWidgets" class="wl-widget-icon"></i>
             </span>  
           </h5>
-
           <span ng-class="'wl-' + entity.mainType" ng-repeat="(id, entity) in selectedEntities[box.id]" class="wl-selected-item">
             {{ entity.label}}
             <i class="wl-deselect-item" ng-click="onSelectedEntityTile(entity, box)"></i>
           </span>
         </div>
+        
         <div ng-show="isWidgetOpened" class="box-widgets">
-            <div ng-show="currentWidget == widget" ng-repeat="widget in box.registeredWidgets">
-              <img ng-click="embedImageInEditor(item.uri)"ng-src="{{ item.uri }}" ng-repeat="item in widgets[ box.id ][ widget ]" />
-            </div>
+          <div ng-show="currentWidget == widget" ng-repeat="widget in box.registeredWidgets">
+            <img ng-click="embedImageInEditor(item.uri)"ng-src="{{ item.uri }}" ng-repeat="item in widgets[ box.id ][ widget ]" />
+          </div>
         </div>
+
   			<div ng-hide="isWidgetOpened" class="box-tiles">
         <wl-entity-tile notify="onSelectedEntityTile(entity.id, box)" entity="entity" ng-repeat="entity in entities"></wl-entity>
   		  </div>
@@ -282,6 +283,10 @@ angular.module('wordlift.core', [])
       $scope.entities = {}
       $scope.currentWidget = undefined
       $scope.isWidgetOpened = false
+
+      $scope.hasSelectedEntities = ()->
+        #$log.debug $scope.selectedEntities[ $scope.box.id ]
+        Object.keys( $scope.selectedEntities[ $scope.box.id ] ).length > 0
 
       $scope.embedImageInEditor = (image)->
         $scope.$emit "embedImageInEditor", image
@@ -319,7 +324,7 @@ angular.module('wordlift.core', [])
         
         $scope.currentWidget = undefined
         $scope.isWidgetOpened = false
-        
+
         for tile in $scope.tiles
           if analysis = annotationId?
             tile.isVisible = tile.entity.isRelatedToAnnotation( annotationId ) 

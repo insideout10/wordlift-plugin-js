@@ -1612,15 +1612,15 @@ body {
   text-transform: uppercase;
   font-weight: bold;
   margin: 5px 0px;
+  line-height: 1.6em;
 }
 #wordlift-edit-post-wrapper .classification-box .box-header .wl-suggestion-tools {
-  padding: 2px 0px;
+  margin-left: 4px;
+  padding: 4px 0px 2px 2px;
+  border-left: #ccc 1px solid;
 }
 #wordlift-edit-post-wrapper .classification-box .box-header .wl-suggestion-tools .wl-widget-icon {
-  font-size: 14px;
   font-family: FontAwesome;
-  line-height: 12px;
-  font-size: 12px;
 }
 #wordlift-edit-post-wrapper .classification-box .box-header .wl-suggestion-tools .wl-widget-icon.wl-ImageSuggestor {
   font-family: FontAwesome;
@@ -1634,6 +1634,19 @@ body {
 }
 #wordlift-edit-post-wrapper .classification-box .box-header .wl-suggestion-tools .wl-widget-icon.wl-ImageSuggestor:before {
   content: "\f03e";
+}
+#wordlift-edit-post-wrapper .classification-box .box-header .wl-suggestion-tools .wl-widget-icon.wl-ArticleSuggestor {
+  font-family: FontAwesome;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 14px;
+  padding: 0px 3px;
+}
+#wordlift-edit-post-wrapper .classification-box .box-header .wl-suggestion-tools .wl-widget-icon.wl-ArticleSuggestor:before {
+  content: "\f03a";
 }
 #wordlift-edit-post-wrapper .classification-box .box-header .wl-selected-item.wl-person {
   padding: 3px 3px 3px 6px;

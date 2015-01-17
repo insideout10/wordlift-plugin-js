@@ -216,20 +216,21 @@ body {
           text-transform: uppercase;
           font-weight: bold;
           margin: 5px 0px;
+          line-height: 1.6em;
         }
 
         .wl-suggestion-tools {
-          padding:2px 0px;
+          margin-left: 4px;
+          padding:4px 0px 2px 2px;
+          border-left:#ccc 1px solid;
+
           
           .wl-widget-icon {
             
-            font-size: 14px;
             font-family: FontAwesome;
-            line-height: 12px;
-            font-size: 12px;
 
             &.wl-ImageSuggestor { .fa-icon(@fa-var-picture-o) };
-           
+            &.wl-ArticleSuggestor { .fa-icon(@fa-var-list) };
           }
 
         }
