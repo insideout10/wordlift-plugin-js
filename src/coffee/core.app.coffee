@@ -316,6 +316,10 @@ angular.module('wordlift.core', [])
           tile.isLinked = (annotationId in tile.entity.occurrences) if tile.entity.id is entity.id
            
       $scope.$watch "annotation", (annotationId) ->
+        
+        $scope.currentWidget = undefined
+        $scope.isWidgetOpened = false
+        
         for tile in $scope.tiles
           if analysis = annotationId?
             tile.isVisible = tile.entity.isRelatedToAnnotation( annotationId ) 
