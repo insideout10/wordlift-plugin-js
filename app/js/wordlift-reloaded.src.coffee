@@ -410,6 +410,44 @@ angular.module('wordlift.core', [])
           	tile.close()
       ctrl
   ])
+.directive('wlEntityForm', ['$log', ($log)->
+    restrict: 'E'
+    scope:
+      entity: '='
+    template: """
+      <form class="wl-entity-form">
+      <div>
+          <label>Entity label</label>
+          <input type="text" ng-model="entity.label" />
+      </div>
+      <div>
+          <label>Entity type</label>
+          <select ng-model="entity.mainType" ng-options="type.id as type.name for type in supportedTypes" ></select>
+      </div>
+      <div>
+          <label>Entity Description</label>
+          <textarea ng-model="entity.description" rows="6"></textarea>
+      </div>
+      <div>
+          <label>Entity id</label>
+          <input type="text" ng-model="entity.id" />
+      </div>
+      <div>
+          <label>Entity Same as</label>
+          <input type="text" ng-model="entity.sameAs" />
+      </div>
+      </form>
+    """
+    link: ($scope, $element, $attrs, $ctrl) ->  
+      $scope.supportedTypes = [
+        { id: 'person', name: 'http://schema.org/Person' },
+        { id: 'place', name: 'http://schema.org/Place' },
+        { id: 'organization', name: 'http://schema.org/Organization' },
+        { id: 'event', name: 'http://schema.org/Event' },
+        { id: 'creative-work', name: 'http://schema.org/CreativeWork' }
+
+      ]
+])
 .directive('wlEntityTile', ['$log', ($log)->
     require: '^wlClassificationBox'
     restrict: 'E'
@@ -423,9 +461,12 @@ angular.module('wordlift.core', [])
         <span class="label" ng-click="select()">{{entity.label}}</span>
         <small ng-show="entity.occurrences.length > 0">({{entity.occurrences.length}})</small>
         <i ng-class="{ 'wl-more': isOpened == false, 'wl-less': isOpened == true }" ng-click="toggle()"></i>
-  	    <div class="details" ng-show="isOpened">
-          <p><img class="thumbnail" ng-src="{{ entity.images[0] }}" />{{entity.description}}</p>
+  	    <span ng-class="{ 'active' : editingModeOn }" ng-click="toggleEditingMode()" ng-show="isOpened" class="wl-edit-button">Edit</span>
+        <div class="details" ng-show="isOpened">
+          <p ng-hide="editingModeOn"><img class="thumbnail" ng-src="{{ entity.images[0] }}" />{{entity.description}}</p>
+          <wl-entity-form entity="entity" ng-show="editingModeOn"></wl-entity-form>
         </div>
+
   	  </div>
 
   	"""
@@ -438,9 +479,14 @@ angular.module('wordlift.core', [])
       $scope.isVisible = true
       $scope.isSelected = false
       $scope.isLinked = false
+
       $scope.annotationModeOn = false
+      $scope.editingModeOn = false
 
       $scope.wrapperCssClasses = [ "entity", "wl-#{$scope.entity.mainType}" ]
+
+      $scope.toggleEditingMode = ()->
+        $scope.editingModeOn = !$scope.editingModeOn
 
       $scope.open = ()->
       	$scope.isOpened = true

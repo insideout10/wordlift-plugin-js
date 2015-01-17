@@ -447,6 +447,36 @@
         }
       };
     }
+  ]).directive('wlEntityForm', [
+    '$log', function($log) {
+      return {
+        restrict: 'E',
+        scope: {
+          entity: '='
+        },
+        template: "<form class=\"wl-entity-form\">\n<div>\n    <label>Entity label</label>\n    <input type=\"text\" ng-model=\"entity.label\" />\n</div>\n<div>\n    <label>Entity type</label>\n    <select ng-model=\"entity.mainType\" ng-options=\"type.id as type.name for type in supportedTypes\" ></select>\n</div>\n<div>\n    <label>Entity Description</label>\n    <textarea ng-model=\"entity.description\" rows=\"6\"></textarea>\n</div>\n<div>\n    <label>Entity id</label>\n    <input type=\"text\" ng-model=\"entity.id\" />\n</div>\n<div>\n    <label>Entity Same as</label>\n    <input type=\"text\" ng-model=\"entity.sameAs\" />\n</div>\n</form>",
+        link: function($scope, $element, $attrs, $ctrl) {
+          return $scope.supportedTypes = [
+            {
+              id: 'person',
+              name: 'http://schema.org/Person'
+            }, {
+              id: 'place',
+              name: 'http://schema.org/Place'
+            }, {
+              id: 'organization',
+              name: 'http://schema.org/Organization'
+            }, {
+              id: 'event',
+              name: 'http://schema.org/Event'
+            }, {
+              id: 'creative-work',
+              name: 'http://schema.org/CreativeWork'
+            }
+          ];
+        }
+      };
+    }
   ]).directive('wlEntityTile', [
     '$log', function($log) {
       return {
@@ -455,7 +485,7 @@
         scope: {
           entity: '='
         },
-        template: "<div ng-class=\"wrapperCssClasses\" ng-show=\"isVisible\">\n  <i ng-show=\"annotationModeOn\" ng-class=\"{ 'wl-linked' : isLinked, 'wl-unlinked' : !isLinked }\"></i>\n        <i ng-hide=\"annotationModeOn\" ng-class=\"{ 'wl-selected' : isSelected, 'wl-unselected' : !isSelected }\"></i>\n        <i class=\"type\"></i>\n        <span class=\"label\" ng-click=\"select()\">{{entity.label}}</span>\n        <small ng-show=\"entity.occurrences.length > 0\">({{entity.occurrences.length}})</small>\n        <i ng-class=\"{ 'wl-more': isOpened == false, 'wl-less': isOpened == true }\" ng-click=\"toggle()\"></i>\n  <div class=\"details\" ng-show=\"isOpened\">\n          <p><img class=\"thumbnail\" ng-src=\"{{ entity.images[0] }}\" />{{entity.description}}</p>\n        </div>\n</div>\n",
+        template: "<div ng-class=\"wrapperCssClasses\" ng-show=\"isVisible\">\n  <i ng-show=\"annotationModeOn\" ng-class=\"{ 'wl-linked' : isLinked, 'wl-unlinked' : !isLinked }\"></i>\n        <i ng-hide=\"annotationModeOn\" ng-class=\"{ 'wl-selected' : isSelected, 'wl-unselected' : !isSelected }\"></i>\n        <i class=\"type\"></i>\n        <span class=\"label\" ng-click=\"select()\">{{entity.label}}</span>\n        <small ng-show=\"entity.occurrences.length > 0\">({{entity.occurrences.length}})</small>\n        <i ng-class=\"{ 'wl-more': isOpened == false, 'wl-less': isOpened == true }\" ng-click=\"toggle()\"></i>\n  <span ng-class=\"{ 'active' : editingModeOn }\" ng-click=\"toggleEditingMode()\" ng-show=\"isOpened\" class=\"wl-edit-button\">Edit</span>\n        <div class=\"details\" ng-show=\"isOpened\">\n          <p ng-hide=\"editingModeOn\"><img class=\"thumbnail\" ng-src=\"{{ entity.images[0] }}\" />{{entity.description}}</p>\n          <wl-entity-form entity=\"entity\" ng-show=\"editingModeOn\"></wl-entity-form>\n        </div>\n\n</div>\n",
         link: function($scope, $element, $attrs, $ctrl) {
           $ctrl.addTile($scope);
           $scope.isOpened = false;
@@ -463,7 +493,11 @@
           $scope.isSelected = false;
           $scope.isLinked = false;
           $scope.annotationModeOn = false;
+          $scope.editingModeOn = false;
           $scope.wrapperCssClasses = ["entity", "wl-" + $scope.entity.mainType];
+          $scope.toggleEditingMode = function() {
+            return $scope.editingModeOn = !$scope.editingModeOn;
+          };
           $scope.open = function() {
             return $scope.isOpened = true;
           };
