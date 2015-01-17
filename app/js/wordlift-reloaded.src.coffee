@@ -454,7 +454,7 @@ angular.module('wordlift.core', [])
     scope:
       entity: '='
     template: """
-  	  <div ng-class="wrapperCssClasses" ng-show="isVisible">
+  	  <div ng-class="'wl-' + entity.mainType" ng-show="isVisible" class="entity">
   	    <i ng-show="annotationModeOn" ng-class="{ 'wl-linked' : isLinked, 'wl-unlinked' : !isLinked }"></i>
         <i ng-hide="annotationModeOn" ng-class="{ 'wl-selected' : isSelected, 'wl-unselected' : !isSelected }"></i>
         <i class="type"></i>
@@ -482,8 +482,6 @@ angular.module('wordlift.core', [])
 
       $scope.annotationModeOn = false
       $scope.editingModeOn = false
-
-      $scope.wrapperCssClasses = [ "entity", "wl-#{$scope.entity.mainType}" ]
 
       $scope.toggleEditingMode = ()->
         $scope.editingModeOn = !$scope.editingModeOn
