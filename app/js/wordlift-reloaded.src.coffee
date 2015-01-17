@@ -169,6 +169,9 @@ angular.module('wordlift.core', [])
   $rootScope.$on "analysisPerformed", (event, analysis) ->
     service.embedAnalysis analysis if analysis? and analysis.annotations?
   
+  $rootScope.$on "embedImageInEditor", (event, image) ->
+    tinyMCE.execCommand 'mceInsertContent', false, "<img src=\"#{image}\" width=\"100%\" />"
+  
   $rootScope.$on "entitySelected", (event, entity, annotationId) ->
     # per tutte le annotazioni o solo per quella corrente 
     # recupero dal testo una struttura del tipo entityId: [ annotationId ]
@@ -397,7 +400,7 @@ angular.module('wordlift.core', [])
         </div>
         <div ng-show="isWidgetOpened" class="box-widgets">
             <div ng-show="currentWidget == widget" ng-repeat="widget in box.registeredWidgets">
-              <img ng-src="{{ item.uri }}" ng-repeat="item in widgets[ box.id ][ widget ]" />
+              <img ng-click="embedImageInEditor(item.uri)"ng-src="{{ item.uri }}" ng-repeat="item in widgets[ box.id ][ widget ]" />
             </div>
         </div>
   			<div ng-hide="isWidgetOpened" class="box-tiles">
@@ -410,6 +413,9 @@ angular.module('wordlift.core', [])
       $scope.entities = {}
       $scope.currentWidget = undefined
       $scope.isWidgetOpened = false
+
+      $scope.embedImageInEditor = (image)->
+        $scope.$emit "embedImageInEditor", image
 
       $scope.toggleWidget = (widget)->
         if $scope.currentWidget is widget
