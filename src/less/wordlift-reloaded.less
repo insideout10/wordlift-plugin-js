@@ -194,15 +194,43 @@ body {
   }
 
   .classification-box {
+      position: relative;
+        
+      .box-widgets {
+        
+        img {
+          width: 45%;
+          height: auto;
+          margin: 3px;
+        }
+
+      }
       .box-header {
         padding:3px;
         font-size: 0.8em;
+        position: relative;
         text-transform: capitalize;
 
         .label {
           text-transform: uppercase;
           font-weight: bold;
           margin: 5px 0px;
+        }
+
+        .wl-suggestion-tools {
+          padding:2px 0px;
+          
+          .wl-widget-icon {
+            
+            font-size: 14px;
+            font-family: FontAwesome;
+            line-height: 12px;
+            font-size: 12px;
+
+            &.wl-ImageSuggestor { .fa-icon(@fa-var-picture-o) };
+           
+          }
+
         }
 
         .draw-selected-item-wrapper(@color) {
@@ -281,6 +309,8 @@ body {
     right:0px;
     top:0px;
   }
+
+
   .wl-selected { 
     .fa-icon(@fa-var-check-circle-o);
     font-family: FontAwesome;
@@ -292,6 +322,7 @@ body {
     font-size: 14px;
     padding: 4px 0px;
   }
+
   .wl-unselected { 
     .fa-icon(@fa-var-circle-o);
     font-family: FontAwesome;

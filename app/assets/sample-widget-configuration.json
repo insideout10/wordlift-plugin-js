@@ -4,25 +4,25 @@
  			"id": "what",
  			"label": "What",
  			"registeredTypes": [ "event", "organization", "person", "place" ],
- 			"registeredWidgets": [ "imageSuggestor"]
+ 			"registeredWidgets": [ "ImageSuggestor"]
  		},
  		{
 	 		"id": "who",
 	 		"label": "Who",
  			"registeredTypes": [ "organization", "person" ],
- 			"registeredWidgets": [ "imageSuggestor"]
+ 			"registeredWidgets": [ "ImageSuggestor"]
  		},
  		{
 	 		"id": "where",
 	 		"label": "Where",
  			"registeredTypes": [ "place" ],
- 			"registeredWidgets": [ "imageSuggestor"]
+ 			"registeredWidgets": [ "ImageSuggestor"]
  		},
  		{
 	 		"id": "when",
 	 		"label": "When",
  			"registeredTypes": [ "event" ],
- 			"registeredWidgets": [ "imageSuggestor"]
+ 			"registeredWidgets": [ "ImageSuggestor"]
  		}
  	]
 }

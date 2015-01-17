@@ -293,11 +293,33 @@
       };
       return service;
     }
+  ]).service('ImageSuggestorDataRetriever', [
+    '$log', '$http', '$rootScope', function($log, $http, $rootScope) {
+      var service;
+      service = {};
+      service.loadData = function(entities) {
+        var entity, id, image, items, _i, _len, _ref;
+        items = [];
+        for (id in entities) {
+          entity = entities[id];
+          _ref = entity.images;
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            image = _ref[_i];
+            items.push({
+              'uri': image
+            });
+          }
+        }
+        return items;
+      };
+      return service;
+    }
   ]).controller('EditPostWidgetController', [
-    '$log', '$scope', '$rootScope', function($log, $scope, $rootScope) {
+    '$log', '$scope', '$rootScope', '$injector', function($log, $scope, $rootScope, $injector) {
       $scope.configuration = [];
       $scope.analysis = {};
       $scope.selectedEntities = {};
+      $scope.widgets = {};
       $scope.annotation = void 0;
       $scope.boxes = [];
       $scope.addBox = function(scope, id) {
@@ -326,11 +348,17 @@
         }
       });
       $scope.$on("configurationLoaded", function(event, configuration) {
-        var box, _i, _len, _ref;
+        var box, widget, _i, _j, _len, _len1, _ref, _ref1;
         _ref = configuration.classificationBoxes;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           box = _ref[_i];
           $scope.selectedEntities[box.id] = {};
+          $scope.widgets[box.id] = {};
+          _ref1 = box.registeredWidgets;
+          for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+            widget = _ref1[_j];
+            $scope.widgets[box.id][widget] = [];
+          }
         }
         return $scope.configuration = configuration;
       });
@@ -341,15 +369,21 @@
       $scope.$on("analysisPerformed", function(event, analysis) {
         return $scope.analysis = analysis;
       });
+      $scope.updateWidget = function(widget, scope) {
+        var items, retriever;
+        retriever = $injector.get("" + widget + "DataRetriever");
+        items = retriever.loadData($scope.selectedEntities[scope]);
+        return $scope.widgets[scope][widget] = items;
+      };
       return $scope.onSelectedEntityTile = function(entity, scope) {
-        $log.debug("Entity tile selected for entity " + entity.id + " within '" + scope + "' scope");
-        if ($scope.selectedEntities[scope][entity.id] == null) {
-          $scope.selectedEntities[scope][entity.id] = entity;
+        $log.debug("Entity tile selected for entity " + entity.id + " within '" + scope.id + "' scope");
+        if ($scope.selectedEntities[scope.id][entity.id] == null) {
+          $scope.selectedEntities[scope.id][entity.id] = entity;
           return $scope.$emit("entitySelected", entity, $scope.annotation);
         } else {
           $scope.$emit("entityDeselected", entity, $scope.annotation);
-          delete $scope.selectedEntities[scope][entity.id];
-          return $scope.boxes[scope].deselect(entity);
+          delete $scope.selectedEntities[scope.id][entity.id];
+          return $scope.boxes[scope.id].deselect(entity);
         }
       };
     }
@@ -358,10 +392,22 @@
       return {
         restrict: 'E',
         scope: true,
-        template: "    	<div class=\"classification-box\">\n    		<div class=\"box-header\">\n          <h5 class=\"label\">{{box.label}}</h5>\n          <span ng-class=\"'wl-' + entity.mainType\" ng-repeat=\"(id, entity) in selectedEntities[box.id]\" class=\"wl-selected-item\">\n            {{ entity.label}}\n            <i class=\"wl-deselect-item\" ng-click=\"onSelectedEntityTile(entity, box.id)\"></i>\n          </span>\n        </div>\n	<wl-entity-tile notify=\"onSelectedEntityTile(entity.id, box.id)\" entity=\"entity\" ng-repeat=\"entity in entities\"></wl-entity>\n</div>	",
+        template: "<div class=\"classification-box\">\n	<div class=\"box-header\">\n          <h5 class=\"label\">{{box.label}}\n            <span class=\"wl-suggestion-tools\">\n            <i ng-class=\"'wl-' + widget\" ng-click=\"toggleWidget(widget)\" ng-repeat=\"widget in box.registeredWidgets\" class=\"wl-widget-icon\"></i>\n            </span>  \n          </h5>\n\n          <span ng-class=\"'wl-' + entity.mainType\" ng-repeat=\"(id, entity) in selectedEntities[box.id]\" class=\"wl-selected-item\">\n            {{ entity.label}}\n            <i class=\"wl-deselect-item\" ng-click=\"onSelectedEntityTile(entity, box)\"></i>\n          </span>\n        </div>\n        <div ng-show=\"isWidgetOpened\" class=\"box-widgets\">\n            <div ng-show=\"currentWidget == widget\" ng-repeat=\"widget in box.registeredWidgets\">\n              <img ng-src=\"{{ item.uri }}\" ng-repeat=\"item in widgets[ box.id ][ widget ]\" />\n            </div>\n        </div>\n  			<div ng-hide=\"isWidgetOpened\" class=\"box-tiles\">\n        <wl-entity-tile notify=\"onSelectedEntityTile(entity.id, box)\" entity=\"entity\" ng-repeat=\"entity in entities\"></wl-entity>\n  		  </div>\n      </div>	",
         link: function($scope, $element, $attrs, $ctrl) {
           var entity, id, _ref, _ref1, _results;
           $scope.entities = {};
+          $scope.currentWidget = void 0;
+          $scope.isWidgetOpened = false;
+          $scope.toggleWidget = function(widget) {
+            if ($scope.currentWidget === widget) {
+              $scope.currentWidget = void 0;
+              return $scope.isWidgetOpened = false;
+            } else {
+              $scope.updateWidget(widget, $scope.box.id);
+              $scope.currentWidget = widget;
+              return $scope.isWidgetOpened = true;
+            }
+          };
           _ref = $scope.analysis.entities;
           _results = [];
           for (id in _ref) {
@@ -427,7 +473,7 @@
           ctrl = {
             onSelectedTile: function(tile) {
               tile.isSelected = !tile.isSelected;
-              return $scope.onSelectedEntityTile(tile.entity, $scope.box.id);
+              return $scope.onSelectedEntityTile(tile.entity, $scope.box);
             },
             addTile: function(tile) {
               return $scope.tiles.push(tile);
