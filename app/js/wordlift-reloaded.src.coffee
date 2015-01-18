@@ -316,6 +316,19 @@ angular.module('wordlift.core', [])
   service
 
 ])
+
+# Manage redlink analysis responses
+.service('ArticleSuggestorDataRetriever', [ '$log', '$http', '$rootScope', ($log, $http, $rootScope)-> 
+  
+  service = {}
+  service.loadData = (entities)->
+    $log.debug "Nothing to do"
+    items = []
+    items
+
+  service
+
+])
 # Manage redlink analysis responses
 .controller('EditPostWidgetController', [ '$log', '$scope', '$rootScope', '$injector', ($log, $scope, $rootScope, $injector)-> 
 
@@ -368,17 +381,17 @@ angular.module('wordlift.core', [])
     $scope.widgets[ scope ][ widget ] = items
     
   $scope.onSelectedEntityTile = (entity, scope)->
-  	$log.debug "Entity tile selected for entity #{entity.id} within '#{scope.id}' scope"
-  	if not $scope.selectedEntities[ scope.id ][ entity.id ]?
+    $log.debug "Entity tile selected for entity #{entity.id} within '#{scope.id}' scope"
+    for id, box of $scope.boxes
+      box.closeWidgets()
+
+    if not $scope.selectedEntities[ scope.id ][ entity.id ]?
       $scope.selectedEntities[ scope.id ][ entity.id ] = entity
       
       # Emit an event to communicate with the EditorService
       $scope.$emit "entitySelected", entity, $scope.annotation
-  	else
-      # TODO Any related annotation has to be reset just if this is the last related instance 
+    else
       $scope.$emit "entityDeselected", entity, $scope.annotation  
-      delete $scope.selectedEntities[ scope.id ][ entity.id ]
-      $scope.boxes[ scope.id ].deselect entity
       
 ])
 .directive('wlClassificationBox', ['$log', ($log)->
@@ -392,20 +405,20 @@ angular.module('wordlift.core', [])
               <i ng-class="'wl-' + widget" title="{{widget}}" ng-click="toggleWidget(widget)" ng-repeat="widget in box.registeredWidgets" class="wl-widget-icon"></i>
             </span>  
           </h5>
-          <span ng-class="'wl-' + entity.mainType" ng-repeat="(id, entity) in selectedEntities[box.id]" class="wl-selected-item">
-            {{ entity.label}}
-            <i class="wl-deselect-item" ng-click="onSelectedEntityTile(entity, box)"></i>
-          </span>
-        </div>
-        
-        <div ng-show="isWidgetOpened" class="box-widgets">
-          <div ng-show="currentWidget == widget" ng-repeat="widget in box.registeredWidgets">
-            <img ng-click="embedImageInEditor(item.uri)"ng-src="{{ item.uri }}" ng-repeat="item in widgets[ box.id ][ widget ]" />
+          <div ng-show="isWidgetOpened" class="box-widgets">
+            <div ng-show="currentWidget == widget" ng-repeat="widget in box.registeredWidgets">
+              <img ng-click="embedImageInEditor(item.uri)"ng-src="{{ item.uri }}" ng-repeat="item in widgets[ box.id ][ widget ]" />
+            </div>
+          </div>
+          <div class="selected-entities">
+            <span ng-class="'wl-' + entity.mainType" ng-repeat="(id, entity) in selectedEntities[box.id]" class="wl-selected-item">
+              {{ entity.label}}
+              <i class="wl-deselect-item" ng-click="onSelectedEntityTile(entity, box)"></i>
+            </span>
           </div>
         </div>
-
-  			<div ng-hide="isWidgetOpened" class="box-tiles">
-        <wl-entity-tile notify="onSelectedEntityTile(entity.id, box)" entity="entity" ng-repeat="entity in entities"></wl-entity>
+  			<div class="box-tiles">
+          <wl-entity-tile notify="onSelectedEntityTile(entity.id, box)" entity="entity" ng-repeat="entity in entities"></wl-entity>
   		  </div>
       </div>	
     """
@@ -415,8 +428,11 @@ angular.module('wordlift.core', [])
       $scope.currentWidget = undefined
       $scope.isWidgetOpened = false
 
+      $scope.closeWidgets = ()->
+        $scope.currentWidget = undefined
+        $scope.isWidgetOpened = false
+
       $scope.hasSelectedEntities = ()->
-        #$log.debug $scope.selectedEntities[ $scope.box.id ]
         Object.keys( $scope.selectedEntities[ $scope.box.id ] ).length > 0
 
       $scope.embedImageInEditor = (image)->

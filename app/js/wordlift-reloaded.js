@@ -317,6 +317,18 @@
       };
       return service;
     }
+  ]).service('ArticleSuggestorDataRetriever', [
+    '$log', '$http', '$rootScope', function($log, $http, $rootScope) {
+      var service;
+      service = {};
+      service.loadData = function(entities) {
+        var items;
+        $log.debug("Nothing to do");
+        items = [];
+        return items;
+      };
+      return service;
+    }
   ]).controller('EditPostWidgetController', [
     '$log', '$scope', '$rootScope', '$injector', function($log, $scope, $rootScope, $injector) {
       $scope.configuration = [];
@@ -379,14 +391,18 @@
         return $scope.widgets[scope][widget] = items;
       };
       return $scope.onSelectedEntityTile = function(entity, scope) {
+        var box, id, _ref;
         $log.debug("Entity tile selected for entity " + entity.id + " within '" + scope.id + "' scope");
+        _ref = $scope.boxes;
+        for (id in _ref) {
+          box = _ref[id];
+          box.closeWidgets();
+        }
         if ($scope.selectedEntities[scope.id][entity.id] == null) {
           $scope.selectedEntities[scope.id][entity.id] = entity;
           return $scope.$emit("entitySelected", entity, $scope.annotation);
         } else {
-          $scope.$emit("entityDeselected", entity, $scope.annotation);
-          delete $scope.selectedEntities[scope.id][entity.id];
-          return $scope.boxes[scope.id].deselect(entity);
+          return $scope.$emit("entityDeselected", entity, $scope.annotation);
         }
       };
     }
@@ -395,12 +411,16 @@
       return {
         restrict: 'E',
         scope: true,
-        template: "<div class=\"classification-box\">\n	<div class=\"box-header\">\n          <h5 class=\"label\">{{box.label}}\n            <span class=\"wl-suggestion-tools\" ng-show=\"hasSelectedEntities()\">\n              <i ng-class=\"'wl-' + widget\" title=\"{{widget}}\" ng-click=\"toggleWidget(widget)\" ng-repeat=\"widget in box.registeredWidgets\" class=\"wl-widget-icon\"></i>\n            </span>  \n          </h5>\n          <span ng-class=\"'wl-' + entity.mainType\" ng-repeat=\"(id, entity) in selectedEntities[box.id]\" class=\"wl-selected-item\">\n            {{ entity.label}}\n            <i class=\"wl-deselect-item\" ng-click=\"onSelectedEntityTile(entity, box)\"></i>\n          </span>\n        </div>\n        \n        <div ng-show=\"isWidgetOpened\" class=\"box-widgets\">\n          <div ng-show=\"currentWidget == widget\" ng-repeat=\"widget in box.registeredWidgets\">\n            <img ng-click=\"embedImageInEditor(item.uri)\"ng-src=\"{{ item.uri }}\" ng-repeat=\"item in widgets[ box.id ][ widget ]\" />\n          </div>\n        </div>\n\n  			<div ng-hide=\"isWidgetOpened\" class=\"box-tiles\">\n        <wl-entity-tile notify=\"onSelectedEntityTile(entity.id, box)\" entity=\"entity\" ng-repeat=\"entity in entities\"></wl-entity>\n  		  </div>\n      </div>	",
+        template: "<div class=\"classification-box\">\n	<div class=\"box-header\">\n          <h5 class=\"label\">{{box.label}}\n            <span class=\"wl-suggestion-tools\" ng-show=\"hasSelectedEntities()\">\n              <i ng-class=\"'wl-' + widget\" title=\"{{widget}}\" ng-click=\"toggleWidget(widget)\" ng-repeat=\"widget in box.registeredWidgets\" class=\"wl-widget-icon\"></i>\n            </span>  \n          </h5>\n          <div ng-show=\"isWidgetOpened\" class=\"box-widgets\">\n            <div ng-show=\"currentWidget == widget\" ng-repeat=\"widget in box.registeredWidgets\">\n              <img ng-click=\"embedImageInEditor(item.uri)\"ng-src=\"{{ item.uri }}\" ng-repeat=\"item in widgets[ box.id ][ widget ]\" />\n            </div>\n          </div>\n          <div class=\"selected-entities\">\n            <span ng-class=\"'wl-' + entity.mainType\" ng-repeat=\"(id, entity) in selectedEntities[box.id]\" class=\"wl-selected-item\">\n              {{ entity.label}}\n              <i class=\"wl-deselect-item\" ng-click=\"onSelectedEntityTile(entity, box)\"></i>\n            </span>\n          </div>\n        </div>\n  			<div class=\"box-tiles\">\n          <wl-entity-tile notify=\"onSelectedEntityTile(entity.id, box)\" entity=\"entity\" ng-repeat=\"entity in entities\"></wl-entity>\n  		  </div>\n      </div>	",
         link: function($scope, $element, $attrs, $ctrl) {
           var entity, id, _ref, _ref1, _results;
           $scope.entities = {};
           $scope.currentWidget = void 0;
           $scope.isWidgetOpened = false;
+          $scope.closeWidgets = function() {
+            $scope.currentWidget = void 0;
+            return $scope.isWidgetOpened = false;
+          };
           $scope.hasSelectedEntities = function() {
             return Object.keys($scope.selectedEntities[$scope.box.id]).length > 0;
           };
