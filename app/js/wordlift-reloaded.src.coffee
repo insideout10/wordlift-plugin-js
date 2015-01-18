@@ -382,18 +382,19 @@ angular.module('wordlift.core', [])
     
   $scope.onSelectedEntityTile = (entity, scope)->
     $log.debug "Entity tile selected for entity #{entity.id} within '#{scope.id}' scope"
+    
+    # Close all opened widgets ...
     for id, box of $scope.boxes
       box.closeWidgets()
-
+    
     if not $scope.selectedEntities[ scope.id ][ entity.id ]?
       $scope.selectedEntities[ scope.id ][ entity.id ] = entity
-      
-      # Emit an event to communicate with the EditorService
       $scope.$emit "entitySelected", entity, $scope.annotation
     else
       $scope.$emit "entityDeselected", entity, $scope.annotation  
       
 ])
+
 .directive('wlClassificationBox', ['$log', ($log)->
     restrict: 'E'
     scope: true
@@ -403,6 +404,9 @@ angular.module('wordlift.core', [])
           <h5 class="label">{{box.label}}
             <span class="wl-suggestion-tools" ng-show="hasSelectedEntities()">
               <i ng-class="'wl-' + widget" title="{{widget}}" ng-click="toggleWidget(widget)" ng-repeat="widget in box.registeredWidgets" class="wl-widget-icon"></i>
+            </span>
+            <span ng-show="isWidgetOpened" class="wl-widget-label">{{currentWidget}}
+              <i ng-click="toggleWidget(currentWidget)" class="wl-deselect-widget"></i>
             </span>  
           </h5>
           <div ng-show="isWidgetOpened" class="box-widgets">
@@ -457,6 +461,7 @@ angular.module('wordlift.core', [])
       # TODO manage on scope distruction event
       $scope.tiles = []
 
+      # Register the current classification box on EditPostWidgetController
       $scope.addBox $scope, $scope.box.id
 
       $scope.deselect = (entity)->
@@ -589,7 +594,9 @@ $(
           <i class="wl-annotation-label-icon"></i>
           {{ analysis.annotations[ annotation ].text }}
           <small>[ {{ analysis.annotations[ annotation ].start }}, {{ analysis.annotations[ annotation ].end }} ]</small>
-        </h4></div>
+          <i class="wl-annotation-label-remove-icon" ng-click="annotation = undefined"></i>
+        </h4>
+      </div>
       <wl-classification-box ng-repeat="box in configuration.classificationBoxes"></wl-classification-box>
     </div>
 
