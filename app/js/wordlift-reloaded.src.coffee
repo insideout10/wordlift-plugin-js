@@ -135,7 +135,7 @@ $ = jQuery
 # Create the main AngularJS module, and set it dependent on controllers and directives.
 angular.module('wordlift.core', [])
 # Manage redlink analysis responses
-.service('EditorService', [ '$log', '$http', '$rootScope', ($log, $http, $rootScope)-> 
+.service('EditorService', [ 'AnalysisService', '$log', '$http', '$rootScope', (AnalysisService, $log, $http, $rootScope)-> 
   
   editor = ->
     tinyMCE.get('content')
@@ -212,6 +212,45 @@ angular.module('wordlift.core', [])
     $rootScope.$broadcast "updateOccurencesForEntity", entity.id, occurrences
         
   service =
+    # Create a textAnnotation starting from the current selection
+    createTextAnnotationFromCurrentSelection: ()->
+      # A reference to the editor.
+      ed = editor()
+      # If the current selection is collapsed / blank, then nothing to do
+      if ed.selection.isCollapsed()
+        $log.warn "Invalid selection! The text annotation cannot be created"
+        return 
+      # Retrieve the selected text
+      # Notice that toString() method of browser native selection obj is used
+      text = "#{ed.selection.getSel()}"
+      # Create the text annotation
+      textAnnotation = AnalysisService.createAnnotation { 
+        text: text
+      }
+
+      # Prepare span wrapper for the new text annotation
+      textAnnotationSpan = "<span id=\"#{textAnnotation.id}\" class=\"textannotation selected\">#{ed.selection.getContent()}</span>"
+      # Update the content within the editor
+      ed.selection.setContent(textAnnotationSpan)
+      # Retrieve the current heml content
+      content = ed.getContent({format: "html"})
+      # Create a Traslator instance
+      traslator =  Traslator.create content
+      # Retrieve the index position of the new span
+      htmlPosition = content.indexOf(textAnnotationSpan);
+      # Detect the coresponding text position
+      textPosition = traslator.html2text(htmlPosition)
+          
+      # Set start & end text annotation properties
+      textAnnotation.start = textPosition 
+      textAnnotation.end = textAnnotation.start + text.length
+          
+      $log.debug "New text annotation created!"
+      $log.debug textAnnotation
+          
+      # Send a message about the new textAnnotation.
+      $rootScope.$broadcast 'textAnnotationAdded', textAnnotation
+
     # Embed the provided analysis in the editor.
     embedAnalysis: (analysis) =>
       # A reference to the editor.
@@ -251,8 +290,33 @@ angular.module('wordlift.core', [])
 # Manage redlink analysis responses
 .service('AnalysisService', [ '$log', '$http', '$rootScope', ($log, $http, $rootScope)-> 
 	
+  # Creates a unique ID of the specified length (default 8).
+  uniqueId = (length = 8) ->
+    id = ''
+    id += Math.random().toString(36).substr(2) while id.length < length
+    id.substr 0, length
+
+  # Merges two objects by copying overrides param onto the options.
+  merge = (options, overrides) ->
+    extend (extend {}, options), overrides
+  extend = (object, properties) ->
+    for key, val of properties
+      object[key] = val
+    object
+
   service = 
     _currentAnalysis = {}
+
+  service.createAnnotation = (params = {}) ->
+    # Set the defalut values.
+    defaults =
+      id: 'urn:local-text-annotation-' + uniqueId 32
+      text: ''
+      start: 0
+      end: 0
+      entityMatches: []
+    
+    merge defaults, params
 
   service.parse = (data) ->
     
@@ -622,40 +686,17 @@ injector = angular.bootstrap $('body'), ['wordlift.core']
     )
     # Add a WordLift button the TinyMCE editor.
     # TODO Disable the new button as default
-    editor.addButton 'wordlift_add_entity',
+    editor.addButton 'wordlift',
       classes: 'widget btn wordlift_add_entity'
       text: ' ' # the space is necessary to avoid right spacing on TinyMCE 4
       tooltip: 'Insert entity'
       onclick: ->
-
-        #injector.invoke(['EditorService','$rootScope', (EditorService, $rootScope) ->
+        injector.invoke(['EditorService', '$rootScope', (EditorService, $rootScope) ->
           # execute the following commands in the angular js context.
-        #  $rootScope.$apply(->
-            #EditorService.createTextAnnotationFromCurrentSelection()
-        #  )
-        #])
-
-    # Add a WordLift button the TinyMCE editor.
-    editor.addButton 'wordlift',
-      classes: 'widget btn wordlift'
-      text: ' ' # the space is necessary to avoid right spacing on TinyMCE 4
-      tooltip: 'Analyse'
-
-    # When the editor is clicked, the [EditorService.analyze](app.services.EditorService.html#analyze) method is invoked.
-      onclick: ->
-        #injector.invoke(['EditorService', '$rootScope', '$log', (EditorService, $rootScope, $log) ->
-        #  $rootScope.$apply(->
-            # Get the html content of the editor.
-            #html = editor.getContent format: 'raw'
-
-            # Get the text content from the Html.
-            #text = Traslator.create(html).getText()
-
-            # $log.info "onclick [ html :: #{html} ][ text :: #{text} ]"
-            # Send the text content for analysis.
-            #EditorService.analyze text
-        #  )
-        #])
+          $rootScope.$apply(->
+            EditorService.createTextAnnotationFromCurrentSelection()
+          )
+        ])
 
     # TODO: move this outside of this method.
     # this event is raised when a textannotation is selected in the TinyMCE editor.

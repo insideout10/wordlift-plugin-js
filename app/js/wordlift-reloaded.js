@@ -109,7 +109,7 @@
   $ = jQuery;
 
   angular.module('wordlift.core', []).service('EditorService', [
-    '$log', '$http', '$rootScope', function($log, $http, $rootScope) {
+    'AnalysisService', '$log', '$http', '$rootScope', function(AnalysisService, $log, $http, $rootScope) {
       var currentOccurencesForEntity, dedisambiguate, disambiguate, editor, service;
       editor = function() {
         return tinyMCE.get('content');
@@ -203,6 +203,31 @@
         return $rootScope.$broadcast("updateOccurencesForEntity", entity.id, occurrences);
       });
       service = {
+        createTextAnnotationFromCurrentSelection: function() {
+          var content, ed, htmlPosition, text, textAnnotation, textAnnotationSpan, textPosition, traslator;
+          ed = editor();
+          if (ed.selection.isCollapsed()) {
+            $log.warn("Invalid selection! The text annotation cannot be created");
+            return;
+          }
+          text = "" + (ed.selection.getSel());
+          textAnnotation = AnalysisService.createAnnotation({
+            text: text
+          });
+          textAnnotationSpan = "<span id=\"" + textAnnotation.id + "\" class=\"textannotation selected\">" + (ed.selection.getContent()) + "</span>";
+          ed.selection.setContent(textAnnotationSpan);
+          content = ed.getContent({
+            format: "html"
+          });
+          traslator = Traslator.create(content);
+          htmlPosition = content.indexOf(textAnnotationSpan);
+          textPosition = traslator.html2text(htmlPosition);
+          textAnnotation.start = textPosition;
+          textAnnotation.end = textAnnotation.start + text.length;
+          $log.debug("New text annotation created!");
+          $log.debug(textAnnotation);
+          return $rootScope.$broadcast('textAnnotationAdded', textAnnotation);
+        },
         embedAnalysis: (function(_this) {
           return function(analysis) {
             var annotation, annotationId, ed, element, entity, html, isDirty, traslator, _ref;
@@ -238,8 +263,44 @@
     }
   ]).service('AnalysisService', [
     '$log', '$http', '$rootScope', function($log, $http, $rootScope) {
-      var service, _currentAnalysis;
+      var extend, merge, service, uniqueId, _currentAnalysis;
+      uniqueId = function(length) {
+        var id;
+        if (length == null) {
+          length = 8;
+        }
+        id = '';
+        while (id.length < length) {
+          id += Math.random().toString(36).substr(2);
+        }
+        return id.substr(0, length);
+      };
+      merge = function(options, overrides) {
+        return extend(extend({}, options), overrides);
+      };
+      extend = function(object, properties) {
+        var key, val;
+        for (key in properties) {
+          val = properties[key];
+          object[key] = val;
+        }
+        return object;
+      };
       service = _currentAnalysis = {};
+      service.createAnnotation = function(params) {
+        var defaults;
+        if (params == null) {
+          params = {};
+        }
+        defaults = {
+          id: 'urn:local-text-annotation-' + uniqueId(32),
+          text: '',
+          start: 0,
+          end: 0,
+          entityMatches: []
+        };
+        return merge(defaults, params);
+      };
       service.parse = function(data) {
         var annotation, ea, entity, id, _i, _len, _ref, _ref1, _ref2, _ref3;
         _ref = data.entities;
@@ -605,17 +666,19 @@
         }
       ]);
     });
-    editor.addButton('wordlift_add_entity', {
+    editor.addButton('wordlift', {
       classes: 'widget btn wordlift_add_entity',
       text: ' ',
       tooltip: 'Insert entity',
-      onclick: function() {}
-    });
-    editor.addButton('wordlift', {
-      classes: 'widget btn wordlift',
-      text: ' ',
-      tooltip: 'Analyse',
-      onclick: function() {}
+      onclick: function() {
+        return injector.invoke([
+          'EditorService', '$rootScope', function(EditorService, $rootScope) {
+            return $rootScope.$apply(function() {
+              return EditorService.createTextAnnotationFromCurrentSelection();
+            });
+          }
+        ]);
+      }
     });
     return editor.onClick.add(function(editor, e) {
       return injector.invoke([

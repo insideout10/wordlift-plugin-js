@@ -3,12 +3,12 @@
 
 
 // TinyMCE toolbar
-.wp_themeSkin .mceIcon.mce_wordlift, .mce-widget.mce-btn.mce-wordlift button {
+.mceIcon.mce_wordlift, .mce-widget.mce-btn.mce-wordlift button {
     background-position: center center;
     background-repeat: no-repeat;
     
     &:before {
-      content: @fa-var-cogs; 
+      content: @fa-var-pencil; 
     }
     &:hover {
       color:rgb(0,0,0) !important;
@@ -23,17 +23,13 @@
     
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-  &.running {
-    background-image: data-uri('../img/spinner-20x20.gif');
-    width: 21px;
-    height: 22px;
-      &:before {
-        content: ' ';
-      }
-  }
+
 }
 
-.wp_themeSkin .mceIcon.mce_wordlift_add_entity, .mce-widget.mce-btn.mce-wordlift_add_entity button {
+.mceIcon.mce_wordlift_add_entity, .mce-widget.mce-btn.mce-wordlift_add_entity button {
+
+    background-position: center center;
+    background-repeat: no-repeat;
 
     &:before {
       content: @fa-var-pencil; 
