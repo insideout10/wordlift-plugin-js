@@ -424,7 +424,7 @@
       $scope.annotation = void 0;
       $scope.boxes = [];
       $scope.addNewEntityToAnalysis = function() {
-        var annotation, box, id, _ref, _results;
+        var annotation, box, id, _ref;
         $scope.analysis.entities[$scope.newEntity.id] = $scope.newEntity;
         annotation = $scope.analysis.annotations[$scope.annotation];
         annotation.entityMatches.push({
@@ -433,12 +433,11 @@
         });
         $scope.analysis.entities[$scope.newEntity.id].annotations[annotation.id] = annotation;
         _ref = $scope.boxes;
-        _results = [];
         for (id in _ref) {
           box = _ref[id];
-          _results.push(box.redraw());
+          box.redraw();
         }
-        return _results;
+        return $scope.newEntity = AnalysisService.createEntity();
       };
       $scope.addBox = function(scope, id) {
         return $scope.boxes[id] = scope;
@@ -606,6 +605,7 @@
           };
           $scope.$watch("annotation", function(annotationId) {
             var analysis, tile, _i, _len, _ref, _results;
+            $log.debug("Watching annotation ... New value " + annotationId);
             $scope.currentWidget = void 0;
             $scope.isWidgetOpened = false;
             _ref = $scope.tiles;

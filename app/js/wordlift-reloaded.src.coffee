@@ -421,16 +421,17 @@ angular.module('wordlift.core', [])
   $scope.boxes = []
 
   $scope.addNewEntityToAnalysis = ()->
-    # Add current annotation to new entity occurrences
-    # $scope.newEntity.occurrences.push $scope.annotation
     # Add new entity to the analysis
     $scope.analysis.entities[ $scope.newEntity.id ] = $scope.newEntity
     annotation = $scope.analysis.annotations[ $scope.annotation ]
     annotation.entityMatches.push { entityId: $scope.newEntity.id, confidence: 1 }
     $scope.analysis.entities[ $scope.newEntity.id ].annotations[ annotation.id ] = annotation
-    # Redraw boxes 
     for id, box of $scope.boxes
       box.redraw()
+    # TODO Check entity tiles status
+      
+    # Create new entity object
+    $scope.newEntity = AnalysisService.createEntity()
 
   $scope.addBox = (scope, id)->
     $scope.boxes[id] = scope
@@ -557,7 +558,7 @@ angular.module('wordlift.core', [])
         for id, entity of $scope.analysis.entities
           if entity.mainType in $scope.box.registeredTypes
             $scope.entities[ id ] = entity
-
+        
       for id, entity of $scope.analysis.entities
         if entity.mainType in $scope.box.registeredTypes
           $scope.entities[ id ] = entity
@@ -581,6 +582,7 @@ angular.module('wordlift.core', [])
            
       $scope.$watch "annotation", (annotationId) ->
         
+        $log.debug "Watching annotation ... New value #{annotationId}"
         $scope.currentWidget = undefined
         $scope.isWidgetOpened = false
 
