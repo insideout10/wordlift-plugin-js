@@ -300,7 +300,14 @@
           types: [],
           images: [],
           occurrences: [],
-          annotations: {}
+          annotations: {},
+          isRelatedToAnnotation: function(annotationId) {
+            if (this.annotations[annotationId] != null) {
+              return true;
+            } else {
+              return false;
+            }
+          }
         };
         return merge(defaults, params);
       };
@@ -606,7 +613,7 @@
             for (_i = 0, _len = _ref.length; _i < _len; _i++) {
               tile = _ref[_i];
               if (analysis = annotationId != null) {
-                tile.isVisible = true;
+                tile.isVisible = tile.entity.isRelatedToAnnotation(annotationId);
                 tile.annotationModeOn = true;
                 _results.push(tile.isLinked = (__indexOf.call(tile.entity.occurrences, annotationId) >= 0));
               } else {

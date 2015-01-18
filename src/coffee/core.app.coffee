@@ -187,6 +187,8 @@ angular.module('wordlift.core', [])
       images: []
       occurrences: []
       annotations: {}
+      isRelatedToAnnotation: (annotationId)->
+        if @.annotations[ annotationId ]? then true else false
     
     merge defaults, params
 
@@ -453,7 +455,7 @@ angular.module('wordlift.core', [])
 
         for tile in $scope.tiles
           if analysis = annotationId?
-            tile.isVisible = true #tile.entity.isRelatedToAnnotation( annotationId ) 
+            tile.isVisible = tile.entity.isRelatedToAnnotation( annotationId ) 
             tile.annotationModeOn = true
             tile.isLinked = (annotationId in tile.entity.occurrences)
           else
