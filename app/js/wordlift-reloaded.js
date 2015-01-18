@@ -287,6 +287,23 @@
         return object;
       };
       service = _currentAnalysis = {};
+      service.createEntity = function(params) {
+        var defaults;
+        if (params == null) {
+          params = {};
+        }
+        defaults = {
+          id: 'local-entity-' + uniqueId(32),
+          label: '',
+          description: '',
+          mainType: '',
+          types: [],
+          images: [],
+          occurrences: [],
+          annotations: {}
+        };
+        return merge(defaults, params);
+      };
       service.createAnnotation = function(params) {
         var defaults;
         if (params == null) {
@@ -391,13 +408,31 @@
       return service;
     }
   ]).controller('EditPostWidgetController', [
-    '$log', '$scope', '$rootScope', '$injector', function($log, $scope, $rootScope, $injector) {
+    'AnalysisService', '$log', '$scope', '$rootScope', '$injector', function(AnalysisService, $log, $scope, $rootScope, $injector) {
       $scope.configuration = [];
       $scope.analysis = {};
+      $scope.newEntity = AnalysisService.createEntity();
       $scope.selectedEntities = {};
       $scope.widgets = {};
       $scope.annotation = void 0;
       $scope.boxes = [];
+      $scope.addNewEntityToAnalysis = function() {
+        var annotation, box, id, _ref, _results;
+        $scope.analysis.entities[$scope.newEntity.id] = $scope.newEntity;
+        annotation = $scope.analysis.annotations[$scope.annotation];
+        annotation.entityMatches.push({
+          entityId: $scope.newEntity.id,
+          confidence: 1
+        });
+        $scope.analysis.entities[$scope.newEntity.id].annotations[annotation.id] = annotation;
+        _ref = $scope.boxes;
+        _results = [];
+        for (id in _ref) {
+          box = _ref[id];
+          _results.push(box.redraw());
+        }
+        return _results;
+      };
       $scope.addBox = function(scope, id) {
         return $scope.boxes[id] = scope;
       };
@@ -441,6 +476,12 @@
       $scope.$on("textAnnotationClicked", function(event, annotationId) {
         $log.debug("click on " + annotationId);
         return $scope.annotation = annotationId;
+      });
+      $scope.$on("textAnnotationAdded", function(event, annotation) {
+        $log.debug("added a new annotation with Id " + annotation.id);
+        $scope.analysis.annotations[annotation.id] = annotation;
+        $scope.annotation = annotation.id;
+        return $scope.newEntity.label = annotation.text;
       });
       $scope.$on("analysisPerformed", function(event, analysis) {
         return $scope.analysis = analysis;
@@ -498,6 +539,20 @@
               return $scope.isWidgetOpened = true;
             }
           };
+          $scope.redraw = function() {
+            var entity, id, _ref, _ref1, _results;
+            _ref = $scope.analysis.entities;
+            _results = [];
+            for (id in _ref) {
+              entity = _ref[id];
+              if (_ref1 = entity.mainType, __indexOf.call($scope.box.registeredTypes, _ref1) >= 0) {
+                _results.push($scope.entities[id] = entity);
+              } else {
+                _results.push(void 0);
+              }
+            }
+            return _results;
+          };
           _ref = $scope.analysis.entities;
           _results = [];
           for (id in _ref) {
@@ -551,7 +606,7 @@
             for (_i = 0, _len = _ref.length; _i < _len; _i++) {
               tile = _ref[_i];
               if (analysis = annotationId != null) {
-                tile.isVisible = tile.entity.isRelatedToAnnotation(annotationId);
+                tile.isVisible = true;
                 tile.annotationModeOn = true;
                 _results.push(tile.isLinked = (__indexOf.call(tile.entity.occurrences, annotationId) >= 0));
               } else {
@@ -590,9 +645,10 @@
       return {
         restrict: 'E',
         scope: {
-          entity: '='
+          entity: '=',
+          onSubmit: '&'
         },
-        template: "<form class=\"wl-entity-form\">\n<div>\n    <label>Entity label</label>\n    <input type=\"text\" ng-model=\"entity.label\" />\n</div>\n<div>\n    <label>Entity type</label>\n    <select ng-model=\"entity.mainType\" ng-options=\"type.id as type.name for type in supportedTypes\" ></select>\n</div>\n<div>\n    <label>Entity Description</label>\n    <textarea ng-model=\"entity.description\" rows=\"6\"></textarea>\n</div>\n<div>\n    <label>Entity id</label>\n    <input type=\"text\" ng-model=\"entity.id\" />\n</div>\n<div>\n    <label>Entity Same as</label>\n    <input type=\"text\" ng-model=\"entity.sameAs\" />\n</div>\n</form>",
+        template: "<form class=\"wl-entity-form\" ng-submit=\"onSubmit()\">\n<div>\n    <label>Entity label</label>\n    <input type=\"text\" ng-model=\"entity.label\" />\n</div>\n<div>\n    <label>Entity type</label>\n    <select ng-model=\"entity.mainType\" ng-options=\"type.id as type.name for type in supportedTypes\" ></select>\n</div>\n<div>\n    <label>Entity Description</label>\n    <textarea ng-model=\"entity.description\" rows=\"6\"></textarea>\n</div>\n<div>\n    <label>Entity id</label>\n    <input type=\"text\" ng-model=\"entity.id\" />\n</div>\n<div>\n    <label>Entity Same as</label>\n    <input type=\"text\" ng-model=\"entity.sameAs\" />\n</div>\n<input type=\"submit\" value=\"save\" />\n</form>",
         link: function($scope, $element, $attrs, $ctrl) {
           return $scope.supportedTypes = [
             {
@@ -623,7 +679,7 @@
         scope: {
           entity: '='
         },
-        template: "<div ng-class=\"'wl-' + entity.mainType\" ng-show=\"isVisible\" class=\"entity\">\n  <i ng-show=\"annotationModeOn\" ng-class=\"{ 'wl-linked' : isLinked, 'wl-unlinked' : !isLinked }\"></i>\n        <i ng-hide=\"annotationModeOn\" ng-class=\"{ 'wl-selected' : isSelected, 'wl-unselected' : !isSelected }\"></i>\n        <i class=\"type\"></i>\n        <span class=\"label\" ng-click=\"select()\">{{entity.label}}</span>\n        <small ng-show=\"entity.occurrences.length > 0\">({{entity.occurrences.length}})</small>\n        <i ng-class=\"{ 'wl-more': isOpened == false, 'wl-less': isOpened == true }\" ng-click=\"toggle()\"></i>\n  <span ng-class=\"{ 'active' : editingModeOn }\" ng-click=\"toggleEditingMode()\" ng-show=\"isOpened\" class=\"wl-edit-button\">Edit</span>\n        <div class=\"details\" ng-show=\"isOpened\">\n          <p ng-hide=\"editingModeOn\"><img class=\"thumbnail\" ng-src=\"{{ entity.images[0] }}\" />{{entity.description}}</p>\n          <wl-entity-form entity=\"entity\" ng-show=\"editingModeOn\"></wl-entity-form>\n        </div>\n\n</div>\n",
+        template: "<div ng-class=\"'wl-' + entity.mainType\" ng-show=\"isVisible\" class=\"entity\">\n  <i ng-show=\"annotationModeOn\" ng-class=\"{ 'wl-linked' : isLinked, 'wl-unlinked' : !isLinked }\"></i>\n        <i ng-hide=\"annotationModeOn\" ng-class=\"{ 'wl-selected' : isSelected, 'wl-unselected' : !isSelected }\"></i>\n        <i class=\"type\"></i>\n        <span class=\"label\" ng-click=\"select()\">{{entity.label}}</span>\n        <small ng-show=\"entity.occurrences.length > 0\">({{entity.occurrences.length}})</small>\n        <i ng-class=\"{ 'wl-more': isOpened == false, 'wl-less': isOpened == true }\" ng-click=\"toggle()\"></i>\n  <span ng-class=\"{ 'active' : editingModeOn }\" ng-click=\"toggleEditingMode()\" ng-show=\"isOpened\" class=\"wl-edit-button\">Edit</span>\n        <div class=\"details\" ng-show=\"isOpened\">\n          <p ng-hide=\"editingModeOn\"><img class=\"thumbnail\" ng-src=\"{{ entity.images[0] }}\" />{{entity.description}}</p>\n          <wl-entity-form entity=\"entity\" ng-show=\"editingModeOn\" on-submit=\"toggleEditingMode()\"></wl-entity-form>\n        </div>\n\n</div>\n",
         link: function($scope, $element, $attrs, $ctrl) {
           $ctrl.addTile($scope);
           $scope.isOpened = false;
@@ -655,7 +711,7 @@
     }
   ]);
 
-  $(container = $("<div id=\"wordlift-edit-post-wrapper\" ng-controller=\"EditPostWidgetController\">\n	<div ng-show=\"annotation\">\n        <h4 class=\"wl-annotation-label\">\n          <i class=\"wl-annotation-label-icon\"></i>\n          {{ analysis.annotations[ annotation ].text }}\n          <small>[ {{ analysis.annotations[ annotation ].start }}, {{ analysis.annotations[ annotation ].end }} ]</small>\n          <i class=\"wl-annotation-label-remove-icon\" ng-click=\"annotation = undefined\"></i>\n        </h4>\n      </div>\n      <wl-classification-box ng-repeat=\"box in configuration.classificationBoxes\"></wl-classification-box>\n    </div>\n").appendTo('#dx'), injector = angular.bootstrap($('body'), ['wordlift.core']), tinymce.PluginManager.add('wordlift', function(editor, url) {
+  $(container = $("<div id=\"wordlift-edit-post-wrapper\" ng-controller=\"EditPostWidgetController\">\n	<div ng-show=\"annotation\">\n        <h4 class=\"wl-annotation-label\">\n          <i class=\"wl-annotation-label-icon\"></i>\n          {{ analysis.annotations[ annotation ].text }}\n          <small>[ {{ analysis.annotations[ annotation ].start }}, {{ analysis.annotations[ annotation ].end }} ]</small>\n          <i class=\"wl-annotation-label-remove-icon\" ng-click=\"annotation = undefined\"></i>\n        </h4>\n        <wl-entity-form entity=\"newEntity\" on-submit=\"addNewEntityToAnalysis()\"ng-show=\"analysis.annotations[annotation].entityMatches.length == 0\"></wl-entity-form>\n      </div>\n      <wl-classification-box ng-repeat=\"box in configuration.classificationBoxes\"></wl-classification-box>\n    </div>\n").appendTo('#dx'), injector = angular.bootstrap($('body'), ['wordlift.core']), tinymce.PluginManager.add('wordlift', function(editor, url) {
     editor.onLoadContent.add(function(ed, o) {
       return injector.invoke([
         'ConfigurationService', 'AnalysisService', 'EditorService', '$rootScope', function(ConfigurationService, AnalysisService, EditorService, $rootScope) {

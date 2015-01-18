@@ -176,6 +176,20 @@ angular.module('wordlift.core', [])
   service = 
     _currentAnalysis = {}
 
+  service.createEntity = (params = {}) ->
+    # Set the defalut values.
+    defaults =
+      id: 'local-entity-' + uniqueId 32
+      label: ''
+      description: ''
+      mainType: ''
+      types: []
+      images: []
+      occurrences: []
+      annotations: {}
+    
+    merge defaults, params
+
   service.createAnnotation = (params = {}) ->
     # Set the defalut values.
     defaults =
@@ -263,14 +277,27 @@ angular.module('wordlift.core', [])
 
 ])
 # Manage redlink analysis responses
-.controller('EditPostWidgetController', [ '$log', '$scope', '$rootScope', '$injector', ($log, $scope, $rootScope, $injector)-> 
+.controller('EditPostWidgetController', [ 'AnalysisService', '$log', '$scope', '$rootScope', '$injector', (AnalysisService, $log, $scope, $rootScope, $injector)-> 
 
   $scope.configuration = []
   $scope.analysis = {}
+  $scope.newEntity = AnalysisService.createEntity()
   $scope.selectedEntities = {}
   $scope.widgets = {}
   $scope.annotation = undefined
   $scope.boxes = []
+
+  $scope.addNewEntityToAnalysis = ()->
+    # Add current annotation to new entity occurrences
+    # $scope.newEntity.occurrences.push $scope.annotation
+    # Add new entity to the analysis
+    $scope.analysis.entities[ $scope.newEntity.id ] = $scope.newEntity
+    annotation = $scope.analysis.annotations[ $scope.annotation ]
+    annotation.entityMatches.push { entityId: $scope.newEntity.id, confidence: 1 }
+    $scope.analysis.entities[ $scope.newEntity.id ].annotations[ annotation.id ] = annotation
+    # Redraw boxes 
+    for id, box of $scope.boxes
+      box.redraw()
 
   $scope.addBox = (scope, id)->
     $scope.boxes[id] = scope
@@ -301,6 +328,15 @@ angular.module('wordlift.core', [])
   $scope.$on "textAnnotationClicked", (event, annotationId) ->
     $log.debug "click on #{annotationId}"
     $scope.annotation = annotationId
+
+  $scope.$on "textAnnotationAdded", (event, annotation) ->
+    $log.debug "added a new annotation with Id #{annotation.id}"
+    # Add the new annotation to the current analysis
+    $scope.analysis.annotations[ annotation.id ] = annotation
+    # Set the annotation scope
+    $scope.annotation = annotation.id
+    # Set the annotation text as label for the new entity
+    $scope.newEntity.label = annotation.text
 
   $scope.$on "analysisPerformed", (event, analysis) ->
     $scope.analysis = analysis
@@ -384,6 +420,11 @@ angular.module('wordlift.core', [])
           $scope.currentWidget = widget
           $scope.isWidgetOpened = true   
 
+      $scope.redraw = ()->
+        for id, entity of $scope.analysis.entities
+          if entity.mainType in $scope.box.registeredTypes
+            $scope.entities[ id ] = entity
+
       for id, entity of $scope.analysis.entities
         if entity.mainType in $scope.box.registeredTypes
           $scope.entities[ id ] = entity
@@ -412,7 +453,7 @@ angular.module('wordlift.core', [])
 
         for tile in $scope.tiles
           if analysis = annotationId?
-            tile.isVisible = tile.entity.isRelatedToAnnotation( annotationId ) 
+            tile.isVisible = true #tile.entity.isRelatedToAnnotation( annotationId ) 
             tile.annotationModeOn = true
             tile.isLinked = (annotationId in tile.entity.occurrences)
           else
@@ -435,8 +476,9 @@ angular.module('wordlift.core', [])
     restrict: 'E'
     scope:
       entity: '='
+      onSubmit: '&'
     template: """
-      <form class="wl-entity-form">
+      <form class="wl-entity-form" ng-submit="onSubmit()">
       <div>
           <label>Entity label</label>
           <input type="text" ng-model="entity.label" />
@@ -457,6 +499,7 @@ angular.module('wordlift.core', [])
           <label>Entity Same as</label>
           <input type="text" ng-model="entity.sameAs" />
       </div>
+      <input type="submit" value="save" />
       </form>
     """
     link: ($scope, $element, $attrs, $ctrl) ->  
@@ -485,7 +528,7 @@ angular.module('wordlift.core', [])
   	    <span ng-class="{ 'active' : editingModeOn }" ng-click="toggleEditingMode()" ng-show="isOpened" class="wl-edit-button">Edit</span>
         <div class="details" ng-show="isOpened">
           <p ng-hide="editingModeOn"><img class="thumbnail" ng-src="{{ entity.images[0] }}" />{{entity.description}}</p>
-          <wl-entity-form entity="entity" ng-show="editingModeOn"></wl-entity-form>
+          <wl-entity-form entity="entity" ng-show="editingModeOn" on-submit="toggleEditingMode()"></wl-entity-form>
         </div>
 
   	  </div>
@@ -529,6 +572,7 @@ $(
           <small>[ {{ analysis.annotations[ annotation ].start }}, {{ analysis.annotations[ annotation ].end }} ]</small>
           <i class="wl-annotation-label-remove-icon" ng-click="annotation = undefined"></i>
         </h4>
+        <wl-entity-form entity="newEntity" on-submit="addNewEntityToAnalysis()"ng-show="analysis.annotations[annotation].entityMatches.length == 0"></wl-entity-form>
       </div>
       <wl-classification-box ng-repeat="box in configuration.classificationBoxes"></wl-classification-box>
     </div>
