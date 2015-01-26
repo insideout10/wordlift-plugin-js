@@ -426,15 +426,11 @@ angular.module('wordlift.core', [])
     annotation = $scope.analysis.annotations[ $scope.annotation ]
     annotation.entityMatches.push { entityId: $scope.newEntity.id, confidence: 1 }
     $scope.analysis.entities[ $scope.newEntity.id ].annotations[ annotation.id ] = annotation
-    for id, box of $scope.boxes
-      box.redraw()
+    
     # TODO Check entity tiles status
-      
+
     # Create new entity object
     $scope.newEntity = AnalysisService.createEntity()
-
-  $scope.addBox = (scope, id)->
-    $scope.boxes[id] = scope
     
   $scope.$on "updateOccurencesForEntity", (event, entityId, occurrences) ->
     $log.debug "Occurrences #{occurrences.length} for #{entityId}"
@@ -472,10 +468,17 @@ angular.module('wordlift.core', [])
     # Set the annotation text as label for the new entity
     $scope.newEntity.label = annotation.text
 
-  $scope.$on "analysisPerformed", (event, analysis) ->
+  $scope.$on "registeredBox", (event, scope, boxId) ->
+    $scope.boxes[boxId] = scope
+  
+  $scope.$on "analysisPerformed", (event, analysis) ->   
     $scope.analysis = analysis
 
-  $scope.updateWidget = (widget, scope)->
+  $scope.$on "entityTileSelected", (event, entity, scope)->
+    $scope.onSelectedEntityTile(entity, scope)
+
+  $scope.$on "updateWidget", (event, widget, scope)->
+    $log.debug "Going to updated widget #{widget} for box #{scope}"
     # Retrieve the proper DatarRetriever
     retriever = $injector.get "#{widget}DataRetriever"
     # Load widget items
@@ -500,7 +503,13 @@ angular.module('wordlift.core', [])
 
 .directive('wlClassificationBox', ['$log', ($log)->
     restrict: 'E'
-    scope: true
+    scope:
+      entities: '='
+      box: '='   
+      selectedEntities: '='
+      widgets: '='
+      annotation: '='
+      
     template: """
     	<div class="classification-box">
     		<div class="box-header">
@@ -520,7 +529,7 @@ angular.module('wordlift.core', [])
           <div class="selected-entities">
             <span ng-class="'wl-' + entity.mainType" ng-repeat="(id, entity) in selectedEntities[box.id]" class="wl-selected-item">
               {{ entity.label}}
-              <i class="wl-deselect-item" ng-click="onSelectedEntityTile(entity, box)"></i>
+              <i class="wl-deselect-item" ng-click="deselectEntity(entity)"></i>
             </span>
           </div>
         </div>
@@ -531,7 +540,6 @@ angular.module('wordlift.core', [])
     """
     link: ($scope, $element, $attrs, $ctrl) ->  	  
   	  
-      $scope.entities = {}
       $scope.currentWidget = undefined
       $scope.isWidgetOpened = false
 
@@ -550,19 +558,10 @@ angular.module('wordlift.core', [])
           $scope.currentWidget = undefined
           $scope.isWidgetOpened = false
         else 
-          $scope.updateWidget widget, $scope.box.id 
           $scope.currentWidget = widget
           $scope.isWidgetOpened = true   
-
-      $scope.redraw = ()->
-        for id, entity of $scope.analysis.entities
-          if entity.mainType in $scope.box.registeredTypes
-            $scope.entities[ id ] = entity
-        
-      for id, entity of $scope.analysis.entities
-        if entity.mainType in $scope.box.registeredTypes
-          $scope.entities[ id ] = entity
-
+          $scope.$emit "updateWidget", widget, $scope.box.id 
+          
     controller: ($scope, $element, $attrs) ->
       
       # Mantain a reference to nested entity tiles $scope
@@ -570,7 +569,7 @@ angular.module('wordlift.core', [])
       $scope.tiles = []
 
       # Register the current classification box on EditPostWidgetController
-      $scope.addBox $scope, $scope.box.id
+      $scope.$emit "registeredBox", $scope, $scope.box.id
 
       $scope.deselect = (entity)->
         for tile in $scope.tiles
@@ -579,6 +578,9 @@ angular.module('wordlift.core', [])
       $scope.relink = (entity, annotationId)->
         for tile in $scope.tiles
           tile.isLinked = (annotationId in tile.entity.occurrences) if tile.entity.id is entity.id
+
+      $scope.deselectEntity = (entity)->
+        $scope.$emit "entityTileSelected", entity, $scope.box
            
       $scope.$watch "annotation", (annotationId) ->
         
@@ -587,7 +589,7 @@ angular.module('wordlift.core', [])
         $scope.isWidgetOpened = false
 
         for tile in $scope.tiles
-          if analysis = annotationId?
+          if annotationId?
             tile.isVisible = tile.entity.isRelatedToAnnotation( annotationId ) 
             tile.annotationModeOn = true
             tile.isLinked = (annotationId in tile.entity.occurrences)
@@ -599,7 +601,7 @@ angular.module('wordlift.core', [])
       ctrl =
         onSelectedTile: (tile)->
           tile.isSelected = !tile.isSelected
-          $scope.onSelectedEntityTile tile.entity, $scope.box
+          $scope.$emit "entityTileSelected", tile.entity, $scope.box
         addTile: (tile)->
           $scope.tiles.push tile
         closeTiles: ()->
@@ -652,6 +654,7 @@ angular.module('wordlift.core', [])
     restrict: 'E'
     scope:
       entity: '='
+      annotation: '='
     template: """
   	  <div ng-class="'wl-' + entity.mainType" ng-show="isVisible" class="entity">
   	    <i ng-show="annotationModeOn" ng-class="{ 'wl-linked' : isLinked, 'wl-unlinked' : !isLinked }"></i>
@@ -681,7 +684,7 @@ angular.module('wordlift.core', [])
 
       $scope.annotationModeOn = false
       $scope.editingModeOn = false
-
+      
       $scope.toggleEditingMode = ()->
         $scope.editingModeOn = !$scope.editingModeOn
 
@@ -703,15 +706,18 @@ $(
   		<div ng-show="annotation">
         <h4 class="wl-annotation-label">
           <i class="wl-annotation-label-icon"></i>
-          {{ analysis.annotations[ annotation ].text }}
+          {{ analysis.annotations[ annotation ].text }} 
           <small>[ {{ analysis.annotations[ annotation ].start }}, {{ analysis.annotations[ annotation ].end }} ]</small>
           <i class="wl-annotation-label-remove-icon" ng-click="annotation = undefined"></i>
         </h4>
         <wl-entity-form entity="newEntity" on-submit="addNewEntityToAnalysis()"ng-show="analysis.annotations[annotation].entityMatches.length == 0"></wl-entity-form>
       </div>
-      <wl-classification-box ng-repeat="box in configuration.classificationBoxes"></wl-classification-box>
-    </div>
+      <div ng-repeat="box in configuration.classificationBoxes">
+        <wl-classification-box widgets="widgets" annotation="annotation" entities="analysis.entities" box="box" selected-entities="selectedEntities">
 
+        </wl-classification-box>
+      </div>
+    </div>
   """)
   .appendTo('#dx')
 
@@ -739,7 +745,7 @@ injector = angular.bootstrap $('body'), ['wordlift.core']
       text: ' ' # the space is necessary to avoid right spacing on TinyMCE 4
       tooltip: 'Insert entity'
       onclick: ->
-        injector.invoke(['EditorService', '$rootScope', (EditorService, $rootScope) ->
+        injector.invoke(['AnalysisService', 'EditorService', '$rootScope', (AnalysisService, EditorService, $rootScope) ->
           # execute the following commands in the angular js context.
           $rootScope.$apply(->
             EditorService.createTextAnnotationFromCurrentSelection()
