@@ -336,15 +336,9 @@ angular.module('wordlift.core', [])
     $scope.annotation = annotation.id
     # Set the annotation text as label for the new entity
     $scope.newEntity.label = annotation.text
-
-  $scope.$on "registeredBox", (event, scope, boxId) ->
-    $scope.boxes[boxId] = scope
   
   $scope.$on "analysisPerformed", (event, analysis) ->   
     $scope.analysis = analysis
-
-  $scope.$on "entityTileSelected", (event, entity, scope)->
-    $scope.onSelectedEntityTile(entity, scope)
 
   $scope.$on "updateWidget", (event, widget, scope)->
     $log.debug "Going to updated widget #{widget} for box #{scope}"
@@ -372,13 +366,8 @@ angular.module('wordlift.core', [])
 
 .directive('wlClassificationBox', ['$log', ($log)->
     restrict: 'E'
-    scope:
-      entities: '='
-      box: '='   
-      selectedEntities: '='
-      widgets: '='
-      annotation: '='
-      
+    scope: true
+    transclude: true      
     template: """
     	<div class="classification-box">
     		<div class="box-header">
@@ -398,12 +387,12 @@ angular.module('wordlift.core', [])
           <div class="selected-entities">
             <span ng-class="'wl-' + entity.mainType" ng-repeat="(id, entity) in selectedEntities[box.id]" class="wl-selected-item">
               {{ entity.label}}
-              <i class="wl-deselect-item" ng-click="deselectEntity(entity)"></i>
+              <i class="wl-deselect-item" ng-click="onSelectedEntityTile(entity, box)"></i>
             </span>
           </div>
         </div>
   			<div class="box-tiles">
-          <wl-entity-tile notify="onSelectedEntityTile(entity.id, box)" entity="entity" ng-repeat="entity in entities"></wl-entity>
+          <div ng-transclude></div>
   		  </div>
       </div>	
     """
@@ -437,8 +426,8 @@ angular.module('wordlift.core', [])
       # TODO manage on scope distruction event
       $scope.tiles = []
 
-      # Register the current classification box on EditPostWidgetController
-      $scope.$emit "registeredBox", $scope, $scope.box.id
+      # TODO don't use $parent
+      $scope.$parent.boxes[ $scope.box.id ] = $scope
 
       $scope.deselect = (entity)->
         for tile in $scope.tiles
@@ -447,9 +436,6 @@ angular.module('wordlift.core', [])
       $scope.relink = (entity, annotationId)->
         for tile in $scope.tiles
           tile.isLinked = (annotationId in tile.entity.occurrences) if tile.entity.id is entity.id
-
-      $scope.deselectEntity = (entity)->
-        $scope.$emit "entityTileSelected", entity, $scope.box
            
       $scope.$watch "annotation", (annotationId) ->
         
@@ -470,7 +456,7 @@ angular.module('wordlift.core', [])
       ctrl =
         onSelectedTile: (tile)->
           tile.isSelected = !tile.isSelected
-          $scope.$emit "entityTileSelected", tile.entity, $scope.box
+          $scope.onSelectedEntityTile tile.entity, $scope.box
         addTile: (tile)->
           $scope.tiles.push tile
         closeTiles: ()->
@@ -523,7 +509,6 @@ angular.module('wordlift.core', [])
     restrict: 'E'
     scope:
       entity: '='
-      annotation: '='
     template: """
   	  <div ng-class="'wl-' + entity.mainType" ng-show="isVisible" class="entity">
   	    <i ng-show="annotationModeOn" ng-class="{ 'wl-linked' : isLinked, 'wl-unlinked' : !isLinked }"></i>
@@ -581,11 +566,9 @@ $(
         </h4>
         <wl-entity-form entity="newEntity" on-submit="addNewEntityToAnalysis()"ng-show="analysis.annotations[annotation].entityMatches.length == 0"></wl-entity-form>
       </div>
-      <div ng-repeat="box in configuration.classificationBoxes">
-        <wl-classification-box widgets="widgets" annotation="annotation" entities="analysis.entities" box="box" selected-entities="selectedEntities">
-
-        </wl-classification-box>
-      </div>
+      <wl-classification-box ng-repeat="box in configuration.classificationBoxes">
+        <wl-entity-tile entity="entity" ng-repeat="entity in analysis.entities"></wl-entity>
+      </wl-classification-box>
     </div>
   """)
   .appendTo('#dx')
