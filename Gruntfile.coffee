@@ -34,7 +34,15 @@ module.exports = (grunt) ->
           ]
           'app/js/wordlift-reloaded.js': [
             'src/coffee/traslator.coffee'
-            'src/coffee/core.app.coffee'
+            'src/coffee/editpost-widget/app.controllers.EditPostWidgetController.coffee'
+            'src/coffee/editpost-widget/app.directives.wlClassificationBox.coffee'
+            'src/coffee/editpost-widget/app.directives.wlEntityForm.coffee'
+            'src/coffee/editpost-widget/app.directives.wlEntityTile.coffee'
+            'src/coffee/editpost-widget/app.services.AnalysisService.coffee'
+            'src/coffee/editpost-widget/app.services.EditorService.coffee'
+            'src/coffee/editpost-widget/app.services.ImageSuggestorDataRetrieverService.coffee'
+            'src/coffee/editpost-widget/app.services.ConfigurationService.coffee'   
+            'src/coffee/editpost-widget/app.coffee'
           ]
           'app/js/wordlift.ui.js': [
             'src/coffee/ui/chord.coffee'

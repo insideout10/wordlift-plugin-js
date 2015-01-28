@@ -129,11 +129,370 @@ class Traslator
     @_text
 
 window.Traslator = Traslator
-# Set the well-known $ reference to jQuery.
-$ = jQuery
+angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', [
+  'wordlift.editpost.widget.services.AnalysisService'
+])
+.controller('EditPostWidgetController', [ 'AnalysisService', '$log', '$scope', '$rootScope', '$injector', (AnalysisService, $log, $scope, $rootScope, $injector)-> 
 
+  $scope.configuration = []
+  $scope.analysis = {}
+  $scope.newEntity = AnalysisService.createEntity()
+  $scope.selectedEntities = {}
+  $scope.widgets = {}
+  $scope.annotation = undefined
+  $scope.boxes = []
+
+  $scope.addNewEntityToAnalysis = ()->
+    # Add new entity to the analysis
+    $scope.analysis.entities[ $scope.newEntity.id ] = $scope.newEntity
+    annotation = $scope.analysis.annotations[ $scope.annotation ]
+    annotation.entityMatches.push { entityId: $scope.newEntity.id, confidence: 1 }
+    $scope.analysis.entities[ $scope.newEntity.id ].annotations[ annotation.id ] = annotation
+    
+    # TODO Check entity tiles status
+
+    # Create new entity object
+    $scope.newEntity = AnalysisService.createEntity()
+    
+  $scope.$on "updateOccurencesForEntity", (event, entityId, occurrences) ->
+    $log.debug "Occurrences #{occurrences.length} for #{entityId}"
+    $scope.analysis.entities[ entityId ].occurrences = occurrences
+
+    if $scope.annotation?
+      for box, entities of $scope.selectedEntities
+        $scope.boxes[ box ].relink $scope.analysis.entities[ entityId ], $scope.annotation
+        
+    if occurrences.length is 0
+      for box, entities of $scope.selectedEntities
+        delete $scope.selectedEntities[ box ][ entityId ]
+        $scope.boxes[ box ].deselect $scope.analysis.entities[ entityId ]
+        
+
+  $scope.$on "configurationLoaded", (event, configuration) ->
+    for box in configuration.classificationBoxes
+      $scope.selectedEntities[ box.id ] = {}
+      $scope.widgets[ box.id ] = {}
+      for widget in box.registeredWidgets
+        $scope.widgets[ box.id ][ widget ] = []
+              
+    $scope.configuration = configuration
+
+  $scope.$on "textAnnotationClicked", (event, annotationId) ->
+    $log.debug "click on #{annotationId}"
+    $scope.annotation = annotationId
+
+  $scope.$on "textAnnotationAdded", (event, annotation) ->
+    $log.debug "added a new annotation with Id #{annotation.id}"
+    # Add the new annotation to the current analysis
+    $scope.analysis.annotations[ annotation.id ] = annotation
+    # Set the annotation scope
+    $scope.annotation = annotation.id
+    # Set the annotation text as label for the new entity
+    $scope.newEntity.label = annotation.text
+  
+  $scope.$on "analysisPerformed", (event, analysis) ->   
+    $scope.analysis = analysis
+
+  $scope.$on "updateWidget", (event, widget, scope)->
+    $log.debug "Going to updated widget #{widget} for box #{scope}"
+    # Retrieve the proper DatarRetriever
+    retriever = $injector.get "#{widget}DataRetrieverService"
+    # Load widget items
+    items = retriever.loadData $scope.selectedEntities[ scope ]
+    # Assign items to the widget scope
+    $scope.widgets[ scope ][ widget ] = items
+    
+  $scope.onSelectedEntityTile = (entity, scope)->
+    $log.debug "Entity tile selected for entity #{entity.id} within '#{scope.id}' scope"
+    
+    # Close all opened widgets ...
+    for id, box of $scope.boxes
+      box.closeWidgets()
+    
+    if not $scope.selectedEntities[ scope.id ][ entity.id ]?
+      $scope.selectedEntities[ scope.id ][ entity.id ] = entity
+      $scope.$emit "entitySelected", entity, $scope.annotation
+    else
+      $scope.$emit "entityDeselected", entity, $scope.annotation  
+      
+])
+angular.module('wordlift.editpost.widget.directives.wlClassificationBox', [])
+.directive('wlClassificationBox', ['$log', ($log)->
+    restrict: 'E'
+    scope: true
+    transclude: true      
+    template: """
+    	<div class="classification-box">
+    		<div class="box-header">
+          <h5 class="label">{{box.label}}
+            <span class="wl-suggestion-tools" ng-show="hasSelectedEntities()">
+              <i ng-class="'wl-' + widget" title="{{widget}}" ng-click="toggleWidget(widget)" ng-repeat="widget in box.registeredWidgets" class="wl-widget-icon"></i>
+            </span>
+            <span ng-show="isWidgetOpened" class="wl-widget-label">{{currentWidget}}
+              <i ng-click="toggleWidget(currentWidget)" class="wl-deselect-widget"></i>
+            </span>  
+          </h5>
+          <div ng-show="isWidgetOpened" class="box-widgets">
+            <div ng-show="currentWidget == widget" ng-repeat="widget in box.registeredWidgets">
+              <img ng-click="embedImageInEditor(item.uri)"ng-src="{{ item.uri }}" ng-repeat="item in widgets[ box.id ][ widget ]" />
+            </div>
+          </div>
+          <div class="selected-entities">
+            <span ng-class="'wl-' + entity.mainType" ng-repeat="(id, entity) in selectedEntities[box.id]" class="wl-selected-item">
+              {{ entity.label}}
+              <i class="wl-deselect-item" ng-click="onSelectedEntityTile(entity, box)"></i>
+            </span>
+          </div>
+        </div>
+  			<div class="box-tiles">
+          <div ng-transclude></div>
+  		  </div>
+      </div>	
+    """
+    link: ($scope, $element, $attrs, $ctrl) ->  	  
+  	  
+      $scope.currentWidget = undefined
+      $scope.isWidgetOpened = false
+
+      $scope.closeWidgets = ()->
+        $scope.currentWidget = undefined
+        $scope.isWidgetOpened = false
+
+      $scope.hasSelectedEntities = ()->
+        Object.keys( $scope.selectedEntities[ $scope.box.id ] ).length > 0
+
+      $scope.embedImageInEditor = (image)->
+        $scope.$emit "embedImageInEditor", image
+
+      $scope.toggleWidget = (widget)->
+        if $scope.currentWidget is widget
+          $scope.currentWidget = undefined
+          $scope.isWidgetOpened = false
+        else 
+          $scope.currentWidget = widget
+          $scope.isWidgetOpened = true   
+          $scope.$emit "updateWidget", widget, $scope.box.id 
+          
+    controller: ($scope, $element, $attrs) ->
+      
+      # Mantain a reference to nested entity tiles $scope
+      # TODO manage on scope distruction event
+      $scope.tiles = []
+
+      # TODO don't use $parent
+      $scope.$parent.boxes[ $scope.box.id ] = $scope
+
+      $scope.deselect = (entity)->
+        for tile in $scope.tiles
+          tile.isSelected = false if tile.entity.id is entity.id
+      
+      $scope.relink = (entity, annotationId)->
+        for tile in $scope.tiles
+          tile.isLinked = (annotationId in tile.entity.occurrences) if tile.entity.id is entity.id
+           
+      $scope.$watch "annotation", (annotationId) ->
+        
+        $log.debug "Watching annotation ... New value #{annotationId}"
+        $scope.currentWidget = undefined
+        $scope.isWidgetOpened = false
+
+        for tile in $scope.tiles
+          if annotationId?
+            tile.isVisible = tile.entity.isRelatedToAnnotation( annotationId ) 
+            tile.annotationModeOn = true
+            tile.isLinked = (annotationId in tile.entity.occurrences)
+          else
+            tile.isVisible = true
+            tile.isLinked = false
+            tile.annotationModeOn = false
+            
+      ctrl =
+        onSelectedTile: (tile)->
+          tile.isSelected = !tile.isSelected
+          $scope.onSelectedEntityTile tile.entity, $scope.box
+        addTile: (tile)->
+          $scope.tiles.push tile
+        closeTiles: ()->
+          for tile in $scope.tiles
+          	tile.close()
+      ctrl
+  ])
+angular.module('wordlift.editpost.widget.directives.wlEntityForm', [])
+.directive('wlEntityForm', ['$log', ($log)->
+    restrict: 'E'
+    scope:
+      entity: '='
+      onSubmit: '&'
+    template: """
+      <form class="wl-entity-form" ng-submit="onSubmit()">
+      <div>
+          <label>Entity label</label>
+          <input type="text" ng-model="entity.label" />
+      </div>
+      <div>
+          <label>Entity type</label>
+          <select ng-model="entity.mainType" ng-options="type.id as type.name for type in supportedTypes" ></select>
+      </div>
+      <div>
+          <label>Entity Description</label>
+          <textarea ng-model="entity.description" rows="6"></textarea>
+      </div>
+      <div>
+          <label>Entity id</label>
+          <input type="text" ng-model="entity.id" />
+      </div>
+      <div>
+          <label>Entity Same as</label>
+          <input type="text" ng-model="entity.sameAs" />
+      </div>
+      <input type="submit" value="save" />
+      </form>
+    """
+    link: ($scope, $element, $attrs, $ctrl) ->  
+      $scope.supportedTypes = [
+        { id: 'person', name: 'http://schema.org/Person' },
+        { id: 'place', name: 'http://schema.org/Place' },
+        { id: 'organization', name: 'http://schema.org/Organization' },
+        { id: 'event', name: 'http://schema.org/Event' },
+        { id: 'creative-work', name: 'http://schema.org/CreativeWork' }
+
+      ]
+])
+
+angular.module('wordlift.editpost.widget.directives.wlEntityTile', [])
+.directive('wlEntityTile', ['$log', ($log)->
+    require: '^wlClassificationBox'
+    restrict: 'E'
+    scope:
+      entity: '='
+    template: """
+  	  <div ng-class="'wl-' + entity.mainType" ng-show="isVisible" class="entity">
+  	    <i ng-show="annotationModeOn" ng-class="{ 'wl-linked' : isLinked, 'wl-unlinked' : !isLinked }"></i>
+        <i ng-hide="annotationModeOn" ng-class="{ 'wl-selected' : isSelected, 'wl-unselected' : !isSelected }"></i>
+        <i class="type"></i>
+        <span class="label" ng-click="select()">{{entity.label}}</span>
+        <small ng-show="entity.occurrences.length > 0">({{entity.occurrences.length}})</small>
+        <i ng-class="{ 'wl-more': isOpened == false, 'wl-less': isOpened == true }" ng-click="toggle()"></i>
+  	    <span ng-class="{ 'active' : editingModeOn }" ng-click="toggleEditingMode()" ng-show="isOpened" class="wl-edit-button">Edit</span>
+        <div class="details" ng-show="isOpened">
+          <p ng-hide="editingModeOn"><img class="thumbnail" ng-src="{{ entity.images[0] }}" />{{entity.description}}</p>
+          <wl-entity-form entity="entity" ng-show="editingModeOn" on-submit="toggleEditingMode()"></wl-entity-form>
+        </div>
+
+  	  </div>
+
+  	"""
+    link: ($scope, $element, $attrs, $ctrl) ->				      
+      
+      # Add tile to related container scope
+      $ctrl.addTile $scope
+
+      $scope.isOpened = false
+      $scope.isVisible = true
+      $scope.isSelected = false
+      $scope.isLinked = false
+
+      $scope.annotationModeOn = false
+      $scope.editingModeOn = false
+      
+      $scope.toggleEditingMode = ()->
+        $scope.editingModeOn = !$scope.editingModeOn
+
+      $scope.open = ()->
+      	$scope.isOpened = true
+      $scope.close = ()->
+      	$scope.isOpened = false  	
+      $scope.toggle = ()->
+        if !$scope.isOpened 
+          $ctrl.closeTiles()    
+        $scope.isOpened = !$scope.isOpened
+        
+      $scope.select = ()-> 
+        $ctrl.onSelectedTile $scope
+  ])
+
+angular.module('wordlift.editpost.widget.services.AnalysisService', [])
+# Manage redlink analysis responses
+.service('AnalysisService', [ '$log', '$http', '$rootScope', ($log, $http, $rootScope)-> 
+	
+  # Creates a unique ID of the specified length (default 8).
+  uniqueId = (length = 8) ->
+    id = ''
+    id += Math.random().toString(36).substr(2) while id.length < length
+    id.substr 0, length
+
+  # Merges two objects by copying overrides param onto the options.
+  merge = (options, overrides) ->
+    extend (extend {}, options), overrides
+  extend = (object, properties) ->
+    for key, val of properties
+      object[key] = val
+    object
+
+  service = 
+    _currentAnalysis = {}
+
+  service.createEntity = (params = {}) ->
+    # Set the defalut values.
+    defaults =
+      id: 'local-entity-' + uniqueId 32
+      label: ''
+      description: ''
+      mainType: ''
+      types: []
+      images: []
+      occurrences: []
+      annotations: {}
+      isRelatedToAnnotation: (annotationId)->
+        if @.annotations[ annotationId ]? then true else false
+    
+    merge defaults, params
+
+  service.createAnnotation = (params = {}) ->
+    # Set the defalut values.
+    defaults =
+      id: 'urn:local-text-annotation-' + uniqueId 32
+      text: ''
+      start: 0
+      end: 0
+      entityMatches: []
+    
+    merge defaults, params
+
+  service.parse = (data) ->
+    
+    for id, entity of data.entities
+      entity.occurrences = 0
+      entity.id = id
+      entity.annotations = {}
+      entity.isRelatedToAnnotation = (annotationId)->
+        if @.annotations[ annotationId ]? then true else false
+
+    for id, annotation of data.annotations
+      for ea in annotation.entityMatches
+      	data.entities[ ea.entityId ].annotations[ id ] = annotation
+
+    for id, annotation of data.annotations
+      annotation.id = id
+
+    data
+
+  service.perform = ()->
+  	$http(
+      method: 'get'
+      url: 'assets/sample-response.json'
+    )
+    # If successful, broadcast an *analysisReceived* event.
+    .success (data) ->
+       $rootScope.$broadcast "analysisPerformed", service.parse( data )
+
+  service
+
+])
 # Create the main AngularJS module, and set it dependent on controllers and directives.
-angular.module('wordlift.core', [])
+angular.module('wordlift.editpost.widget.services.EditorService', [
+  'wordlift.editpost.widget.services.AnalysisService'
+  ])
 # Manage redlink analysis responses
 .service('EditorService', [ 'AnalysisService', '$log', '$http', '$rootScope', (AnalysisService, $log, $http, $rootScope)-> 
   
@@ -287,84 +646,22 @@ angular.module('wordlift.core', [])
 
   service
 ])
+angular.module('wordlift.editpost.widget.services.ImageSuggestorDataRetrieverService', [])
 # Manage redlink analysis responses
-.service('AnalysisService', [ '$log', '$http', '$rootScope', ($log, $http, $rootScope)-> 
-	
-  # Creates a unique ID of the specified length (default 8).
-  uniqueId = (length = 8) ->
-    id = ''
-    id += Math.random().toString(36).substr(2) while id.length < length
-    id.substr 0, length
-
-  # Merges two objects by copying overrides param onto the options.
-  merge = (options, overrides) ->
-    extend (extend {}, options), overrides
-  extend = (object, properties) ->
-    for key, val of properties
-      object[key] = val
-    object
-
-  service = 
-    _currentAnalysis = {}
-
-  service.createEntity = (params = {}) ->
-    # Set the defalut values.
-    defaults =
-      id: 'local-entity-' + uniqueId 32
-      label: ''
-      description: ''
-      mainType: ''
-      types: []
-      images: []
-      occurrences: []
-      annotations: {}
-      isRelatedToAnnotation: (annotationId)->
-        if @.annotations[ annotationId ]? then true else false
-    
-    merge defaults, params
-
-  service.createAnnotation = (params = {}) ->
-    # Set the defalut values.
-    defaults =
-      id: 'urn:local-text-annotation-' + uniqueId 32
-      text: ''
-      start: 0
-      end: 0
-      entityMatches: []
-    
-    merge defaults, params
-
-  service.parse = (data) ->
-    
-    for id, entity of data.entities
-      entity.occurrences = 0
-      entity.id = id
-      entity.annotations = {}
-      entity.isRelatedToAnnotation = (annotationId)->
-        if @.annotations[ annotationId ]? then true else false
-
-    for id, annotation of data.annotations
-      for ea in annotation.entityMatches
-      	data.entities[ ea.entityId ].annotations[ id ] = annotation
-
-    for id, annotation of data.annotations
-      annotation.id = id
-
-    data
-
-  service.perform = ()->
-  	$http(
-      method: 'get'
-      url: 'assets/sample-response.json'
-    )
-    # If successful, broadcast an *analysisReceived* event.
-    .success (data) ->
-       $rootScope.$broadcast "analysisPerformed", service.parse( data )
+.service('ImageSuggestorDataRetrieverService', [ '$log', '$http', '$rootScope', ($log, $http, $rootScope)-> 
+  
+  service = {}
+  service.loadData = (entities)->
+    items = []
+    for id, entity of entities
+      for image in entity.images
+        items.push { 'uri': image }
+    items
 
   service
 
 ])
-
+angular.module('wordlift.editpost.widget.services.ConfigurationService', [])
 # Manage redlink analysis responses
 .service('ConfigurationService', [ '$log', '$http', '$rootScope', ($log, $http, $rootScope)-> 
 	
@@ -381,310 +678,21 @@ angular.module('wordlift.core', [])
   service
 
 ])
+# Set the well-known $ reference to jQuery.
+$ = jQuery
 
-# Manage redlink analysis responses
-.service('ImageSuggestorDataRetriever', [ '$log', '$http', '$rootScope', ($log, $http, $rootScope)-> 
-  
-  service = {}
-  service.loadData = (entities)->
-    items = []
-    for id, entity of entities
-      for image in entity.images
-        items.push { 'uri': image }
-    items
+# Create the main AngularJS module, and set it dependent on controllers and directives.
+angular.module('wordlift.editpost.widget', [
+	'wordlift.editpost.widget.controllers.EditPostWidgetController', 
+	'wordlift.editpost.widget.directives.wlClassificationBox', 
+	'wordlift.editpost.widget.directives.wlEntityForm', 
+	'wordlift.editpost.widget.directives.wlEntityTile', 
+	'wordlift.editpost.widget.services.AnalysisService', 
+	'wordlift.editpost.widget.services.EditorService', 
+	'wordlift.editpost.widget.services.ConfigurationService', 
+	'wordlift.editpost.widget.services.ImageSuggestorDataRetrieverService', 		
+	])
 
-  service
-
-])
-
-# Manage redlink analysis responses
-.service('ArticleSuggestorDataRetriever', [ '$log', '$http', '$rootScope', ($log, $http, $rootScope)-> 
-  
-  service = {}
-  service.loadData = (entities)->
-    $log.debug "Nothing to do"
-    items = []
-    items
-
-  service
-
-])
-# Manage redlink analysis responses
-.controller('EditPostWidgetController', [ 'AnalysisService', '$log', '$scope', '$rootScope', '$injector', (AnalysisService, $log, $scope, $rootScope, $injector)-> 
-
-  $scope.configuration = []
-  $scope.analysis = {}
-  $scope.newEntity = AnalysisService.createEntity()
-  $scope.selectedEntities = {}
-  $scope.widgets = {}
-  $scope.annotation = undefined
-  $scope.boxes = []
-
-  $scope.addNewEntityToAnalysis = ()->
-    # Add new entity to the analysis
-    $scope.analysis.entities[ $scope.newEntity.id ] = $scope.newEntity
-    annotation = $scope.analysis.annotations[ $scope.annotation ]
-    annotation.entityMatches.push { entityId: $scope.newEntity.id, confidence: 1 }
-    $scope.analysis.entities[ $scope.newEntity.id ].annotations[ annotation.id ] = annotation
-    
-    # TODO Check entity tiles status
-
-    # Create new entity object
-    $scope.newEntity = AnalysisService.createEntity()
-    
-  $scope.$on "updateOccurencesForEntity", (event, entityId, occurrences) ->
-    $log.debug "Occurrences #{occurrences.length} for #{entityId}"
-    $scope.analysis.entities[ entityId ].occurrences = occurrences
-
-    if $scope.annotation?
-      for box, entities of $scope.selectedEntities
-        $scope.boxes[ box ].relink $scope.analysis.entities[ entityId ], $scope.annotation
-        
-    if occurrences.length is 0
-      for box, entities of $scope.selectedEntities
-        delete $scope.selectedEntities[ box ][ entityId ]
-        $scope.boxes[ box ].deselect $scope.analysis.entities[ entityId ]
-        
-
-  $scope.$on "configurationLoaded", (event, configuration) ->
-    for box in configuration.classificationBoxes
-      $scope.selectedEntities[ box.id ] = {}
-      $scope.widgets[ box.id ] = {}
-      for widget in box.registeredWidgets
-        $scope.widgets[ box.id ][ widget ] = []
-              
-    $scope.configuration = configuration
-
-  $scope.$on "textAnnotationClicked", (event, annotationId) ->
-    $log.debug "click on #{annotationId}"
-    $scope.annotation = annotationId
-
-  $scope.$on "textAnnotationAdded", (event, annotation) ->
-    $log.debug "added a new annotation with Id #{annotation.id}"
-    # Add the new annotation to the current analysis
-    $scope.analysis.annotations[ annotation.id ] = annotation
-    # Set the annotation scope
-    $scope.annotation = annotation.id
-    # Set the annotation text as label for the new entity
-    $scope.newEntity.label = annotation.text
-  
-  $scope.$on "analysisPerformed", (event, analysis) ->   
-    $scope.analysis = analysis
-
-  $scope.$on "updateWidget", (event, widget, scope)->
-    $log.debug "Going to updated widget #{widget} for box #{scope}"
-    # Retrieve the proper DatarRetriever
-    retriever = $injector.get "#{widget}DataRetriever"
-    # Load widget items
-    items = retriever.loadData $scope.selectedEntities[ scope ]
-    # Assign items to the widget scope
-    $scope.widgets[ scope ][ widget ] = items
-    
-  $scope.onSelectedEntityTile = (entity, scope)->
-    $log.debug "Entity tile selected for entity #{entity.id} within '#{scope.id}' scope"
-    
-    # Close all opened widgets ...
-    for id, box of $scope.boxes
-      box.closeWidgets()
-    
-    if not $scope.selectedEntities[ scope.id ][ entity.id ]?
-      $scope.selectedEntities[ scope.id ][ entity.id ] = entity
-      $scope.$emit "entitySelected", entity, $scope.annotation
-    else
-      $scope.$emit "entityDeselected", entity, $scope.annotation  
-      
-])
-
-.directive('wlClassificationBox', ['$log', ($log)->
-    restrict: 'E'
-    scope: true
-    transclude: true      
-    template: """
-    	<div class="classification-box">
-    		<div class="box-header">
-          <h5 class="label">{{box.label}}
-            <span class="wl-suggestion-tools" ng-show="hasSelectedEntities()">
-              <i ng-class="'wl-' + widget" title="{{widget}}" ng-click="toggleWidget(widget)" ng-repeat="widget in box.registeredWidgets" class="wl-widget-icon"></i>
-            </span>
-            <span ng-show="isWidgetOpened" class="wl-widget-label">{{currentWidget}}
-              <i ng-click="toggleWidget(currentWidget)" class="wl-deselect-widget"></i>
-            </span>  
-          </h5>
-          <div ng-show="isWidgetOpened" class="box-widgets">
-            <div ng-show="currentWidget == widget" ng-repeat="widget in box.registeredWidgets">
-              <img ng-click="embedImageInEditor(item.uri)"ng-src="{{ item.uri }}" ng-repeat="item in widgets[ box.id ][ widget ]" />
-            </div>
-          </div>
-          <div class="selected-entities">
-            <span ng-class="'wl-' + entity.mainType" ng-repeat="(id, entity) in selectedEntities[box.id]" class="wl-selected-item">
-              {{ entity.label}}
-              <i class="wl-deselect-item" ng-click="onSelectedEntityTile(entity, box)"></i>
-            </span>
-          </div>
-        </div>
-  			<div class="box-tiles">
-          <div ng-transclude></div>
-  		  </div>
-      </div>	
-    """
-    link: ($scope, $element, $attrs, $ctrl) ->  	  
-  	  
-      $scope.currentWidget = undefined
-      $scope.isWidgetOpened = false
-
-      $scope.closeWidgets = ()->
-        $scope.currentWidget = undefined
-        $scope.isWidgetOpened = false
-
-      $scope.hasSelectedEntities = ()->
-        Object.keys( $scope.selectedEntities[ $scope.box.id ] ).length > 0
-
-      $scope.embedImageInEditor = (image)->
-        $scope.$emit "embedImageInEditor", image
-
-      $scope.toggleWidget = (widget)->
-        if $scope.currentWidget is widget
-          $scope.currentWidget = undefined
-          $scope.isWidgetOpened = false
-        else 
-          $scope.currentWidget = widget
-          $scope.isWidgetOpened = true   
-          $scope.$emit "updateWidget", widget, $scope.box.id 
-          
-    controller: ($scope, $element, $attrs) ->
-      
-      # Mantain a reference to nested entity tiles $scope
-      # TODO manage on scope distruction event
-      $scope.tiles = []
-
-      # TODO don't use $parent
-      $scope.$parent.boxes[ $scope.box.id ] = $scope
-
-      $scope.deselect = (entity)->
-        for tile in $scope.tiles
-          tile.isSelected = false if tile.entity.id is entity.id
-      
-      $scope.relink = (entity, annotationId)->
-        for tile in $scope.tiles
-          tile.isLinked = (annotationId in tile.entity.occurrences) if tile.entity.id is entity.id
-           
-      $scope.$watch "annotation", (annotationId) ->
-        
-        $log.debug "Watching annotation ... New value #{annotationId}"
-        $scope.currentWidget = undefined
-        $scope.isWidgetOpened = false
-
-        for tile in $scope.tiles
-          if annotationId?
-            tile.isVisible = tile.entity.isRelatedToAnnotation( annotationId ) 
-            tile.annotationModeOn = true
-            tile.isLinked = (annotationId in tile.entity.occurrences)
-          else
-            tile.isVisible = true
-            tile.isLinked = false
-            tile.annotationModeOn = false
-            
-      ctrl =
-        onSelectedTile: (tile)->
-          tile.isSelected = !tile.isSelected
-          $scope.onSelectedEntityTile tile.entity, $scope.box
-        addTile: (tile)->
-          $scope.tiles.push tile
-        closeTiles: ()->
-          for tile in $scope.tiles
-          	tile.close()
-      ctrl
-  ])
-.directive('wlEntityForm', ['$log', ($log)->
-    restrict: 'E'
-    scope:
-      entity: '='
-      onSubmit: '&'
-    template: """
-      <form class="wl-entity-form" ng-submit="onSubmit()">
-      <div>
-          <label>Entity label</label>
-          <input type="text" ng-model="entity.label" />
-      </div>
-      <div>
-          <label>Entity type</label>
-          <select ng-model="entity.mainType" ng-options="type.id as type.name for type in supportedTypes" ></select>
-      </div>
-      <div>
-          <label>Entity Description</label>
-          <textarea ng-model="entity.description" rows="6"></textarea>
-      </div>
-      <div>
-          <label>Entity id</label>
-          <input type="text" ng-model="entity.id" />
-      </div>
-      <div>
-          <label>Entity Same as</label>
-          <input type="text" ng-model="entity.sameAs" />
-      </div>
-      <input type="submit" value="save" />
-      </form>
-    """
-    link: ($scope, $element, $attrs, $ctrl) ->  
-      $scope.supportedTypes = [
-        { id: 'person', name: 'http://schema.org/Person' },
-        { id: 'place', name: 'http://schema.org/Place' },
-        { id: 'organization', name: 'http://schema.org/Organization' },
-        { id: 'event', name: 'http://schema.org/Event' },
-        { id: 'creative-work', name: 'http://schema.org/CreativeWork' }
-
-      ]
-])
-.directive('wlEntityTile', ['$log', ($log)->
-    require: '^wlClassificationBox'
-    restrict: 'E'
-    scope:
-      entity: '='
-    template: """
-  	  <div ng-class="'wl-' + entity.mainType" ng-show="isVisible" class="entity">
-  	    <i ng-show="annotationModeOn" ng-class="{ 'wl-linked' : isLinked, 'wl-unlinked' : !isLinked }"></i>
-        <i ng-hide="annotationModeOn" ng-class="{ 'wl-selected' : isSelected, 'wl-unselected' : !isSelected }"></i>
-        <i class="type"></i>
-        <span class="label" ng-click="select()">{{entity.label}}</span>
-        <small ng-show="entity.occurrences.length > 0">({{entity.occurrences.length}})</small>
-        <i ng-class="{ 'wl-more': isOpened == false, 'wl-less': isOpened == true }" ng-click="toggle()"></i>
-  	    <span ng-class="{ 'active' : editingModeOn }" ng-click="toggleEditingMode()" ng-show="isOpened" class="wl-edit-button">Edit</span>
-        <div class="details" ng-show="isOpened">
-          <p ng-hide="editingModeOn"><img class="thumbnail" ng-src="{{ entity.images[0] }}" />{{entity.description}}</p>
-          <wl-entity-form entity="entity" ng-show="editingModeOn" on-submit="toggleEditingMode()"></wl-entity-form>
-        </div>
-
-  	  </div>
-
-  	"""
-    link: ($scope, $element, $attrs, $ctrl) ->				      
-      
-      # Add tile to related container scope
-      $ctrl.addTile $scope
-
-      $scope.isOpened = false
-      $scope.isVisible = true
-      $scope.isSelected = false
-      $scope.isLinked = false
-
-      $scope.annotationModeOn = false
-      $scope.editingModeOn = false
-      
-      $scope.toggleEditingMode = ()->
-        $scope.editingModeOn = !$scope.editingModeOn
-
-      $scope.open = ()->
-      	$scope.isOpened = true
-      $scope.close = ()->
-      	$scope.isOpened = false  	
-      $scope.toggle = ()->
-        if !$scope.isOpened 
-          $ctrl.closeTiles()    
-        $scope.isOpened = !$scope.isOpened
-        
-      $scope.select = ()-> 
-        $ctrl.onSelectedTile $scope
-  ])
 $(
   container = $("""
   	<div id="wordlift-edit-post-wrapper" ng-controller="EditPostWidgetController">
@@ -704,8 +712,7 @@ $(
   """)
   .appendTo('#dx')
 
-injector = angular.bootstrap $('body'), ['wordlift.core']
-
+injector = angular.bootstrap $('#wordlift-edit-post-wrapper'), ['wordlift.editpost.widget']
 
 # Add WordLift as a plugin of the TinyMCE editor.
   tinymce.PluginManager.add 'wordlift', (editor, url) ->
@@ -741,7 +748,7 @@ injector = angular.bootstrap $('body'), ['wordlift.core']
       injector.invoke(['$rootScope', ($rootScope) ->
         # execute the following commands in the angular js context.
         $rootScope.$apply(->
-          
+          # TODO move EditorService
           for annotation in editor.dom.select "span.textannotation"
             if annotation.id is e.target.id
               if editor.dom.hasClass annotation.id, "selected"
