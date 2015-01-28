@@ -106,8 +106,9 @@
 
   window.Traslator = Traslator;
 
-  angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', ['wordlift.editpost.widget.services.AnalysisService']).controller('EditPostWidgetController', [
-    'AnalysisService', '$log', '$scope', '$rootScope', '$injector', function(AnalysisService, $log, $scope, $rootScope, $injector) {
+  angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', ['wordlift.editpost.widget.services.AnalysisService', 'wordlift.editpost.widget.providers.ConfigurationProvider']).controller('EditPostWidgetController', [
+    'AnalysisService', 'configuration', '$log', '$scope', '$rootScope', '$injector', function(AnalysisService, configuration, $log, $scope, $rootScope, $injector) {
+      var box, widget, _i, _j, _len, _len1, _ref, _ref1;
       $scope.configuration = [];
       $scope.analysis = {};
       $scope.newEntity = AnalysisService.createEntity();
@@ -115,6 +116,19 @@
       $scope.widgets = {};
       $scope.annotation = void 0;
       $scope.boxes = [];
+      $log.debug(configuration);
+      _ref = configuration.boxes;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        box = _ref[_i];
+        $scope.selectedEntities[box.id] = {};
+        $scope.widgets[box.id] = {};
+        _ref1 = box.registeredWidgets;
+        for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+          widget = _ref1[_j];
+          $scope.widgets[box.id][widget] = [];
+        }
+      }
+      $scope.configuration = configuration;
       $scope.addNewEntityToAnalysis = function() {
         var annotation;
         $scope.analysis.entities[$scope.newEntity.id] = $scope.newEntity;
@@ -127,41 +141,26 @@
         return $scope.newEntity = AnalysisService.createEntity();
       };
       $scope.$on("updateOccurencesForEntity", function(event, entityId, occurrences) {
-        var box, entities, _ref, _ref1, _results;
+        var entities, _ref2, _ref3, _results;
         $log.debug("Occurrences " + occurrences.length + " for " + entityId);
         $scope.analysis.entities[entityId].occurrences = occurrences;
         if ($scope.annotation != null) {
-          _ref = $scope.selectedEntities;
-          for (box in _ref) {
-            entities = _ref[box];
+          _ref2 = $scope.selectedEntities;
+          for (box in _ref2) {
+            entities = _ref2[box];
             $scope.boxes[box].relink($scope.analysis.entities[entityId], $scope.annotation);
           }
         }
         if (occurrences.length === 0) {
-          _ref1 = $scope.selectedEntities;
+          _ref3 = $scope.selectedEntities;
           _results = [];
-          for (box in _ref1) {
-            entities = _ref1[box];
+          for (box in _ref3) {
+            entities = _ref3[box];
             delete $scope.selectedEntities[box][entityId];
             _results.push($scope.boxes[box].deselect($scope.analysis.entities[entityId]));
           }
           return _results;
         }
-      });
-      $scope.$on("configurationLoaded", function(event, configuration) {
-        var box, widget, _i, _j, _len, _len1, _ref, _ref1;
-        _ref = configuration.classificationBoxes;
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          box = _ref[_i];
-          $scope.selectedEntities[box.id] = {};
-          $scope.widgets[box.id] = {};
-          _ref1 = box.registeredWidgets;
-          for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-            widget = _ref1[_j];
-            $scope.widgets[box.id][widget] = [];
-          }
-        }
-        return $scope.configuration = configuration;
       });
       $scope.$on("textAnnotationClicked", function(event, annotationId) {
         $log.debug("click on " + annotationId);
@@ -184,11 +183,11 @@
         return $scope.widgets[scope][widget] = items;
       });
       return $scope.onSelectedEntityTile = function(entity, scope) {
-        var box, id, _ref;
+        var id, _ref2;
         $log.debug("Entity tile selected for entity " + entity.id + " within '" + scope.id + "' scope");
-        _ref = $scope.boxes;
-        for (id in _ref) {
-          box = _ref[id];
+        _ref2 = $scope.boxes;
+        for (id in _ref2) {
+          box = _ref2[id];
           box.closeWidgets();
         }
         if ($scope.selectedEntities[scope.id][entity.id] == null) {
@@ -669,33 +668,36 @@
     }
   ]);
 
-  angular.module('wordlift.editpost.widget.services.ConfigurationService', []).service('ConfigurationService', [
-    '$log', '$http', '$rootScope', function($log, $http, $rootScope) {
-      var service, _configuration;
-      service = _configuration = {};
-      service.loadConfiguration = function() {
-        return $http({
-          method: 'get',
-          url: 'assets/sample-widget-configuration.json'
-        }).success(function(data) {
-          return $rootScope.$broadcast("configurationLoaded", data);
-        });
-      };
-      return service;
-    }
-  ]);
+  angular.module('wordlift.editpost.widget.providers.ConfigurationProvider', []).provider("configuration", function() {
+    var boxes, provider;
+    boxes = void 0;
+    provider = {
+      setBoxes: function(items) {
+        return boxes = items;
+      },
+      $get: function() {
+        return {
+          boxes: boxes
+        };
+      }
+    };
+    return provider;
+  });
 
   $ = jQuery;
 
-  angular.module('wordlift.editpost.widget', ['wordlift.editpost.widget.controllers.EditPostWidgetController', 'wordlift.editpost.widget.directives.wlClassificationBox', 'wordlift.editpost.widget.directives.wlEntityForm', 'wordlift.editpost.widget.directives.wlEntityTile', 'wordlift.editpost.widget.services.AnalysisService', 'wordlift.editpost.widget.services.EditorService', 'wordlift.editpost.widget.services.ConfigurationService', 'wordlift.editpost.widget.services.ImageSuggestorDataRetrieverService']);
+  angular.module('wordlift.editpost.widget', ['wordlift.editpost.widget.providers.ConfigurationProvider', 'wordlift.editpost.widget.controllers.EditPostWidgetController', 'wordlift.editpost.widget.directives.wlClassificationBox', 'wordlift.editpost.widget.directives.wlEntityForm', 'wordlift.editpost.widget.directives.wlEntityTile', 'wordlift.editpost.widget.services.AnalysisService', 'wordlift.editpost.widget.services.EditorService', 'wordlift.editpost.widget.services.ImageSuggestorDataRetrieverService']).config(function(configurationProvider) {
+    console.log("daje sempre");
+    console.log(window.wordlift.classificationBoxes);
+    return configurationProvider.setBoxes(window.wordlift.classificationBoxes);
+  });
 
-  $(container = $("<div id=\"wordlift-edit-post-wrapper\" ng-controller=\"EditPostWidgetController\">\n	<div ng-show=\"annotation\">\n        <h4 class=\"wl-annotation-label\">\n          <i class=\"wl-annotation-label-icon\"></i>\n          {{ analysis.annotations[ annotation ].text }} \n          <small>[ {{ analysis.annotations[ annotation ].start }}, {{ analysis.annotations[ annotation ].end }} ]</small>\n          <i class=\"wl-annotation-label-remove-icon\" ng-click=\"annotation = undefined\"></i>\n        </h4>\n        <wl-entity-form entity=\"newEntity\" on-submit=\"addNewEntityToAnalysis()\"ng-show=\"analysis.annotations[annotation].entityMatches.length == 0\"></wl-entity-form>\n      </div>\n      <wl-classification-box ng-repeat=\"box in configuration.classificationBoxes\">\n        <wl-entity-tile entity=\"entity\" ng-repeat=\"entity in analysis.entities\"></wl-entity>\n      </wl-classification-box>\n    </div>").appendTo('#dx'), injector = angular.bootstrap($('#wordlift-edit-post-wrapper'), ['wordlift.editpost.widget']), tinymce.PluginManager.add('wordlift', function(editor, url) {
+  $(container = $("<div id=\"wordlift-edit-post-wrapper\" ng-controller=\"EditPostWidgetController\">\n	<div ng-show=\"annotation\">\n        <h4 class=\"wl-annotation-label\">\n          <i class=\"wl-annotation-label-icon\"></i>\n          {{ analysis.annotations[ annotation ].text }} \n          <small>[ {{ analysis.annotations[ annotation ].start }}, {{ analysis.annotations[ annotation ].end }} ]</small>\n          <i class=\"wl-annotation-label-remove-icon\" ng-click=\"annotation = undefined\"></i>\n        </h4>\n        <wl-entity-form entity=\"newEntity\" on-submit=\"addNewEntityToAnalysis()\"ng-show=\"analysis.annotations[annotation].entityMatches.length == 0\"></wl-entity-form>\n      </div>\n      <wl-classification-box ng-repeat=\"box in configuration.boxes\">\n        <wl-entity-tile entity=\"entity\" ng-repeat=\"entity in analysis.entities\"></wl-entity>\n      </wl-classification-box>\n    </div>").appendTo('#dx'), injector = angular.bootstrap($('#wordlift-edit-post-wrapper'), ['wordlift.editpost.widget']), tinymce.PluginManager.add('wordlift', function(editor, url) {
     editor.onLoadContent.add(function(ed, o) {
       return injector.invoke([
-        'ConfigurationService', 'AnalysisService', 'EditorService', '$rootScope', function(ConfigurationService, AnalysisService, EditorService, $rootScope) {
+        'AnalysisService', 'EditorService', '$rootScope', function(AnalysisService, EditorService, $rootScope) {
           return $rootScope.$apply(function() {
-            AnalysisService.perform();
-            return ConfigurationService.loadConfiguration();
+            return AnalysisService.perform();
           });
         }
       ]);

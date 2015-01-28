@@ -1,7 +1,8 @@
 angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', [
   'wordlift.editpost.widget.services.AnalysisService'
+  'wordlift.editpost.widget.providers.ConfigurationProvider'
 ])
-.controller('EditPostWidgetController', [ 'AnalysisService', '$log', '$scope', '$rootScope', '$injector', (AnalysisService, $log, $scope, $rootScope, $injector)-> 
+.controller('EditPostWidgetController', [ 'AnalysisService', 'configuration', '$log', '$scope', '$rootScope', '$injector', (AnalysisService, configuration, $log, $scope, $rootScope, $injector)-> 
 
   $scope.configuration = []
   $scope.analysis = {}
@@ -10,6 +11,17 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
   $scope.widgets = {}
   $scope.annotation = undefined
   $scope.boxes = []
+  
+  $log.debug configuration
+  for box in configuration.boxes
+
+    $scope.selectedEntities[ box.id ] = {}
+    $scope.widgets[ box.id ] = {}
+    for widget in box.registeredWidgets
+      $scope.widgets[ box.id ][ widget ] = []
+              
+  $scope.configuration = configuration
+
 
   $scope.addNewEntityToAnalysis = ()->
     # Add new entity to the analysis
@@ -36,16 +48,6 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
         delete $scope.selectedEntities[ box ][ entityId ]
         $scope.boxes[ box ].deselect $scope.analysis.entities[ entityId ]
         
-
-  $scope.$on "configurationLoaded", (event, configuration) ->
-    for box in configuration.classificationBoxes
-      $scope.selectedEntities[ box.id ] = {}
-      $scope.widgets[ box.id ] = {}
-      for widget in box.registeredWidgets
-        $scope.widgets[ box.id ][ widget ] = []
-              
-    $scope.configuration = configuration
-
   $scope.$on "textAnnotationClicked", (event, annotationId) ->
     $log.debug "click on #{annotationId}"
     $scope.annotation = annotationId

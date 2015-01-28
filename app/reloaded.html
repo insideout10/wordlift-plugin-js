@@ -55,7 +55,6 @@ Crollano Atene e petrolio, l'euro precipita e Piazza Affari stampa un calo del 5
     </div>
     <br class="clear" />
   </div>
-    <script src="js/wordlift-reloaded.js"></script>
     <script type="text/javascript">
 
     $(
@@ -94,10 +93,39 @@ Crollano Atene e petrolio, l'euro precipita e Piazza Affari stampa un calo del 5
                     editor = ed;
                 }
             })
+
     );
+    window.wordlift = {};
 
+    window.wordlift["classificationBoxes"] = [
+        {
+            "id": "what",
+            "label": "What",
+            "registeredTypes": [ "event", "organization", "person", "place" ],
+            "registeredWidgets": [ "ImageSuggestor"]
+        },
+        {
+            "id": "who",
+            "label": "Who",
+            "registeredTypes": [ "organization", "person" ],
+            "registeredWidgets": [ "ImageSuggestor"]
+        },
+        {
+            "id": "where",
+            "label": "Where",
+            "registeredTypes": [ "place" ],
+            "registeredWidgets": [ "ImageSuggestor"]
+        },
+        {
+            "id": "when",
+            "label": "When",
+            "registeredTypes": [ "event" ],
+            "registeredWidgets": [ "ImageSuggestor"]
+        }
+        ];
 </script>
-
+<script src="js/wordlift-reloaded.js"></script>
+    
 
   </body>
 </html>

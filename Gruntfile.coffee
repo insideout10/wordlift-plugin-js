@@ -41,7 +41,7 @@ module.exports = (grunt) ->
             'src/coffee/editpost-widget/app.services.AnalysisService.coffee'
             'src/coffee/editpost-widget/app.services.EditorService.coffee'
             'src/coffee/editpost-widget/app.services.ImageSuggestorDataRetrieverService.coffee'
-            'src/coffee/editpost-widget/app.services.ConfigurationService.coffee'   
+            'src/coffee/editpost-widget/app.providers.ConfigurationProvider.coffee'   
             'src/coffee/editpost-widget/app.coffee'
           ]
           'app/js/wordlift.ui.js': [

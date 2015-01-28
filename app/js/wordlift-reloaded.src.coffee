@@ -131,8 +131,9 @@ class Traslator
 window.Traslator = Traslator
 angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', [
   'wordlift.editpost.widget.services.AnalysisService'
+  'wordlift.editpost.widget.providers.ConfigurationProvider'
 ])
-.controller('EditPostWidgetController', [ 'AnalysisService', '$log', '$scope', '$rootScope', '$injector', (AnalysisService, $log, $scope, $rootScope, $injector)-> 
+.controller('EditPostWidgetController', [ 'AnalysisService', 'configuration', '$log', '$scope', '$rootScope', '$injector', (AnalysisService, configuration, $log, $scope, $rootScope, $injector)-> 
 
   $scope.configuration = []
   $scope.analysis = {}
@@ -141,6 +142,17 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
   $scope.widgets = {}
   $scope.annotation = undefined
   $scope.boxes = []
+  
+  $log.debug configuration
+  for box in configuration.boxes
+
+    $scope.selectedEntities[ box.id ] = {}
+    $scope.widgets[ box.id ] = {}
+    for widget in box.registeredWidgets
+      $scope.widgets[ box.id ][ widget ] = []
+              
+  $scope.configuration = configuration
+
 
   $scope.addNewEntityToAnalysis = ()->
     # Add new entity to the analysis
@@ -167,16 +179,6 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
         delete $scope.selectedEntities[ box ][ entityId ]
         $scope.boxes[ box ].deselect $scope.analysis.entities[ entityId ]
         
-
-  $scope.$on "configurationLoaded", (event, configuration) ->
-    for box in configuration.classificationBoxes
-      $scope.selectedEntities[ box.id ] = {}
-      $scope.widgets[ box.id ] = {}
-      for widget in box.registeredWidgets
-        $scope.widgets[ box.id ][ widget ] = []
-              
-    $scope.configuration = configuration
-
   $scope.$on "textAnnotationClicked", (event, annotationId) ->
     $log.debug "click on #{annotationId}"
     $scope.annotation = annotationId
@@ -661,37 +663,43 @@ angular.module('wordlift.editpost.widget.services.ImageSuggestorDataRetrieverSer
   service
 
 ])
-angular.module('wordlift.editpost.widget.services.ConfigurationService', [])
-# Manage redlink analysis responses
-.service('ConfigurationService', [ '$log', '$http', '$rootScope', ($log, $http, $rootScope)-> 
-	
-  service = 
-    _configuration = {}
+angular.module('wordlift.editpost.widget.providers.ConfigurationProvider', [])
+.provider("configuration", ()->
+  
+  boxes = undefined
+  
+  provider =
+    setBoxes: (items)->
+      boxes = items
+    $get: ()->
+      { boxes: boxes }
 
-  service.loadConfiguration = ()->
-  	$http(
-      method: 'get'
-      url: 'assets/sample-widget-configuration.json'
-    )
-    .success (data) ->
-      $rootScope.$broadcast "configurationLoaded", data
-  service
+  provider
+)
 
-])
+
 # Set the well-known $ reference to jQuery.
 $ = jQuery
 
 # Create the main AngularJS module, and set it dependent on controllers and directives.
 angular.module('wordlift.editpost.widget', [
+
+	'wordlift.editpost.widget.providers.ConfigurationProvider', 
 	'wordlift.editpost.widget.controllers.EditPostWidgetController', 
 	'wordlift.editpost.widget.directives.wlClassificationBox', 
 	'wordlift.editpost.widget.directives.wlEntityForm', 
 	'wordlift.editpost.widget.directives.wlEntityTile', 
 	'wordlift.editpost.widget.services.AnalysisService', 
 	'wordlift.editpost.widget.services.EditorService', 
-	'wordlift.editpost.widget.services.ConfigurationService', 
-	'wordlift.editpost.widget.services.ImageSuggestorDataRetrieverService', 		
+	'wordlift.editpost.widget.services.ImageSuggestorDataRetrieverService' 		
+	
 	])
+
+.config((configurationProvider)->
+  console.log "daje sempre"
+  console.log window.wordlift.classificationBoxes
+  configurationProvider.setBoxes window.wordlift.classificationBoxes
+)
 
 $(
   container = $("""
@@ -705,7 +713,7 @@ $(
         </h4>
         <wl-entity-form entity="newEntity" on-submit="addNewEntityToAnalysis()"ng-show="analysis.annotations[annotation].entityMatches.length == 0"></wl-entity-form>
       </div>
-      <wl-classification-box ng-repeat="box in configuration.classificationBoxes">
+      <wl-classification-box ng-repeat="box in configuration.boxes">
         <wl-entity-tile entity="entity" ng-repeat="entity in analysis.entities"></wl-entity>
       </wl-classification-box>
     </div>
@@ -718,13 +726,12 @@ injector = angular.bootstrap $('#wordlift-edit-post-wrapper'), ['wordlift.editpo
   tinymce.PluginManager.add 'wordlift', (editor, url) ->
     # Perform analysis once tinymce is loaded
     editor.onLoadContent.add((ed, o) ->
-      injector.invoke(['ConfigurationService', 'AnalysisService', 'EditorService', '$rootScope',
-       (ConfigurationService, AnalysisService, EditorService, $rootScope) ->
+      injector.invoke(['AnalysisService', 'EditorService', '$rootScope',
+       (AnalysisService, EditorService, $rootScope) ->
         # execute the following commands in the angular js context.
         $rootScope.$apply(->
           
           AnalysisService.perform()
-          ConfigurationService.loadConfiguration()
         )
       ])
     )

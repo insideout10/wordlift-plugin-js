@@ -3,15 +3,23 @@ $ = jQuery
 
 # Create the main AngularJS module, and set it dependent on controllers and directives.
 angular.module('wordlift.editpost.widget', [
+
+	'wordlift.editpost.widget.providers.ConfigurationProvider', 
 	'wordlift.editpost.widget.controllers.EditPostWidgetController', 
 	'wordlift.editpost.widget.directives.wlClassificationBox', 
 	'wordlift.editpost.widget.directives.wlEntityForm', 
 	'wordlift.editpost.widget.directives.wlEntityTile', 
 	'wordlift.editpost.widget.services.AnalysisService', 
 	'wordlift.editpost.widget.services.EditorService', 
-	'wordlift.editpost.widget.services.ConfigurationService', 
-	'wordlift.editpost.widget.services.ImageSuggestorDataRetrieverService', 		
+	'wordlift.editpost.widget.services.ImageSuggestorDataRetrieverService' 		
+	
 	])
+
+.config((configurationProvider)->
+  console.log "daje sempre"
+  console.log window.wordlift.classificationBoxes
+  configurationProvider.setBoxes window.wordlift.classificationBoxes
+)
 
 $(
   container = $("""
@@ -25,7 +33,7 @@ $(
         </h4>
         <wl-entity-form entity="newEntity" on-submit="addNewEntityToAnalysis()"ng-show="analysis.annotations[annotation].entityMatches.length == 0"></wl-entity-form>
       </div>
-      <wl-classification-box ng-repeat="box in configuration.classificationBoxes">
+      <wl-classification-box ng-repeat="box in configuration.boxes">
         <wl-entity-tile entity="entity" ng-repeat="entity in analysis.entities"></wl-entity>
       </wl-classification-box>
     </div>
@@ -38,13 +46,12 @@ injector = angular.bootstrap $('#wordlift-edit-post-wrapper'), ['wordlift.editpo
   tinymce.PluginManager.add 'wordlift', (editor, url) ->
     # Perform analysis once tinymce is loaded
     editor.onLoadContent.add((ed, o) ->
-      injector.invoke(['ConfigurationService', 'AnalysisService', 'EditorService', '$rootScope',
-       (ConfigurationService, AnalysisService, EditorService, $rootScope) ->
+      injector.invoke(['AnalysisService', 'EditorService', '$rootScope',
+       (AnalysisService, EditorService, $rootScope) ->
         # execute the following commands in the angular js context.
         $rootScope.$apply(->
           
           AnalysisService.perform()
-          ConfigurationService.loadConfiguration()
         )
       ])
     )
