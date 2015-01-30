@@ -2,6 +2,17 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
   'wordlift.editpost.widget.services.AnalysisService'
   'wordlift.editpost.widget.providers.ConfigurationProvider'
 ])
+.filter('entityTypeIn', [ '$log', ($log)->
+  return (items, types)->
+    
+    filtered = []
+
+    for id, entity of items
+      if entity.mainType in types
+        filtered.push entity
+    
+    filtered
+])
 .controller('EditPostWidgetController', [ 'AnalysisService', 'configuration', '$log', '$scope', '$rootScope', '$injector', (AnalysisService, configuration, $log, $scope, $rootScope, $injector)-> 
 
   $scope.configuration = []

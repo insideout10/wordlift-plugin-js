@@ -106,7 +106,21 @@
 
   window.Traslator = Traslator;
 
-  angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', ['wordlift.editpost.widget.services.AnalysisService', 'wordlift.editpost.widget.providers.ConfigurationProvider']).controller('EditPostWidgetController', [
+  angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', ['wordlift.editpost.widget.services.AnalysisService', 'wordlift.editpost.widget.providers.ConfigurationProvider']).filter('entityTypeIn', [
+    '$log', function($log) {
+      return function(items, types) {
+        var entity, filtered, id, _ref;
+        filtered = [];
+        for (id in items) {
+          entity = items[id];
+          if (_ref = entity.mainType, __indexOf.call(types, _ref) >= 0) {
+            filtered.push(entity);
+          }
+        }
+        return filtered;
+      };
+    }
+  ]).controller('EditPostWidgetController', [
     'AnalysisService', 'configuration', '$log', '$scope', '$rootScope', '$injector', function(AnalysisService, configuration, $log, $scope, $rootScope, $injector) {
       var box, widget, _i, _j, _len, _len1, _ref, _ref1;
       $scope.configuration = [];
@@ -692,10 +706,10 @@
     return configurationProvider.setBoxes(window.wordlift.classificationBoxes);
   });
 
-  $(container = $("<div id=\"wordlift-edit-post-wrapper\" ng-controller=\"EditPostWidgetController\">\n	<div ng-show=\"annotation\">\n        <h4 class=\"wl-annotation-label\">\n          <i class=\"wl-annotation-label-icon\"></i>\n          {{ analysis.annotations[ annotation ].text }} \n          <small>[ {{ analysis.annotations[ annotation ].start }}, {{ analysis.annotations[ annotation ].end }} ]</small>\n          <i class=\"wl-annotation-label-remove-icon\" ng-click=\"annotation = undefined\"></i>\n        </h4>\n        <wl-entity-form entity=\"newEntity\" on-submit=\"addNewEntityToAnalysis()\"ng-show=\"analysis.annotations[annotation].entityMatches.length == 0\"></wl-entity-form>\n      </div>\n      <wl-classification-box ng-repeat=\"box in configuration.boxes\">\n        <wl-entity-tile entity=\"entity\" ng-repeat=\"entity in analysis.entities\"></wl-entity>\n      </wl-classification-box>\n    </div>").appendTo('#dx'), injector = angular.bootstrap($('#wordlift-edit-post-wrapper'), ['wordlift.editpost.widget']), tinymce.PluginManager.add('wordlift', function(editor, url) {
+  $(container = $("<div id=\"wordlift-edit-post-wrapper\" ng-controller=\"EditPostWidgetController\">\n	<div ng-show=\"annotation\">\n        <h4 class=\"wl-annotation-label\">\n          <i class=\"wl-annotation-label-icon\"></i>\n          {{ analysis.annotations[ annotation ].text }} \n          <small>[ {{ analysis.annotations[ annotation ].start }}, {{ analysis.annotations[ annotation ].end }} ]</small>\n          <i class=\"wl-annotation-label-remove-icon\" ng-click=\"annotation = undefined\"></i>\n        </h4>\n        <wl-entity-form entity=\"newEntity\" on-submit=\"addNewEntityToAnalysis()\"ng-show=\"analysis.annotations[annotation].entityMatches.length == 0\"></wl-entity-form>\n      </div>\n      <wl-classification-box ng-repeat=\"box in configuration.boxes\">\n        <wl-entity-tile entity=\"entity\" ng-repeat=\"entity in analysis.entities | entityTypeIn:box.registeredTypes\"></wl-entity>\n      </wl-classification-box>\n    </div>").appendTo('#dx'), injector = angular.bootstrap($('#wordlift-edit-post-wrapper'), ['wordlift.editpost.widget']), tinymce.PluginManager.add('wordlift', function(editor, url) {
     editor.onLoadContent.add(function(ed, o) {
       return injector.invoke([
-        'AnalysisService', 'EditorService', '$rootScope', function(AnalysisService, EditorService, $rootScope) {
+        'AnalysisService', '$rootScope', function(AnalysisService, $rootScope) {
           return $rootScope.$apply(function() {
             return AnalysisService.perform();
           });

@@ -7,6 +7,7 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
   
   editor = ->
     tinyMCE.get('content')
+    
   disambiguate = ( annotation, entity )->
     ed = editor()
     ed.dom.addClass annotation.id, "disambiguated"

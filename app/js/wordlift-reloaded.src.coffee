@@ -133,6 +133,17 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
   'wordlift.editpost.widget.services.AnalysisService'
   'wordlift.editpost.widget.providers.ConfigurationProvider'
 ])
+.filter('entityTypeIn', [ '$log', ($log)->
+  return (items, types)->
+    
+    filtered = []
+
+    for id, entity of items
+      if entity.mainType in types
+        filtered.push entity
+    
+    filtered
+])
 .controller('EditPostWidgetController', [ 'AnalysisService', 'configuration', '$log', '$scope', '$rootScope', '$injector', (AnalysisService, configuration, $log, $scope, $rootScope, $injector)-> 
 
   $scope.configuration = []
@@ -500,6 +511,7 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
   
   editor = ->
     tinyMCE.get('content')
+    
   disambiguate = ( annotation, entity )->
     ed = editor()
     ed.dom.addClass annotation.id, "disambiguated"
@@ -714,7 +726,7 @@ $(
         <wl-entity-form entity="newEntity" on-submit="addNewEntityToAnalysis()"ng-show="analysis.annotations[annotation].entityMatches.length == 0"></wl-entity-form>
       </div>
       <wl-classification-box ng-repeat="box in configuration.boxes">
-        <wl-entity-tile entity="entity" ng-repeat="entity in analysis.entities"></wl-entity>
+        <wl-entity-tile entity="entity" ng-repeat="entity in analysis.entities | entityTypeIn:box.registeredTypes"></wl-entity>
       </wl-classification-box>
     </div>
   """)
@@ -726,11 +738,10 @@ injector = angular.bootstrap $('#wordlift-edit-post-wrapper'), ['wordlift.editpo
   tinymce.PluginManager.add 'wordlift', (editor, url) ->
     # Perform analysis once tinymce is loaded
     editor.onLoadContent.add((ed, o) ->
-      injector.invoke(['AnalysisService', 'EditorService', '$rootScope',
-       (AnalysisService, EditorService, $rootScope) ->
+      injector.invoke(['AnalysisService', '$rootScope',
+       (AnalysisService, $rootScope) ->
         # execute the following commands in the angular js context.
-        $rootScope.$apply(->
-          
+        $rootScope.$apply(->    
           AnalysisService.perform()
         )
       ])
