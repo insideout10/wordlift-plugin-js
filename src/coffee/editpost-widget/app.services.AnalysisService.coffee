@@ -25,13 +25,11 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
       id: 'local-entity-' + uniqueId 32
       label: ''
       description: ''
-      mainType: ''
+      mainType: 'thing' # DefaultType
       types: []
       images: []
       occurrences: []
       annotations: {}
-      isRelatedToAnnotation: (annotationId)->
-        if @.annotations[ annotationId ]? then true else false
     
     merge defaults, params
 
@@ -45,22 +43,23 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
       entityMatches: []
     
     merge defaults, params
-
+  
   service.parse = (data) ->
     
-    for id, entity of data.entities
-      entity.occurrences = 0
-      entity.id = id
-      entity.annotations = {}
-      entity.isRelatedToAnnotation = (annotationId)->
-        if @.annotations[ annotationId ]? then true else false
+    # Add id to entity obj
+    # Add id to annotation obj
+    # Add occurences as a blank array
+    # Add annotation references to each entity
 
-    for id, annotation of data.annotations
-      for ea in annotation.entityMatches
-      	data.entities[ ea.entityId ].annotations[ id ] = annotation
+    for id, entity of data.entities
+      entity.id = id
+      entity.occurrences = []
+      entity.annotations = {}
 
     for id, annotation of data.annotations
       annotation.id = id
+      for ea in annotation.entityMatches
+        data.entities[ ea.entityId ].annotations[ id ] = annotation
 
     data
 

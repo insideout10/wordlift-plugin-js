@@ -80,7 +80,7 @@ angular.module('wordlift.editpost.widget.directives.wlClassificationBox', [])
 
         for tile in $scope.tiles
           if annotationId?
-            tile.isVisible = tile.entity.isRelatedToAnnotation( annotationId ) 
+            tile.isVisible = (tile.entity.annotations[ annotationId ]?)
             tile.annotationModeOn = true
             tile.isLinked = (annotationId in tile.entity.occurrences)
           else

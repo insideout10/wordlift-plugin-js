@@ -286,7 +286,7 @@
             for (_i = 0, _len = _ref.length; _i < _len; _i++) {
               tile = _ref[_i];
               if (annotationId != null) {
-                tile.isVisible = tile.entity.isRelatedToAnnotation(annotationId);
+                tile.isVisible = (tile.entity.annotations[annotationId] != null);
                 tile.annotationModeOn = true;
                 _results.push(tile.isLinked = (__indexOf.call(tile.entity.occurrences, annotationId) >= 0));
               } else {
@@ -434,14 +434,7 @@
           types: [],
           images: [],
           occurrences: [],
-          annotations: {},
-          isRelatedToAnnotation: function(annotationId) {
-            if (this.annotations[annotationId] != null) {
-              return true;
-            } else {
-              return false;
-            }
-          }
+          annotations: {}
         };
         return merge(defaults, params);
       };
@@ -460,34 +453,23 @@
         return merge(defaults, params);
       };
       service.parse = function(data) {
-        var annotation, ea, entity, id, _i, _len, _ref, _ref1, _ref2, _ref3;
+        var annotation, ea, entity, id, _i, _len, _ref, _ref1, _ref2;
         _ref = data.entities;
         for (id in _ref) {
           entity = _ref[id];
-          entity.occurrences = 0;
           entity.id = id;
+          entity.occurrences = [];
           entity.annotations = {};
-          entity.isRelatedToAnnotation = function(annotationId) {
-            if (this.annotations[annotationId] != null) {
-              return true;
-            } else {
-              return false;
-            }
-          };
         }
         _ref1 = data.annotations;
         for (id in _ref1) {
           annotation = _ref1[id];
+          annotation.id = id;
           _ref2 = annotation.entityMatches;
           for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
             ea = _ref2[_i];
             data.entities[ea.entityId].annotations[id] = annotation;
           }
-        }
-        _ref3 = data.annotations;
-        for (id in _ref3) {
-          annotation = _ref3[id];
-          annotation.id = id;
         }
         return data;
       };

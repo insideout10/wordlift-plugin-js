@@ -311,7 +311,7 @@ angular.module('wordlift.editpost.widget.directives.wlClassificationBox', [])
 
         for tile in $scope.tiles
           if annotationId?
-            tile.isVisible = tile.entity.isRelatedToAnnotation( annotationId ) 
+            tile.isVisible = (tile.entity.annotations[ annotationId ]?)
             tile.annotationModeOn = true
             tile.isLinked = (annotationId in tile.entity.occurrences)
           else
@@ -456,8 +456,6 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
       images: []
       occurrences: []
       annotations: {}
-      isRelatedToAnnotation: (annotationId)->
-        if @.annotations[ annotationId ]? then true else false
     
     merge defaults, params
 
@@ -471,22 +469,23 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
       entityMatches: []
     
     merge defaults, params
-
+  
   service.parse = (data) ->
     
+    # Add id to entity obj
+    # Add id to annotation obj
+    # Add occurences as a blank array
+    # Add annotation references to each entity
+    
     for id, entity of data.entities
-      entity.occurrences = 0
       entity.id = id
+      entity.occurrences = []
       entity.annotations = {}
-      entity.isRelatedToAnnotation = (annotationId)->
-        if @.annotations[ annotationId ]? then true else false
-
-    for id, annotation of data.annotations
-      for ea in annotation.entityMatches
-      	data.entities[ ea.entityId ].annotations[ id ] = annotation
 
     for id, annotation of data.annotations
       annotation.id = id
+      for ea in annotation.entityMatches
+        data.entities[ ea.entityId ].annotations[ id ] = annotation
 
     data
 
