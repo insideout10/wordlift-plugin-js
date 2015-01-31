@@ -1,5 +1,6 @@
 angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', [
   'wordlift.editpost.widget.services.AnalysisService'
+  'wordlift.editpost.widget.services.EditorService'
   'wordlift.editpost.widget.providers.ConfigurationProvider'
 ])
 .filter('entityTypeIn', [ '$log', ($log)->
@@ -13,7 +14,7 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     
     filtered
 ])
-.controller('EditPostWidgetController', [ 'AnalysisService', 'configuration', '$log', '$scope', '$rootScope', '$injector', (AnalysisService, configuration, $log, $scope, $rootScope, $injector)-> 
+.controller('EditPostWidgetController', [ 'EditorService', 'AnalysisService', 'configuration', '$log', '$scope', '$rootScope', '$injector', (EditorService, AnalysisService, configuration, $log, $scope, $rootScope, $injector)-> 
 
   $scope.configuration = []
   $scope.analysis = {}
@@ -23,7 +24,6 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
   $scope.annotation = undefined
   $scope.boxes = []
   
-  $log.debug configuration
   for box in configuration.boxes
 
     $scope.selectedEntities[ box.id ] = {}
@@ -72,7 +72,7 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     # Set the annotation text as label for the new entity
     $scope.newEntity.label = annotation.text
   
-  $scope.$on "analysisPerformed", (event, analysis) ->   
+  $scope.$on "analysisPerformed", (event, analysis) -> 
     $scope.analysis = analysis
 
   $scope.$on "updateWidget", (event, widget, scope)->

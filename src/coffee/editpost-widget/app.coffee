@@ -16,8 +16,6 @@ angular.module('wordlift.editpost.widget', [
 	])
 
 .config((configurationProvider)->
-  console.log "daje sempre"
-  console.log window.wordlift.classificationBoxes
   configurationProvider.setBoxes window.wordlift.classificationBoxes
 )
 
@@ -61,7 +59,7 @@ injector = angular.bootstrap $('#wordlift-edit-post-wrapper'), ['wordlift.editpo
       text: ' ' # the space is necessary to avoid right spacing on TinyMCE 4
       tooltip: 'Insert entity'
       onclick: ->
-        injector.invoke(['AnalysisService', 'EditorService', '$rootScope', (AnalysisService, EditorService, $rootScope) ->
+        injector.invoke(['EditorService', '$rootScope', (EditorService, $rootScope) ->
           # execute the following commands in the angular js context.
           $rootScope.$apply(->
             EditorService.createTextAnnotationFromCurrentSelection()

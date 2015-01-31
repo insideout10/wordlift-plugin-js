@@ -131,6 +131,7 @@ class Traslator
 window.Traslator = Traslator
 angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', [
   'wordlift.editpost.widget.services.AnalysisService'
+  'wordlift.editpost.widget.services.EditorService'
   'wordlift.editpost.widget.providers.ConfigurationProvider'
 ])
 .filter('entityTypeIn', [ '$log', ($log)->
@@ -144,7 +145,7 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     
     filtered
 ])
-.controller('EditPostWidgetController', [ 'AnalysisService', 'configuration', '$log', '$scope', '$rootScope', '$injector', (AnalysisService, configuration, $log, $scope, $rootScope, $injector)-> 
+.controller('EditPostWidgetController', [ 'EditorService', 'AnalysisService', 'configuration', '$log', '$scope', '$rootScope', '$injector', (EditorService, AnalysisService, configuration, $log, $scope, $rootScope, $injector)-> 
 
   $scope.configuration = []
   $scope.analysis = {}
@@ -154,7 +155,6 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
   $scope.annotation = undefined
   $scope.boxes = []
   
-  $log.debug configuration
   for box in configuration.boxes
 
     $scope.selectedEntities[ box.id ] = {}
@@ -203,7 +203,7 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     # Set the annotation text as label for the new entity
     $scope.newEntity.label = annotation.text
   
-  $scope.$on "analysisPerformed", (event, analysis) ->   
+  $scope.$on "analysisPerformed", (event, analysis) -> 
     $scope.analysis = analysis
 
   $scope.$on "updateWidget", (event, widget, scope)->
@@ -708,8 +708,6 @@ angular.module('wordlift.editpost.widget', [
 	])
 
 .config((configurationProvider)->
-  console.log "daje sempre"
-  console.log window.wordlift.classificationBoxes
   configurationProvider.setBoxes window.wordlift.classificationBoxes
 )
 
@@ -753,7 +751,7 @@ injector = angular.bootstrap $('#wordlift-edit-post-wrapper'), ['wordlift.editpo
       text: ' ' # the space is necessary to avoid right spacing on TinyMCE 4
       tooltip: 'Insert entity'
       onclick: ->
-        injector.invoke(['AnalysisService', 'EditorService', '$rootScope', (AnalysisService, EditorService, $rootScope) ->
+        injector.invoke(['EditorService', '$rootScope', (EditorService, $rootScope) ->
           # execute the following commands in the angular js context.
           $rootScope.$apply(->
             EditorService.createTextAnnotationFromCurrentSelection()

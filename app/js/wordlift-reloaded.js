@@ -106,7 +106,7 @@
 
   window.Traslator = Traslator;
 
-  angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', ['wordlift.editpost.widget.services.AnalysisService', 'wordlift.editpost.widget.providers.ConfigurationProvider']).filter('entityTypeIn', [
+  angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', ['wordlift.editpost.widget.services.AnalysisService', 'wordlift.editpost.widget.services.EditorService', 'wordlift.editpost.widget.providers.ConfigurationProvider']).filter('entityTypeIn', [
     '$log', function($log) {
       return function(items, types) {
         var entity, filtered, id, _ref;
@@ -121,7 +121,7 @@
       };
     }
   ]).controller('EditPostWidgetController', [
-    'AnalysisService', 'configuration', '$log', '$scope', '$rootScope', '$injector', function(AnalysisService, configuration, $log, $scope, $rootScope, $injector) {
+    'EditorService', 'AnalysisService', 'configuration', '$log', '$scope', '$rootScope', '$injector', function(EditorService, AnalysisService, configuration, $log, $scope, $rootScope, $injector) {
       var box, widget, _i, _j, _len, _len1, _ref, _ref1;
       $scope.configuration = [];
       $scope.analysis = {};
@@ -130,7 +130,6 @@
       $scope.widgets = {};
       $scope.annotation = void 0;
       $scope.boxes = [];
-      $log.debug(configuration);
       _ref = configuration.boxes;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         box = _ref[_i];
@@ -701,8 +700,6 @@
   $ = jQuery;
 
   angular.module('wordlift.editpost.widget', ['wordlift.editpost.widget.providers.ConfigurationProvider', 'wordlift.editpost.widget.controllers.EditPostWidgetController', 'wordlift.editpost.widget.directives.wlClassificationBox', 'wordlift.editpost.widget.directives.wlEntityForm', 'wordlift.editpost.widget.directives.wlEntityTile', 'wordlift.editpost.widget.services.AnalysisService', 'wordlift.editpost.widget.services.EditorService', 'wordlift.editpost.widget.services.ImageSuggestorDataRetrieverService']).config(function(configurationProvider) {
-    console.log("daje sempre");
-    console.log(window.wordlift.classificationBoxes);
     return configurationProvider.setBoxes(window.wordlift.classificationBoxes);
   });
 
@@ -722,7 +719,7 @@
       tooltip: 'Insert entity',
       onclick: function() {
         return injector.invoke([
-          'AnalysisService', 'EditorService', '$rootScope', function(AnalysisService, EditorService, $rootScope) {
+          'EditorService', '$rootScope', function(EditorService, $rootScope) {
             return $rootScope.$apply(function() {
               return EditorService.createTextAnnotationFromCurrentSelection();
             });
