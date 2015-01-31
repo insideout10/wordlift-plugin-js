@@ -297,26 +297,24 @@
             }
             return _results;
           });
-          ctrl = {
-            onSelectedTile: function(tile) {
-              tile.isSelected = !tile.isSelected;
-              return $scope.onSelectedEntityTile(tile.entity, $scope.box);
-            },
-            addTile: function(tile) {
-              return $scope.tiles.push(tile);
-            },
-            closeTiles: function() {
-              var tile, _i, _len, _ref, _results;
-              _ref = $scope.tiles;
-              _results = [];
-              for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-                tile = _ref[_i];
-                _results.push(tile.close());
-              }
-              return _results;
-            }
+          ctrl = this;
+          ctrl.onSelectedTile = function(tile) {
+            tile.isSelected = !tile.isSelected;
+            return $scope.onSelectedEntityTile(tile.entity, $scope.box);
           };
-          return ctrl;
+          ctrl.addTile = function(tile) {
+            return $scope.tiles.push(tile);
+          };
+          return ctrl.closeTiles = function() {
+            var tile, _i, _len, _ref, _results;
+            _ref = $scope.tiles;
+            _results = [];
+            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+              tile = _ref[_i];
+              _results.push(tile.close());
+            }
+            return _results;
+          };
         }
       };
     }
@@ -348,6 +346,9 @@
             }, {
               id: 'creative-work',
               name: 'http://schema.org/CreativeWork'
+            }, {
+              id: 'thing',
+              name: 'http://schema.org/Thing'
             }
           ];
         }
@@ -364,8 +365,8 @@
           entity: '='
         },
         template: "<div ng-class=\"'wl-' + entity.mainType\" ng-show=\"isVisible\" class=\"entity\">\n  <i ng-show=\"annotationModeOn\" ng-class=\"{ 'wl-linked' : isLinked, 'wl-unlinked' : !isLinked }\"></i>\n        <i ng-hide=\"annotationModeOn\" ng-class=\"{ 'wl-selected' : isSelected, 'wl-unselected' : !isSelected }\"></i>\n        <i class=\"type\"></i>\n        <span class=\"label\" ng-click=\"select()\">{{entity.label}}</span>\n        <small ng-show=\"entity.occurrences.length > 0\">({{entity.occurrences.length}})</small>\n        <i ng-class=\"{ 'wl-more': isOpened == false, 'wl-less': isOpened == true }\" ng-click=\"toggle()\"></i>\n  <span ng-class=\"{ 'active' : editingModeOn }\" ng-click=\"toggleEditingMode()\" ng-show=\"isOpened\" class=\"wl-edit-button\">Edit</span>\n        <div class=\"details\" ng-show=\"isOpened\">\n          <p ng-hide=\"editingModeOn\"><img class=\"thumbnail\" ng-src=\"{{ entity.images[0] }}\" />{{entity.description}}</p>\n          <wl-entity-form entity=\"entity\" ng-show=\"editingModeOn\" on-submit=\"toggleEditingMode()\"></wl-entity-form>\n        </div>\n\n</div>\n",
-        link: function($scope, $element, $attrs, $ctrl) {
-          $ctrl.addTile($scope);
+        link: function($scope, $element, $attrs, $boxCtrl) {
+          $boxCtrl.addTile($scope);
           $scope.isOpened = false;
           $scope.isVisible = true;
           $scope.isSelected = false;
@@ -383,12 +384,12 @@
           };
           $scope.toggle = function() {
             if (!$scope.isOpened) {
-              $ctrl.closeTiles();
+              $boxCtrl.closeTiles();
             }
             return $scope.isOpened = !$scope.isOpened;
           };
           return $scope.select = function() {
-            return $ctrl.onSelectedTile($scope);
+            return $boxCtrl.onSelectedTile($scope);
           };
         }
       };
@@ -430,7 +431,7 @@
           id: 'local-entity-' + uniqueId(32),
           label: '',
           description: '',
-          mainType: '',
+          mainType: 'thing',
           types: [],
           images: [],
           occurrences: [],

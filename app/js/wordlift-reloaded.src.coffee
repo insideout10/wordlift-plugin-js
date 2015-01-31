@@ -318,17 +318,17 @@ angular.module('wordlift.editpost.widget.directives.wlClassificationBox', [])
             tile.isVisible = true
             tile.isLinked = false
             tile.annotationModeOn = false
-            
-      ctrl =
-        onSelectedTile: (tile)->
-          tile.isSelected = !tile.isSelected
-          $scope.onSelectedEntityTile tile.entity, $scope.box
-        addTile: (tile)->
-          $scope.tiles.push tile
-        closeTiles: ()->
-          for tile in $scope.tiles
-          	tile.close()
-      ctrl
+
+      ctrl = @
+      ctrl.onSelectedTile = (tile)->
+        tile.isSelected = !tile.isSelected
+        $scope.onSelectedEntityTile tile.entity, $scope.box
+      ctrl.addTile = (tile)->
+        $scope.tiles.push tile
+      ctrl.closeTiles = ()->
+        for tile in $scope.tiles
+          tile.close()
+      
   ])
 angular.module('wordlift.editpost.widget.directives.wlEntityForm', [])
 .directive('wlEntityForm', ['$log', ($log)->
@@ -367,8 +367,8 @@ angular.module('wordlift.editpost.widget.directives.wlEntityForm', [])
         { id: 'place', name: 'http://schema.org/Place' },
         { id: 'organization', name: 'http://schema.org/Organization' },
         { id: 'event', name: 'http://schema.org/Event' },
-        { id: 'creative-work', name: 'http://schema.org/CreativeWork' }
-
+        { id: 'creative-work', name: 'http://schema.org/CreativeWork' },
+        { id: 'thing', name: 'http://schema.org/Thing' }
       ]
 ])
 
@@ -395,10 +395,10 @@ angular.module('wordlift.editpost.widget.directives.wlEntityTile', [])
   	  </div>
 
   	"""
-    link: ($scope, $element, $attrs, $ctrl) ->				      
+    link: ($scope, $element, $attrs, $boxCtrl) ->				      
       
       # Add tile to related container scope
-      $ctrl.addTile $scope
+      $boxCtrl.addTile $scope
 
       $scope.isOpened = false
       $scope.isVisible = true
@@ -417,11 +417,11 @@ angular.module('wordlift.editpost.widget.directives.wlEntityTile', [])
       	$scope.isOpened = false  	
       $scope.toggle = ()->
         if !$scope.isOpened 
-          $ctrl.closeTiles()    
+          $boxCtrl.closeTiles()    
         $scope.isOpened = !$scope.isOpened
         
       $scope.select = ()-> 
-        $ctrl.onSelectedTile $scope
+        $boxCtrl.onSelectedTile $scope
   ])
 
 angular.module('wordlift.editpost.widget.services.AnalysisService', [])
@@ -451,7 +451,7 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
       id: 'local-entity-' + uniqueId 32
       label: ''
       description: ''
-      mainType: ''
+      mainType: 'thing' # DefaultType
       types: []
       images: []
       occurrences: []
@@ -476,7 +476,7 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
     # Add id to annotation obj
     # Add occurences as a blank array
     # Add annotation references to each entity
-    
+
     for id, entity of data.entities
       entity.id = id
       entity.occurrences = []

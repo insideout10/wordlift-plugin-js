@@ -35,7 +35,7 @@ angular.module('wordlift.editpost.widget.directives.wlEntityForm', [])
         { id: 'place', name: 'http://schema.org/Place' },
         { id: 'organization', name: 'http://schema.org/Organization' },
         { id: 'event', name: 'http://schema.org/Event' },
-        { id: 'creative-work', name: 'http://schema.org/CreativeWork' }
-
+        { id: 'creative-work', name: 'http://schema.org/CreativeWork' },
+        { id: 'thing', name: 'http://schema.org/Thing' }
       ]
 ])

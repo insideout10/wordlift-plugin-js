@@ -87,15 +87,15 @@ angular.module('wordlift.editpost.widget.directives.wlClassificationBox', [])
             tile.isVisible = true
             tile.isLinked = false
             tile.annotationModeOn = false
-            
-      ctrl =
-        onSelectedTile: (tile)->
-          tile.isSelected = !tile.isSelected
-          $scope.onSelectedEntityTile tile.entity, $scope.box
-        addTile: (tile)->
-          $scope.tiles.push tile
-        closeTiles: ()->
-          for tile in $scope.tiles
-          	tile.close()
-      ctrl
+
+      ctrl = @
+      ctrl.onSelectedTile = (tile)->
+        tile.isSelected = !tile.isSelected
+        $scope.onSelectedEntityTile tile.entity, $scope.box
+      ctrl.addTile = (tile)->
+        $scope.tiles.push tile
+      ctrl.closeTiles = ()->
+        for tile in $scope.tiles
+          tile.close()
+      
   ])

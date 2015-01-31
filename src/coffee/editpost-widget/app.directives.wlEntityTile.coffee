@@ -21,10 +21,10 @@ angular.module('wordlift.editpost.widget.directives.wlEntityTile', [])
   	  </div>
 
   	"""
-    link: ($scope, $element, $attrs, $ctrl) ->				      
+    link: ($scope, $element, $attrs, $boxCtrl) ->				      
       
       # Add tile to related container scope
-      $ctrl.addTile $scope
+      $boxCtrl.addTile $scope
 
       $scope.isOpened = false
       $scope.isVisible = true
@@ -43,9 +43,9 @@ angular.module('wordlift.editpost.widget.directives.wlEntityTile', [])
       	$scope.isOpened = false  	
       $scope.toggle = ()->
         if !$scope.isOpened 
-          $ctrl.closeTiles()    
+          $boxCtrl.closeTiles()    
         $scope.isOpened = !$scope.isOpened
         
       $scope.select = ()-> 
-        $ctrl.onSelectedTile $scope
+        $boxCtrl.onSelectedTile $scope
   ])
