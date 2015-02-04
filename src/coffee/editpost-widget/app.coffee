@@ -34,7 +34,7 @@ $(
           <small>[ {{ analysis.annotations[ annotation ].start }}, {{ analysis.annotations[ annotation ].end }} ]</small>
           <i class="wl-annotation-label-remove-icon" ng-click="selectAnnotation(undefined)"></i>
         </h4>
-        <wl-entity-form entity="newEntity" on-submit="addNewEntityToAnalysis()"ng-show="analysis.annotations[annotation].entityMatches.length == 0"></wl-entity-form>
+        <wl-entity-form entity="newEntity" on-submit="addNewEntityToAnalysis()" ng-show="analysis.annotations[annotation].entityMatches.length == 0"></wl-entity-form>
       </div>
       <wl-classification-box ng-repeat="box in configuration.boxes">
         <wl-entity-tile entity="entity" ng-repeat="entity in analysis.entities | entityTypeIn:box.registeredTypes"></wl-entity>

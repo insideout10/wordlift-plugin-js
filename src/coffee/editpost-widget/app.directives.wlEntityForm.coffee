@@ -6,7 +6,7 @@ angular.module('wordlift.editpost.widget.directives.wlEntityForm', [])
       onSubmit: '&'
     template: """
       <form class="wl-entity-form" ng-submit="onSubmit()">
-      <div>
+      <div class="f>
           <label>Entity label</label>
           <input type="text" ng-model="entity.label" />
       </div>
@@ -18,9 +18,9 @@ angular.module('wordlift.editpost.widget.directives.wlEntityForm', [])
           <label>Entity Description</label>
           <textarea ng-model="entity.description" rows="6"></textarea>
       </div>
-      <div>
-          <label>Entity id</label>
-          <input type="text" ng-model="entity.id" />
+      <div ng-show="checkEntityId(entity.id)">
+          <label>Entity Id</label>
+          <small class="wl-entity-id">{{entity.id}}</small>
       </div>
       <div>
           <label>Entity Same as</label>
@@ -30,6 +30,11 @@ angular.module('wordlift.editpost.widget.directives.wlEntityForm', [])
       </form>
     """
     link: ($scope, $element, $attrs, $ctrl) ->  
+
+      $scope.checkEntityId = (uri)->
+        /^(f|ht)tps?:\/\//i.test(uri)
+
+      # TMP
       $scope.supportedTypes = [
         { id: 'person', name: 'http://schema.org/Person' },
         { id: 'place', name: 'http://schema.org/Place' },
