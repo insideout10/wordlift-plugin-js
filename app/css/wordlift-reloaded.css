@@ -1563,6 +1563,33 @@ body {
   font-family: "Open Sans", sans-serif;
   background-color: white;
 }
+#wordlift-edit-post-wrapper .wl-new-entity-button {
+  padding: 3px 10px;
+  color: #666;
+  background-color: #e2e2e2;
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  border-radius: 6px;
+  font-size: 0.8em;
+}
+#wordlift-edit-post-wrapper .wl-new-entity-button.selected {
+  color: #fff;
+  background-color: #f20f62;
+}
+#wordlift-edit-post-wrapper .wl-new-entity-button .wl-annotation-label-icon {
+  padding: 0px 3px;
+  font-family: FontAwesome;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 14px;
+  padding: 4px 0px;
+}
+#wordlift-edit-post-wrapper .wl-new-entity-button .wl-annotation-label-icon:before {
+  content: "\f040";
+}
 #wordlift-edit-post-wrapper .wl-annotation-label {
   border-bottom: #ccc 1px solid;
   margin: 0px;

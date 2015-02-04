@@ -154,6 +154,7 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
   $scope.widgets = {}
   $scope.annotation = undefined
   $scope.boxes = []
+  $scope.isSelectionCollapsed = true
   
   for box in configuration.boxes
 
@@ -164,6 +165,8 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
               
   $scope.configuration = configuration
 
+  $scope.createTextAnnotationFromCurrentSelection = ()->
+    EditorService.createTextAnnotationFromCurrentSelection()
 
   $scope.addNewEntityToAnalysis = ()->
     # Add new entity to the analysis
@@ -177,6 +180,10 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     # Create new entity object
     $scope.newEntity = AnalysisService.createEntity()
     
+  $scope.$on "isSelectionCollapsed", (event, status) ->
+    $log.debug "Going to se isSelectionAvailable to #{status}"
+    $scope.isSelectionCollapsed = status
+
   $scope.$on "updateOccurencesForEntity", (event, entityId, occurrences) ->
     $log.debug "Occurrences #{occurrences.length} for #{entityId}"
     $scope.analysis.entities[ entityId ].occurrences = occurrences
@@ -713,7 +720,12 @@ angular.module('wordlift.editpost.widget', [
 $(
   container = $("""
   	<div id="wordlift-edit-post-wrapper" ng-controller="EditPostWidgetController">
-  		<div ng-show="annotation">
+  		<div ng-click="createTextAnnotationFromCurrentSelection()">
+        <span class="wl-new-entity-button" ng-class="{ 'selected' : !isSelectionCollapsed }">
+          <i class="wl-annotation-label-icon"></i> add entity 
+        </span>
+      </div>
+      <div ng-show="annotation">
         <h4 class="wl-annotation-label">
           <i class="wl-annotation-label-icon"></i>
           {{ analysis.annotations[ annotation ].text }} 
@@ -743,20 +755,18 @@ injector = angular.bootstrap $('#wordlift-edit-post-wrapper'), ['wordlift.editpo
         )
       ])
     )
-    # Add a WordLift button the TinyMCE editor.
-    # TODO Disable the new button as default
-    editor.addButton 'wordlift',
-      classes: 'widget btn wordlift_add_entity'
-      text: ' ' # the space is necessary to avoid right spacing on TinyMCE 4
-      tooltip: 'Insert entity'
-      onclick: ->
-        injector.invoke(['EditorService', '$rootScope', (EditorService, $rootScope) ->
-          # execute the following commands in the angular js context.
-          $rootScope.$apply(->
-            EditorService.createTextAnnotationFromCurrentSelection()
-          )
-        ])
 
+    # Fires when the user changes node location using the mouse or keyboard in the TinyMCE editor.
+    # Here is used 
+    editor.onNodeChange.add (editor, e) ->
+            
+      injector.invoke(['$rootScope', ($rootScope) ->
+        # execute the following commands in the angular js context.      
+        $rootScope.$apply(->
+          $rootScope.$broadcast 'isSelectionCollapsed', editor.selection.isCollapsed()
+        )
+      ])
+              
     # TODO: move this outside of this method.
     # this event is raised when a textannotation is selected in the TinyMCE editor.
     editor.onClick.add (editor, e) ->

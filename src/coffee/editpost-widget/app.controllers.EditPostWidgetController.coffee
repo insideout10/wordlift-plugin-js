@@ -23,6 +23,7 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
   $scope.widgets = {}
   $scope.annotation = undefined
   $scope.boxes = []
+  $scope.isSelectionCollapsed = true
   
   for box in configuration.boxes
 
@@ -33,6 +34,8 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
               
   $scope.configuration = configuration
 
+  $scope.createTextAnnotationFromCurrentSelection = ()->
+    EditorService.createTextAnnotationFromCurrentSelection()
 
   $scope.addNewEntityToAnalysis = ()->
     # Add new entity to the analysis
@@ -46,6 +49,10 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     # Create new entity object
     $scope.newEntity = AnalysisService.createEntity()
     
+  $scope.$on "isSelectionCollapsed", (event, status) ->
+    $log.debug "Going to se isSelectionAvailable to #{status}"
+    $scope.isSelectionCollapsed = status
+
   $scope.$on "updateOccurencesForEntity", (event, entityId, occurrences) ->
     $log.debug "Occurrences #{occurrences.length} for #{entityId}"
     $scope.analysis.entities[ entityId ].occurrences = occurrences

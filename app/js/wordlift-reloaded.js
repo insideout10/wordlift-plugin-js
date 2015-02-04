@@ -130,6 +130,7 @@
       $scope.widgets = {};
       $scope.annotation = void 0;
       $scope.boxes = [];
+      $scope.isSelectionCollapsed = true;
       _ref = configuration.boxes;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         box = _ref[_i];
@@ -142,6 +143,9 @@
         }
       }
       $scope.configuration = configuration;
+      $scope.createTextAnnotationFromCurrentSelection = function() {
+        return EditorService.createTextAnnotationFromCurrentSelection();
+      };
       $scope.addNewEntityToAnalysis = function() {
         var annotation;
         $scope.analysis.entities[$scope.newEntity.id] = $scope.newEntity;
@@ -153,6 +157,10 @@
         $scope.analysis.entities[$scope.newEntity.id].annotations[annotation.id] = annotation;
         return $scope.newEntity = AnalysisService.createEntity();
       };
+      $scope.$on("isSelectionCollapsed", function(event, status) {
+        $log.debug("Going to se isSelectionAvailable to " + status);
+        return $scope.isSelectionCollapsed = status;
+      });
       $scope.$on("updateOccurencesForEntity", function(event, entityId, occurrences) {
         var entities, _ref2, _ref3, _results;
         $log.debug("Occurrences " + occurrences.length + " for " + entityId);
@@ -686,7 +694,7 @@
     return configurationProvider.setBoxes(window.wordlift.classificationBoxes);
   });
 
-  $(container = $("<div id=\"wordlift-edit-post-wrapper\" ng-controller=\"EditPostWidgetController\">\n	<div ng-show=\"annotation\">\n        <h4 class=\"wl-annotation-label\">\n          <i class=\"wl-annotation-label-icon\"></i>\n          {{ analysis.annotations[ annotation ].text }} \n          <small>[ {{ analysis.annotations[ annotation ].start }}, {{ analysis.annotations[ annotation ].end }} ]</small>\n          <i class=\"wl-annotation-label-remove-icon\" ng-click=\"annotation = undefined\"></i>\n        </h4>\n        <wl-entity-form entity=\"newEntity\" on-submit=\"addNewEntityToAnalysis()\"ng-show=\"analysis.annotations[annotation].entityMatches.length == 0\"></wl-entity-form>\n      </div>\n      <wl-classification-box ng-repeat=\"box in configuration.boxes\">\n        <wl-entity-tile entity=\"entity\" ng-repeat=\"entity in analysis.entities | entityTypeIn:box.registeredTypes\"></wl-entity>\n      </wl-classification-box>\n    </div>").appendTo('#dx'), injector = angular.bootstrap($('#wordlift-edit-post-wrapper'), ['wordlift.editpost.widget']), tinymce.PluginManager.add('wordlift', function(editor, url) {
+  $(container = $("<div id=\"wordlift-edit-post-wrapper\" ng-controller=\"EditPostWidgetController\">\n	<div ng-click=\"createTextAnnotationFromCurrentSelection()\">\n        <span class=\"wl-new-entity-button\" ng-class=\"{ 'selected' : !isSelectionCollapsed }\">\n          <i class=\"wl-annotation-label-icon\"></i> add entity \n        </span>\n      </div>\n      <div ng-show=\"annotation\">\n        <h4 class=\"wl-annotation-label\">\n          <i class=\"wl-annotation-label-icon\"></i>\n          {{ analysis.annotations[ annotation ].text }} \n          <small>[ {{ analysis.annotations[ annotation ].start }}, {{ analysis.annotations[ annotation ].end }} ]</small>\n          <i class=\"wl-annotation-label-remove-icon\" ng-click=\"annotation = undefined\"></i>\n        </h4>\n        <wl-entity-form entity=\"newEntity\" on-submit=\"addNewEntityToAnalysis()\"ng-show=\"analysis.annotations[annotation].entityMatches.length == 0\"></wl-entity-form>\n      </div>\n      <wl-classification-box ng-repeat=\"box in configuration.boxes\">\n        <wl-entity-tile entity=\"entity\" ng-repeat=\"entity in analysis.entities | entityTypeIn:box.registeredTypes\"></wl-entity>\n      </wl-classification-box>\n    </div>").appendTo('#dx'), injector = angular.bootstrap($('#wordlift-edit-post-wrapper'), ['wordlift.editpost.widget']), tinymce.PluginManager.add('wordlift', function(editor, url) {
     editor.onLoadContent.add(function(ed, o) {
       return injector.invoke([
         'AnalysisService', '$rootScope', function(AnalysisService, $rootScope) {
@@ -696,19 +704,14 @@
         }
       ]);
     });
-    editor.addButton('wordlift', {
-      classes: 'widget btn wordlift_add_entity',
-      text: ' ',
-      tooltip: 'Insert entity',
-      onclick: function() {
-        return injector.invoke([
-          'EditorService', '$rootScope', function(EditorService, $rootScope) {
-            return $rootScope.$apply(function() {
-              return EditorService.createTextAnnotationFromCurrentSelection();
-            });
-          }
-        ]);
-      }
+    editor.onNodeChange.add(function(editor, e) {
+      return injector.invoke([
+        '$rootScope', function($rootScope) {
+          return $rootScope.$apply(function() {
+            return $rootScope.$broadcast('isSelectionCollapsed', editor.selection.isCollapsed());
+          });
+        }
+      ]);
     });
     return editor.onClick.add(function(editor, e) {
       return injector.invoke([
