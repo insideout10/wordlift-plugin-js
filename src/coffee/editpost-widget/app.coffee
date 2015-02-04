@@ -32,7 +32,7 @@ $(
           <i class="wl-annotation-label-icon"></i>
           {{ analysis.annotations[ annotation ].text }} 
           <small>[ {{ analysis.annotations[ annotation ].start }}, {{ analysis.annotations[ annotation ].end }} ]</small>
-          <i class="wl-annotation-label-remove-icon" ng-click="annotation = undefined"></i>
+          <i class="wl-annotation-label-remove-icon" ng-click="selectAnnotation(undefined)"></i>
         </h4>
         <wl-entity-form entity="newEntity" on-submit="addNewEntityToAnalysis()"ng-show="analysis.annotations[annotation].entityMatches.length == 0"></wl-entity-form>
       </div>
@@ -59,9 +59,7 @@ injector = angular.bootstrap $('#wordlift-edit-post-wrapper'), ['wordlift.editpo
     )
 
     # Fires when the user changes node location using the mouse or keyboard in the TinyMCE editor.
-    # Here is used 
-    editor.onNodeChange.add (editor, e) ->
-            
+    editor.onNodeChange.add (editor, e) ->        
       injector.invoke(['$rootScope', ($rootScope) ->
         # execute the following commands in the angular js context.      
         $rootScope.$apply(->
@@ -69,20 +67,12 @@ injector = angular.bootstrap $('#wordlift-edit-post-wrapper'), ['wordlift.editpo
         )
       ])
               
-    # TODO: move this outside of this method.
     # this event is raised when a textannotation is selected in the TinyMCE editor.
     editor.onClick.add (editor, e) ->
-      injector.invoke(['$rootScope', ($rootScope) ->
+      injector.invoke(['EditorService','$rootScope', (EditorService, $rootScope) ->
         # execute the following commands in the angular js context.
-        $rootScope.$apply(->
-          
-          $rootScope.$broadcast 'textAnnotationClicked', undefined
-          for annotation in editor.dom.select "span.textannotation"
-            editor.dom.removeClass annotation.id, "selected"
- 
-          if editor.dom.hasClass e.target.id, "textannotation"
-            editor.dom.addClass e.target.id, "selected"
-            $rootScope.$broadcast 'textAnnotationClicked', e.target.id          
+        $rootScope.$apply(->          
+          EditorService.selectAnnotation e.target.id 
         )
       ])
 )

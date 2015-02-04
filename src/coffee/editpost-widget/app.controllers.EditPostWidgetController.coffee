@@ -34,8 +34,12 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
               
   $scope.configuration = configuration
 
+  # Delegate to EditorService
   $scope.createTextAnnotationFromCurrentSelection = ()->
     EditorService.createTextAnnotationFromCurrentSelection()
+  # Delegate to EditorService
+  $scope.selectAnnotation = (annotationId)->
+    EditorService.selectAnnotation annotationId
 
   $scope.addNewEntityToAnalysis = ()->
     # Add new entity to the analysis
@@ -67,7 +71,6 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
         $scope.boxes[ box ].deselect $scope.analysis.entities[ entityId ]
         
   $scope.$on "textAnnotationClicked", (event, annotationId) ->
-    $log.debug "click on #{annotationId}"
     $scope.annotation = annotationId
 
   $scope.$on "textAnnotationAdded", (event, annotation) ->

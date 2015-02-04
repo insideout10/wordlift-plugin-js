@@ -120,6 +120,20 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
       # Send a message about the new textAnnotation.
       $rootScope.$broadcast 'textAnnotationAdded', textAnnotation
 
+    # Select annotation with a id annotationId if available
+    selectAnnotation: (annotationId)->
+      # A reference to the editor.
+      ed = editor()
+      # Unselect all annotations 
+      for annotation in ed.dom.select "span.textannotation"
+        ed.dom.removeClass annotation.id, "selected"
+      # Notify it
+      $rootScope.$broadcast 'textAnnotationClicked', undefined
+      # If current is a text annotation, then select it and notify
+      if ed.dom.hasClass annotationId, "textannotation"
+        ed.dom.addClass annotationId, "selected"
+        $rootScope.$broadcast 'textAnnotationClicked', annotationId
+
     # Embed the provided analysis in the editor.
     embedAnalysis: (analysis) =>
       # A reference to the editor.

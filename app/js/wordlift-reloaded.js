@@ -146,6 +146,9 @@
       $scope.createTextAnnotationFromCurrentSelection = function() {
         return EditorService.createTextAnnotationFromCurrentSelection();
       };
+      $scope.selectAnnotation = function(annotationId) {
+        return EditorService.selectAnnotation(annotationId);
+      };
       $scope.addNewEntityToAnalysis = function() {
         var annotation;
         $scope.analysis.entities[$scope.newEntity.id] = $scope.newEntity;
@@ -184,7 +187,6 @@
         }
       });
       $scope.$on("textAnnotationClicked", function(event, annotationId) {
-        $log.debug("click on " + annotationId);
         return $scope.annotation = annotationId;
       });
       $scope.$on("textAnnotationAdded", function(event, annotation) {
@@ -614,6 +616,20 @@
           $log.debug(textAnnotation);
           return $rootScope.$broadcast('textAnnotationAdded', textAnnotation);
         },
+        selectAnnotation: function(annotationId) {
+          var annotation, ed, _i, _len, _ref;
+          ed = editor();
+          _ref = ed.dom.select("span.textannotation");
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            annotation = _ref[_i];
+            ed.dom.removeClass(annotation.id, "selected");
+          }
+          $rootScope.$broadcast('textAnnotationClicked', void 0);
+          if (ed.dom.hasClass(annotationId, "textannotation")) {
+            ed.dom.addClass(annotationId, "selected");
+            return $rootScope.$broadcast('textAnnotationClicked', annotationId);
+          }
+        },
         embedAnalysis: (function(_this) {
           return function(analysis) {
             var annotation, annotationId, ed, element, entity, html, isDirty, traslator, _ref;
@@ -694,7 +710,7 @@
     return configurationProvider.setBoxes(window.wordlift.classificationBoxes);
   });
 
-  $(container = $("<div id=\"wordlift-edit-post-wrapper\" ng-controller=\"EditPostWidgetController\">\n	<div ng-click=\"createTextAnnotationFromCurrentSelection()\">\n        <span class=\"wl-new-entity-button\" ng-class=\"{ 'selected' : !isSelectionCollapsed }\">\n          <i class=\"wl-annotation-label-icon\"></i> add entity \n        </span>\n      </div>\n      <div ng-show=\"annotation\">\n        <h4 class=\"wl-annotation-label\">\n          <i class=\"wl-annotation-label-icon\"></i>\n          {{ analysis.annotations[ annotation ].text }} \n          <small>[ {{ analysis.annotations[ annotation ].start }}, {{ analysis.annotations[ annotation ].end }} ]</small>\n          <i class=\"wl-annotation-label-remove-icon\" ng-click=\"annotation = undefined\"></i>\n        </h4>\n        <wl-entity-form entity=\"newEntity\" on-submit=\"addNewEntityToAnalysis()\"ng-show=\"analysis.annotations[annotation].entityMatches.length == 0\"></wl-entity-form>\n      </div>\n      <wl-classification-box ng-repeat=\"box in configuration.boxes\">\n        <wl-entity-tile entity=\"entity\" ng-repeat=\"entity in analysis.entities | entityTypeIn:box.registeredTypes\"></wl-entity>\n      </wl-classification-box>\n    </div>").appendTo('#dx'), injector = angular.bootstrap($('#wordlift-edit-post-wrapper'), ['wordlift.editpost.widget']), tinymce.PluginManager.add('wordlift', function(editor, url) {
+  $(container = $("<div id=\"wordlift-edit-post-wrapper\" ng-controller=\"EditPostWidgetController\">\n	<div ng-click=\"createTextAnnotationFromCurrentSelection()\">\n        <span class=\"wl-new-entity-button\" ng-class=\"{ 'selected' : !isSelectionCollapsed }\">\n          <i class=\"wl-annotation-label-icon\"></i> add entity \n        </span>\n      </div>\n      <div ng-show=\"annotation\">\n        <h4 class=\"wl-annotation-label\">\n          <i class=\"wl-annotation-label-icon\"></i>\n          {{ analysis.annotations[ annotation ].text }} \n          <small>[ {{ analysis.annotations[ annotation ].start }}, {{ analysis.annotations[ annotation ].end }} ]</small>\n          <i class=\"wl-annotation-label-remove-icon\" ng-click=\"selectAnnotation(undefined)\"></i>\n        </h4>\n        <wl-entity-form entity=\"newEntity\" on-submit=\"addNewEntityToAnalysis()\"ng-show=\"analysis.annotations[annotation].entityMatches.length == 0\"></wl-entity-form>\n      </div>\n      <wl-classification-box ng-repeat=\"box in configuration.boxes\">\n        <wl-entity-tile entity=\"entity\" ng-repeat=\"entity in analysis.entities | entityTypeIn:box.registeredTypes\"></wl-entity>\n      </wl-classification-box>\n    </div>").appendTo('#dx'), injector = angular.bootstrap($('#wordlift-edit-post-wrapper'), ['wordlift.editpost.widget']), tinymce.PluginManager.add('wordlift', function(editor, url) {
     editor.onLoadContent.add(function(ed, o) {
       return injector.invoke([
         'AnalysisService', '$rootScope', function(AnalysisService, $rootScope) {
@@ -715,19 +731,9 @@
     });
     return editor.onClick.add(function(editor, e) {
       return injector.invoke([
-        '$rootScope', function($rootScope) {
+        'EditorService', '$rootScope', function(EditorService, $rootScope) {
           return $rootScope.$apply(function() {
-            var annotation, _i, _len, _ref;
-            $rootScope.$broadcast('textAnnotationClicked', void 0);
-            _ref = editor.dom.select("span.textannotation");
-            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-              annotation = _ref[_i];
-              editor.dom.removeClass(annotation.id, "selected");
-            }
-            if (editor.dom.hasClass(e.target.id, "textannotation")) {
-              editor.dom.addClass(e.target.id, "selected");
-              return $rootScope.$broadcast('textAnnotationClicked', e.target.id);
-            }
+            return EditorService.selectAnnotation(e.target.id);
           });
         }
       ]);
