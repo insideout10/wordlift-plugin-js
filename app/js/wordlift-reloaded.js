@@ -717,24 +717,17 @@
       return injector.invoke([
         '$rootScope', function($rootScope) {
           return $rootScope.$apply(function() {
-            var annotation, _i, _len, _ref, _results;
+            var annotation, _i, _len, _ref;
+            $rootScope.$broadcast('textAnnotationClicked', void 0);
             _ref = editor.dom.select("span.textannotation");
-            _results = [];
             for (_i = 0, _len = _ref.length; _i < _len; _i++) {
               annotation = _ref[_i];
-              if (annotation.id === e.target.id) {
-                if (editor.dom.hasClass(annotation.id, "selected")) {
-                  editor.dom.removeClass(annotation.id, "selected");
-                  _results.push($rootScope.$broadcast('textAnnotationClicked', void 0));
-                } else {
-                  editor.dom.addClass(annotation.id, "selected");
-                  _results.push($rootScope.$broadcast('textAnnotationClicked', e.target.id));
-                }
-              } else {
-                _results.push(editor.dom.removeClass(annotation.id, "selected"));
-              }
+              editor.dom.removeClass(annotation.id, "selected");
             }
-            return _results;
+            if (editor.dom.hasClass(e.target.id, "textannotation")) {
+              editor.dom.addClass(e.target.id, "selected");
+              return $rootScope.$broadcast('textAnnotationClicked', e.target.id);
+            }
           });
         }
       ]);

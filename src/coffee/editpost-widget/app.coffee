@@ -75,19 +75,14 @@ injector = angular.bootstrap $('#wordlift-edit-post-wrapper'), ['wordlift.editpo
       injector.invoke(['$rootScope', ($rootScope) ->
         # execute the following commands in the angular js context.
         $rootScope.$apply(->
-          # TODO move EditorService
+          
+          $rootScope.$broadcast 'textAnnotationClicked', undefined
           for annotation in editor.dom.select "span.textannotation"
-            if annotation.id is e.target.id
-              if editor.dom.hasClass annotation.id, "selected"
-                editor.dom.removeClass annotation.id, "selected"
-                # send a message to clear current text annotation scope
-                $rootScope.$broadcast 'textAnnotationClicked', undefined
-              else
-                editor.dom.addClass annotation.id, "selected"
-                # send a message about the currently clicked annotation.
-                $rootScope.$broadcast 'textAnnotationClicked', e.target.id
-            else 
-             editor.dom.removeClass annotation.id, "selected"          
+            editor.dom.removeClass annotation.id, "selected"
+ 
+          if editor.dom.hasClass e.target.id, "textannotation"
+            editor.dom.addClass e.target.id, "selected"
+            $rootScope.$broadcast 'textAnnotationClicked', e.target.id          
         )
       ])
 )
