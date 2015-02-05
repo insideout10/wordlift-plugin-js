@@ -4,10 +4,11 @@ angular.module('wordlift.editpost.widget.directives.wlEntityTile', [])
     restrict: 'E'
     scope:
       entity: '='
+      annotation: '='
     template: """
   	  <div ng-class="'wl-' + entity.mainType" ng-show="isVisible" class="entity">
-  	    <i ng-show="annotationModeOn" ng-class="{ 'wl-linked' : isLinked, 'wl-unlinked' : !isLinked }"></i>
-        <i ng-hide="annotationModeOn" ng-class="{ 'wl-selected' : isSelected, 'wl-unselected' : !isSelected }"></i>
+  	    <i ng-show="annotation" ng-class="{ 'wl-linked' : isLinked, 'wl-unlinked' : !isLinked }"></i>
+        <i ng-hide="annotation" ng-class="{ 'wl-selected' : isSelected, 'wl-unselected' : !isSelected }"></i>
         <i class="type"></i>
         <span class="label" ng-click="select()">{{entity.label}}</span>
         <small ng-show="entity.occurrences.length > 0">({{entity.occurrences.length}})</small>
@@ -27,13 +28,16 @@ angular.module('wordlift.editpost.widget.directives.wlEntityTile', [])
       $boxCtrl.addTile $scope
 
       $scope.isOpened = false
-      $scope.isVisible = true
       $scope.isSelected = false
-      $scope.isLinked = false
-
-      $scope.annotationModeOn = false
       $scope.editingModeOn = false
-      
+
+      if $scope.annotation
+        $scope.isVisible = ($scope.entity.annotations[ $scope.annotation ]?)
+        $scope.isLinked = ($scope.annotation in $scope.entity.occurrences)
+      else
+        $scope.isVisible = true
+        $scope.isLinked = false
+            
       $scope.toggleEditingMode = ()->
         $scope.editingModeOn = !$scope.editingModeOn
 

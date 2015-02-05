@@ -48,13 +48,10 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     annotation.entityMatches.push { entityId: $scope.newEntity.id, confidence: 1 }
     $scope.analysis.entities[ $scope.newEntity.id ].annotations[ annotation.id ] = annotation
     
-    # TODO Check entity tiles status
-
     # Create new entity object
     $scope.newEntity = AnalysisService.createEntity()
     
   $scope.$on "isSelectionCollapsed", (event, status) ->
-    $log.debug "Going to se isSelectionAvailable to #{status}"
     $scope.isSelectionCollapsed = status
 
   $scope.$on "updateOccurencesForEntity", (event, entityId, occurrences) ->
@@ -68,8 +65,8 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     if occurrences.length is 0
       for box, entities of $scope.selectedEntities
         delete $scope.selectedEntities[ box ][ entityId ]
-        $scope.boxes[ box ].deselect $scope.analysis.entities[ entityId ]
-        
+        $scope.boxes[ box ].deselect entityId
+
   $scope.$on "textAnnotationClicked", (event, annotationId) ->
     $scope.annotation = annotationId
 
@@ -81,11 +78,13 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     $scope.annotation = annotation.id
     # Set the annotation text as label for the new entity
     $scope.newEntity.label = annotation.text
-  
+    # Set the annotation id as id for the new entity
+    $scope.newEntity.id = annotation.id
+
   $scope.$on "analysisPerformed", (event, analysis) -> 
     $scope.analysis = analysis
 
-  $scope.$on "updateWidget", (event, widget, scope)->
+  $scope.updateWidget = (widget, scope)->
     $log.debug "Going to updated widget #{widget} for box #{scope}"
     # Retrieve the proper DatarRetriever
     retriever = $injector.get "#{widget}DataRetrieverService"

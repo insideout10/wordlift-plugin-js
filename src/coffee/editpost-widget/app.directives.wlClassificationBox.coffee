@@ -53,7 +53,7 @@ angular.module('wordlift.editpost.widget.directives.wlClassificationBox', [])
         else 
           $scope.currentWidget = widget
           $scope.isWidgetOpened = true   
-          $scope.$emit "updateWidget", widget, $scope.box.id 
+          $scope.updateWidget widget, $scope.box.id 
           
     controller: ($scope, $element, $attrs) ->
       
@@ -61,12 +61,11 @@ angular.module('wordlift.editpost.widget.directives.wlClassificationBox', [])
       # TODO manage on scope distruction event
       $scope.tiles = []
 
-      # TODO don't use $parent
-      $scope.$parent.boxes[ $scope.box.id ] = $scope
+      $scope.boxes[ $scope.box.id ] = $scope
 
-      $scope.deselect = (entity)->
+      $scope.deselect = (entityId)->
         for tile in $scope.tiles
-          tile.isSelected = false if tile.entity.id is entity.id
+          tile.isSelected = false if tile.entity.id is entityId
       
       $scope.relink = (entity, annotationId)->
         for tile in $scope.tiles
@@ -74,20 +73,17 @@ angular.module('wordlift.editpost.widget.directives.wlClassificationBox', [])
            
       $scope.$watch "annotation", (annotationId) ->
         
-        $log.debug "Watching annotation ... New value #{annotationId}"
         $scope.currentWidget = undefined
         $scope.isWidgetOpened = false
 
         for tile in $scope.tiles
           if annotationId?
             tile.isVisible = (tile.entity.annotations[ annotationId ]?)
-            tile.annotationModeOn = true
             tile.isLinked = (annotationId in tile.entity.occurrences)
           else
             tile.isVisible = true
             tile.isLinked = false
-            tile.annotationModeOn = false
-
+            
       ctrl = @
       ctrl.onSelectedTile = (tile)->
         tile.isSelected = !tile.isSelected

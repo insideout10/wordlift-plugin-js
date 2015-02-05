@@ -179,13 +179,10 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     annotation.entityMatches.push { entityId: $scope.newEntity.id, confidence: 1 }
     $scope.analysis.entities[ $scope.newEntity.id ].annotations[ annotation.id ] = annotation
     
-    # TODO Check entity tiles status
-
     # Create new entity object
     $scope.newEntity = AnalysisService.createEntity()
     
   $scope.$on "isSelectionCollapsed", (event, status) ->
-    $log.debug "Going to se isSelectionAvailable to #{status}"
     $scope.isSelectionCollapsed = status
 
   $scope.$on "updateOccurencesForEntity", (event, entityId, occurrences) ->
@@ -199,8 +196,8 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     if occurrences.length is 0
       for box, entities of $scope.selectedEntities
         delete $scope.selectedEntities[ box ][ entityId ]
-        $scope.boxes[ box ].deselect $scope.analysis.entities[ entityId ]
-        
+        $scope.boxes[ box ].deselect entityId
+
   $scope.$on "textAnnotationClicked", (event, annotationId) ->
     $scope.annotation = annotationId
 
@@ -212,11 +209,13 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     $scope.annotation = annotation.id
     # Set the annotation text as label for the new entity
     $scope.newEntity.label = annotation.text
-  
+    # Set the annotation id as id for the new entity
+    $scope.newEntity.id = annotation.id
+
   $scope.$on "analysisPerformed", (event, analysis) -> 
     $scope.analysis = analysis
 
-  $scope.$on "updateWidget", (event, widget, scope)->
+  $scope.updateWidget = (widget, scope)->
     $log.debug "Going to updated widget #{widget} for box #{scope}"
     # Retrieve the proper DatarRetriever
     retriever = $injector.get "#{widget}DataRetrieverService"
@@ -294,7 +293,7 @@ angular.module('wordlift.editpost.widget.directives.wlClassificationBox', [])
         else 
           $scope.currentWidget = widget
           $scope.isWidgetOpened = true   
-          $scope.$emit "updateWidget", widget, $scope.box.id 
+          $scope.updateWidget widget, $scope.box.id 
           
     controller: ($scope, $element, $attrs) ->
       
@@ -302,12 +301,11 @@ angular.module('wordlift.editpost.widget.directives.wlClassificationBox', [])
       # TODO manage on scope distruction event
       $scope.tiles = []
 
-      # TODO don't use $parent
-      $scope.$parent.boxes[ $scope.box.id ] = $scope
+      $scope.boxes[ $scope.box.id ] = $scope
 
-      $scope.deselect = (entity)->
+      $scope.deselect = (entityId)->
         for tile in $scope.tiles
-          tile.isSelected = false if tile.entity.id is entity.id
+          tile.isSelected = false if tile.entity.id is entityId
       
       $scope.relink = (entity, annotationId)->
         for tile in $scope.tiles
@@ -315,20 +313,17 @@ angular.module('wordlift.editpost.widget.directives.wlClassificationBox', [])
            
       $scope.$watch "annotation", (annotationId) ->
         
-        $log.debug "Watching annotation ... New value #{annotationId}"
         $scope.currentWidget = undefined
         $scope.isWidgetOpened = false
 
         for tile in $scope.tiles
           if annotationId?
             tile.isVisible = (tile.entity.annotations[ annotationId ]?)
-            tile.annotationModeOn = true
             tile.isLinked = (annotationId in tile.entity.occurrences)
           else
             tile.isVisible = true
             tile.isLinked = false
-            tile.annotationModeOn = false
-
+            
       ctrl = @
       ctrl.onSelectedTile = (tile)->
         tile.isSelected = !tile.isSelected
@@ -393,10 +388,11 @@ angular.module('wordlift.editpost.widget.directives.wlEntityTile', [])
     restrict: 'E'
     scope:
       entity: '='
+      annotation: '='
     template: """
   	  <div ng-class="'wl-' + entity.mainType" ng-show="isVisible" class="entity">
-  	    <i ng-show="annotationModeOn" ng-class="{ 'wl-linked' : isLinked, 'wl-unlinked' : !isLinked }"></i>
-        <i ng-hide="annotationModeOn" ng-class="{ 'wl-selected' : isSelected, 'wl-unselected' : !isSelected }"></i>
+  	    <i ng-show="annotation" ng-class="{ 'wl-linked' : isLinked, 'wl-unlinked' : !isLinked }"></i>
+        <i ng-hide="annotation" ng-class="{ 'wl-selected' : isSelected, 'wl-unselected' : !isSelected }"></i>
         <i class="type"></i>
         <span class="label" ng-click="select()">{{entity.label}}</span>
         <small ng-show="entity.occurrences.length > 0">({{entity.occurrences.length}})</small>
@@ -416,13 +412,16 @@ angular.module('wordlift.editpost.widget.directives.wlEntityTile', [])
       $boxCtrl.addTile $scope
 
       $scope.isOpened = false
-      $scope.isVisible = true
       $scope.isSelected = false
-      $scope.isLinked = false
-
-      $scope.annotationModeOn = false
       $scope.editingModeOn = false
-      
+
+      if $scope.annotation
+        $scope.isVisible = ($scope.entity.annotations[ $scope.annotation ]?)
+        $scope.isLinked = ($scope.annotation in $scope.entity.occurrences)
+      else
+        $scope.isVisible = true
+        $scope.isLinked = false
+            
       $scope.toggleEditingMode = ()->
         $scope.editingModeOn = !$scope.editingModeOn
 
@@ -757,7 +756,7 @@ $(
         <wl-entity-form entity="newEntity" on-submit="addNewEntityToAnalysis()" ng-show="analysis.annotations[annotation].entityMatches.length == 0"></wl-entity-form>
       </div>
       <wl-classification-box ng-repeat="box in configuration.boxes">
-        <wl-entity-tile entity="entity" ng-repeat="entity in analysis.entities | entityTypeIn:box.registeredTypes"></wl-entity>
+        <wl-entity-tile annotation="annotation" entity="entity" ng-repeat="entity in analysis.entities | entityTypeIn:box.registeredTypes"></wl-entity>
       </wl-classification-box>
     </div>
   """)
