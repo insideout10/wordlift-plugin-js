@@ -196,7 +196,24 @@
         return $scope.newEntity.id = annotation.id;
       });
       $scope.$on("analysisPerformed", function(event, analysis) {
-        return $scope.analysis = analysis;
+        var entityId, _k, _len2, _ref2, _results;
+        $scope.analysis = analysis;
+        _ref2 = configuration.boxes;
+        _results = [];
+        for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
+          box = _ref2[_k];
+          _results.push((function() {
+            var _l, _len3, _ref3, _results1;
+            _ref3 = box.selectedEntities;
+            _results1 = [];
+            for (_l = 0, _len3 = _ref3.length; _l < _len3; _l++) {
+              entityId = _ref3[_l];
+              _results1.push($scope.selectedEntities[box.id][entityId] = analysis.entities[entityId]);
+            }
+            return _results1;
+          })());
+        }
+        return _results;
       });
       $scope.updateWidget = function(widget, scope) {
         var items, retriever;
@@ -414,7 +431,7 @@
 
   angular.module('wordlift.editpost.widget.services.AnalysisService', []).service('AnalysisService', [
     '$log', '$http', '$rootScope', function($log, $http, $rootScope) {
-      var extend, merge, service, uniqueId, _currentAnalysis;
+      var extend, findAnnotation, merge, service, uniqueId, _currentAnalysis;
       uniqueId = function(length) {
         var id;
         if (length == null) {
@@ -436,6 +453,15 @@
           object[key] = val;
         }
         return object;
+      };
+      findAnnotation = function(annotations, start, end) {
+        var annotation, id;
+        for (id in annotations) {
+          annotation = annotations[id];
+          if (annotation.start === start && annotation.end === end) {
+            return annotation;
+          }
+        }
       };
       service = _currentAnalysis = {};
       service.createEntity = function(params) {
@@ -498,13 +524,38 @@
           return $rootScope.$broadcast("analysisPerformed", service.parse(data));
         });
       };
+      service.preselect = function(analysis, annotations) {
+        var annotation, textAnnotation, _i, _len, _results;
+        _results = [];
+        for (_i = 0, _len = annotations.length; _i < _len; _i++) {
+          annotation = annotations[_i];
+          textAnnotation = findAnnotation(analysis.annotations, annotation.start, annotation.end);
+          _results.push(analysis.entities[annotation.uri].occurrences.push(textAnnotation.id));
+        }
+        return _results;
+      };
       return service;
     }
   ]);
 
   angular.module('wordlift.editpost.widget.services.EditorService', ['wordlift.editpost.widget.services.AnalysisService']).service('EditorService', [
     'AnalysisService', '$log', '$http', '$rootScope', function(AnalysisService, $log, $http, $rootScope) {
-      var currentOccurencesForEntity, dedisambiguate, disambiguate, editor, service;
+      var currentOccurencesForEntity, dedisambiguate, disambiguate, editor, findEntities, service;
+      findEntities = function(html) {
+        var match, pattern, traslator, _results;
+        traslator = Traslator.create(html);
+        pattern = /<(\w+)[^>]*\sitemid="([^"]+)"[^>]*>([^<]+)<\/\1>/gim;
+        _results = [];
+        while (match = pattern.exec(html)) {
+          _results.push({
+            start: traslator.html2text(match.index),
+            end: traslator.html2text(match.index + match[0].length),
+            uri: match[2],
+            label: match[3]
+          });
+        }
+        return _results;
+      };
       editor = function() {
         return tinyMCE.get('content');
       };
@@ -560,7 +611,6 @@
           _ref = entity.annotations;
           for (id in _ref) {
             annotation = _ref[id];
-            $log.debug("Going to disambiguate annotation " + id);
             discarded.push(disambiguate(annotation, entity));
           }
         }
@@ -593,7 +643,7 @@
             $rootScope.$broadcast("updateOccurencesForEntity", entityId, occurrences);
           }
         }
-        occurrences = currentOccurencesForEntity(entity);
+        occurrences = currentOccurencesForEntity(entity.id);
         return $rootScope.$broadcast("updateOccurencesForEntity", entity.id, occurrences);
       });
       service = {
@@ -638,11 +688,13 @@
         },
         embedAnalysis: (function(_this) {
           return function(analysis) {
-            var annotation, annotationId, ed, element, entity, html, isDirty, traslator, _ref;
+            var annotation, annotationId, ed, element, em, entities, entity, html, isDirty, traslator, _i, _len, _ref, _ref1;
             ed = editor();
             html = ed.getContent({
               format: 'raw'
             });
+            entities = findEntities(html);
+            AnalysisService.preselect(analysis, entities);
             while (html.match(/<(\w+)[^>]*\sclass="textannotation[^"]*"[^>]*>([^<]+)<\/\1>/gim, '$2')) {
               html = html.replace(/<(\w+)[^>]*\sclass="textannotation[^"]*"[^>]*>([^<]+)<\/\1>/gim, '$2');
             }
@@ -650,8 +702,16 @@
             _ref = analysis.annotations;
             for (annotationId in _ref) {
               annotation = _ref[annotationId];
-              entity = analysis.entities[ annotation.entityMatches[0].entityId];
-              element = "<span id=\"" + annotationId + "\" class=\"textannotation\">";
+              element = "<span id=\"" + annotationId + "\" class=\"textannotation";
+              _ref1 = annotation.entityMatches;
+              for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+                em = _ref1[_i];
+                entity = analysis.entities[em.entityId];
+                if (__indexOf.call(entity.occurrences, annotationId) >= 0) {
+                  element += " disambiguated wl-" + entity.mainType + "\" itemid=\"" + entity.id;
+                }
+              }
+              element += "\">";
               traslator.insertHtml(element, {
                 text: annotation.start
               });

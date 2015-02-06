@@ -44,7 +44,7 @@
     <div id="sx">
         <form name="post">
         <textarea style="width: 100%; height: 100%" id="content">
-Crollano Atene e petrolio, l'euro precipita e Piazza Affari stampa un calo del 5%. Sono molti gli elementi di tensione sui mercati internazionali a caratterizzare la ripresa degli scambi di inizio settimana. L'incertezza in Grecia, dove è partita una campagna elettorale infiammata in vista delle elezioni del 25 gennaio prossimo, le aspettative per un intervento della Bce con l'acquisto di titoli di Stato e il calo del greggio, che tocca i minimi dal 2009 sotto la soglia di 50 dollari, sono un mix che genera una corsa a vendere azioni. Piazza Affari recita il ruolo della più colpita tra le principali Borse europee, con un calo finale del 4,92%. La moneta unica europea si deprezza sotto l'effetto combinato di due elementi: le possibili evoluzioni politiche ad Atene, con l'ascesa di Alexis Tsipras che potrebbe significare rimettere mano alla ristrutturazione del debito, e l'azione di Mario Draghi che potrebbe a breve stampare nuova moneta. La Commissione Ue prova a rintuzzare la criticità ellenica indicando, per bocca di un portavoce, che il trattato Ue dice che la partecipazione all'area euro "è irreversibile".
+Crollano <span itemid="http://dbpedia.org/resource/Athens_Prefecture" id="urn:enhancement-afe6a8de-56cf-6dca-d307-d890993297fb" class="textannotation disambiguated wl-place">Atene</span> e petrolio, l'euro precipita e Piazza Affari stampa un calo del 5%. Sono molti gli elementi di tensione sui mercati internazionali a caratterizzare la ripresa degli scambi di inizio settimana. L'incertezza in Grecia, dove è partita una campagna elettorale infiammata in vista delle elezioni del 25 gennaio prossimo, le aspettative per un intervento della Bce con l'acquisto di titoli di Stato e il calo del greggio, che tocca i minimi dal 2009 sotto la soglia di 50 dollari, sono un mix che genera una corsa a vendere azioni. Piazza Affari recita il ruolo della più colpita tra le principali Borse europee, con un calo finale del 4,92%. La moneta unica europea si deprezza sotto l'effetto combinato di due elementi: le possibili evoluzioni politiche ad <span itemid="http://dbpedia.org/resource/Athens_Prefecture" id="urn:enhancement-afe6a8de-56cf-6dca-d307-d890993297fa" class="textannotation disambiguated wl-place">Atene</span>, con l'ascesa di <span id="urn:enhancement-1f83847a-95c2-c81b-cba9-f958aed45b34" class="textannotation">Alexis Tsipras</span> che potrebbe significare rimettere mano alla ristrutturazione del debito, e l'azione di Mario Draghi che potrebbe a breve stampare nuova moneta. La Commissione Ue prova a rintuzzare la criticità ellenica indicando, per bocca di un portavoce, che il trattato Ue dice che la partecipazione all'area euro "è irreversibile".
         </textarea>
         </form>        
     </div>
@@ -81,6 +81,7 @@ Crollano Atene e petrolio, l'euro precipita e Piazza Affari stampa un calo del 5
                 // Example content CSS (should be your site CSS)
                 content_css : "css/wordlift-reloaded.css",
                 extended_valid_elements: 'span[itemid|id|class]',
+                custom_elements: 'span[itemid|id|class]',
 
                 // Drop lists for link/image/media/template dialogs
                 template_external_list_url: "js/template_list.js",
@@ -102,7 +103,7 @@ Crollano Atene e petrolio, l'euro precipita e Piazza Affari stampa un calo del 5
             "label": "What",
             "registeredTypes": [ "event", "organization", "person", "place", "thing" ],
             "registeredWidgets": [ "ImageSuggestor"],
-            "selectedEntities":  []
+            "selectedEntities":  [ "http://dbpedia.org/resource/Athens_Prefecture" ]
         },
         {
             "id": "who",

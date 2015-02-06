@@ -5,6 +5,24 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
 # Manage redlink analysis responses
 .service('EditorService', [ 'AnalysisService', '$log', '$http', '$rootScope', (AnalysisService, $log, $http, $rootScope)-> 
   
+  
+  # Find existing entities selected in the html content (by looking for *itemid* attributes).
+  findEntities = (html) ->
+    # Prepare a traslator instance that will traslate Html and Text positions.
+    traslator = Traslator.create html
+    # Set the pattern to look for *itemid* attributes.
+    pattern = /<(\w+)[^>]*\sitemid="([^"]+)"[^>]*>([^<]+)<\/\1>/gim
+
+    # Get the matches and return them.
+    (while match = pattern.exec html
+      {
+        start: traslator.html2text match.index
+        end: traslator.html2text (match.index + match[0].length)
+        uri: match[2]
+        label: match[3]
+      }
+    )
+
   editor = ->
     tinyMCE.get('content')
     
@@ -53,7 +71,6 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
       discarded.push disambiguate entity.annotations[ annotationId ], entity
     else    
       for id, annotation of entity.annotations
-        $log.debug "Going to disambiguate annotation #{id}"
         discarded.push disambiguate annotation, entity
     
     for entityId in discarded
@@ -68,7 +85,7 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
     discarded = []
     if annotationId?
       dedisambiguate entity.annotations[ annotationId ], entity
-    else   
+    else
       for id, annotation of entity.annotations
         dedisambiguate annotation, entity
     
@@ -77,7 +94,7 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
         occurrences = currentOccurencesForEntity entityId
         $rootScope.$broadcast "updateOccurencesForEntity", entityId, occurrences
         
-    occurrences = currentOccurencesForEntity entity
+    occurrences = currentOccurencesForEntity entity.id    
     $rootScope.$broadcast "updateOccurencesForEntity", entity.id, occurrences
         
   service =
@@ -141,10 +158,10 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
       # Get the TinyMCE editor html content.
       html = ed.getContent format: 'raw'
       # Find existing entities.
-      # entities = findEntities html
+      entities = findEntities html
 
       # Preselect entities found in html.
-      # AnalysisService.preselect analysis, entities
+      AnalysisService.preselect analysis, entities
 
       # Remove existing text annotations (the while-match is necessary to remove nested spans).
       while html.match(/<(\w+)[^>]*\sclass="textannotation[^"]*"[^>]*>([^<]+)<\/\1>/gim, '$2')
@@ -156,8 +173,15 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
       # Add text annotations to the html (skip those text annotations that don't have entity annotations).
       for annotationId, annotation of analysis.annotations # when 0 < Object.keys(textAnnotation.entityAnnotations).length
         
-        entity = analysis.entities[ annotation.entityMatches[0].entityId ]
-        element = "<span id=\"#{annotationId}\" class=\"textannotation\">"
+        element = "<span id=\"#{annotationId}\" class=\"textannotation"
+        
+        # Loop annotation to see which has to be preselected
+        for em in annotation.entityMatches
+          entity = analysis.entities[ em.entityId ] 
+          if annotationId in entity.occurrences
+            element += " disambiguated wl-#{entity.mainType}\" itemid=\"#{entity.id}"
+        
+        element += "\">"
         
         # Finally insert the HTML code.
         traslator.insertHtml element, text: annotation.start

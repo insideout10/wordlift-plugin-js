@@ -15,6 +15,10 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
     for key, val of properties
       object[key] = val
     object
+ 
+  findAnnotation = (annotations, start, end) ->
+    return annotation for id, annotation of annotations when annotation.start is start and annotation.end is end
+
 
   service = 
     _currentAnalysis = {}
@@ -71,6 +75,17 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
     # If successful, broadcast an *analysisReceived* event.
     .success (data) ->
        $rootScope.$broadcast "analysisPerformed", service.parse( data )
+
+  # Preselect entity annotations in the provided analysis using the provided collection of annotations.
+  service.preselect = (analysis, annotations) ->
+
+    # Find the existing entities in the html
+    for annotation in annotations
+      # Find the proper annotation            
+      textAnnotation = findAnnotation analysis.annotations, annotation.start, annotation.end
+      # TODO Look for same as
+      # Enhance entity occurences
+      analysis.entities[ annotation.uri ].occurrences.push  textAnnotation.id
 
   service
 

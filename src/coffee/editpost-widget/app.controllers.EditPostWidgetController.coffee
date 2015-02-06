@@ -28,6 +28,7 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
   for box in configuration.boxes
 
     $scope.selectedEntities[ box.id ] = {}
+
     $scope.widgets[ box.id ] = {}
     for widget in box.registeredWidgets
       $scope.widgets[ box.id ][ widget ] = []
@@ -55,6 +56,7 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     $scope.isSelectionCollapsed = status
 
   $scope.$on "updateOccurencesForEntity", (event, entityId, occurrences) ->
+    
     $log.debug "Occurrences #{occurrences.length} for #{entityId}"
     $scope.analysis.entities[ entityId ].occurrences = occurrences
 
@@ -83,6 +85,10 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
 
   $scope.$on "analysisPerformed", (event, analysis) -> 
     $scope.analysis = analysis
+    # Preselect 
+    for box in configuration.boxes
+      for entityId in box.selectedEntities
+        $scope.selectedEntities[ box.id ][ entityId ] = analysis.entities[ entityId ]
 
   $scope.updateWidget = (widget, scope)->
     $log.debug "Going to updated widget #{widget} for box #{scope}"
