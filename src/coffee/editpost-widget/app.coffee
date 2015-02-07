@@ -8,7 +8,8 @@ angular.module('wordlift.editpost.widget', [
 	'wordlift.editpost.widget.controllers.EditPostWidgetController', 
 	'wordlift.editpost.widget.directives.wlClassificationBox', 
 	'wordlift.editpost.widget.directives.wlEntityForm', 
-	'wordlift.editpost.widget.directives.wlEntityTile', 
+	'wordlift.editpost.widget.directives.wlEntityTile',
+  'wordlift.editpost.widget.directives.wlEntityInputBox', 
 	'wordlift.editpost.widget.services.AnalysisService', 
 	'wordlift.editpost.widget.services.EditorService', 
 	'wordlift.editpost.widget.services.ImageSuggestorDataRetrieverService' 		
@@ -39,6 +40,12 @@ $(
       <wl-classification-box ng-repeat="box in configuration.boxes">
         <wl-entity-tile annotation="annotation" entity="entity" ng-repeat="entity in analysis.entities | entityTypeIn:box.registeredTypes"></wl-entity>
       </wl-classification-box>
+      <div class="wl-entity-input-boxes">
+        <wl-entity-input-box annotation="annotation" entity="entity" ng-repeat="entity in analysis.entities | isEntitySelected"></wl-entity-input-box>
+        <div ng-repeat="(box, entities) in selectedEntities">
+          <input type='text' name='wl_boxes[{{box}}][]' value='{{id}}' ng-repeat="(id, entity) in entities">
+        </div> 
+      </div>   
     </div>
   """)
   .appendTo('#dx')

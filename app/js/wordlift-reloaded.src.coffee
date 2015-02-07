@@ -145,6 +145,18 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     
     filtered
 ])
+
+.filter('isEntitySelected', [ '$log', ($log)->
+  return (items)->
+    
+    filtered = []
+
+    for id, entity of items
+      if entity.occurrences.length > 0
+        filtered.push entity
+    
+    filtered
+])
 .controller('EditPostWidgetController', [ 'EditorService', 'AnalysisService', 'configuration', '$log', '$scope', '$rootScope', '$injector', (EditorService, AnalysisService, configuration, $log, $scope, $rootScope, $injector)-> 
 
   $scope.configuration = []
@@ -408,7 +420,6 @@ angular.module('wordlift.editpost.widget.directives.wlEntityTile', [])
           <p ng-hide="editingModeOn"><img class="thumbnail" ng-src="{{ entity.images[0] }}" />{{entity.description}}</p>
           <wl-entity-form entity="entity" ng-show="editingModeOn" on-submit="toggleEditingMode()"></wl-entity-form>
         </div>
-
   	  </div>
 
   	"""
@@ -444,6 +455,30 @@ angular.module('wordlift.editpost.widget.directives.wlEntityTile', [])
         $boxCtrl.onSelectedTile $scope
   ])
 
+angular.module('wordlift.editpost.widget.directives.wlEntityInputBox', [])
+# The wlEntityInputBoxes prints the inputs and textareas with entities data.
+.directive('wlEntityInputBox', ->
+    restrict: 'E'
+    scope:
+      entity: '='
+    template: """
+        <div>
+
+          <input type='text' name='wl_entities[{{entity.id}}][uri]' value='{{entity.id}}'>
+          <input type='text' name='wl_entities[{{entity.id}}][label]' value='{{entity.label}}'>
+          <textarea name='wl_entities[{{entity.id}}][description]'>{{entity.description}}</textarea>
+          <input type='text' name='wl_entities[{{entity.id}}][main_type]' value='{{entity.mainType}}'>
+
+          <input ng-repeat="type in entity.types" type='text'
+          	name='wl_entities[{{entity.id}}][type][]' value='{{type}}' />
+          <input ng-repeat="image in entity.images" type='text'
+            name='wl_entities[{{entity.id}}][image][]' value='{{image}}' />
+          <input ng-repeat="sameAs in entity.sameAs" type='text'
+            name='wl_entities[{{entity.id}}][sameas][]' value='{{sameAs}}' />
+
+      	</div>
+    """
+  )
 angular.module('wordlift.editpost.widget.services.AnalysisService', [])
 # Manage redlink analysis responses
 .service('AnalysisService', [ '$log', '$http', '$rootScope', ($log, $http, $rootScope)-> 
@@ -762,6 +797,7 @@ angular.module('wordlift.editpost.widget.providers.ConfigurationProvider', [])
 )
 
 
+
 # Set the well-known $ reference to jQuery.
 $ = jQuery
 
@@ -772,7 +808,8 @@ angular.module('wordlift.editpost.widget', [
 	'wordlift.editpost.widget.controllers.EditPostWidgetController', 
 	'wordlift.editpost.widget.directives.wlClassificationBox', 
 	'wordlift.editpost.widget.directives.wlEntityForm', 
-	'wordlift.editpost.widget.directives.wlEntityTile', 
+	'wordlift.editpost.widget.directives.wlEntityTile',
+  'wordlift.editpost.widget.directives.wlEntityInputBox', 
 	'wordlift.editpost.widget.services.AnalysisService', 
 	'wordlift.editpost.widget.services.EditorService', 
 	'wordlift.editpost.widget.services.ImageSuggestorDataRetrieverService' 		
@@ -803,6 +840,12 @@ $(
       <wl-classification-box ng-repeat="box in configuration.boxes">
         <wl-entity-tile annotation="annotation" entity="entity" ng-repeat="entity in analysis.entities | entityTypeIn:box.registeredTypes"></wl-entity>
       </wl-classification-box>
+      <div class="wl-entity-input-boxes">
+        <wl-entity-input-box annotation="annotation" entity="entity" ng-repeat="entity in analysis.entities | isEntitySelected"></wl-entity-input-box>
+        <div ng-repeat="(box, entities) in selectedEntities">
+          <input type='text' name='wl_boxes[{{box}}][]' value='{{id}}' ng-repeat="(id, entity) in entities">
+        </div> 
+      </div>   
     </div>
   """)
   .appendTo('#dx')

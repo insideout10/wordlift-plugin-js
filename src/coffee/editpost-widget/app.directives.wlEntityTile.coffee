@@ -18,7 +18,6 @@ angular.module('wordlift.editpost.widget.directives.wlEntityTile', [])
           <p ng-hide="editingModeOn"><img class="thumbnail" ng-src="{{ entity.images[0] }}" />{{entity.description}}</p>
           <wl-entity-form entity="entity" ng-show="editingModeOn" on-submit="toggleEditingMode()"></wl-entity-form>
         </div>
-
   	  </div>
 
   	"""

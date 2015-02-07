@@ -14,6 +14,18 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     
     filtered
 ])
+
+.filter('isEntitySelected', [ '$log', ($log)->
+  return (items)->
+    
+    filtered = []
+
+    for id, entity of items
+      if entity.occurrences.length > 0
+        filtered.push entity
+    
+    filtered
+])
 .controller('EditPostWidgetController', [ 'EditorService', 'AnalysisService', 'configuration', '$log', '$scope', '$rootScope', '$injector', (EditorService, AnalysisService, configuration, $log, $scope, $rootScope, $injector)-> 
 
   $scope.configuration = []

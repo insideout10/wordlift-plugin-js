@@ -38,6 +38,7 @@ module.exports = (grunt) ->
             'src/coffee/editpost-widget/app.directives.wlClassificationBox.coffee'
             'src/coffee/editpost-widget/app.directives.wlEntityForm.coffee'
             'src/coffee/editpost-widget/app.directives.wlEntityTile.coffee'
+            'src/coffee/editpost-widget/app.directives.wlEntityInputBox.coffee'
             'src/coffee/editpost-widget/app.services.AnalysisService.coffee'
             'src/coffee/editpost-widget/app.services.EditorService.coffee'
             'src/coffee/editpost-widget/app.services.ImageSuggestorDataRetrieverService.coffee'

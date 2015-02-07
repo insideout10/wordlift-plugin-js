@@ -1336,6 +1336,10 @@
 .fa-plus-square-o:before {
   content: "\f196";
 }
+.wl-entity-input-boxes,
+.wl-entity-props {
+  display: none;
+}
 .mceIcon.mce_wordlift,
 .mce-widget.mce-btn.mce-wordlift button {
   background-position: center center;

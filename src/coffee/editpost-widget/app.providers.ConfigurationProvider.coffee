@@ -12,3 +12,4 @@ angular.module('wordlift.editpost.widget.providers.ConfigurationProvider', [])
   provider
 )
 
+
