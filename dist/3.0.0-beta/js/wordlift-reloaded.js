@@ -542,9 +542,8 @@
       };
       service.perform = function(content) {
         return $http({
-          method: 'post',
-          url: ajaxurl,
-          data: content
+          method: 'get',
+          url: ajaxurl
         }).success(function(data) {
           return $rootScope.$broadcast("analysisPerformed", service.parse(data));
         });
