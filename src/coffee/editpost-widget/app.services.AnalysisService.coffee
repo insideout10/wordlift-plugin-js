@@ -67,10 +67,11 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
 
     data
 
-  service.perform = ()->
+  service.perform = (content)->
   	$http(
-      method: 'get'
-      url: 'assets/sample-response.json'
+      method: 'post'
+      url: ajaxurl + '?action=wordlift_analyze'
+      data: content      
     )
     # If successful, broadcast an *analysisReceived* event.
     .success (data) ->

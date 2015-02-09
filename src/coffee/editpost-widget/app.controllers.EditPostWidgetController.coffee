@@ -12,7 +12,11 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
       if entity.mainType in types
         filtered.push entity
     
+#    filtered.sort (a, b) ->
+#      a['confidence'] > b['confidence']
+
     filtered
+
 ])
 
 .filter('isEntitySelected', [ '$log', ($log)->
@@ -29,7 +33,7 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
 .controller('EditPostWidgetController', [ 'EditorService', 'AnalysisService', 'configuration', '$log', '$scope', '$rootScope', '$injector', (EditorService, AnalysisService, configuration, $log, $scope, $rootScope, $injector)-> 
 
   $scope.configuration = []
-  $scope.analysis = {}
+  $scope.analysis = undefined
   $scope.newEntity = AnalysisService.createEntity()
   $scope.selectedEntities = {}
   $scope.widgets = {}

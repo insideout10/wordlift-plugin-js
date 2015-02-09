@@ -143,7 +143,11 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
       if entity.mainType in types
         filtered.push entity
     
+#    filtered.sort (a, b) ->
+#      a['confidence'] > b['confidence']
+
     filtered
+
 ])
 
 .filter('isEntitySelected', [ '$log', ($log)->
@@ -160,7 +164,7 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
 .controller('EditPostWidgetController', [ 'EditorService', 'AnalysisService', 'configuration', '$log', '$scope', '$rootScope', '$injector', (EditorService, AnalysisService, configuration, $log, $scope, $rootScope, $injector)-> 
 
   $scope.configuration = []
-  $scope.analysis = {}
+  $scope.analysis = undefined
   $scope.newEntity = AnalysisService.createEntity()
   $scope.selectedEntities = {}
   $scope.widgets = {}
@@ -548,10 +552,11 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
 
     data
 
-  service.perform = ()->
+  service.perform = (content)->
   	$http(
-      method: 'get'
-      url: 'assets/sample-response.json'
+      method: 'post'
+      url: ajaxurl + '?action=wordlift_analyze'
+      data: content      
     )
     # If successful, broadcast an *analysisReceived* event.
     .success (data) ->
@@ -744,7 +749,7 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
       traslator = Traslator.create html
 
       # Add text annotations to the html (skip those text annotations that don't have entity annotations).
-      for annotationId, annotation of analysis.annotations # when 0 < Object.keys(textAnnotation.entityAnnotations).length
+      for annotationId, annotation of analysis.annotations when 0 < annotation.entityMatches.length
         
         element = "<span id=\"#{annotationId}\" class=\"textannotation"
         
@@ -822,7 +827,7 @@ angular.module('wordlift.editpost.widget', [
 
 $(
   container = $("""
-  	<div id="wordlift-edit-post-wrapper" ng-controller="EditPostWidgetController">
+  	<div ng-show="analysis" id="wordlift-edit-post-wrapper" ng-controller="EditPostWidgetController">
   		<div ng-click="createTextAnnotationFromCurrentSelection()">
         <span class="wl-new-entity-button" ng-class="{ 'selected' : !isSelectionCollapsed }">
           <i class="wl-annotation-label-icon"></i> add entity 
@@ -848,7 +853,7 @@ $(
       </div>   
     </div>
   """)
-  .appendTo('#dx')
+  .appendTo('#wordlift-edit-post-outer-wrapper')
 
 injector = angular.bootstrap $('#wordlift-edit-post-wrapper'), ['wordlift.editpost.widget']
 
@@ -860,7 +865,11 @@ injector = angular.bootstrap $('#wordlift-edit-post-wrapper'), ['wordlift.editpo
        (AnalysisService, $rootScope) ->
         # execute the following commands in the angular js context.
         $rootScope.$apply(->    
-          AnalysisService.perform()
+          # Get the html content of the editor.
+          html = editor.getContent format: 'raw'
+          # Get the text content from the Html.
+          text = Traslator.create(html).getText()
+          AnalysisService.perform text
         )
       ])
     )

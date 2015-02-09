@@ -22,7 +22,7 @@ angular.module('wordlift.editpost.widget', [
 
 $(
   container = $("""
-  	<div id="wordlift-edit-post-wrapper" ng-controller="EditPostWidgetController">
+  	<div ng-show="analysis" id="wordlift-edit-post-wrapper" ng-controller="EditPostWidgetController">
   		<div ng-click="createTextAnnotationFromCurrentSelection()">
         <span class="wl-new-entity-button" ng-class="{ 'selected' : !isSelectionCollapsed }">
           <i class="wl-annotation-label-icon"></i> add entity 
@@ -48,7 +48,7 @@ $(
       </div>   
     </div>
   """)
-  .appendTo('#dx')
+  .appendTo('#wordlift-edit-post-outer-wrapper')
 
 injector = angular.bootstrap $('#wordlift-edit-post-wrapper'), ['wordlift.editpost.widget']
 
@@ -60,7 +60,11 @@ injector = angular.bootstrap $('#wordlift-edit-post-wrapper'), ['wordlift.editpo
        (AnalysisService, $rootScope) ->
         # execute the following commands in the angular js context.
         $rootScope.$apply(->    
-          AnalysisService.perform()
+          # Get the html content of the editor.
+          html = editor.getContent format: 'raw'
+          # Get the text content from the Html.
+          text = Traslator.create(html).getText()
+          AnalysisService.perform text
         )
       ])
     )

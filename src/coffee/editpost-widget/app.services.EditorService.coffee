@@ -171,7 +171,7 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
       traslator = Traslator.create html
 
       # Add text annotations to the html (skip those text annotations that don't have entity annotations).
-      for annotationId, annotation of analysis.annotations # when 0 < Object.keys(textAnnotation.entityAnnotations).length
+      for annotationId, annotation of analysis.annotations when 0 < annotation.entityMatches.length
         
         element = "<span id=\"#{annotationId}\" class=\"textannotation"
         
