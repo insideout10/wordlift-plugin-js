@@ -330,7 +330,7 @@ angular.module('wordlift.editpost.widget.directives.wlClassificationBox', [])
           $log.debug entityId
           if tile.entity.id is entityId
             tile.isSelected = false 
-            tile.isVisible = false 
+            tile.isVisible = tile.entity.isRelevant 
 
       $scope.relink = (entity, annotationId)->
         for tile in $scope.tiles
@@ -346,7 +346,7 @@ angular.module('wordlift.editpost.widget.directives.wlClassificationBox', [])
             tile.isVisible = (tile.entity.annotations[ annotationId ]?)
             tile.isLinked = (annotationId in tile.entity.occurrences)
           else
-            tile.isVisible = (tile.entity.occurrences.length > 0)
+            tile.isVisible = tile.entity.isRelevant
             tile.isLinked = false
             
       ctrl = @
@@ -443,7 +443,7 @@ angular.module('wordlift.editpost.widget.directives.wlEntityTile', [])
         $scope.isVisible = ($scope.entity.annotations[ $scope.annotation ]?)
         $scope.isLinked = ($scope.annotation in $scope.entity.occurrences)
       else
-        $scope.isVisible = ($scope.entity.occurrences.length > 0)
+        $scope.isVisible = $scope.entity.isRelevant
         $scope.isLinked = false
             
       $scope.toggleEditingMode = ()->
@@ -548,11 +548,17 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
       entity.id = id
       entity.occurrences = []
       entity.annotations = {}
+      entity.annotation_count = 0
 
     for id, annotation of data.annotations
       annotation.id = id
       for ea in annotation.entityMatches
         data.entities[ ea.entityId ].annotations[ id ] = annotation
+        data.entities[ ea.entityId ].annotation_count += 1
+    
+    for id, entity of data.entities
+      entity.isRelevant = ( entity.annotation_count > 1 and entity.confidence is entity.annotation_count)
+    
 
     data
 

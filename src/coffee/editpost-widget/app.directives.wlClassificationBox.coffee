@@ -68,7 +68,7 @@ angular.module('wordlift.editpost.widget.directives.wlClassificationBox', [])
           $log.debug entityId
           if tile.entity.id is entityId
             tile.isSelected = false 
-            tile.isVisible = false 
+            tile.isVisible = tile.entity.isRelevant 
 
       $scope.relink = (entity, annotationId)->
         for tile in $scope.tiles
@@ -84,7 +84,7 @@ angular.module('wordlift.editpost.widget.directives.wlClassificationBox', [])
             tile.isVisible = (tile.entity.annotations[ annotationId ]?)
             tile.isLinked = (annotationId in tile.entity.occurrences)
           else
-            tile.isVisible = (tile.entity.occurrences.length > 0)
+            tile.isVisible = tile.entity.isRelevant
             tile.isLinked = false
             
       ctrl = @

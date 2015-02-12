@@ -298,7 +298,7 @@
               $log.debug(entityId);
               if (tile.entity.id === entityId) {
                 tile.isSelected = false;
-                _results.push(tile.isVisible = false);
+                _results.push(tile.isVisible = tile.entity.isRelevant);
               } else {
                 _results.push(void 0);
               }
@@ -331,7 +331,7 @@
                 tile.isVisible = (tile.entity.annotations[annotationId] != null);
                 _results.push(tile.isLinked = (__indexOf.call(tile.entity.occurrences, annotationId) >= 0));
               } else {
-                tile.isVisible = tile.entity.occurrences.length > 0;
+                tile.isVisible = tile.entity.isRelevant;
                 _results.push(tile.isLinked = false);
               }
             }
@@ -419,7 +419,7 @@
             $scope.isVisible = ($scope.entity.annotations[$scope.annotation] != null);
             $scope.isLinked = (_ref = $scope.annotation, __indexOf.call($scope.entity.occurrences, _ref) >= 0);
           } else {
-            $scope.isVisible = $scope.entity.occurrences.length > 0;
+            $scope.isVisible = $scope.entity.isRelevant;
             $scope.isLinked = false;
           }
           $scope.toggleEditingMode = function() {
@@ -522,7 +522,7 @@
         return merge(defaults, params);
       };
       service.parse = function(data) {
-        var annotation, ea, entity, id, _i, _len, _ref, _ref1, _ref2;
+        var annotation, ea, entity, id, _i, _len, _ref, _ref1, _ref2, _ref3;
         $log.debug(Object.keys(data.entities).length);
         _ref = data.entities;
         for (id in _ref) {
@@ -530,6 +530,7 @@
           entity.id = id;
           entity.occurrences = [];
           entity.annotations = {};
+          entity.annotation_count = 0;
         }
         _ref1 = data.annotations;
         for (id in _ref1) {
@@ -539,7 +540,13 @@
           for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
             ea = _ref2[_i];
             data.entities[ea.entityId].annotations[id] = annotation;
+            data.entities[ea.entityId].annotation_count += 1;
           }
+        }
+        _ref3 = data.entities;
+        for (id in _ref3) {
+          entity = _ref3[id];
+          entity.isRelevant = entity.annotation_count > 1 && entity.confidence === entity.annotation_count;
         }
         return data;
       };

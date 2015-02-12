@@ -60,11 +60,17 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
       entity.id = id
       entity.occurrences = []
       entity.annotations = {}
+      entity.annotation_count = 0
 
     for id, annotation of data.annotations
       annotation.id = id
       for ea in annotation.entityMatches
         data.entities[ ea.entityId ].annotations[ id ] = annotation
+        data.entities[ ea.entityId ].annotation_count += 1
+    
+    for id, entity of data.entities
+      entity.isRelevant = ( entity.annotation_count > 1 and entity.confidence is entity.annotation_count)
+    
 
     data
 
