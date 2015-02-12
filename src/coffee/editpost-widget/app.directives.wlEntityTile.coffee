@@ -34,7 +34,7 @@ angular.module('wordlift.editpost.widget.directives.wlEntityTile', [])
         $scope.isVisible = ($scope.entity.annotations[ $scope.annotation ]?)
         $scope.isLinked = ($scope.annotation in $scope.entity.occurrences)
       else
-        $scope.isVisible = true
+        $scope.isVisible = ($scope.entity.occurrences.length > 0)
         $scope.isLinked = false
             
       $scope.toggleEditingMode = ()->

@@ -55,6 +55,7 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
     # Add occurences as a blank array
     # Add annotation references to each entity
 
+    $log.debug Object.keys(data.entities).length
     for id, entity of data.entities
       entity.id = id
       entity.occurrences = []
@@ -69,9 +70,9 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
 
   service.perform = (content)->
   	$http(
-      method: 'get'
-      url: ajaxurl #+ '?action=wordlift_analyze'
-      #data: content      
+      method: 'post'
+      url: ajaxurl + '?action=wordlift_analyze'
+      data: content      
     )
     # If successful, broadcast an *analysisReceived* event.
     .success (data) ->

@@ -327,8 +327,11 @@ angular.module('wordlift.editpost.widget.directives.wlClassificationBox', [])
 
       $scope.deselect = (entityId)->
         for tile in $scope.tiles
-          tile.isSelected = false if tile.entity.id is entityId
-      
+          $log.debug entityId
+          if tile.entity.id is entityId
+            tile.isSelected = false 
+            tile.isVisible = false 
+
       $scope.relink = (entity, annotationId)->
         for tile in $scope.tiles
           tile.isLinked = (annotationId in tile.entity.occurrences) if tile.entity.id is entity.id
@@ -343,7 +346,7 @@ angular.module('wordlift.editpost.widget.directives.wlClassificationBox', [])
             tile.isVisible = (tile.entity.annotations[ annotationId ]?)
             tile.isLinked = (annotationId in tile.entity.occurrences)
           else
-            tile.isVisible = true
+            tile.isVisible = (tile.entity.occurrences.length > 0)
             tile.isLinked = false
             
       ctrl = @
@@ -440,7 +443,7 @@ angular.module('wordlift.editpost.widget.directives.wlEntityTile', [])
         $scope.isVisible = ($scope.entity.annotations[ $scope.annotation ]?)
         $scope.isLinked = ($scope.annotation in $scope.entity.occurrences)
       else
-        $scope.isVisible = true
+        $scope.isVisible = ($scope.entity.occurrences.length > 0)
         $scope.isLinked = false
             
       $scope.toggleEditingMode = ()->
@@ -540,6 +543,7 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
     # Add occurences as a blank array
     # Add annotation references to each entity
 
+    $log.debug Object.keys(data.entities).length
     for id, entity of data.entities
       entity.id = id
       entity.occurrences = []
@@ -554,9 +558,9 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
 
   service.perform = (content)->
   	$http(
-      method: 'get'
-      url: ajaxurl #+ '?action=wordlift_analyze'
-      #data: content      
+      method: 'post'
+      url: ajaxurl + '?action=wordlift_analyze'
+      data: content      
     )
     # If successful, broadcast an *analysisReceived* event.
     .success (data) ->

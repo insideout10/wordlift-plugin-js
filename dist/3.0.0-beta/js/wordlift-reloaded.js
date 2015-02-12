@@ -295,8 +295,10 @@
             _results = [];
             for (_i = 0, _len = _ref.length; _i < _len; _i++) {
               tile = _ref[_i];
+              $log.debug(entityId);
               if (tile.entity.id === entityId) {
-                _results.push(tile.isSelected = false);
+                tile.isSelected = false;
+                _results.push(tile.isVisible = false);
               } else {
                 _results.push(void 0);
               }
@@ -329,7 +331,7 @@
                 tile.isVisible = (tile.entity.annotations[annotationId] != null);
                 _results.push(tile.isLinked = (__indexOf.call(tile.entity.occurrences, annotationId) >= 0));
               } else {
-                tile.isVisible = true;
+                tile.isVisible = tile.entity.occurrences.length > 0;
                 _results.push(tile.isLinked = false);
               }
             }
@@ -417,7 +419,7 @@
             $scope.isVisible = ($scope.entity.annotations[$scope.annotation] != null);
             $scope.isLinked = (_ref = $scope.annotation, __indexOf.call($scope.entity.occurrences, _ref) >= 0);
           } else {
-            $scope.isVisible = true;
+            $scope.isVisible = $scope.entity.occurrences.length > 0;
             $scope.isLinked = false;
           }
           $scope.toggleEditingMode = function() {
@@ -521,6 +523,7 @@
       };
       service.parse = function(data) {
         var annotation, ea, entity, id, _i, _len, _ref, _ref1, _ref2;
+        $log.debug(Object.keys(data.entities).length);
         _ref = data.entities;
         for (id in _ref) {
           entity = _ref[id];
@@ -542,8 +545,9 @@
       };
       service.perform = function(content) {
         return $http({
-          method: 'get',
-          url: ajaxurl
+          method: 'post',
+          url: ajaxurl + '?action=wordlift_analyze',
+          data: content
         }).success(function(data) {
           return $rootScope.$broadcast("analysisPerformed", service.parse(data));
         });
