@@ -3,18 +3,40 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
   'wordlift.editpost.widget.services.EditorService'
   'wordlift.editpost.widget.providers.ConfigurationProvider'
 ])
-.filter('entityTypeIn', [ '$log', ($log)->
+.filter('filterEntitiesByTypesAndRelevance', [ '$log', ($log)->
   return (items, types)->
     
     filtered = []
-
-    for id, entity of items
-      if entity.mainType in types
-        filtered.push entity
     
-#    filtered.sort (a, b) ->
-#      a['confidence'] > b['confidence']
+    if not items? 
+      return filtered
 
+    treshold = Math.floor ( 1/120 * Object.keys(items).length ) + 0.75 
+    
+    for id, entity of items
+      if  entity.mainType in types
+        
+        annotations_count = Object.keys( entity.annotations ).length
+        if annotations_count > treshold and entity.confidence is 1
+           filtered.push entity
+           continue
+        if entity.occurrences.length > 0
+          filtered.push entity
+        
+        # TODO se è una entità di wordlift la mostro
+
+    filtered
+
+])
+
+.filter('filterEntitiesByTypes', [ '$log', ($log)->
+  return (items, types)->
+    
+    filtered = []
+    
+    for id, entity of items
+      if  entity.mainType in types
+        filtered.push entity
     filtered
 
 ])
@@ -57,6 +79,10 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
   # Delegate to EditorService
   $scope.selectAnnotation = (annotationId)->
     EditorService.selectAnnotation annotationId
+  $scope.isEntitySelected = (entity, box)->
+    return $scope.selectedEntities[ box.id ][ entity.id ]?
+  $scope.isLinkedToCurrentAnnotation = (entity)->
+    return ($scope.annotation in entity.occurrences)
 
   $scope.addNewEntityToAnalysis = ()->
     # Add new entity to the analysis
@@ -75,15 +101,10 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     
     $log.debug "Occurrences #{occurrences.length} for #{entityId}"
     $scope.analysis.entities[ entityId ].occurrences = occurrences
-
-    if $scope.annotation?
-      for box, entities of $scope.selectedEntities
-        $scope.boxes[ box ].relink $scope.analysis.entities[ entityId ], $scope.annotation
-        
+    
     if occurrences.length is 0
       for box, entities of $scope.selectedEntities
         delete $scope.selectedEntities[ box ][ entityId ]
-        $scope.boxes[ box ].deselect entityId
 
   $scope.$on "textAnnotationClicked", (event, annotationId) ->
     $scope.annotation = annotationId

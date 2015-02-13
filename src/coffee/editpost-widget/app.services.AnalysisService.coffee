@@ -56,22 +56,29 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
     # Add annotation references to each entity
 
     $log.debug Object.keys(data.entities).length
+
     for id, entity of data.entities
       entity.id = id
       entity.occurrences = []
       entity.annotations = {}
-      entity.annotation_count = 0
+      entity.confidence = 1 
 
     for id, annotation of data.annotations
       annotation.id = id
+      annotation.entities = {}
+      
       for ea in annotation.entityMatches
         data.entities[ ea.entityId ].annotations[ id ] = annotation
-        data.entities[ ea.entityId ].annotation_count += 1
-    
-    for id, entity of data.entities
-      entity.isRelevant = ( entity.annotation_count > 1 and entity.confidence is entity.annotation_count)
-    
+        data.annotations[ id ].entities[ ea.entityId ] = data.entities[ ea.entityId ]
 
+    # TODO move this calculation on the server
+    for id, entity of data.entities
+      for annotationId, annotation of data.annotations
+        local_confidence = 1
+        for em in annotation.entityMatches  
+          local_confidence = em.confidence if em.entityId is id
+        entity.confidence = entity.confidence * local_confidence
+ 
     data
 
   service.perform = (content)->

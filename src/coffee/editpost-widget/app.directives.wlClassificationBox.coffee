@@ -63,34 +63,12 @@ angular.module('wordlift.editpost.widget.directives.wlClassificationBox', [])
 
       $scope.boxes[ $scope.box.id ] = $scope
 
-      $scope.deselect = (entityId)->
-        for tile in $scope.tiles
-          $log.debug entityId
-          if tile.entity.id is entityId
-            tile.isSelected = false 
-            tile.isVisible = tile.entity.isRelevant 
-
-      $scope.relink = (entity, annotationId)->
-        for tile in $scope.tiles
-          tile.isLinked = (annotationId in tile.entity.occurrences) if tile.entity.id is entity.id
-           
       $scope.$watch "annotation", (annotationId) ->
         
         $scope.currentWidget = undefined
         $scope.isWidgetOpened = false
-
-        for tile in $scope.tiles
-          if annotationId?
-            tile.isVisible = (tile.entity.annotations[ annotationId ]?)
-            tile.isLinked = (annotationId in tile.entity.occurrences)
-          else
-            tile.isVisible = tile.entity.isRelevant
-            tile.isLinked = false
             
       ctrl = @
-      ctrl.onSelectedTile = (tile)->
-        tile.isSelected = !tile.isSelected
-        $scope.onSelectedEntityTile tile.entity, $scope.box
       ctrl.addTile = (tile)->
         $scope.tiles.push tile
       ctrl.closeTiles = ()->

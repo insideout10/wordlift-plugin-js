@@ -4,13 +4,13 @@ angular.module('wordlift.editpost.widget.directives.wlEntityTile', [])
     restrict: 'E'
     scope:
       entity: '='
-      annotation: '='
+      isSelected: '='
+      onEntitySelect: '&'
     template: """
-  	  <div ng-class="'wl-' + entity.mainType" ng-show="isVisible" class="entity">
-  	    <i ng-show="annotation" ng-class="{ 'wl-linked' : isLinked, 'wl-unlinked' : !isLinked }"></i>
-        <i ng-hide="annotation" ng-class="{ 'wl-selected' : isSelected, 'wl-unselected' : !isSelected }"></i>
+  	  <div ng-class="'wl-' + entity.mainType" class="entity">
+  	    <i ng-hide="annotation" ng-class="{ 'wl-selected' : isSelected, 'wl-unselected' : !isSelected }"></i>
         <i class="type"></i>
-        <span class="label" ng-click="select()">{{entity.label}}</span>
+        <span class="label" ng-click="onEntitySelect()">{{entity.label}}</span>
         <small ng-show="entity.occurrences.length > 0">({{entity.occurrences.length}})</small>
         <i ng-class="{ 'wl-more': isOpened == false, 'wl-less': isOpened == true }" ng-click="toggle()"></i>
   	    <span ng-class="{ 'active' : editingModeOn }" ng-click="toggleEditingMode()" ng-show="isOpened" class="wl-edit-button">Edit</span>
@@ -23,20 +23,13 @@ angular.module('wordlift.editpost.widget.directives.wlEntityTile', [])
   	"""
     link: ($scope, $element, $attrs, $boxCtrl) ->				      
       
+      $log.debug "Created entity tile with id #{$scope.$id} and confidence #{$scope.entity.confidence}"
       # Add tile to related container scope
       $boxCtrl.addTile $scope
 
       $scope.isOpened = false
-      $scope.isSelected = false
       $scope.editingModeOn = false
-
-      if $scope.annotation
-        $scope.isVisible = ($scope.entity.annotations[ $scope.annotation ]?)
-        $scope.isLinked = ($scope.annotation in $scope.entity.occurrences)
-      else
-        $scope.isVisible = $scope.entity.isRelevant
-        $scope.isLinked = false
-            
+                 
       $scope.toggleEditingMode = ()->
         $scope.editingModeOn = !$scope.editingModeOn
 
@@ -49,6 +42,4 @@ angular.module('wordlift.editpost.widget.directives.wlEntityTile', [])
           $boxCtrl.closeTiles()    
         $scope.isOpened = !$scope.isOpened
         
-      $scope.select = ()-> 
-        $boxCtrl.onSelectedTile $scope
   ])

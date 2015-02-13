@@ -377,8 +377,7 @@ body {
     top:0px;
   }
 
-
-  .wl-selected { 
+  .wl-without-annotation .wl-selected { 
     .fa-icon(@fa-var-check-circle-o);
     font-family: FontAwesome;
     font-style: normal;
@@ -389,7 +388,10 @@ body {
     font-size: 14px;
     padding: 4px 0px;
   }
-
+  
+  .wl-with-annotation .wl-selected { 
+    .fa-icon(@fa-var-link);
+   }
   .wl-unselected { 
     .fa-icon(@fa-var-circle-o);
     font-family: FontAwesome;
@@ -402,29 +404,9 @@ body {
     padding: 4px 0px;
 
   }  
-  .wl-linked { 
-    .fa-icon(@fa-var-link);
-    font-family: FontAwesome;
-    font-style: normal;
-    font-weight: normal;
-    line-height: 14px;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    font-size: 14px;
-    padding: 4px 0px;
-  }
-  .wl-unlinked { 
+  .wl-with-annotation .wl-unselected { 
     .fa-icon(@fa-var-chain-broken);
-    font-family: FontAwesome;
-    font-style: normal;
-    font-weight: normal;
-    line-height: 14px;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    font-size: 14px;
-    padding: 4px 0px;
-
-  } 
+   }
 
 }
 

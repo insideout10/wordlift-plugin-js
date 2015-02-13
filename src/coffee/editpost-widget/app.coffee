@@ -28,6 +28,7 @@ $(
           <i class="wl-annotation-label-icon"></i> add entity 
         </span>
       </div>
+      
       <div ng-show="annotation">
         <h4 class="wl-annotation-label">
           <i class="wl-annotation-label-icon"></i>
@@ -37,9 +38,16 @@ $(
         </h4>
         <wl-entity-form entity="newEntity" on-submit="addNewEntityToAnalysis()" ng-show="analysis.annotations[annotation].entityMatches.length == 0"></wl-entity-form>
       </div>
+
       <wl-classification-box ng-repeat="box in configuration.boxes">
-        <wl-entity-tile annotation="annotation" entity="entity" ng-repeat="entity in analysis.entities | entityTypeIn:box.registeredTypes"></wl-entity>
+        <div ng-hide="annotation" class="wl-without-annotation">
+          <wl-entity-tile is-selected="isEntitySelected(entity, box)" on-entity-select="onSelectedEntityTile(entity, box)" entity="entity" ng-repeat="entity in analysis.entities | filterEntitiesByTypesAndRelevance:box.registeredTypes"></wl-entity>
+        </div>  
+        <div ng-show="annotation" class="wl-with-annotation">
+          <wl-entity-tile is-selected="isLinkedToCurrentAnnotation(entity)" on-entity-select="onSelectedEntityTile(entity, box)" entity="entity" ng-repeat="entity in analysis.annotations[annotation].entities | filterEntitiesByTypes:box.registeredTypes"" ></wl-entity>
+        </div>  
       </wl-classification-box>
+
       <div class="wl-entity-input-boxes">
         <wl-entity-input-box annotation="annotation" entity="entity" ng-repeat="entity in analysis.entities | isEntitySelected"></wl-entity-input-box>
         <div ng-repeat="(box, entities) in selectedEntities">
