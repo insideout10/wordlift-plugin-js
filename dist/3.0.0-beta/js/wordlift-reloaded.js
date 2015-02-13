@@ -197,6 +197,8 @@
       };
       $scope.addNewEntityToAnalysis = function() {
         var annotation;
+        $log.debug("Going to add new entity");
+        $log.debug($scope.newEntity);
         $scope.analysis.entities[$scope.newEntity.id] = $scope.newEntity;
         annotation = $scope.analysis.annotations[$scope.annotation];
         annotation.entityMatches.push({
@@ -204,6 +206,7 @@
           confidence: 1
         });
         $scope.analysis.entities[$scope.newEntity.id].annotations[annotation.id] = annotation;
+        $scope.analysis.annotations[$scope.annotation].entities[$scope.newEntity.id] = $scope.newEntity;
         return $scope.newEntity = AnalysisService.createEntity();
       };
       $scope.$on("isSelectionCollapsed", function(event, status) {
@@ -468,6 +471,7 @@
           mainType: 'thing',
           types: [],
           images: [],
+          confidence: 1,
           occurrences: [],
           annotations: {}
         };
@@ -483,6 +487,7 @@
           text: '',
           start: 0,
           end: 0,
+          entities: [],
           entityMatches: []
         };
         return merge(defaults, params);

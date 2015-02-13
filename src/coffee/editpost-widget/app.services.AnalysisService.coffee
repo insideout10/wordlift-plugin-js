@@ -32,6 +32,7 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
       mainType: 'thing' # DefaultType
       types: []
       images: []
+      confidence: 1
       occurrences: []
       annotations: {}
     
@@ -44,6 +45,7 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
       text: ''
       start: 0
       end: 0
+      entities: []
       entityMatches: []
     
     merge defaults, params

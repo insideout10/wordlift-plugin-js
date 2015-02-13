@@ -216,15 +216,18 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     return ($scope.annotation in entity.occurrences)
 
   $scope.addNewEntityToAnalysis = ()->
+    $log.debug "Going to add new entity"
+    $log.debug $scope.newEntity
     # Add new entity to the analysis
     $scope.analysis.entities[ $scope.newEntity.id ] = $scope.newEntity
     annotation = $scope.analysis.annotations[ $scope.annotation ]
     annotation.entityMatches.push { entityId: $scope.newEntity.id, confidence: 1 }
     $scope.analysis.entities[ $scope.newEntity.id ].annotations[ annotation.id ] = annotation
+    $scope.analysis.annotations[ $scope.annotation ].entities[ $scope.newEntity.id ] = $scope.newEntity
     
     # Create new entity object
     $scope.newEntity = AnalysisService.createEntity()
-    
+
   $scope.$on "isSelectionCollapsed", (event, status) ->
     $scope.isSelectionCollapsed = status
 
@@ -510,6 +513,7 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
       mainType: 'thing' # DefaultType
       types: []
       images: []
+      confidence: 1
       occurrences: []
       annotations: {}
     
@@ -522,6 +526,7 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
       text: ''
       start: 0
       end: 0
+      entities: []
       entityMatches: []
     
     merge defaults, params
