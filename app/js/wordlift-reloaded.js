@@ -552,7 +552,7 @@
       };
       service.perform = function(content) {
         return $http({
-          method: 'post',
+          method: 'get',
           url: ajaxurl,
           data: content
         }).success(function(data) {

@@ -564,7 +564,7 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
 
   service.perform = (content)->
   	$http(
-      method: 'post'
+      method: 'get'
       url: ajaxurl #+ '?action=wordlift_analyze'
       data: content      
     )
