@@ -553,7 +553,7 @@
       service.perform = function(content) {
         return $http({
           method: 'post',
-          url: ajaxurl + '?action=wordlift_analyze',
+          url: ajaxurl,
           data: content
         }).success(function(data) {
           return $rootScope.$broadcast("analysisPerformed", service.parse(data));
