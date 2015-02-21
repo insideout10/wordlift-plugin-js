@@ -5,8 +5,8 @@ angular.module('wordlift.editpost.widget.directives.wlEntityForm', [])
       entity: '='
       onSubmit: '&'
     template: """
-      <form class="wl-entity-form" ng-submit="onSubmit()">
-      <div class="f>
+      <div name="wordlift" class="wl-entity-form">
+      <div>
           <label>Entity label</label>
           <input type="text" ng-model="entity.label" />
       </div>
@@ -23,11 +23,11 @@ angular.module('wordlift.editpost.widget.directives.wlEntityForm', [])
           <small class="wl-entity-id">{{entity.id}}</small>
       </div>
       <div>
-          <label>Entity Same as</label>
+          <label>Entity Same as (*)</label>
           <input type="text" ng-model="entity.sameAs" />
       </div>
-      <input type="submit" value="save" />
-      </form>
+      <h3 ng-click="onSubmit()">Save</h3>
+      </div>
     """
     link: ($scope, $element, $attrs, $ctrl) ->  
 

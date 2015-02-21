@@ -12,6 +12,7 @@ angular.module('wordlift.editpost.widget.directives.wlEntityTile', [])
         <i class="type"></i>
         <span class="label" ng-click="onEntitySelect()">{{entity.label}}</span>     
         <small ng-show="entity.occurrences.length > 0">({{entity.occurrences.length}})</small>
+        <span ng-show="isInternal()">*</span>  
         <i ng-class="{ 'wl-more': isOpened == false, 'wl-less': isOpened == true }" ng-click="toggle()"></i>
   	    <span ng-class="{ 'active' : editingModeOn }" ng-click="toggleEditingMode()" ng-show="isOpened" class="wl-edit-button">Edit</span>
         <div class="details" ng-show="isOpened">
@@ -23,13 +24,17 @@ angular.module('wordlift.editpost.widget.directives.wlEntityTile', [])
   	"""
     link: ($scope, $element, $attrs, $boxCtrl) ->				      
       
-      # $log.debug "Created entity tile with id #{$scope.$id} and confidence #{$scope.entity.confidence}"
       # Add tile to related container scope
       $boxCtrl.addTile $scope
 
       $scope.isOpened = false
       $scope.editingModeOn = false
-                 
+      
+      $scope.isInternal = ()->
+        if $scope.entity.id.match /redlink/
+          return true
+        return false 
+       
       $scope.toggleEditingMode = ()->
         $scope.editingModeOn = !$scope.editingModeOn
 

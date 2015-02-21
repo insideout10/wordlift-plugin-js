@@ -216,7 +216,11 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     return ($scope.annotation in entity.occurrences)
 
   $scope.addNewEntityToAnalysis = ()->
-    $log.debug "Going to add new entity"
+    # Keep the sameAs as Tmp id
+    sameAs = $scope.newEntity.sameAs
+    $scope.newEntity.id = sameAs
+    $scope.newEntity.sameAs = [ sameAs ]
+    
     $log.debug $scope.newEntity
     # Add new entity to the analysis
     $scope.analysis.entities[ $scope.newEntity.id ] = $scope.newEntity
@@ -372,8 +376,8 @@ angular.module('wordlift.editpost.widget.directives.wlEntityForm', [])
       entity: '='
       onSubmit: '&'
     template: """
-      <form class="wl-entity-form" ng-submit="onSubmit()">
-      <div class="f>
+      <div name="wordlift" class="wl-entity-form">
+      <div>
           <label>Entity label</label>
           <input type="text" ng-model="entity.label" />
       </div>
@@ -390,11 +394,11 @@ angular.module('wordlift.editpost.widget.directives.wlEntityForm', [])
           <small class="wl-entity-id">{{entity.id}}</small>
       </div>
       <div>
-          <label>Entity Same as</label>
+          <label>Entity Same as (*)</label>
           <input type="text" ng-model="entity.sameAs" />
       </div>
-      <input type="submit" value="save" />
-      </form>
+      <h3 ng-click="onSubmit()">Save</h3>
+      </div>
     """
     link: ($scope, $element, $attrs, $ctrl) ->  
 
@@ -426,6 +430,7 @@ angular.module('wordlift.editpost.widget.directives.wlEntityTile', [])
         <i class="type"></i>
         <span class="label" ng-click="onEntitySelect()">{{entity.label}}</span>     
         <small ng-show="entity.occurrences.length > 0">({{entity.occurrences.length}})</small>
+        <span ng-show="isInternal()">*</span>  
         <i ng-class="{ 'wl-more': isOpened == false, 'wl-less': isOpened == true }" ng-click="toggle()"></i>
   	    <span ng-class="{ 'active' : editingModeOn }" ng-click="toggleEditingMode()" ng-show="isOpened" class="wl-edit-button">Edit</span>
         <div class="details" ng-show="isOpened">
@@ -437,13 +442,17 @@ angular.module('wordlift.editpost.widget.directives.wlEntityTile', [])
   	"""
     link: ($scope, $element, $attrs, $boxCtrl) ->				      
       
-      # $log.debug "Created entity tile with id #{$scope.$id} and confidence #{$scope.entity.confidence}"
       # Add tile to related container scope
       $boxCtrl.addTile $scope
 
       $scope.isOpened = false
       $scope.editingModeOn = false
-                 
+      
+      $scope.isInternal = ()->
+        if $scope.entity.id.match /redlink/
+          return true
+        return false 
+       
       $scope.toggleEditingMode = ()->
         $scope.editingModeOn = !$scope.editingModeOn
 
@@ -470,7 +479,7 @@ angular.module('wordlift.editpost.widget.directives.wlEntityInputBox', [])
           <input type='text' name='wl_entities[{{entity.id}}][uri]' value='{{entity.id}}'>
           <input type='text' name='wl_entities[{{entity.id}}][label]' value='{{entity.label}}'>
           <textarea name='wl_entities[{{entity.id}}][description]'>{{entity.description}}</textarea>
-          <input type='text' name='wl_entities[{{entity.id}}][main_type]' value='{{entity.mainType}}'>
+          <input type='text' name='wl_entities[{{entity.id}}][main_type]' value='wl-{{entity.mainType}}'>
 
           <input ng-repeat="type in entity.types" type='text'
           	name='wl_entities[{{entity.id}}][type][]' value='{{type}}' />
@@ -549,6 +558,9 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
         data.entities[ id ] = localEntity
 
     for id, entity of data.entities
+      if not entity.label
+        $log.warn "Label missing for entity #{id}"
+
       entity.id = id
       entity.occurrences = []
       entity.annotations = {}
@@ -603,7 +615,6 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
 
     # Find the existing entities in the html
     for annotation in annotations
-
       # Find the proper annotation  
       textAnnotation = findAnnotation analysis.annotations, annotation.start, annotation.end
       
@@ -934,6 +945,7 @@ injector = angular.bootstrap $('#wordlift-edit-post-wrapper'), ['wordlift.editpo
         $rootScope.$apply(->    
           # Get the html content of the editor.
           html = editor.getContent format: 'raw'
+
           # Get the text content from the Html.
           text = Traslator.create(html).getText()
           AnalysisService.perform text

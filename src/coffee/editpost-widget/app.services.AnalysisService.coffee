@@ -65,6 +65,9 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
         data.entities[ id ] = localEntity
 
     for id, entity of data.entities
+      if not entity.label
+        $log.warn "Label missing for entity #{id}"
+
       entity.id = id
       entity.occurrences = []
       entity.annotations = {}
@@ -119,7 +122,6 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
 
     # Find the existing entities in the html
     for annotation in annotations
-
       # Find the proper annotation  
       textAnnotation = findAnnotation analysis.annotations, annotation.start, annotation.end
       

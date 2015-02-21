@@ -10,7 +10,7 @@ angular.module('wordlift.editpost.widget.directives.wlEntityInputBox', [])
           <input type='text' name='wl_entities[{{entity.id}}][uri]' value='{{entity.id}}'>
           <input type='text' name='wl_entities[{{entity.id}}][label]' value='{{entity.label}}'>
           <textarea name='wl_entities[{{entity.id}}][description]'>{{entity.description}}</textarea>
-          <input type='text' name='wl_entities[{{entity.id}}][main_type]' value='{{entity.mainType}}'>
+          <input type='text' name='wl_entities[{{entity.id}}][main_type]' value='wl-{{entity.mainType}}'>
 
           <input ng-repeat="type in entity.types" type='text'
           	name='wl_entities[{{entity.id}}][type][]' value='{{type}}' />

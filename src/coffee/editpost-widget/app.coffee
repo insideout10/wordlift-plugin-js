@@ -70,6 +70,7 @@ injector = angular.bootstrap $('#wordlift-edit-post-wrapper'), ['wordlift.editpo
         $rootScope.$apply(->    
           # Get the html content of the editor.
           html = editor.getContent format: 'raw'
+
           # Get the text content from the Html.
           text = Traslator.create(html).getText()
           AnalysisService.perform text

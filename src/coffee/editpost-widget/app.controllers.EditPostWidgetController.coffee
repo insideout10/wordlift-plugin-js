@@ -85,7 +85,11 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     return ($scope.annotation in entity.occurrences)
 
   $scope.addNewEntityToAnalysis = ()->
-    $log.debug "Going to add new entity"
+    # Keep the sameAs as Tmp id
+    sameAs = $scope.newEntity.sameAs
+    $scope.newEntity.id = sameAs
+    $scope.newEntity.sameAs = [ sameAs ]
+    
     $log.debug $scope.newEntity
     # Add new entity to the analysis
     $scope.analysis.entities[ $scope.newEntity.id ] = $scope.newEntity

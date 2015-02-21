@@ -199,8 +199,10 @@
         return (_ref2 = $scope.annotation, __indexOf.call(entity.occurrences, _ref2) >= 0);
       };
       $scope.addNewEntityToAnalysis = function() {
-        var annotation;
-        $log.debug("Going to add new entity");
+        var annotation, sameAs;
+        sameAs = $scope.newEntity.sameAs;
+        $scope.newEntity.id = sameAs;
+        $scope.newEntity.sameAs = [sameAs];
         $log.debug($scope.newEntity);
         $scope.analysis.entities[$scope.newEntity.id] = $scope.newEntity;
         annotation = $scope.analysis.annotations[$scope.annotation];
@@ -354,7 +356,7 @@
           entity: '=',
           onSubmit: '&'
         },
-        template: "<form class=\"wl-entity-form\" ng-submit=\"onSubmit()\">\n<div class=\"f>\n    <label>Entity label</label>\n    <input type=\"text\" ng-model=\"entity.label\" />\n</div>\n<div>\n    <label>Entity type</label>\n    <select ng-model=\"entity.mainType\" ng-options=\"type.id as type.name for type in supportedTypes\" ></select>\n</div>\n<div>\n    <label>Entity Description</label>\n    <textarea ng-model=\"entity.description\" rows=\"6\"></textarea>\n</div>\n<div ng-show=\"checkEntityId(entity.id)\">\n    <label>Entity Id</label>\n    <small class=\"wl-entity-id\">{{entity.id}}</small>\n</div>\n<div>\n    <label>Entity Same as</label>\n    <input type=\"text\" ng-model=\"entity.sameAs\" />\n</div>\n<input type=\"submit\" value=\"save\" />\n</form>",
+        template: "<div name=\"wordlift\" class=\"wl-entity-form\">\n<div>\n    <label>Entity label</label>\n    <input type=\"text\" ng-model=\"entity.label\" />\n</div>\n<div>\n    <label>Entity type</label>\n    <select ng-model=\"entity.mainType\" ng-options=\"type.id as type.name for type in supportedTypes\" ></select>\n</div>\n<div>\n    <label>Entity Description</label>\n    <textarea ng-model=\"entity.description\" rows=\"6\"></textarea>\n</div>\n<div ng-show=\"checkEntityId(entity.id)\">\n    <label>Entity Id</label>\n    <small class=\"wl-entity-id\">{{entity.id}}</small>\n</div>\n<div>\n    <label>Entity Same as (*)</label>\n    <input type=\"text\" ng-model=\"entity.sameAs\" />\n</div>\n<h3 ng-click=\"onSubmit()\">Save</h3>\n</div>",
         link: function($scope, $element, $attrs, $ctrl) {
           $scope.checkEntityId = function(uri) {
             return /^(f|ht)tps?:\/\//i.test(uri);
@@ -395,11 +397,17 @@
           isSelected: '=',
           onEntitySelect: '&'
         },
-        template: "<div ng-class=\"'wl-' + entity.mainType\" class=\"entity\">\n  <i ng-hide=\"annotation\" ng-class=\"{ 'wl-selected' : isSelected, 'wl-unselected' : !isSelected }\"></i>\n        <i class=\"type\"></i>\n        <span class=\"label\" ng-click=\"onEntitySelect()\">{{entity.label}}</span>     \n        <small ng-show=\"entity.occurrences.length > 0\">({{entity.occurrences.length}})</small>\n        <i ng-class=\"{ 'wl-more': isOpened == false, 'wl-less': isOpened == true }\" ng-click=\"toggle()\"></i>\n  <span ng-class=\"{ 'active' : editingModeOn }\" ng-click=\"toggleEditingMode()\" ng-show=\"isOpened\" class=\"wl-edit-button\">Edit</span>\n        <div class=\"details\" ng-show=\"isOpened\">\n          <p ng-hide=\"editingModeOn\"><img class=\"thumbnail\" ng-src=\"{{ entity.images[0] }}\" />{{entity.description}}</p>\n          <wl-entity-form entity=\"entity\" ng-show=\"editingModeOn\" on-submit=\"toggleEditingMode()\"></wl-entity-form>\n        </div>\n</div>\n",
+        template: "<div ng-class=\"'wl-' + entity.mainType\" class=\"entity\">\n  <i ng-hide=\"annotation\" ng-class=\"{ 'wl-selected' : isSelected, 'wl-unselected' : !isSelected }\"></i>\n        <i class=\"type\"></i>\n        <span class=\"label\" ng-click=\"onEntitySelect()\">{{entity.label}}</span>     \n        <small ng-show=\"entity.occurrences.length > 0\">({{entity.occurrences.length}})</small>\n        <span ng-show=\"isInternal()\">*</span>  \n        <i ng-class=\"{ 'wl-more': isOpened == false, 'wl-less': isOpened == true }\" ng-click=\"toggle()\"></i>\n  <span ng-class=\"{ 'active' : editingModeOn }\" ng-click=\"toggleEditingMode()\" ng-show=\"isOpened\" class=\"wl-edit-button\">Edit</span>\n        <div class=\"details\" ng-show=\"isOpened\">\n          <p ng-hide=\"editingModeOn\"><img class=\"thumbnail\" ng-src=\"{{ entity.images[0] }}\" />{{entity.description}}</p>\n          <wl-entity-form entity=\"entity\" ng-show=\"editingModeOn\" on-submit=\"toggleEditingMode()\"></wl-entity-form>\n        </div>\n</div>\n",
         link: function($scope, $element, $attrs, $boxCtrl) {
           $boxCtrl.addTile($scope);
           $scope.isOpened = false;
           $scope.editingModeOn = false;
+          $scope.isInternal = function() {
+            if ($scope.entity.id.match(/redlink/)) {
+              return true;
+            }
+            return false;
+          };
           $scope.toggleEditingMode = function() {
             return $scope.editingModeOn = !$scope.editingModeOn;
           };
@@ -426,7 +434,7 @@
       scope: {
         entity: '='
       },
-      template: "        <div>\n\n          <input type='text' name='wl_entities[{{entity.id}}][uri]' value='{{entity.id}}'>\n          <input type='text' name='wl_entities[{{entity.id}}][label]' value='{{entity.label}}'>\n          <textarea name='wl_entities[{{entity.id}}][description]'>{{entity.description}}</textarea>\n          <input type='text' name='wl_entities[{{entity.id}}][main_type]' value='{{entity.mainType}}'>\n\n          <input ng-repeat=\"type in entity.types\" type='text'\n          	name='wl_entities[{{entity.id}}][type][]' value='{{type}}' />\n          <input ng-repeat=\"image in entity.images\" type='text'\n            name='wl_entities[{{entity.id}}][image][]' value='{{image}}' />\n          <input ng-repeat=\"sameAs in entity.sameAs\" type='text'\n            name='wl_entities[{{entity.id}}][sameas][]' value='{{sameAs}}' />\n\n</div>"
+      template: "        <div>\n\n          <input type='text' name='wl_entities[{{entity.id}}][uri]' value='{{entity.id}}'>\n          <input type='text' name='wl_entities[{{entity.id}}][label]' value='{{entity.label}}'>\n          <textarea name='wl_entities[{{entity.id}}][description]'>{{entity.description}}</textarea>\n          <input type='text' name='wl_entities[{{entity.id}}][main_type]' value='wl-{{entity.mainType}}'>\n\n          <input ng-repeat=\"type in entity.types\" type='text'\n          	name='wl_entities[{{entity.id}}][type][]' value='{{type}}' />\n          <input ng-repeat=\"image in entity.images\" type='text'\n            name='wl_entities[{{entity.id}}][image][]' value='{{image}}' />\n          <input ng-repeat=\"sameAs in entity.sameAs\" type='text'\n            name='wl_entities[{{entity.id}}][sameas][]' value='{{sameAs}}' />\n\n</div>"
     };
   });
 
@@ -513,6 +521,9 @@
         _ref1 = data.entities;
         for (id in _ref1) {
           entity = _ref1[id];
+          if (!entity.label) {
+            $log.warn("Label missing for entity " + id);
+          }
           entity.id = id;
           entity.occurrences = [];
           entity.annotations = {};
