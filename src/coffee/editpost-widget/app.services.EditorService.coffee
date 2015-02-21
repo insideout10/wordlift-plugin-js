@@ -86,7 +86,11 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
     if annotationId?
       dedisambiguate entity.annotations[ annotationId ], entity
     else
+      $log.debug "Here I am"
+      $log.debug entity.annotations
       for id, annotation of entity.annotations
+        $log.debug "Daje"
+      
         dedisambiguate annotation, entity
     
     for entityId in discarded
@@ -178,6 +182,7 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
         # Loop annotation to see which has to be preselected
         for em in annotation.entityMatches
           entity = analysis.entities[ em.entityId ] 
+          
           if annotationId in entity.occurrences
             element += " disambiguated wl-#{entity.mainType}\" itemid=\"#{entity.id}"
         

@@ -1,6 +1,6 @@
 angular.module('wordlift.editpost.widget.services.AnalysisService', [])
 # Manage redlink analysis responses
-.service('AnalysisService', [ '$log', '$http', '$rootScope', ($log, $http, $rootScope)-> 
+.service('AnalysisService', [ 'configuration', '$log', '$http', '$rootScope', (configuration, $log, $http, $rootScope)-> 
 	
   # Creates a unique ID of the specified length (default 8).
   uniqueId = (length = 8) ->
@@ -52,12 +52,17 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
   
   service.parse = (data) ->
     
+    # Add local entities
     # Add id to entity obj
     # Add id to annotation obj
     # Add occurences as a blank array
     # Add annotation references to each entity
-
-    $log.debug Object.keys(data.entities).length
+    for id, localEntity of configuration.entities
+      if data.entities[ id ]?
+        $log.debug "LocalEntity #{id} found into the analysis"
+      else
+        $log.debug "Going to add localEntity #{id} to the analysis"
+        data.entities[ id ] = localEntity
 
     for id, entity of data.entities
       entity.id = id
@@ -78,32 +83,70 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
       for annotationId, annotation of data.annotations
         local_confidence = 1
         for em in annotation.entityMatches  
-          local_confidence = em.confidence if em.entityId is id
+          if em.entityId is id
+            local_confidence = em.confidence
         entity.confidence = entity.confidence * local_confidence
  
     data
 
   service.perform = (content)->
-  	$http(
-      method: 'get'
-      url: ajaxurl #+ '?action=wordlift_analyze'
+    
+    $log.info "Start to performing analysis"
+
+    if not content?
+      $log.warn "content missing: nothing to do"
+      return
+
+    $http(
+      method: 'post'
+      url: ajaxurl + '?action=wordlift_analyze'
       data: content      
     )
     # If successful, broadcast an *analysisReceived* event.
     .success (data) ->
+      
+       if typeof data is 'string'
+         $log.warn "Invalid data returned"
+         $log.debug data
+         return
+
        $rootScope.$broadcast "analysisPerformed", service.parse( data )
+    .error (data, status) ->
+       $log.warn "Error on analysis, statut #{status}"
 
   # Preselect entity annotations in the provided analysis using the provided collection of annotations.
   service.preselect = (analysis, annotations) ->
 
     # Find the existing entities in the html
     for annotation in annotations
-      # Find the proper annotation            
-      textAnnotation = findAnnotation analysis.annotations, annotation.start, annotation.end
-      # TODO Look for same as
-      # Enhance entity occurences
-      analysis.entities[ annotation.uri ].occurrences.push  textAnnotation.id
 
+      # Find the proper annotation  
+      textAnnotation = findAnnotation analysis.annotations, annotation.start, annotation.end
+      
+      # If there is no textAnnotation then create it and add to the current analysis
+      if not textAnnotation?
+        $log.debug "There is no annotation with start #{annotation.start} and end #{annotation.end}"
+        textAnnotation = @createAnnotation({
+          start: annotation.start
+          end: annotation.end
+          text: annotation.label
+          })
+        analysis.annotations[ textAnnotation.id ] = textAnnotation
+        
+      # TODO Look for same as
+      # Look for the entity in the current analysis result
+      # Local entities are merged previously in analysis parsing
+      entity = analysis.entities[ annotation.uri ]
+      # If no entity is found we have a problem
+      if not entity?
+         $log.warn "Entity with uri #{annotation.uri} is missing both in analysis results and in local storage"
+         continue
+      # Enhance analysis accordingly
+      analysis.entities[ entity.id ].occurrences.push  textAnnotation.id 
+      analysis.entities[ entity.id ].annotations[ textAnnotation.id ] = textAnnotation 
+      analysis.annotations[ textAnnotation.id ].entityMatches.push { entityId: entity.id, confidence: 1 } 
+      analysis.annotations[ textAnnotation.id ].entities[ entity.id ] = analysis.entities[ entity.id ]            
+        
   service
 
 ])

@@ -11,16 +11,19 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     if not items? 
       return filtered
 
-    treshold = Math.floor ( 1/120 * Object.keys(items).length ) + 0.75 
+    treshold = Math.floor ( (1/120) * Object.keys(items).length ) + 0.75 
     
     for id, entity of items
       if  entity.mainType in types
         
         annotations_count = Object.keys( entity.annotations ).length
         if annotations_count > treshold and entity.confidence is 1
-           filtered.push entity
-           continue
+          filtered.push entity
+          continue
         if entity.occurrences.length > 0
+          filtered.push entity
+          continue
+        if entity.id.match(/redlink/)
           filtered.push entity
         
         # TODO se è una entità di wordlift la mostro
@@ -54,7 +57,6 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
 ])
 .controller('EditPostWidgetController', [ 'EditorService', 'AnalysisService', 'configuration', '$log', '$scope', '$rootScope', '$injector', (EditorService, AnalysisService, configuration, $log, $scope, $rootScope, $injector)-> 
 
-  $scope.configuration = []
   $scope.analysis = undefined
   $scope.newEntity = AnalysisService.createEntity()
   $scope.selectedEntities = {}
@@ -62,17 +64,15 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
   $scope.annotation = undefined
   $scope.boxes = []
   $scope.isSelectionCollapsed = true
-  
-  for box in configuration.boxes
+  $scope.configuration = configuration
 
+  for box in $scope.configuration.classificationBoxes
     $scope.selectedEntities[ box.id ] = {}
-
     $scope.widgets[ box.id ] = {}
+
     for widget in box.registeredWidgets
       $scope.widgets[ box.id ][ widget ] = []
               
-  $scope.configuration = configuration
-
   # Delegate to EditorService
   $scope.createTextAnnotationFromCurrentSelection = ()->
     EditorService.createTextAnnotationFromCurrentSelection()
@@ -126,9 +126,12 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
   $scope.$on "analysisPerformed", (event, analysis) -> 
     $scope.analysis = analysis
     # Preselect 
-    for box in configuration.boxes
-      for entityId in box.selectedEntities
-        $scope.selectedEntities[ box.id ][ entityId ] = analysis.entities[ entityId ]
+    for box in $scope.configuration.classificationBoxes
+      for entityId in box.selectedEntities  
+        if entity = analysis.entities[ entityId ]
+          $scope.selectedEntities[ box.id ][ entityId ] = analysis.entities[ entityId ]
+        else
+          $log.warn "Entity with id #{entityId} should be linked to #{box.id} but is missing"
 
   $scope.updateWidget = (widget, scope)->
     $log.debug "Going to updated widget #{widget} for box #{scope}"

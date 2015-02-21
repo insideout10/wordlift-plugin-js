@@ -1,13 +1,13 @@
 angular.module('wordlift.editpost.widget.providers.ConfigurationProvider', [])
 .provider("configuration", ()->
   
-  boxes = undefined
+  _configuration = undefined
   
   provider =
-    setBoxes: (items)->
-      boxes = items
+    setConfiguration: (configuration)->
+      _configuration = configuration
     $get: ()->
-      { boxes: boxes }
+      _configuration
 
   provider
 )

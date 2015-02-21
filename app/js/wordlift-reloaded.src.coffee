@@ -142,16 +142,19 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     if not items? 
       return filtered
 
-    treshold = Math.floor ( 1/120 * Object.keys(items).length ) + 0.75 
+    treshold = Math.floor ( (1/120) * Object.keys(items).length ) + 0.75 
     
     for id, entity of items
       if  entity.mainType in types
         
         annotations_count = Object.keys( entity.annotations ).length
         if annotations_count > treshold and entity.confidence is 1
-           filtered.push entity
-           continue
+          filtered.push entity
+          continue
         if entity.occurrences.length > 0
+          filtered.push entity
+          continue
+        if entity.id.match(/redlink/)
           filtered.push entity
         
         # TODO se è una entità di wordlift la mostro
@@ -185,7 +188,6 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
 ])
 .controller('EditPostWidgetController', [ 'EditorService', 'AnalysisService', 'configuration', '$log', '$scope', '$rootScope', '$injector', (EditorService, AnalysisService, configuration, $log, $scope, $rootScope, $injector)-> 
 
-  $scope.configuration = []
   $scope.analysis = undefined
   $scope.newEntity = AnalysisService.createEntity()
   $scope.selectedEntities = {}
@@ -193,17 +195,15 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
   $scope.annotation = undefined
   $scope.boxes = []
   $scope.isSelectionCollapsed = true
-  
-  for box in configuration.boxes
+  $scope.configuration = configuration
 
+  for box in $scope.configuration.classificationBoxes
     $scope.selectedEntities[ box.id ] = {}
-
     $scope.widgets[ box.id ] = {}
+
     for widget in box.registeredWidgets
       $scope.widgets[ box.id ][ widget ] = []
               
-  $scope.configuration = configuration
-
   # Delegate to EditorService
   $scope.createTextAnnotationFromCurrentSelection = ()->
     EditorService.createTextAnnotationFromCurrentSelection()
@@ -257,9 +257,12 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
   $scope.$on "analysisPerformed", (event, analysis) -> 
     $scope.analysis = analysis
     # Preselect 
-    for box in configuration.boxes
-      for entityId in box.selectedEntities
-        $scope.selectedEntities[ box.id ][ entityId ] = analysis.entities[ entityId ]
+    for box in $scope.configuration.classificationBoxes
+      for entityId in box.selectedEntities  
+        if entity = analysis.entities[ entityId ]
+          $scope.selectedEntities[ box.id ][ entityId ] = analysis.entities[ entityId ]
+        else
+          $log.warn "Entity with id #{entityId} should be linked to #{box.id} but is missing"
 
   $scope.updateWidget = (widget, scope)->
     $log.debug "Going to updated widget #{widget} for box #{scope}"
@@ -421,7 +424,7 @@ angular.module('wordlift.editpost.widget.directives.wlEntityTile', [])
   	  <div ng-class="'wl-' + entity.mainType" class="entity">
   	    <i ng-hide="annotation" ng-class="{ 'wl-selected' : isSelected, 'wl-unselected' : !isSelected }"></i>
         <i class="type"></i>
-        <span class="label" ng-click="onEntitySelect()">{{entity.label}}</span>
+        <span class="label" ng-click="onEntitySelect()">{{entity.label}}</span>     
         <small ng-show="entity.occurrences.length > 0">({{entity.occurrences.length}})</small>
         <i ng-class="{ 'wl-more': isOpened == false, 'wl-less': isOpened == true }" ng-click="toggle()"></i>
   	    <span ng-class="{ 'active' : editingModeOn }" ng-click="toggleEditingMode()" ng-show="isOpened" class="wl-edit-button">Edit</span>
@@ -434,7 +437,7 @@ angular.module('wordlift.editpost.widget.directives.wlEntityTile', [])
   	"""
     link: ($scope, $element, $attrs, $boxCtrl) ->				      
       
-      $log.debug "Created entity tile with id #{$scope.$id} and confidence #{$scope.entity.confidence}"
+      # $log.debug "Created entity tile with id #{$scope.$id} and confidence #{$scope.entity.confidence}"
       # Add tile to related container scope
       $boxCtrl.addTile $scope
 
@@ -481,7 +484,7 @@ angular.module('wordlift.editpost.widget.directives.wlEntityInputBox', [])
   )
 angular.module('wordlift.editpost.widget.services.AnalysisService', [])
 # Manage redlink analysis responses
-.service('AnalysisService', [ '$log', '$http', '$rootScope', ($log, $http, $rootScope)-> 
+.service('AnalysisService', [ 'configuration', '$log', '$http', '$rootScope', (configuration, $log, $http, $rootScope)-> 
 	
   # Creates a unique ID of the specified length (default 8).
   uniqueId = (length = 8) ->
@@ -533,12 +536,17 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
   
   service.parse = (data) ->
     
+    # Add local entities
     # Add id to entity obj
     # Add id to annotation obj
     # Add occurences as a blank array
     # Add annotation references to each entity
-
-    $log.debug Object.keys(data.entities).length
+    for id, localEntity of configuration.entities
+      if data.entities[ id ]?
+        $log.debug "LocalEntity #{id} found into the analysis"
+      else
+        $log.debug "Going to add localEntity #{id} to the analysis"
+        data.entities[ id ] = localEntity
 
     for id, entity of data.entities
       entity.id = id
@@ -559,32 +567,70 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
       for annotationId, annotation of data.annotations
         local_confidence = 1
         for em in annotation.entityMatches  
-          local_confidence = em.confidence if em.entityId is id
+          if em.entityId is id
+            local_confidence = em.confidence
         entity.confidence = entity.confidence * local_confidence
  
     data
 
   service.perform = (content)->
-  	$http(
-      method: 'get'
-      url: ajaxurl #+ '?action=wordlift_analyze'
+    
+    $log.info "Start to performing analysis"
+
+    if not content?
+      $log.warn "content missing: nothing to do"
+      return
+
+    $http(
+      method: 'post'
+      url: ajaxurl + '?action=wordlift_analyze'
       data: content      
     )
     # If successful, broadcast an *analysisReceived* event.
     .success (data) ->
+      
+       if typeof data is 'string'
+         $log.warn "Invalid data returned"
+         $log.debug data
+         return
+
        $rootScope.$broadcast "analysisPerformed", service.parse( data )
+    .error (data, status) ->
+       $log.warn "Error on analysis, statut #{status}"
 
   # Preselect entity annotations in the provided analysis using the provided collection of annotations.
   service.preselect = (analysis, annotations) ->
 
     # Find the existing entities in the html
     for annotation in annotations
-      # Find the proper annotation            
-      textAnnotation = findAnnotation analysis.annotations, annotation.start, annotation.end
-      # TODO Look for same as
-      # Enhance entity occurences
-      analysis.entities[ annotation.uri ].occurrences.push  textAnnotation.id
 
+      # Find the proper annotation  
+      textAnnotation = findAnnotation analysis.annotations, annotation.start, annotation.end
+      
+      # If there is no textAnnotation then create it and add to the current analysis
+      if not textAnnotation?
+        $log.debug "There is no annotation with start #{annotation.start} and end #{annotation.end}"
+        textAnnotation = @createAnnotation({
+          start: annotation.start
+          end: annotation.end
+          text: annotation.label
+          })
+        analysis.annotations[ textAnnotation.id ] = textAnnotation
+        
+      # TODO Look for same as
+      # Look for the entity in the current analysis result
+      # Local entities are merged previously in analysis parsing
+      entity = analysis.entities[ annotation.uri ]
+      # If no entity is found we have a problem
+      if not entity?
+         $log.warn "Entity with uri #{annotation.uri} is missing both in analysis results and in local storage"
+         continue
+      # Enhance analysis accordingly
+      analysis.entities[ entity.id ].occurrences.push  textAnnotation.id 
+      analysis.entities[ entity.id ].annotations[ textAnnotation.id ] = textAnnotation 
+      analysis.annotations[ textAnnotation.id ].entityMatches.push { entityId: entity.id, confidence: 1 } 
+      analysis.annotations[ textAnnotation.id ].entities[ entity.id ] = analysis.entities[ entity.id ]            
+        
   service
 
 ])
@@ -676,7 +722,11 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
     if annotationId?
       dedisambiguate entity.annotations[ annotationId ], entity
     else
+      $log.debug "Here I am"
+      $log.debug entity.annotations
       for id, annotation of entity.annotations
+        $log.debug "Daje"
+      
         dedisambiguate annotation, entity
     
     for entityId in discarded
@@ -768,6 +818,7 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
         # Loop annotation to see which has to be preselected
         for em in annotation.entityMatches
           entity = analysis.entities[ em.entityId ] 
+          
           if annotationId in entity.occurrences
             element += " disambiguated wl-#{entity.mainType}\" itemid=\"#{entity.id}"
         
@@ -802,13 +853,13 @@ angular.module('wordlift.editpost.widget.services.ImageSuggestorDataRetrieverSer
 angular.module('wordlift.editpost.widget.providers.ConfigurationProvider', [])
 .provider("configuration", ()->
   
-  boxes = undefined
+  _configuration = undefined
   
   provider =
-    setBoxes: (items)->
-      boxes = items
+    setConfiguration: (configuration)->
+      _configuration = configuration
     $get: ()->
-      { boxes: boxes }
+      _configuration
 
   provider
 )
@@ -834,7 +885,7 @@ angular.module('wordlift.editpost.widget', [
 	])
 
 .config((configurationProvider)->
-  configurationProvider.setBoxes window.wordlift.classificationBoxes
+  configurationProvider.setConfiguration window.wordlift
 )
 
 $(
@@ -856,7 +907,7 @@ $(
         <wl-entity-form entity="newEntity" on-submit="addNewEntityToAnalysis()" ng-show="analysis.annotations[annotation].entityMatches.length == 0"></wl-entity-form>
       </div>
 
-      <wl-classification-box ng-repeat="box in configuration.boxes">
+      <wl-classification-box ng-repeat="box in configuration.classificationBoxes">
         <div ng-hide="annotation" class="wl-without-annotation">
           <wl-entity-tile is-selected="isEntitySelected(entity, box)" on-entity-select="onSelectedEntityTile(entity, box)" entity="entity" ng-repeat="entity in analysis.entities | filterEntitiesByTypesAndRelevance:box.registeredTypes"></wl-entity>
         </div>  

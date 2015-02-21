@@ -17,7 +17,7 @@ angular.module('wordlift.editpost.widget', [
 	])
 
 .config((configurationProvider)->
-  configurationProvider.setBoxes window.wordlift.classificationBoxes
+  configurationProvider.setConfiguration window.wordlift
 )
 
 $(
@@ -39,7 +39,7 @@ $(
         <wl-entity-form entity="newEntity" on-submit="addNewEntityToAnalysis()" ng-show="analysis.annotations[annotation].entityMatches.length == 0"></wl-entity-form>
       </div>
 
-      <wl-classification-box ng-repeat="box in configuration.boxes">
+      <wl-classification-box ng-repeat="box in configuration.classificationBoxes">
         <div ng-hide="annotation" class="wl-without-annotation">
           <wl-entity-tile is-selected="isEntitySelected(entity, box)" on-entity-select="onSelectedEntityTile(entity, box)" entity="entity" ng-repeat="entity in analysis.entities | filterEntitiesByTypesAndRelevance:box.registeredTypes"></wl-entity>
         </div>  

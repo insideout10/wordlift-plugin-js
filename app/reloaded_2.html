@@ -44,7 +44,7 @@
     <div id="sx">
         <form name="post">
         <textarea style="width: 100%; height: 100%" id="content">
-Crollano <span itemid="http://dbpedia.org/resource/Athens_Prefecture" id="urn:enhancement-afe6a8de-56cf-6dca-d307-d890993297fb" class="textannotation disambiguated wl-place">Atene</span> e petrolio, l'euro precipita e Piazza Affari stampa un calo del 5%. Sono molti gli elementi di tensione sui mercati internazionali a caratterizzare la ripresa degli scambi di inizio settimana. L'incertezza in Grecia, dove è partita una campagna elettorale infiammata in vista delle elezioni del 25 gennaio prossimo, le aspettative per un intervento della Bce con l'acquisto di titoli di Stato e il calo del greggio, che tocca i minimi dal 2009 sotto la soglia di 50 dollari, sono un mix che genera una corsa a vendere azioni. Piazza Affari recita il ruolo della più colpita tra le principali Borse europee, con un calo finale del 4,92%. La moneta unica europea si deprezza sotto l'effetto combinato di due elementi: le possibili evoluzioni politiche ad <span itemid="http://dbpedia.org/resource/Athens_Prefecture" id="urn:enhancement-afe6a8de-56cf-6dca-d307-d890993297fa" class="textannotation disambiguated wl-place">Atene</span>, con l'ascesa di <span id="urn:enhancement-1f83847a-95c2-c81b-cba9-f958aed45b34" class="textannotation">Alexis Tsipras</span> che potrebbe significare rimettere mano alla ristrutturazione del debito, e l'azione di Mario Draghi che potrebbe a breve stampare nuova moneta. La Commissione Ue prova a rintuzzare la criticità ellenica indicando, per bocca di un portavoce, che il trattato Ue dice che la partecipazione all'area euro "è irreversibile".
+Crollano <span itemid="http://data.redlink.io/91/be2/entity/Athens_Prefecture" id="urn:enhancement-afe6a8de-56cf-6dca-d307-d890993297fb" class="textannotation disambiguated wl-place">Atene</span> e petrolio, l'euro precipita e Piazza Affari stampa un calo del 5%. Sono molti gli elementi di tensione sui mercati internazionali a caratterizzare la ripresa degli scambi di inizio settimana. L'incertezza in Grecia, dove è partita una campagna elettorale infiammata in vista delle elezioni del 25 gennaio prossimo, le aspettative per un intervento della Bce con l'acquisto di titoli di Stato e il calo del greggio, che tocca i minimi dal 2009 sotto la soglia di 50 dollari, sono un mix che genera una corsa a vendere azioni. Piazza Affari recita il ruolo della più colpita tra le principali Borse europee, con un calo finale del 4,92%. La moneta unica europea si deprezza sotto l'effetto combinato di due elementi: le possibili evoluzioni politiche ad <span itemid="http://data.redlink.io/91/be2/entity/Athens_Prefecture" id="urn:enhancement-afe6a8de-56cf-6dca-d307-d890993297fa" class="textannotation disambiguated wl-place">Atene</span>, con l'ascesa di <span id="urn:enhancement-1f83847a-95c2-c81b-cba9-f958aed45b34" class="textannotation">Alexis Tsipras</span> che potrebbe significare rimettere mano alla ristrutturazione del debito, e l'azione di Mario Draghi che potrebbe a breve stampare nuova moneta. La Commissione Ue prova a rintuzzare la criticità ellenica indicando, per bocca di un portavoce, che il trattato Ue dice che la partecipazione all'area euro "è irreversibile". Ed è pur sempre <span itemid="http://data.redlink.io/91/be2/entity/Athens_Prefecture" id="urn:enhancement-afe6a8de-56cf-6dca-d307-d890993297fc" class="textannotation disambiguated wl-place">Atene</span>.
         </textarea>
         </form>        
     </div>
@@ -96,17 +96,20 @@ Crollano <span itemid="http://dbpedia.org/resource/Athens_Prefecture" id="urn:en
 
     );
 
-    var ajaxurl = 'assets/sample-response.json';
+    var ajaxurl = 'assets/sample-response-3.json';
     
     window.wordlift = {};
 
-    window.wordlift["classificationBoxes"] = [
+    window.wordlift.entities = {
+        "http://data.redlink.io/91/be2/entity/Athens_Prefecture" : {"confidence":1,"mainType": "place","types":["http://dbpedia.org/ontology/AdministrativeRegion","http://dbpedia.org/ontology/Place","http://dbpedia.org/ontology/PopulatedPlace","http://dbpedia.org/ontology/Region","http://dbpedia.org/class/yago/AdministrativeDistrict108491826","http://dbpedia.org/class/yago/District108552138","http://dbpedia.org/class/yago/Location100027167","http://dbpedia.org/class/yago/Object100002684","http://dbpedia.org/class/yago/PhysicalEntity100001930","http://dbpedia.org/class/yago/Prefecture108626947","http://dbpedia.org/class/yago/PrefecturesOfGreece","http://dbpedia.org/class/yago/Region108630985","http://dbpedia.org/class/yago/YagoGeoEntity","http://dbpedia.org/class/yago/YagoLegalActorGeo","http://dbpedia.org/class/yago/YagoPermanentlyLocatedEntity","http://www.opengis.net/gml/_Feature","http://www.w3.org/2002/07/owl#Thing","http://schema.org/AdministrativeArea","http://schema.org/Place"],"label":"Atene","description":"Atene era una prefettura della Grecia vicina al fallimento, abolita a partire dal 1º gennaio 2011 a seguito dell'entrata in vigore della riforma amministrativa detta piano Kallikratis. La capitale della prefettura era la città di Atene.","images":["http://upload.wikimedia.org/wikipedia/commons/2/20/GreeceAttica.png"], "sameAs":["http://dbpedia.org/resource/Athens_Prefecture"]}
+    }
+    window.wordlift.classificationBoxes = [
         {
             "id": "what",
             "label": "What",
             "registeredTypes": [ "event", "organization", "person", "place", "thing" ],
             "registeredWidgets": [ "ImageSuggestor"],
-            "selectedEntities":  [ "http://dbpedia.org/resource/Athens_Prefecture" ]
+            "selectedEntities":  [ "http://data.redlink.io/91/be2/entity/Athens_Prefecture" ]
         },
         {
             "id": "who",
