@@ -696,12 +696,9 @@
         if (annotationId != null) {
           dedisambiguate(entity.annotations[annotationId], entity);
         } else {
-          $log.debug("Here I am");
-          $log.debug(entity.annotations);
           _ref = entity.annotations;
           for (id in _ref) {
             annotation = _ref[id];
-            $log.debug("Daje");
             dedisambiguate(annotation, entity);
           }
         }
