@@ -582,7 +582,7 @@
         });
       };
       service.preselect = function(analysis, annotations) {
-        var annotation, entity, textAnnotation, _i, _len, _results;
+        var annotation, e, entity, id, textAnnotation, _i, _len, _ref, _ref1, _results;
         _results = [];
         for (_i = 0, _len = annotations.length; _i < _len; _i++) {
           annotation = annotations[_i];
@@ -597,17 +597,28 @@
             analysis.annotations[textAnnotation.id] = textAnnotation;
           }
           entity = analysis.entities[annotation.uri];
+          _ref = configuration.entities;
+          for (id in _ref) {
+            e = _ref[id];
+            if (_ref1 = annotation.uri, __indexOf.call(e.sameAs, _ref1) >= 0) {
+              entity = analysis.entities[e.id];
+            }
+          }
           if (entity == null) {
             $log.warn("Entity with uri " + annotation.uri + " is missing both in analysis results and in local storage");
             continue;
           }
           analysis.entities[entity.id].occurrences.push(textAnnotation.id);
-          analysis.entities[entity.id].annotations[textAnnotation.id] = textAnnotation;
-          analysis.annotations[textAnnotation.id].entityMatches.push({
-            entityId: entity.id,
-            confidence: 1
-          });
-          _results.push(analysis.annotations[textAnnotation.id].entities[entity.id] = analysis.entities[entity.id]);
+          if (analysis.entities[entity.id].annotations[textAnnotation.id] == null) {
+            analysis.entities[entity.id].annotations[textAnnotation.id] = textAnnotation;
+            analysis.annotations[textAnnotation.id].entityMatches.push({
+              entityId: entity.id,
+              confidence: 1
+            });
+            _results.push(analysis.annotations[textAnnotation.id].entities[entity.id] = analysis.entities[entity.id]);
+          } else {
+            _results.push(void 0);
+          }
         }
         return _results;
       };
@@ -792,6 +803,8 @@
                 }
               }
               element += "\">";
+              $log.debug(element);
+              $log.debug(annotation.entityMatches);
               traslator.insertHtml(element, {
                 text: annotation.start
               });

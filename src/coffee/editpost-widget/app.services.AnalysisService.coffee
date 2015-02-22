@@ -135,19 +135,23 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
           })
         analysis.annotations[ textAnnotation.id ] = textAnnotation
         
-      # TODO Look for same as
       # Look for the entity in the current analysis result
-      # Local entities are merged previously in analysis parsing
+      # Local entities are merged previously during the analysis parsing
+      # Local entities have higher priority
       entity = analysis.entities[ annotation.uri ]
+      for id, e of configuration.entities
+        entity = analysis.entities[ e.id ] if annotation.uri in e.sameAs
+
       # If no entity is found we have a problem
       if not entity?
          $log.warn "Entity with uri #{annotation.uri} is missing both in analysis results and in local storage"
          continue
       # Enhance analysis accordingly
-      analysis.entities[ entity.id ].occurrences.push  textAnnotation.id 
-      analysis.entities[ entity.id ].annotations[ textAnnotation.id ] = textAnnotation 
-      analysis.annotations[ textAnnotation.id ].entityMatches.push { entityId: entity.id, confidence: 1 } 
-      analysis.annotations[ textAnnotation.id ].entities[ entity.id ] = analysis.entities[ entity.id ]            
+      analysis.entities[ entity.id ].occurrences.push  textAnnotation.id
+      if not analysis.entities[ entity.id ].annotations[ textAnnotation.id ]?
+        analysis.entities[ entity.id ].annotations[ textAnnotation.id ] = textAnnotation 
+        analysis.annotations[ textAnnotation.id ].entityMatches.push { entityId: entity.id, confidence: 1 } 
+        analysis.annotations[ textAnnotation.id ].entities[ entity.id ] = analysis.entities[ entity.id ]            
         
   service
 

@@ -183,7 +183,10 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
             element += " disambiguated wl-#{entity.mainType}\" itemid=\"#{entity.id}"
         
         element += "\">"
+        $log.debug element
+        $log.debug annotation.entityMatches
         
+            
         # Finally insert the HTML code.
         traslator.insertHtml element, text: annotation.start
         traslator.insertHtml '</span>', text: annotation.end
