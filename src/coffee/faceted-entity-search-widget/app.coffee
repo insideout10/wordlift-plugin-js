@@ -21,6 +21,9 @@ angular.module('wordlift.facetedsearch.widget', [])
     $scope.facets = []
     $scope.conditions = []
     
+    $scope.isInConditions = (entity)->
+      return (entity.id in $scope.conditions)
+
     $scope.addCondition = (entity)->
       $log.debug "Add entity #{entity.id} to conditions array"
 
@@ -66,8 +69,6 @@ angular.module('wordlift.facetedsearch.widget', [])
 
   service
 
-  service
-
 ])
 .config((configurationProvider)->
   configurationProvider.setConfiguration window.wl_faceted_search_params
@@ -76,22 +77,23 @@ angular.module('wordlift.facetedsearch.widget', [])
 $(
   container = $("""
   	<div ng-controller="FacetedSearchWidgetController">
-      <div class="conditions">
-        <h5>Filtri</h5>
-        <ul>
-          <li ng-repeat="condition in conditions"><span>{{condition}}</span></li>
-        </ul>
-      </div>
       <div class="facets">
         <h3>Facets</h3>
         <ul>
-          <li ng-repeat="entity in facets" ng-click="addCondition(entity)">
+          <li ng-repeat="entity in facets" ng-click="addCondition(entity)" ng-class=" { 'selected' : isInConditions(entity) }">
             {{entity.label}} <small>({{entity.mainType}})</small>
           </li>
         </ul>
       </div>
       <div class="posts">
         <div class="post" ng-repeat="post in posts">{{post.post_title}}</div>   
+      
+    <div class="conditions">
+      <h5>Filtri</h5>
+      <ul>
+        <li ng-repeat="condition in conditions"><small>{{condition}}</small></li>
+      </ul>
+    </div>
       </div>
       <br class="clear" />
     </div>

@@ -1348,12 +1348,19 @@
 }
 #wordlift-faceted-entity-search-widget .facets li {
   list-style-type: none;
-  padding: 0.4em;
+  padding: 0.2em;
   border-bottom: #999 1px solid;
+}
+#wordlift-faceted-entity-search-widget .facets .selected {
+  border-bottom: #6c0 1px solid;
 }
 #wordlift-faceted-entity-search-widget h3 {
   margin: 1em 0em;
   font-size: 1.6em;
+}
+#wordlift-faceted-entity-search-widget h5 {
+  margin: 1em 0em;
+  font-size: 0.8em;
 }
 #wordlift-faceted-entity-search-widget .posts {
   float: right;
