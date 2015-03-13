@@ -15,24 +15,47 @@
       }
     };
     return provider;
-  }).controller('FacetedSearchWidgetController', ['configuration', '$scope', '$log', function(configuration, $scope, $log) {}]).service('DataRetrieverService', [
+  }).controller('FacetedSearchWidgetController', [
+    'DataRetrieverService', 'configuration', '$scope', '$log', function(DataRetrieverService, configuration, $scope, $log) {
+      $scope.posts = [];
+      $scope.facets = [];
+      $scope.conditions = [];
+      $scope.addCondition = function(entity) {
+        $log.debug("Add entity " + entity.id + " to conditions array");
+        $scope.conditions.push(entity.id);
+        return DataRetrieverService.load('posts', $scope.conditions);
+      };
+      $scope.$on("postsLoaded", function(event, posts) {
+        $log.debug("Referencing posts for entity " + configuration.entity_id + " ...");
+        $log.debug(posts);
+        return $scope.posts = posts;
+      });
+      return $scope.$on("facetsLoaded", function(event, facets) {
+        $log.debug("Referencing facets for entity " + configuration.entity_id + " ...");
+        $log.debug(facets);
+        return $scope.facets = facets;
+      });
+    }
+  ]).service('DataRetrieverService', [
     'configuration', '$log', '$http', '$rootScope', function(configuration, $log, $http, $rootScope) {
       var service;
       service = {};
       service.load = function(type, conditions) {
         var uri;
         if (conditions == null) {
-          conditions = {};
+          conditions = [];
         }
         uri = "" + configuration.ajax_url + "?action=" + configuration.action + "&entity_id=" + configuration.entity_id + "&type=" + type;
-        $log.debug("Going to ask posts at uri " + uri);
+        $log.debug("Going to search " + type + " with conditions");
+        $log.debug(conditions);
         return $http({
-          method: 'get',
-          url: uri
+          method: 'post',
+          url: uri,
+          data: conditions
         }).success(function(data) {
-          return $rootScope.$broadcast("postsLoaded", data);
+          return $rootScope.$broadcast("" + type + "Loaded", data);
         }).error(function(data, status) {
-          return $log.warn("Error loading " + type + "s, statut " + status);
+          return $log.warn("Error loading " + type + ", statut " + status);
         });
       };
       service;
@@ -42,12 +65,13 @@
     return configurationProvider.setConfiguration(window.wl_faceted_search_params);
   });
 
-  $(container = $("<div ng-controller=\"FacetedSearchWidgetController\">\n      <div><h3>Facets</h3></div>\n      <div><h3>Related posts</h3></div>\n    </div>").appendTo('#wordlift-faceted-entity-search-widget'), injector = angular.bootstrap($('#wordlift-faceted-entity-search-widget'), ['wordlift.facetedsearch.widget']));
+  $(container = $("<div ng-controller=\"FacetedSearchWidgetController\">\n      <div>\n        <h3>Facets</h3>\n        <ul>\n          <li ng-repeat=\"entity in facets\" ng-click=\"addCondition(entity)\">{{entity.id}} {{entity.mainType}}</li>\n        </ul>\n      </div>\n      <div>\n        <h3>Related posts</h3>\n        <div ng-repeat=\"post in posts\">{{post.post_title}}</div>   \n      </div>\n    </div>").appendTo('#wordlift-faceted-entity-search-widget'), injector = angular.bootstrap($('#wordlift-faceted-entity-search-widget'), ['wordlift.facetedsearch.widget']));
 
   injector.invoke([
     'DataRetrieverService', '$rootScope', '$log', function(DataRetrieverService, $rootScope, $log) {
       return $rootScope.$apply(function() {
-        return DataRetrieverService.load('posts');
+        DataRetrieverService.load('posts');
+        return DataRetrieverService.load('facets');
       });
     }
   ]);

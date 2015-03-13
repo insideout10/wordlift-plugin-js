@@ -15,26 +15,49 @@ angular.module('wordlift.facetedsearch.widget', [])
 
   provider
 )
-.controller('FacetedSearchWidgetController', [ 'configuration', '$scope', '$log', (configuration, $scope, $log)-> 
-  
+.controller('FacetedSearchWidgetController', [ 'DataRetrieverService', 'configuration', '$scope', '$log', (DataRetrieverService, configuration, $scope, $log)-> 
+
+    $scope.posts = []
+    $scope.facets = []
+    $scope.conditions = []
+    
+    $scope.addCondition = (entity)->
+      $log.debug "Add entity #{entity.id} to conditions array"
+      $scope.conditions.push entity.id
+      DataRetrieverService.load( 'posts', $scope.conditions )
+
+        
+    $scope.$on "postsLoaded", (event, posts) -> 
+      $log.debug "Referencing posts for entity #{configuration.entity_id} ..."
+      $log.debug posts
+      $scope.posts = posts
+
+    $scope.$on "facetsLoaded", (event, facets) -> 
+      $log.debug "Referencing facets for entity #{configuration.entity_id} ..."
+      $log.debug facets
+      $scope.facets = facets
+
 ])
 # Retrieve post
 .service('DataRetrieverService', [ 'configuration', '$log', '$http', '$rootScope', (configuration, $log, $http, $rootScope)-> 
   
   service = {}
-  service.load = ( type, conditions = {} )->
+  service.load = ( type, conditions = [] )->
     uri = "#{configuration.ajax_url}?action=#{configuration.action}&entity_id=#{configuration.entity_id}&type=#{type}"
-    $log.debug "Going to ask posts at uri #{uri}"
+    
+    $log.debug "Going to search #{type} with conditions"
+    $log.debug conditions
 
     $http(
-      method: 'get'
+      method: 'post'
       url: uri
+      data: conditions
     )
     # If successful, broadcast an *analysisReceived* event.
     .success (data) ->
-      $rootScope.$broadcast "postsLoaded", data
+      $rootScope.$broadcast "#{type}Loaded", data
     .error (data, status) ->
-       $log.warn "Error loading #{type}s, statut #{status}"
+       $log.warn "Error loading #{type}, statut #{status}"
 
   service
 
@@ -48,8 +71,16 @@ angular.module('wordlift.facetedsearch.widget', [])
 $(
   container = $("""
   	<div ng-controller="FacetedSearchWidgetController">
-      <div><h3>Facets</h3></div>
-      <div><h3>Related posts</h3></div>
+      <div>
+        <h3>Facets</h3>
+        <ul>
+          <li ng-repeat="entity in facets" ng-click="addCondition(entity)">{{entity.id}} {{entity.mainType}}</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Related posts</h3>
+        <div ng-repeat="post in posts">{{post.post_title}}</div>   
+      </div>
     </div>
   """)
   .appendTo('#wordlift-faceted-entity-search-widget')
@@ -59,6 +90,7 @@ injector.invoke(['DataRetrieverService', '$rootScope', '$log', (DataRetrieverSer
   # execute the following commands in the angular js context.
   $rootScope.$apply(->    
     DataRetrieverService.load('posts') 
+    DataRetrieverService.load('facets') 
   )
 ])
 
