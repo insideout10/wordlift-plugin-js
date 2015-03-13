@@ -71,7 +71,7 @@
     return configurationProvider.setConfiguration(window.wl_faceted_search_params);
   });
 
-  $(container = $("<div ng-controller=\"FacetedSearchWidgetController\">\n      <div>\n        <h3>Facets</h3>\n        <ul>\n          <li ng-repeat=\"entity in facets\" ng-click=\"addCondition(entity)\">{{entity.label}} {{entity.mainType}}</li>\n        </ul>\n      </div>\n      <div>\n        <h3>Related posts</h3>\n        <div class=\"posts\" ng-repeat=\"post in posts\">{{post.post_title}}</div>   \n      </div>\n    </div>").appendTo('#wordlift-faceted-entity-search-widget'), injector = angular.bootstrap($('#wordlift-faceted-entity-search-widget'), ['wordlift.facetedsearch.widget']));
+  $(container = $("<div ng-controller=\"FacetedSearchWidgetController\">\n      <div class=\"conditions\">\n        <h5>Filtri</h5>\n        <ul>\n          <li ng-repeat=\"condition in conditions\"><span>{{condition}}</span></li>\n        </ul>\n      </div>\n      <div class=\"facets\">\n        <h3>Facets</h3>\n        <ul>\n          <li ng-repeat=\"entity in facets\" ng-click=\"addCondition(entity)\">\n            {{entity.label}} <small>({{entity.mainType}})</small>\n          </li>\n        </ul>\n      </div>\n      <div class=\"posts\">\n        <div class=\"post\" ng-repeat=\"post in posts\">{{post.post_title}}</div>   \n      </div>\n      <br class=\"clear\" />\n    </div>").appendTo('#wordlift-faceted-entity-search-widget'), injector = angular.bootstrap($('#wordlift-faceted-entity-search-widget'), ['wordlift.facetedsearch.widget']));
 
   injector.invoke([
     'DataRetrieverService', '$rootScope', '$log', function(DataRetrieverService, $rootScope, $log) {

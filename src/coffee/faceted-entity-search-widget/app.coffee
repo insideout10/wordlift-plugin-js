@@ -76,16 +76,24 @@ angular.module('wordlift.facetedsearch.widget', [])
 $(
   container = $("""
   	<div ng-controller="FacetedSearchWidgetController">
-      <div>
-        <h3>Facets</h3>
+      <div class="conditions">
+        <h5>Filtri</h5>
         <ul>
-          <li ng-repeat="entity in facets" ng-click="addCondition(entity)">{{entity.label}} {{entity.mainType}}</li>
+          <li ng-repeat="condition in conditions"><span>{{condition}}</span></li>
         </ul>
       </div>
-      <div>
-        <h3>Related posts</h3>
-        <div class="posts" ng-repeat="post in posts">{{post.post_title}}</div>   
+      <div class="facets">
+        <h3>Facets</h3>
+        <ul>
+          <li ng-repeat="entity in facets" ng-click="addCondition(entity)">
+            {{entity.label}} <small>({{entity.mainType}})</small>
+          </li>
+        </ul>
       </div>
+      <div class="posts">
+        <div class="post" ng-repeat="post in posts">{{post.post_title}}</div>   
+      </div>
+      <br class="clear" />
     </div>
   """)
   .appendTo('#wordlift-faceted-entity-search-widget')
