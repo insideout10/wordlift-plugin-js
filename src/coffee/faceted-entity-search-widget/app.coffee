@@ -15,12 +15,24 @@ angular.module('wordlift.facetedsearch.widget', [])
 
   provider
 )
+.filter('filterEntitiesByType', [ '$log', ($log)->
+  return (items, type)->
+    
+    filtered = []
+    $log.debug "andiamo"
+    for id, entity of items
+      if  entity.mainType is type
+        filtered.push entity
+    filtered
+
+])
 .controller('FacetedSearchWidgetController', [ 'DataRetrieverService', 'configuration', '$scope', '$log', (DataRetrieverService, configuration, $scope, $log)-> 
 
     $scope.posts = []
     $scope.facets = []
     $scope.conditions = []
-    
+    $scope.supportedTypes = ['thing', 'person', 'organization', 'place', 'event']
+
     $scope.isInConditions = (entity)->
       return (entity.id in $scope.conditions)
 
@@ -78,22 +90,23 @@ $(
   container = $("""
   	<div ng-controller="FacetedSearchWidgetController">
       <div class="facets">
-        <h3>Facets</h3>
-        <ul>
-          <li ng-repeat="entity in facets" ng-click="addCondition(entity)" ng-class=" { 'selected' : isInConditions(entity) }">
-            {{entity.label}} <small>({{entity.mainType}})</small>
-          </li>
-        </ul>
+        <fieldset ng-repeat="type in supportedTypes">
+          <legend>{{type}}</legend>
+          <ul>
+            <li ng-class="'wl-fs-' + entity.mainType" class="entity" ng-repeat="entity in facets | filterEntitiesByType:type" ng-click="addCondition(entity)">
+              <i class="checkbox" ng-class=" { 'selected' : isInConditions(entity) }" /><i class="type" /><span class="label">{{entity.label}}</span>
+            
+            </li>
+          </ul>
+        </fieldset>
       </div>
       <div class="posts">
         <div class="post" ng-repeat="post in posts">{{post.post_title}}</div>   
       
-    <div class="conditions">
-      <h5>Filtri</h5>
-      <ul>
-        <li ng-repeat="condition in conditions"><small>{{condition}}</small></li>
-      </ul>
-    </div>
+      <div class="conditions">
+        <h5>Filtri</h5>
+        <span ng-repeat="condition in conditions"><small>{{condition}}</small></span>
+      </div>
       </div>
       <br class="clear" />
     </div>

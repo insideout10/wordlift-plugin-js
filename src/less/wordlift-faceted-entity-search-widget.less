@@ -5,20 +5,88 @@
 
 	font-size: 0.6em;
 	border:#e2e2e2 1px solid;
+
+.fa-icon(@icon) {
+    
+    &:before {
+      content: @icon; 
+    }
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    line-height: 14px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-size: 14px;
+    padding: 0px 3px;
+  }
+
+
+// Set a tile color background, foreground and icons.
+.tile(@color, @icon) {
+  
+  .type {
+    text-align: center;
+    &:before {
+      content: @icon;
+      color: @color; 
+    }
+  }
+  &.selected {
+    background-color: @color;
+    color: contrast(@color);
+  }
+}
+
 	.facets {
 		float:left;
-		width: 30%;
+		width: 40%;
 		background-color:#e2e2e2;
 		padding: 1em;
 
+		fieldset {
+			border: #999 1px solid;
+			padding: 0.2em;
+		}
+		legend {
+			padding: 0.2em 0.6em;
+			text-transform: uppercase;
+			font-weight: bold;
+		}
 		li {
 			list-style-type: none;
 			padding: 0.2em;
-			border-bottom: #999 1px solid;
+			
+			span.label {
+			 text-transform: capitalize;
+			}
+		
+			.type {
+    			font-family: FontAwesome;
+    			font-style: normal;
+    			font-weight: normal;
+    			line-height: 14px;
+	  			-webkit-font-smoothing: antialiased;
+  				-moz-osx-font-smoothing: grayscale;
+    			font-size: 14px;
+   				padding: 4px;
+  			}
+  			.checkbox {
+  				.fa-icon(@fa-var-circle-o);
+  				&.selected {
+	  				.fa-icon(@fa-var-check-circle-o);  					
+  				}
+  			}
+
+  			&.wl-fs-creative-work { .tile(@wl-creative-work-color, @fa-var-lightbulb-o) }
+  			&.wl-fs-event { .tile(@wl-event-color, @fa-var-calendar) }
+  			&.wl-fs-organization { .tile(@wl-organization-color, @fa-var-building-o) }
+  			&.wl-fs-person { .tile(@wl-person-color, @fa-var-user) }
+  			&.wl-fs-place { .tile(@wl-place-color, @fa-var-map-marker) }
+  			&.wl-fs-thing { .tile(@wl-thing-color, @fa-var-file-o) }
+
 		}
-		.selected {
-			border-bottom: #6c0 1px solid;
-		}
+
 	}
 	h3 {
 		margin: 1em 0em;
@@ -31,7 +99,7 @@
 
 	.posts {
 		float:right;
-		width: 70%;
+		width: 60%;
 		padding: 1em;
 		font-size: 1.4em;
 

@@ -1342,17 +1342,127 @@
 }
 #wordlift-faceted-entity-search-widget .facets {
   float: left;
-  width: 30%;
+  width: 40%;
   background-color: #e2e2e2;
   padding: 1em;
+}
+#wordlift-faceted-entity-search-widget .facets fieldset {
+  border: #999 1px solid;
+  padding: 0.2em;
+}
+#wordlift-faceted-entity-search-widget .facets legend {
+  padding: 0.2em 0.6em;
+  text-transform: uppercase;
+  font-weight: bold;
 }
 #wordlift-faceted-entity-search-widget .facets li {
   list-style-type: none;
   padding: 0.2em;
-  border-bottom: #999 1px solid;
 }
-#wordlift-faceted-entity-search-widget .facets .selected {
-  border-bottom: #6c0 1px solid;
+#wordlift-faceted-entity-search-widget .facets li span.label {
+  text-transform: capitalize;
+}
+#wordlift-faceted-entity-search-widget .facets li .type {
+  font-family: FontAwesome;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 14px;
+  padding: 4px;
+}
+#wordlift-faceted-entity-search-widget .facets li .checkbox {
+  font-family: FontAwesome;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 14px;
+  padding: 0px 3px;
+}
+#wordlift-faceted-entity-search-widget .facets li .checkbox:before {
+  content: "\f10c";
+}
+#wordlift-faceted-entity-search-widget .facets li .checkbox.selected {
+  font-family: FontAwesome;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 14px;
+  padding: 0px 3px;
+}
+#wordlift-faceted-entity-search-widget .facets li .checkbox.selected:before {
+  content: "\f05d";
+}
+#wordlift-faceted-entity-search-widget .facets li.wl-fs-creative-work .type {
+  text-align: center;
+}
+#wordlift-faceted-entity-search-widget .facets li.wl-fs-creative-work .type:before {
+  content: "\f0eb";
+  color: #f9f81e;
+}
+#wordlift-faceted-entity-search-widget .facets li.wl-fs-creative-work.selected {
+  background-color: #f9f81e;
+  color: #000000;
+}
+#wordlift-faceted-entity-search-widget .facets li.wl-fs-event .type {
+  text-align: center;
+}
+#wordlift-faceted-entity-search-widget .facets li.wl-fs-event .type:before {
+  content: "\f073";
+  color: #642994;
+}
+#wordlift-faceted-entity-search-widget .facets li.wl-fs-event.selected {
+  background-color: #642994;
+  color: #ffffff;
+}
+#wordlift-faceted-entity-search-widget .facets li.wl-fs-organization .type {
+  text-align: center;
+}
+#wordlift-faceted-entity-search-widget .facets li.wl-fs-organization .type:before {
+  content: "\f0f7";
+  color: #8fd22a;
+}
+#wordlift-faceted-entity-search-widget .facets li.wl-fs-organization.selected {
+  background-color: #8fd22a;
+  color: #000000;
+}
+#wordlift-faceted-entity-search-widget .facets li.wl-fs-person .type {
+  text-align: center;
+}
+#wordlift-faceted-entity-search-widget .facets li.wl-fs-person .type:before {
+  content: "\f007";
+  color: #f20f62;
+}
+#wordlift-faceted-entity-search-widget .facets li.wl-fs-person.selected {
+  background-color: #f20f62;
+  color: #ffffff;
+}
+#wordlift-faceted-entity-search-widget .facets li.wl-fs-place .type {
+  text-align: center;
+}
+#wordlift-faceted-entity-search-widget .facets li.wl-fs-place .type:before {
+  content: "\f041";
+  color: #ff9a2e;
+}
+#wordlift-faceted-entity-search-widget .facets li.wl-fs-place.selected {
+  background-color: #ff9a2e;
+  color: #000000;
+}
+#wordlift-faceted-entity-search-widget .facets li.wl-fs-thing .type {
+  text-align: center;
+}
+#wordlift-faceted-entity-search-widget .facets li.wl-fs-thing .type:before {
+  content: "\f016";
+  color: #000000;
+}
+#wordlift-faceted-entity-search-widget .facets li.wl-fs-thing.selected {
+  background-color: #000000;
+  color: #ffffff;
 }
 #wordlift-faceted-entity-search-widget h3 {
   margin: 1em 0em;
@@ -1364,7 +1474,7 @@
 }
 #wordlift-faceted-entity-search-widget .posts {
   float: right;
-  width: 70%;
+  width: 60%;
   padding: 1em;
   font-size: 1.4em;
 }
