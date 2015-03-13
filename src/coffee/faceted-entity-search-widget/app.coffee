@@ -23,7 +23,12 @@ angular.module('wordlift.facetedsearch.widget', [])
     
     $scope.addCondition = (entity)->
       $log.debug "Add entity #{entity.id} to conditions array"
-      $scope.conditions.push entity.id
+
+      if entity.id in $scope.conditions
+        $scope.conditions.splice $scope.conditions.indexOf( entity.id ), 1
+      else
+        $scope.conditions.push entity.id
+      
       DataRetrieverService.load( 'posts', $scope.conditions )
 
         
@@ -74,12 +79,12 @@ $(
       <div>
         <h3>Facets</h3>
         <ul>
-          <li ng-repeat="entity in facets" ng-click="addCondition(entity)">{{entity.id}} {{entity.mainType}}</li>
+          <li ng-repeat="entity in facets" ng-click="addCondition(entity)">{{entity.label}} {{entity.mainType}}</li>
         </ul>
       </div>
       <div>
         <h3>Related posts</h3>
-        <div ng-repeat="post in posts">{{post.post_title}}</div>   
+        <div class="posts" ng-repeat="post in posts">{{post.post_title}}</div>   
       </div>
     </div>
   """)

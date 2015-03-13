@@ -1,5 +1,6 @@
 (function() {
-  var $, container, injector;
+  var $, container, injector,
+    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   $ = jQuery;
 
@@ -21,8 +22,13 @@
       $scope.facets = [];
       $scope.conditions = [];
       $scope.addCondition = function(entity) {
+        var _ref;
         $log.debug("Add entity " + entity.id + " to conditions array");
-        $scope.conditions.push(entity.id);
+        if (_ref = entity.id, __indexOf.call($scope.conditions, _ref) >= 0) {
+          $scope.conditions.splice($scope.conditions.indexOf(entity.id), 1);
+        } else {
+          $scope.conditions.push(entity.id);
+        }
         return DataRetrieverService.load('posts', $scope.conditions);
       };
       $scope.$on("postsLoaded", function(event, posts) {
@@ -65,7 +71,7 @@
     return configurationProvider.setConfiguration(window.wl_faceted_search_params);
   });
 
-  $(container = $("<div ng-controller=\"FacetedSearchWidgetController\">\n      <div>\n        <h3>Facets</h3>\n        <ul>\n          <li ng-repeat=\"entity in facets\" ng-click=\"addCondition(entity)\">{{entity.id}} {{entity.mainType}}</li>\n        </ul>\n      </div>\n      <div>\n        <h3>Related posts</h3>\n        <div ng-repeat=\"post in posts\">{{post.post_title}}</div>   \n      </div>\n    </div>").appendTo('#wordlift-faceted-entity-search-widget'), injector = angular.bootstrap($('#wordlift-faceted-entity-search-widget'), ['wordlift.facetedsearch.widget']));
+  $(container = $("<div ng-controller=\"FacetedSearchWidgetController\">\n      <div>\n        <h3>Facets</h3>\n        <ul>\n          <li ng-repeat=\"entity in facets\" ng-click=\"addCondition(entity)\">{{entity.label}} {{entity.mainType}}</li>\n        </ul>\n      </div>\n      <div>\n        <h3>Related posts</h3>\n        <div class=\"posts\" ng-repeat=\"post in posts\">{{post.post_title}}</div>   \n      </div>\n    </div>").appendTo('#wordlift-faceted-entity-search-widget'), injector = angular.bootstrap($('#wordlift-faceted-entity-search-widget'), ['wordlift.facetedsearch.widget']));
 
   injector.invoke([
     'DataRetrieverService', '$rootScope', '$log', function(DataRetrieverService, $rootScope, $log) {
