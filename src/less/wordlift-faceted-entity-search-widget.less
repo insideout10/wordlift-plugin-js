@@ -103,18 +103,36 @@
 		padding: 1em;
 		font-size: 1.4em;
 
+		a {
+			border:none !important;
+		}
+
 		.post {
 			border-bottom: #e2e2e2 1px solid;
+			position: relative;
+
+			img {
+				width: 60px;
+				float: left;
+				margin: 5px;
+			}
+		}
+
+		.condition {
+			padding: 0px 0px;
+			text-transform: capitalize;
+
+			&.main {
+				font-weight: bold;
+			}
 		}
 	}
 	.clear {
 		clear:both;
 	}
 	.conditions {
-		li { 
-			display: inline;
-			border-left:#999 3px solid;
-			padding: 0em 1em;
-		}
+		border-bottom: #666 1px solid;
+		margin-bottom: 10px;
 	}
+
 }

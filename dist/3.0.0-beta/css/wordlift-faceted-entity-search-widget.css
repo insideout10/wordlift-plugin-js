@@ -1478,14 +1478,29 @@
   padding: 1em;
   font-size: 1.4em;
 }
+#wordlift-faceted-entity-search-widget .posts a {
+  border: none !important;
+}
 #wordlift-faceted-entity-search-widget .posts .post {
   border-bottom: #e2e2e2 1px solid;
+  position: relative;
+}
+#wordlift-faceted-entity-search-widget .posts .post img {
+  width: 60px;
+  float: left;
+  margin: 5px;
+}
+#wordlift-faceted-entity-search-widget .posts .condition {
+  padding: 0px 0px;
+  text-transform: capitalize;
+}
+#wordlift-faceted-entity-search-widget .posts .condition.main {
+  font-weight: bold;
 }
 #wordlift-faceted-entity-search-widget .clear {
   clear: both;
 }
-#wordlift-faceted-entity-search-widget .conditions li {
-  display: inline;
-  border-left: #999 3px solid;
-  padding: 0em 1em;
+#wordlift-faceted-entity-search-widget .conditions {
+  border-bottom: #666 1px solid;
+  margin-bottom: 10px;
 }

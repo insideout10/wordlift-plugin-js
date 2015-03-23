@@ -1,6 +1,5 @@
 (function() {
-  var $, container, injector,
-    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+  var $, container, injector;
 
   $ = jQuery;
 
@@ -32,32 +31,39 @@
     }
   ]).controller('FacetedSearchWidgetController', [
     'DataRetrieverService', 'configuration', '$scope', '$log', function(DataRetrieverService, configuration, $scope, $log) {
+      $scope.entity = void 0;
       $scope.posts = [];
       $scope.facets = [];
-      $scope.conditions = [];
+      $scope.conditions = {};
       $scope.supportedTypes = ['thing', 'person', 'organization', 'place', 'event'];
       $scope.isInConditions = function(entity) {
-        var _ref;
-        return (_ref = entity.id, __indexOf.call($scope.conditions, _ref) >= 0);
+        if ($scope.conditions[entity.id]) {
+          return true;
+        }
+        return false;
       };
       $scope.addCondition = function(entity) {
-        var _ref;
         $log.debug("Add entity " + entity.id + " to conditions array");
-        if (_ref = entity.id, __indexOf.call($scope.conditions, _ref) >= 0) {
-          $scope.conditions.splice($scope.conditions.indexOf(entity.id), 1);
+        if ($scope.conditions[entity.id]) {
+          delete $scope.conditions[entity.id];
         } else {
-          $scope.conditions.push(entity.id);
+          $scope.conditions[entity.id] = entity;
         }
-        return DataRetrieverService.load('posts', $scope.conditions);
+        return DataRetrieverService.load('posts', Object.keys($scope.conditions));
       };
       $scope.$on("postsLoaded", function(event, posts) {
         $log.debug("Referencing posts for entity " + configuration.entity_id + " ...");
-        $log.debug(posts);
         return $scope.posts = posts;
       });
       return $scope.$on("facetsLoaded", function(event, facets) {
+        var entity, _i, _len;
         $log.debug("Referencing facets for entity " + configuration.entity_id + " ...");
-        $log.debug(facets);
+        for (_i = 0, _len = facets.length; _i < _len; _i++) {
+          entity = facets[_i];
+          if (entity.id === configuration.entity_uri) {
+            $scope.entity = entity;
+          }
+        }
         return $scope.facets = facets;
       });
     }
@@ -89,7 +95,7 @@
     return configurationProvider.setConfiguration(window.wl_faceted_search_params);
   });
 
-  $(container = $("<div ng-controller=\"FacetedSearchWidgetController\">\n      <div class=\"facets\">\n        <fieldset ng-repeat=\"type in supportedTypes\">\n          <legend>{{type}}</legend>\n          <ul>\n            <li ng-class=\"'wl-fs-' + entity.mainType\" class=\"entity\" ng-repeat=\"entity in facets | filterEntitiesByType:type\" ng-click=\"addCondition(entity)\">\n              <i class=\"checkbox\" ng-class=\" { 'selected' : isInConditions(entity) }\" /><i class=\"type\" /><span class=\"label\">{{entity.label}}</span>\n            \n            </li>\n          </ul>\n        </fieldset>\n      </div>\n      <div class=\"posts\">\n        <div class=\"post\" ng-repeat=\"post in posts\">\n          <a ng-href=\"{{post.guid}}\">{{post.post_title}}</a>\n        </div>   \n        <div class=\"conditions\">\n          <h5>Filtri</h5>\n          <span ng-repeat=\"condition in conditions\"><small>{{condition}}</small></span>\n        </div>\n      </div>\n      <br class=\"clear\" />\n    </div>").appendTo('#wordlift-faceted-entity-search-widget'), injector = angular.bootstrap($('#wordlift-faceted-entity-search-widget'), ['wordlift.facetedsearch.widget']));
+  $(container = $("<div ng-controller=\"FacetedSearchWidgetController\">\n      <div class=\"facets\">\n        <fieldset ng-repeat=\"type in supportedTypes\">\n          <legend>{{type}}</legend>\n          <ul>\n            <li ng-class=\"'wl-fs-' + entity.mainType\" class=\"entity\" ng-repeat=\"entity in facets | filterEntitiesByType:type\" ng-click=\"addCondition(entity)\">\n              <i class=\"checkbox\" ng-class=\" { 'selected' : isInConditions(entity) }\" /><i class=\"type\" /><span class=\"label\">{{entity.label}}</span>\n            </li>\n          </ul>\n        </fieldset>\n      </div>\n      <div class=\"posts\">\n        <div class=\"conditions\">\n          Contenuti associati a <strong>{{entity.label}}</strong><br />\n          <span>Filtri:</span>\n          <strong class=\"condition\" ng-repeat=\"(condition, entity) in conditions\">{{entity.label}}. </strong>\n        </div>\n        <div class=\"post\" ng-repeat=\"post in posts\">\n          <img ng-show=\"post.thumbnail\" ng-src=\"{{post.thumbnail}}\" />\n          <a ng-href=\"{{post.guid}}\">{{post.post_title}}</a>\n        </div>   \n      </div>\n      <br class=\"clear\" />\n    </div>").appendTo('#wordlift-faceted-entity-search-widget'), injector = angular.bootstrap($('#wordlift-faceted-entity-search-widget'), ['wordlift.facetedsearch.widget']));
 
   injector.invoke([
     'DataRetrieverService', '$rootScope', '$log', function(DataRetrieverService, $rootScope, $log) {

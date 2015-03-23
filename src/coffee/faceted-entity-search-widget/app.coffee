@@ -27,33 +27,38 @@ angular.module('wordlift.facetedsearch.widget', [])
 ])
 .controller('FacetedSearchWidgetController', [ 'DataRetrieverService', 'configuration', '$scope', '$log', (DataRetrieverService, configuration, $scope, $log)-> 
 
+    $scope.entity = undefined
     $scope.posts = []
     $scope.facets = []
-    $scope.conditions = []
+    $scope.conditions = {}
     $scope.supportedTypes = ['thing', 'person', 'organization', 'place', 'event']
 
     $scope.isInConditions = (entity)->
-      return (entity.id in $scope.conditions)
+      if $scope.conditions[ entity.id ]
+        return true
+      return false
 
     $scope.addCondition = (entity)->
       $log.debug "Add entity #{entity.id} to conditions array"
 
-      if entity.id in $scope.conditions
-        $scope.conditions.splice $scope.conditions.indexOf( entity.id ), 1
+      if $scope.conditions[ entity.id ]
+        delete $scope.conditions[ entity.id ]
       else
-        $scope.conditions.push entity.id
+        $scope.conditions[ entity.id ] = entity
       
-      DataRetrieverService.load( 'posts', $scope.conditions )
+      DataRetrieverService.load( 'posts', Object.keys( $scope.conditions ) )
 
         
     $scope.$on "postsLoaded", (event, posts) -> 
       $log.debug "Referencing posts for entity #{configuration.entity_id} ..."
-      $log.debug posts
       $scope.posts = posts
 
     $scope.$on "facetsLoaded", (event, facets) -> 
       $log.debug "Referencing facets for entity #{configuration.entity_id} ..."
-      $log.debug facets
+      for entity in facets
+        if entity.id is configuration.entity_uri
+          $scope.entity = entity
+
       $scope.facets = facets
 
 ])
@@ -94,19 +99,20 @@ $(
           <ul>
             <li ng-class="'wl-fs-' + entity.mainType" class="entity" ng-repeat="entity in facets | filterEntitiesByType:type" ng-click="addCondition(entity)">
               <i class="checkbox" ng-class=" { 'selected' : isInConditions(entity) }" /><i class="type" /><span class="label">{{entity.label}}</span>
-            
             </li>
           </ul>
         </fieldset>
       </div>
       <div class="posts">
+        <div class="conditions">
+          Contenuti associati a <strong>{{entity.label}}</strong><br />
+          <span>Filtri:</span>
+          <strong class="condition" ng-repeat="(condition, entity) in conditions">{{entity.label}}. </strong>
+        </div>
         <div class="post" ng-repeat="post in posts">
+          <img ng-show="post.thumbnail" ng-src="{{post.thumbnail}}" />
           <a ng-href="{{post.guid}}">{{post.post_title}}</a>
         </div>   
-        <div class="conditions">
-          <h5>Filtri</h5>
-          <span ng-repeat="condition in conditions"><small>{{condition}}</small></span>
-        </div>
       </div>
       <br class="clear" />
     </div>
