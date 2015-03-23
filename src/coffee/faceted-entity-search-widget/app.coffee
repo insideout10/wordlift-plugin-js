@@ -19,7 +19,6 @@ angular.module('wordlift.facetedsearch.widget', [])
   return (items, type)->
     
     filtered = []
-    $log.debug "andiamo"
     for id, entity of items
       if  entity.mainType is type
         filtered.push entity
@@ -101,12 +100,13 @@ $(
         </fieldset>
       </div>
       <div class="posts">
-        <div class="post" ng-repeat="post in posts">{{post.post_title}}</div>   
-      
-      <div class="conditions">
-        <h5>Filtri</h5>
-        <span ng-repeat="condition in conditions"><small>{{condition}}</small></span>
-      </div>
+        <div class="post" ng-repeat="post in posts">
+          <a ng-href="{{post.guid}}">{{post.post_title}}</a>
+        </div>   
+        <div class="conditions">
+          <h5>Filtri</h5>
+          <span ng-repeat="condition in conditions"><small>{{condition}}</small></span>
+        </div>
       </div>
       <br class="clear" />
     </div>
