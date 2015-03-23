@@ -15,12 +15,12 @@ angular.module('wordlift.facetedsearch.widget', [])
 
   provider
 )
-.filter('filterEntitiesByType', [ '$log', ($log)->
+.filter('filterEntitiesByType', [ '$log', 'configuration', ($log, configuration)->
   return (items, type)->
     
     filtered = []
     for id, entity of items
-      if  entity.mainType is type
+      if  entity.mainType is type and entity.id != configuration.entity_uri
         filtered.push entity
     filtered
 
@@ -110,7 +110,6 @@ $(
           <strong class="condition" ng-repeat="(condition, entity) in conditions">{{entity.label}}. </strong>
         </div>
         <div class="post" ng-repeat="post in posts">
-          <img ng-show="post.thumbnail" ng-src="{{post.thumbnail}}" />
           <a ng-href="{{post.guid}}">{{post.post_title}}</a>
         </div>   
       </div>

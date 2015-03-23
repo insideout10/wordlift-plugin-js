@@ -1487,7 +1487,7 @@
 }
 #wordlift-faceted-entity-search-widget .posts .post img {
   width: 60px;
-  float: left;
+  /* float: left; */
   margin: 5px;
 }
 #wordlift-faceted-entity-search-widget .posts .condition {
