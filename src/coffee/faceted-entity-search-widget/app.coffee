@@ -52,6 +52,7 @@ angular.module('wordlift.facetedsearch.widget', [])
     $scope.$on "postsLoaded", (event, posts) -> 
       $log.debug "Referencing posts for entity #{configuration.entity_id} ..."
       $scope.posts = posts
+      $log.debug $scope.posts
 
     $scope.$on "facetsLoaded", (event, facets) -> 
       $log.debug "Referencing facets for entity #{configuration.entity_id} ..."
@@ -110,7 +111,7 @@ $(
           <strong class="condition" ng-repeat="(condition, entity) in conditions">{{entity.label}}. </strong>
         </div>
         <div class="post" ng-repeat="post in posts">
-          <a ng-href="{{post.guid}}">{{post.post_title}}</a>
+          <a ng-href="/?p={{post.ID}}">{{post.post_title}}</a>
         </div>   
       </div>
       <br class="clear" />
