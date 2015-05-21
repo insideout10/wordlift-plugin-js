@@ -25,9 +25,13 @@ angular.module('wordlift.editpost.widget.directives.wlEntityForm', [])
           <label>Entity Id</label>
           <input type="text" ng-model="entity.id" disabled="true" />
       </div>
-      <div>
+      <div class="wl-suggested-sameas-wrapper">
           <label>Entity Same as (*)</label>
           <input type="text" ng-model="entity.sameAs" />
+          <h5 ng-show="entity.suggestedSameAs.length > 0">same as suggestions</h5>
+          <div ng-click="setSameAs(sameAs)" ng-class="{ 'active': entity.sameAs == sameAs }" class="wl-sameas" ng-repeat="sameAs in entity.suggestedSameAs">
+            {{sameAs}}
+          </div>
       </div>
       
       <div class="wl-submit-wrapper">
@@ -38,6 +42,9 @@ angular.module('wordlift.editpost.widget.directives.wlEntityForm', [])
     """
     link: ($scope, $element, $attrs, $ctrl) ->  
 
+      $scope.setSameAs = (uri)->
+        $scope.entity.sameAs = uri
+      
       $scope.checkEntityId = (uri)->
         /^(f|ht)tps?:\/\//i.test(uri)
 

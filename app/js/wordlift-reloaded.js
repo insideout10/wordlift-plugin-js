@@ -203,6 +203,7 @@
         sameAs = $scope.newEntity.sameAs;
         $scope.newEntity.id = sameAs;
         $scope.newEntity.sameAs = [sameAs];
+        delete $scope.newEntity.suggestedSameAs;
         $log.debug($scope.newEntity);
         $scope.analysis.entities[$scope.newEntity.id] = $scope.newEntity;
         annotation = $scope.analysis.annotations[$scope.annotation];
@@ -239,7 +240,12 @@
         $scope.analysis.annotations[annotation.id] = annotation;
         $scope.annotation = annotation.id;
         $scope.newEntity.label = annotation.text;
-        return $scope.newEntity.id = annotation.id;
+        $scope.newEntity.id = annotation.id;
+        return AnalysisService.getSuggestedSameAs(annotation.text);
+      });
+      $scope.$on("sameAsRetrieved", function(event, sameAs) {
+        $log.debug("Retrieved sameAs " + sameAs);
+        return $scope.newEntity.suggestedSameAs = sameAs;
       });
       $scope.$on("analysisPerformed", function(event, analysis) {
         var entity, entityId, _k, _len2, _ref2, _results;
@@ -356,8 +362,11 @@
           entity: '=',
           onSubmit: '&'
         },
-        template: "<div name=\"wordlift\" class=\"wl-entity-form\">\n<div ng-show=\"entity.images.length > 0\">\n    <img ng-src=\"{{entity.images[0]}}\" />\n</div>\n<div>\n    <label>Entity label</label>\n    <input type=\"text\" ng-model=\"entity.label\" />\n</div>\n<div>\n    <label>Entity type</label>\n    <select ng-model=\"entity.mainType\" ng-options=\"type.id as type.name for type in supportedTypes\" ></select>\n</div>\n<div>\n    <label>Entity Description</label>\n    <textarea ng-model=\"entity.description\" rows=\"6\"></textarea>\n</div>\n<div ng-show=\"checkEntityId(entity.id)\">\n    <label>Entity Id</label>\n    <input type=\"text\" ng-model=\"entity.id\" disabled=\"true\" />\n</div>\n<div>\n    <label>Entity Same as (*)</label>\n    <input type=\"text\" ng-model=\"entity.sameAs\" />\n</div>\n\n<div class=\"wl-submit-wrapper\">\n  <span class=\"button button-primary\" ng-click=\"onSubmit()\">Save</span>\n</div>\n\n</div>",
+        template: "<div name=\"wordlift\" class=\"wl-entity-form\">\n<div ng-show=\"entity.images.length > 0\">\n    <img ng-src=\"{{entity.images[0]}}\" />\n</div>\n<div>\n    <label>Entity label</label>\n    <input type=\"text\" ng-model=\"entity.label\" />\n</div>\n<div>\n    <label>Entity type</label>\n    <select ng-model=\"entity.mainType\" ng-options=\"type.id as type.name for type in supportedTypes\" ></select>\n</div>\n<div>\n    <label>Entity Description</label>\n    <textarea ng-model=\"entity.description\" rows=\"6\"></textarea>\n</div>\n<div ng-show=\"checkEntityId(entity.id)\">\n    <label>Entity Id</label>\n    <input type=\"text\" ng-model=\"entity.id\" disabled=\"true\" />\n</div>\n<div class=\"wl-suggested-sameas-wrapper\">\n    <label>Entity Same as (*)</label>\n    <input type=\"text\" ng-model=\"entity.sameAs\" />\n    <h5 ng-show=\"entity.suggestedSameAs.length > 0\">same as suggestions</h5>\n    <div ng-click=\"setSameAs(sameAs)\" ng-class=\"{ 'active': entity.sameAs == sameAs }\" class=\"wl-sameas\" ng-repeat=\"sameAs in entity.suggestedSameAs\">\n      {{sameAs}}\n    </div>\n</div>\n\n<div class=\"wl-submit-wrapper\">\n  <span class=\"button button-primary\" ng-click=\"onSubmit()\">Save</span>\n</div>\n\n</div>",
         link: function($scope, $element, $attrs, $ctrl) {
+          $scope.setSameAs = function(uri) {
+            return $scope.entity.sameAs = uri;
+          };
           $scope.checkEntityId = function(uri) {
             return /^(f|ht)tps?:\/\//i.test(uri);
           };
@@ -471,7 +480,6 @@
       service = _currentAnalysis = {};
       service._supportedTypes = [];
       service._defaultType = "thing";
-      service._brokenEntities = [];
       _ref = configuration.classificationBoxes;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         box = _ref[_i];
@@ -516,8 +524,11 @@
         };
         return merge(defaults, params);
       };
-      service.parse = function(data) {
-        var annotation, annotationId, bmIndex, brokenMatches, ea, em, entity, entityId, id, index, localEntity, local_confidence, _k, _l, _len2, _len3, _len4, _len5, _len6, _m, _n, _o, _ref10, _ref11, _ref12, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
+      service.parse = function(data, brokenEntities) {
+        var annotation, annotationId, bmIndex, brokenMatches, ea, em, entity, entityId, id, index, localEntity, local_confidence, _k, _l, _len2, _len3, _len4, _len5, _len6, _m, _n, _o, _ref10, _ref11, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
+        if (brokenEntities == null) {
+          brokenEntities = [];
+        }
         _ref2 = configuration.entities;
         for (id in _ref2) {
           localEntity = _ref2[id];
@@ -533,7 +544,7 @@
           entity = _ref3[id];
           if (!entity.label) {
             $log.warn("Label missing for entity " + id);
-            this._brokenEntities.push(id);
+            brokenEntities.push(id);
           }
           if (_ref4 = entity.mainType, __indexOf.call(this._supportedTypes, _ref4) < 0) {
             $log.warn("Schema.org type " + entity.mainType + " for entity " + id + " is not supported from current classification boxes configuration");
@@ -574,17 +585,16 @@
             entity.confidence = entity.confidence * local_confidence;
           }
         }
-        _ref10 = this._brokenEntities;
-        for (_m = 0, _len4 = _ref10.length; _m < _len4; _m++) {
-          entityId = _ref10[_m];
+        for (_m = 0, _len4 = brokenEntities.length; _m < _len4; _m++) {
+          entityId = brokenEntities[_m];
           $log.warn("Going to remove " + entityId);
           brokenMatches = [];
-          _ref11 = data.entities[entityId].annotations;
-          for (id in _ref11) {
-            annotation = _ref11[id];
-            _ref12 = annotation.entityMatches;
-            for (index = _n = 0, _len5 = _ref12.length; _n < _len5; index = ++_n) {
-              ea = _ref12[index];
+          _ref10 = data.entities[entityId].annotations;
+          for (id in _ref10) {
+            annotation = _ref10[id];
+            _ref11 = annotation.entityMatches;
+            for (index = _n = 0, _len5 = _ref11.length; _n < _len5; index = ++_n) {
+              ea = _ref11[index];
               if (ea.entityId === entityId) {
                 brokenMatches.push(index);
               }
@@ -600,8 +610,25 @@
         $log.debug(data);
         return data;
       };
-      service.perform = function(content) {
+      service.getSuggestedSameAs = function(content) {
+        var promise;
+        return promise = this._innerPerform(content).success(function(data) {
+          var entity, id, suggestions, _ref2;
+          suggestions = [];
+          _ref2 = data.entities;
+          for (id in _ref2) {
+            entity = _ref2[id];
+            suggestions.push(id);
+          }
+          return $rootScope.$broadcast("sameAsRetrieved", suggestions);
+        }).error(function(data, status) {
+          $log.warn("Error on same as retrieving, statut " + status);
+          return $rootScope.$broadcast("sameAsRetrieved", []);
+        });
+      };
+      service._innerPerform = function(content) {
         $log.info("Start to performing analysis");
+        $log.debug(content);
         if (content == null) {
           $log.warn("content missing: nothing to do");
           return;
@@ -610,7 +637,11 @@
           method: 'post',
           url: ajaxurl + '?action=wordlift_analyze',
           data: content
-        }).success(function(data) {
+        });
+      };
+      service.perform = function(content) {
+        var promise;
+        return promise = this._innerPerform(content).success(function(data) {
           if (typeof data === 'string') {
             $log.warn("Invalid data returned");
             $log.debug(data);

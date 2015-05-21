@@ -24,7 +24,6 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
 
   service._supportedTypes = []
   service._defaultType = "thing"
-  service._brokenEntities = []
   
   # Retrieve supported type from current classification boxes configuration
   for box in configuration.classificationBoxes
@@ -59,7 +58,7 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
     
     merge defaults, params
   
-  service.parse = (data) ->
+  service.parse = (data, brokenEntities = []) ->
     
     # Add local entities
     # Add id to entity obj
@@ -77,7 +76,7 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
       
       if not entity.label
         $log.warn "Label missing for entity #{id}"
-        @._brokenEntities.push id
+        brokenEntities.push id
 
       if entity.mainType not in @._supportedTypes
         $log.warn "Schema.org type #{entity.mainType} for entity #{id} is not supported from current classification boxes configuration"
@@ -109,7 +108,7 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
     
 
     # Clean broken entities
-    for entityId in @._brokenEntities
+    for entityId in brokenEntities
       $log.warn "Going to remove #{entityId}"
       
       brokenMatches = []
@@ -130,26 +129,47 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
     $log.debug data
     data
 
-  service.perform = (content)->
+  service.getSuggestedSameAs = (content)->
+  
+    promise = @._innerPerform content
+    # If successful, broadcast an *sameAsReceived* event.
+    .success (data) ->
+      
+      suggestions = []
+      for id, entity of data.entities
+        suggestions.push id
+      $rootScope.$broadcast "sameAsRetrieved", suggestions
+
+    .error (data, status) ->
+       $log.warn "Error on same as retrieving, statut #{status}"
+       $rootScope.$broadcast "sameAsRetrieved", []
+
     
+  service._innerPerform = (content)->
+
     $log.info "Start to performing analysis"
+    $log.debug content
 
     if not content?
       $log.warn "content missing: nothing to do"
       return
 
-    $http(
+    return $http(
       method: 'post'
       url: ajaxurl + '?action=wordlift_analyze'
       data: content      
     )
+  
+  service.perform = (content)->
+    
+    promise = @._innerPerform content
     # If successful, broadcast an *analysisReceived* event.
     .success (data) ->
       
-       if typeof data is 'string'
-         $log.warn "Invalid data returned"
-         $log.debug data
-         return
+      if typeof data is 'string'
+        $log.warn "Invalid data returned"
+        $log.debug data
+        return
 
        $rootScope.$broadcast "analysisPerformed", service.parse( data )
     .error (data, status) ->

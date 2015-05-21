@@ -89,6 +89,7 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     sameAs = $scope.newEntity.sameAs
     $scope.newEntity.id = sameAs
     $scope.newEntity.sameAs = [ sameAs ]
+    delete $scope.newEntity.suggestedSameAs
     
     $log.debug $scope.newEntity
     # Add new entity to the analysis
@@ -126,7 +127,13 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     $scope.newEntity.label = annotation.text
     # Set the annotation id as id for the new entity
     $scope.newEntity.id = annotation.id
+    # Ask for SameAs suggestions
+    AnalysisService.getSuggestedSameAs annotation.text
 
+  $scope.$on "sameAsRetrieved", (event, sameAs) ->
+    $log.debug "Retrieved sameAs #{sameAs}"
+    $scope.newEntity.suggestedSameAs = sameAs
+  
   $scope.$on "analysisPerformed", (event, analysis) -> 
     $scope.analysis = analysis
     # Preselect 

@@ -220,6 +220,7 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     sameAs = $scope.newEntity.sameAs
     $scope.newEntity.id = sameAs
     $scope.newEntity.sameAs = [ sameAs ]
+    delete $scope.newEntity.suggestedSameAs
     
     $log.debug $scope.newEntity
     # Add new entity to the analysis
@@ -257,7 +258,13 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     $scope.newEntity.label = annotation.text
     # Set the annotation id as id for the new entity
     $scope.newEntity.id = annotation.id
+    # Ask for SameAs suggestions
+    AnalysisService.getSuggestedSameAs annotation.text
 
+  $scope.$on "sameAsRetrieved", (event, sameAs) ->
+    $log.debug "Retrieved sameAs #{sameAs}"
+    $scope.newEntity.suggestedSameAs = sameAs
+  
   $scope.$on "analysisPerformed", (event, analysis) -> 
     $scope.analysis = analysis
     # Preselect 
@@ -398,9 +405,13 @@ angular.module('wordlift.editpost.widget.directives.wlEntityForm', [])
           <label>Entity Id</label>
           <input type="text" ng-model="entity.id" disabled="true" />
       </div>
-      <div>
+      <div class="wl-suggested-sameas-wrapper">
           <label>Entity Same as (*)</label>
           <input type="text" ng-model="entity.sameAs" />
+          <h5 ng-show="entity.suggestedSameAs.length > 0">same as suggestions</h5>
+          <div ng-click="setSameAs(sameAs)" ng-class="{ 'active': entity.sameAs == sameAs }" class="wl-sameas" ng-repeat="sameAs in entity.suggestedSameAs">
+            {{sameAs}}
+          </div>
       </div>
       
       <div class="wl-submit-wrapper">
@@ -411,6 +422,9 @@ angular.module('wordlift.editpost.widget.directives.wlEntityForm', [])
     """
     link: ($scope, $element, $attrs, $ctrl) ->  
 
+      $scope.setSameAs = (uri)->
+        $scope.entity.sameAs = uri
+      
       $scope.checkEntityId = (uri)->
         /^(f|ht)tps?:\/\//i.test(uri)
 
@@ -523,7 +537,6 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
 
   service._supportedTypes = []
   service._defaultType = "thing"
-  service._brokenEntities = []
   
   # Retrieve supported type from current classification boxes configuration
   for box in configuration.classificationBoxes
@@ -558,7 +571,7 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
     
     merge defaults, params
   
-  service.parse = (data) ->
+  service.parse = (data, brokenEntities = []) ->
     
     # Add local entities
     # Add id to entity obj
@@ -576,7 +589,7 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
       
       if not entity.label
         $log.warn "Label missing for entity #{id}"
-        @._brokenEntities.push id
+        brokenEntities.push id
 
       if entity.mainType not in @._supportedTypes
         $log.warn "Schema.org type #{entity.mainType} for entity #{id} is not supported from current classification boxes configuration"
@@ -608,7 +621,7 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
     
 
     # Clean broken entities
-    for entityId in @._brokenEntities
+    for entityId in brokenEntities
       $log.warn "Going to remove #{entityId}"
       
       brokenMatches = []
@@ -629,26 +642,47 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
     $log.debug data
     data
 
-  service.perform = (content)->
+  service.getSuggestedSameAs = (content)->
+  
+    promise = @._innerPerform content
+    # If successful, broadcast an *sameAsReceived* event.
+    .success (data) ->
+      
+      suggestions = []
+      for id, entity of data.entities
+        suggestions.push id
+      $rootScope.$broadcast "sameAsRetrieved", suggestions
+
+    .error (data, status) ->
+       $log.warn "Error on same as retrieving, statut #{status}"
+       $rootScope.$broadcast "sameAsRetrieved", []
+
     
+  service._innerPerform = (content)->
+
     $log.info "Start to performing analysis"
+    $log.debug content
 
     if not content?
       $log.warn "content missing: nothing to do"
       return
 
-    $http(
+    return $http(
       method: 'post'
       url: ajaxurl + '?action=wordlift_analyze'
       data: content      
     )
+  
+  service.perform = (content)->
+    
+    promise = @._innerPerform content
     # If successful, broadcast an *analysisReceived* event.
     .success (data) ->
       
-       if typeof data is 'string'
-         $log.warn "Invalid data returned"
-         $log.debug data
-         return
+      if typeof data is 'string'
+        $log.warn "Invalid data returned"
+        $log.debug data
+        return
 
        $rootScope.$broadcast "analysisPerformed", service.parse( data )
     .error (data, status) ->
