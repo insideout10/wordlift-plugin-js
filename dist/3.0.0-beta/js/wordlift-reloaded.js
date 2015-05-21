@@ -436,7 +436,7 @@
 
   angular.module('wordlift.editpost.widget.services.AnalysisService', []).service('AnalysisService', [
     'configuration', '$log', '$http', '$rootScope', function(configuration, $log, $http, $rootScope) {
-      var extend, findAnnotation, merge, service, uniqueId, _currentAnalysis;
+      var box, extend, findAnnotation, merge, service, type, uniqueId, _currentAnalysis, _i, _j, _len, _len1, _ref, _ref1;
       uniqueId = function(length) {
         var id;
         if (length == null) {
@@ -469,6 +469,20 @@
         }
       };
       service = _currentAnalysis = {};
+      service._supportedTypes = [];
+      service._defaultType = "thing";
+      service._brokenEntities = [];
+      _ref = configuration.classificationBoxes;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        box = _ref[_i];
+        _ref1 = box.registeredTypes;
+        for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+          type = _ref1[_j];
+          if (__indexOf.call(service._supportedTypes, type) < 0) {
+            service._supportedTypes.push(type);
+          }
+        }
+      }
       service.createEntity = function(params) {
         var defaults;
         if (params == null) {
@@ -503,10 +517,10 @@
         return merge(defaults, params);
       };
       service.parse = function(data) {
-        var annotation, annotationId, ea, em, entity, id, localEntity, local_confidence, _i, _j, _len, _len1, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6;
-        _ref = configuration.entities;
-        for (id in _ref) {
-          localEntity = _ref[id];
+        var annotation, annotationId, bmIndex, brokenMatches, ea, em, entity, entityId, id, index, localEntity, local_confidence, _k, _l, _len2, _len3, _len4, _len5, _len6, _m, _n, _o, _ref10, _ref11, _ref12, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
+        _ref2 = configuration.entities;
+        for (id in _ref2) {
+          localEntity = _ref2[id];
           if (data.entities[id] != null) {
             $log.debug("LocalEntity " + id + " found into the analysis");
           } else {
@@ -514,46 +528,76 @@
             data.entities[id] = localEntity;
           }
         }
-        _ref1 = data.entities;
-        for (id in _ref1) {
-          entity = _ref1[id];
+        _ref3 = data.entities;
+        for (id in _ref3) {
+          entity = _ref3[id];
           if (!entity.label) {
             $log.warn("Label missing for entity " + id);
+            this._brokenEntities.push(id);
+          }
+          if (_ref4 = entity.mainType, __indexOf.call(this._supportedTypes, _ref4) < 0) {
+            $log.warn("Schema.org type " + entity.mainType + " for entity " + id + " is not supported from current classification boxes configuration");
+            entity.mainType = this._defaultType;
+            $log.debug("Schema.org type overridden for entity " + id);
           }
           entity.id = id;
           entity.occurrences = [];
           entity.annotations = {};
           entity.confidence = 1;
         }
-        _ref2 = data.annotations;
-        for (id in _ref2) {
-          annotation = _ref2[id];
+        _ref5 = data.annotations;
+        for (id in _ref5) {
+          annotation = _ref5[id];
           annotation.id = id;
           annotation.entities = {};
-          _ref3 = annotation.entityMatches;
-          for (_i = 0, _len = _ref3.length; _i < _len; _i++) {
-            ea = _ref3[_i];
+          _ref6 = annotation.entityMatches;
+          for (index = _k = 0, _len2 = _ref6.length; _k < _len2; index = ++_k) {
+            ea = _ref6[index];
             data.entities[ea.entityId].annotations[id] = annotation;
             data.annotations[id].entities[ea.entityId] = data.entities[ea.entityId];
           }
         }
-        _ref4 = data.entities;
-        for (id in _ref4) {
-          entity = _ref4[id];
-          _ref5 = data.annotations;
-          for (annotationId in _ref5) {
-            annotation = _ref5[annotationId];
+        _ref7 = data.entities;
+        for (id in _ref7) {
+          entity = _ref7[id];
+          _ref8 = data.annotations;
+          for (annotationId in _ref8) {
+            annotation = _ref8[annotationId];
             local_confidence = 1;
-            _ref6 = annotation.entityMatches;
-            for (_j = 0, _len1 = _ref6.length; _j < _len1; _j++) {
-              em = _ref6[_j];
-              if (em.entityId === id) {
+            _ref9 = annotation.entityMatches;
+            for (_l = 0, _len3 = _ref9.length; _l < _len3; _l++) {
+              em = _ref9[_l];
+              if ((em.entityId != null) && em.entityId === id) {
                 local_confidence = em.confidence;
               }
             }
             entity.confidence = entity.confidence * local_confidence;
           }
         }
+        _ref10 = this._brokenEntities;
+        for (_m = 0, _len4 = _ref10.length; _m < _len4; _m++) {
+          entityId = _ref10[_m];
+          $log.warn("Going to remove " + entityId);
+          brokenMatches = [];
+          _ref11 = data.entities[entityId].annotations;
+          for (id in _ref11) {
+            annotation = _ref11[id];
+            _ref12 = annotation.entityMatches;
+            for (index = _n = 0, _len5 = _ref12.length; _n < _len5; index = ++_n) {
+              ea = _ref12[index];
+              if (ea.entityId === entityId) {
+                brokenMatches.push(index);
+              }
+              delete data.annotations[id].entities[entityId];
+            }
+          }
+          for (_o = 0, _len6 = brokenMatches.length; _o < _len6; _o++) {
+            bmIndex = brokenMatches[_o];
+            data.annotations[id].entityMatches.splice(bmIndex, 1);
+          }
+          delete data.entities[entityId];
+        }
+        $log.debug(data);
         return data;
       };
       service.perform = function(content) {
@@ -578,10 +622,10 @@
         });
       };
       service.preselect = function(analysis, annotations) {
-        var annotation, e, entity, id, textAnnotation, _i, _len, _ref, _ref1, _results;
+        var annotation, e, entity, id, textAnnotation, _k, _len2, _ref2, _ref3, _results;
         _results = [];
-        for (_i = 0, _len = annotations.length; _i < _len; _i++) {
-          annotation = annotations[_i];
+        for (_k = 0, _len2 = annotations.length; _k < _len2; _k++) {
+          annotation = annotations[_k];
           textAnnotation = findAnnotation(analysis.annotations, annotation.start, annotation.end);
           if (textAnnotation == null) {
             $log.debug("There is no annotation with start " + annotation.start + " and end " + annotation.end);
@@ -593,10 +637,10 @@
             analysis.annotations[textAnnotation.id] = textAnnotation;
           }
           entity = analysis.entities[annotation.uri];
-          _ref = configuration.entities;
-          for (id in _ref) {
-            e = _ref[id];
-            if (_ref1 = annotation.uri, __indexOf.call(e.sameAs, _ref1) >= 0) {
+          _ref2 = configuration.entities;
+          for (id in _ref2) {
+            e = _ref2[id];
+            if (_ref3 = annotation.uri, __indexOf.call(e.sameAs, _ref3) >= 0) {
               entity = analysis.entities[e.id];
             }
           }
@@ -799,8 +843,6 @@
                 }
               }
               element += "\">";
-              $log.debug(element);
-              $log.debug(annotation.entityMatches);
               traslator.insertHtml(element, {
                 text: annotation.start
               });

@@ -518,9 +518,18 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
   findAnnotation = (annotations, start, end) ->
     return annotation for id, annotation of annotations when annotation.start is start and annotation.end is end
 
-
   service = 
     _currentAnalysis = {}
+
+  service._supportedTypes = []
+  service._defaultType = "thing"
+  service._brokenEntities = []
+  
+  # Retrieve supported type from current classification boxes configuration
+  for box in configuration.classificationBoxes
+    for type in box.registeredTypes
+      if type not in service._supportedTypes
+        service._supportedTypes.push type
 
   service.createEntity = (params = {}) ->
     # Set the defalut values.
@@ -564,9 +573,16 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
         data.entities[ id ] = localEntity
 
     for id, entity of data.entities
+      
       if not entity.label
         $log.warn "Label missing for entity #{id}"
+        @._brokenEntities.push id
 
+      if entity.mainType not in @._supportedTypes
+        $log.warn "Schema.org type #{entity.mainType} for entity #{id} is not supported from current classification boxes configuration"
+        entity.mainType = @._defaultType
+        $log.debug "Schema.org type overridden for entity #{id}"
+        
       entity.id = id
       entity.occurrences = []
       entity.annotations = {}
@@ -576,7 +592,8 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
       annotation.id = id
       annotation.entities = {}
       
-      for ea in annotation.entityMatches
+      for ea, index in annotation.entityMatches
+        
         data.entities[ ea.entityId ].annotations[ id ] = annotation
         data.annotations[ id ].entities[ ea.entityId ] = data.entities[ ea.entityId ]
 
@@ -585,10 +602,31 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
       for annotationId, annotation of data.annotations
         local_confidence = 1
         for em in annotation.entityMatches  
-          if em.entityId is id
+          if em.entityId? and em.entityId is id
             local_confidence = em.confidence
         entity.confidence = entity.confidence * local_confidence
- 
+    
+
+    # Clean broken entities
+    for entityId in @._brokenEntities
+      $log.warn "Going to remove #{entityId}"
+      
+      brokenMatches = []
+
+      for id, annotation of data.entities[ entityId ].annotations
+        for ea, index in annotation.entityMatches
+
+          if ea.entityId is entityId
+            brokenMatches.push index
+        
+          delete data.annotations[ id ].entities[ entityId ]
+
+      for bmIndex in brokenMatches
+          data.annotations[ id ].entityMatches.splice(bmIndex, 1)
+        
+      delete data.entities[ entityId ]
+
+    $log.debug data
     data
 
   service.perform = (content)->
@@ -834,14 +872,15 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
         
         # Loop annotation to see which has to be preselected
         for em in annotation.entityMatches
+          
           entity = analysis.entities[ em.entityId ] 
           
           if annotationId in entity.occurrences
             element += " disambiguated wl-#{entity.mainType}\" itemid=\"#{entity.id}"
         
         element += "\">"
-        $log.debug element
-        $log.debug annotation.entityMatches
+        #$log.debug element
+        #$log.debug annotation.entityMatches
         
             
         # Finally insert the HTML code.

@@ -177,14 +177,15 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
         
         # Loop annotation to see which has to be preselected
         for em in annotation.entityMatches
+          
           entity = analysis.entities[ em.entityId ] 
           
           if annotationId in entity.occurrences
             element += " disambiguated wl-#{entity.mainType}\" itemid=\"#{entity.id}"
         
         element += "\">"
-        $log.debug element
-        $log.debug annotation.entityMatches
+        #$log.debug element
+        #$log.debug annotation.entityMatches
         
             
         # Finally insert the HTML code.
