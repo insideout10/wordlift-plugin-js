@@ -172,6 +172,13 @@
     text-align: right;
 
     .button {
+      color: #ccc;
+      border-color: #ccc;
+      cursor: not-allowed;
+      &:hover {
+        border-color: #ccc;
+      }
+
       &.selected {
         color: #fff;
         background-color: @wp-cta-color;
@@ -204,7 +211,7 @@
       position: absolute;
       right: 0px;
       bottom:0px;
-      margin: 0px 6px 6px 0px;
+      margin: 0px 0px 6px 0px;
     }
 
     small {
@@ -354,8 +361,7 @@
     .wl-submit-wrapper {
       margin-top: 10px;
       padding: 10px;
-      border-top: 1px solid #ddd;
-      background: #f5f5f5;
+      border-top: 3px solid #ddd;
       text-align: right;
     }
 

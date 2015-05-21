@@ -1569,6 +1569,14 @@
   padding: 4px 0px 0px 0px;
   text-align: right;
 }
+#wordlift-edit-post-wrapper #wl-add-entity-button-wrapper .button {
+  color: #ccc;
+  border-color: #ccc;
+  cursor: not-allowed;
+}
+#wordlift-edit-post-wrapper #wl-add-entity-button-wrapper .button:hover {
+  border-color: #ccc;
+}
 #wordlift-edit-post-wrapper #wl-add-entity-button-wrapper .button.selected {
   color: #fff;
   background-color: #2ea2cc;
@@ -1607,7 +1615,7 @@
   position: absolute;
   right: 0px;
   bottom: 0px;
-  margin: 0px 6px 6px 0px;
+  margin: 0px 0px 6px 0px;
 }
 #wordlift-edit-post-wrapper .wl-annotation-label .wl-annotation-label-remove-icon:before {
   content: "\f00d";
@@ -1776,8 +1784,7 @@
 #wordlift-edit-post-wrapper .wl-entity-form .wl-submit-wrapper {
   margin-top: 10px;
   padding: 10px;
-  border-top: 1px solid #ddd;
-  background: #f5f5f5;
+  border-top: 3px solid #ddd;
   text-align: right;
 }
 #wordlift-edit-post-wrapper .wl-entity-form label {
