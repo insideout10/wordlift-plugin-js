@@ -1384,39 +1384,30 @@
 }
 .entity {
   background: white;
-  cursor: pointer;
   padding: 0em;
   margin: 0.2em 0em;
   font-size: 0.9em;
   position: relative;
 }
+.entity .label,
+.entity i {
+  cursor: pointer;
+}
 .entity .details {
-  margin: 5px;
-  padding: 0px 10px;
-  border-left: #ccc 1px solid;
-  border-bottom: #ccc 1px solid;
+  margin: 0px;
+  padding: 0px;
+  color: #999;
 }
 .entity .details p {
   margin: 5px 0px;
-  font-size: 0.86em;
+  font-size: inherit;
+  cursor: pointer;
+  max-height: 200px;
+  overflow-y: auto;
 }
-.entity .details img.thumbnail {
+.entity .details img {
   width: 100%;
   height: auto;
-}
-.entity .wl-edit-button {
-  background-color: #ccc;
-  color: #666;
-  font-size: 0.8em;
-  padding: 3px 6px;
-  margin: 10px 0px;
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  border-radius: 4px;
-}
-.entity .wl-edit-button.active {
-  background-color: #6c0;
-  color: #fff;
 }
 .entity .type {
   font-family: FontAwesome;
@@ -1430,7 +1421,7 @@
 }
 .entity.wl-creative-work {
   border-color: #f9f81e;
-  color: black;
+  color: #444;
 }
 .entity.wl-creative-work .type {
   text-align: center;
@@ -1452,7 +1443,7 @@
 }
 .entity.wl-event {
   border-color: #642994;
-  color: black;
+  color: #444;
 }
 .entity.wl-event .type {
   text-align: center;
@@ -1474,7 +1465,7 @@
 }
 .entity.wl-organization {
   border-color: #8fd22a;
-  color: black;
+  color: #444;
 }
 .entity.wl-organization .type {
   text-align: center;
@@ -1496,7 +1487,7 @@
 }
 .entity.wl-person {
   border-color: #f20f62;
-  color: black;
+  color: #444;
 }
 .entity.wl-person .type {
   text-align: center;
@@ -1518,7 +1509,7 @@
 }
 .entity.wl-place {
   border-color: #ff9a2e;
-  color: black;
+  color: #444;
 }
 .entity.wl-place .type {
   text-align: center;
@@ -1540,7 +1531,7 @@
 }
 .entity.wl-thing {
   border-color: #000000;
-  color: black;
+  color: #444;
 }
 .entity.wl-thing .type {
   text-align: center;
@@ -1560,40 +1551,29 @@
   background-color: #000000;
   color: #ffffff;
 }
-body {
-  font-family: "Open Sans", sans-serif;
-}
 #wordlift-edit-post-wrapper {
-  font-family: "Open Sans", sans-serif;
+  margin: 10px 0em;
   background-color: white;
 }
-#wordlift-edit-post-wrapper .wl-new-entity-button {
-  padding: 3px 10px;
-  color: #666;
-  background-color: #e2e2e2;
-  -webkit-border-radius: 6px;
-  -moz-border-radius: 6px;
-  border-radius: 6px;
-  font-size: 0.8em;
+#wordlift-edit-post-wrapper .clear {
+  clear: both;
+  height: 1px;
 }
-#wordlift-edit-post-wrapper .wl-new-entity-button.selected {
+#wordlift-edit-post-wrapper input,
+#wordlift-edit-post-wrapper select,
+#wordlift-edit-post-wrapper textarea {
+  width: 100%;
+  font-size: inherit;
+}
+#wordlift-edit-post-wrapper #wl-add-entity-button-wrapper {
+  padding: 4px 0px 0px 0px;
+  text-align: right;
+}
+#wordlift-edit-post-wrapper #wl-add-entity-button-wrapper .button.selected {
   color: #fff;
-  background-color: #f20f62;
+  background-color: #2ea2cc;
+  border-color: #0074a2;
   cursor: pointer;
-}
-#wordlift-edit-post-wrapper .wl-new-entity-button .wl-annotation-label-icon {
-  padding: 0px 3px;
-  font-family: FontAwesome;
-  font-style: normal;
-  font-weight: normal;
-  line-height: 14px;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  font-size: 14px;
-  padding: 4px 0px;
-}
-#wordlift-edit-post-wrapper .wl-new-entity-button .wl-annotation-label-icon:before {
-  content: "\f040";
 }
 #wordlift-edit-post-wrapper .wl-annotation-label {
   border-bottom: #ccc 1px solid;
@@ -1639,9 +1619,10 @@ body {
   position: relative;
 }
 #wordlift-edit-post-wrapper .classification-box .box-widgets {
-  background-color: #e2e2e2;
-  padding: 6px;
-  margin: 0px 10px 10px 0px;
+  color: #555;
+  border: #ccc 1px solid;
+  padding: 0px;
+  margin: 0px 0px 10px 0px;
 }
 #wordlift-edit-post-wrapper .classification-box .box-widgets img {
   cursor: pointer;
@@ -1649,8 +1630,11 @@ body {
   height: auto;
   margin: 3px;
 }
+#wordlift-edit-post-wrapper .classification-box .box-tiles {
+  margin-top: 3px;
+  border-top: #eee 1px solid;
+}
 #wordlift-edit-post-wrapper .classification-box .box-header {
-  padding: 3px;
   font-size: 0.8em;
   text-transform: capitalize;
 }
@@ -1660,19 +1644,23 @@ body {
   font-weight: bold;
   padding: 5px 0px;
   margin: 0px;
-  line-height: 1.6em;
+  line-height: 1.3em;
+  font-size: 1.3em;
 }
 #wordlift-edit-post-wrapper .classification-box .box-header .wl-widget-label {
-  position: absolute;
-  right: 10px;
-  bottom: 0;
+  position: relative;
   text-transform: capitalize;
   font-weight: normal;
-  padding: 2px 2px 2px 6px;
-  background-color: #e2e2e2;
-  color: #666;
+  font-size: inherit;
+  padding: 0px 2px 0px 6px;
+  background-color: #f7f7f7;
+  border-bottom: #ccc 1px solid;
+  color: #555;
 }
 #wordlift-edit-post-wrapper .classification-box .box-header .wl-widget-label .wl-deselect-widget {
+  position: absolute;
+  top: 3px;
+  right: 3px;
   font-family: FontAwesome;
   font-style: normal;
   font-weight: normal;
@@ -1681,10 +1669,14 @@ body {
   -moz-osx-font-smoothing: grayscale;
   font-size: 14px;
   padding: 0px 3px;
-  font-size: 0.9em;
+  font-size: inherit;
+  color: #aaa;
 }
 #wordlift-edit-post-wrapper .classification-box .box-header .wl-widget-label .wl-deselect-widget:before {
   content: "\f00d";
+}
+#wordlift-edit-post-wrapper .classification-box .box-header .wl-widget-label .wl-deselect-widget:hover {
+  color: #aa0000;
 }
 #wordlift-edit-post-wrapper .classification-box .box-header .wl-suggestion-tools {
   margin-left: 4px;
@@ -1695,6 +1687,7 @@ body {
   font-family: FontAwesome;
 }
 #wordlift-edit-post-wrapper .classification-box .box-header .wl-suggestion-tools .wl-widget-icon.wl-ImageSuggestor {
+  color: #2ea2cc;
   font-family: FontAwesome;
   font-style: normal;
   font-weight: normal;
@@ -1708,6 +1701,7 @@ body {
   content: "\f03e";
 }
 #wordlift-edit-post-wrapper .classification-box .box-header .wl-suggestion-tools .wl-widget-icon.wl-ArticleSuggestor {
+  color: #2ea2cc;
   font-family: FontAwesome;
   font-style: normal;
   font-weight: normal;
@@ -1720,71 +1714,35 @@ body {
 #wordlift-edit-post-wrapper .classification-box .box-header .wl-suggestion-tools .wl-widget-icon.wl-ArticleSuggestor:before {
   content: "\f03a";
 }
-#wordlift-edit-post-wrapper .classification-box .box-header .wl-selected-item.wl-person {
-  padding: 3px 3px 3px 6px;
-  margin-right: 5px;
-  font-size: 0.8em;
-  color: #333;
-  border: #f20f62 1px solid;
-  -webkit-border-radius: 6px;
-  -moz-border-radius: 6px;
-  border-radius: 6px;
+#wordlift-edit-post-wrapper .classification-box .box-header .wl-selected-item {
   text-align: center;
+  float: left;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  padding: 0px 3px;
+  margin: 3px 3px 0px 0px;
+  font-size: 1em;
+  color: #555;
+  border: #ccc 1px solid;
+}
+#wordlift-edit-post-wrapper .classification-box .box-header .wl-selected-item.wl-person {
+  border-left: #f20f62 5px solid;
 }
 #wordlift-edit-post-wrapper .classification-box .box-header .wl-selected-item.wl-place {
-  padding: 3px 3px 3px 6px;
-  margin-right: 5px;
-  font-size: 0.8em;
-  color: #333;
-  border: #ff9a2e 1px solid;
-  -webkit-border-radius: 6px;
-  -moz-border-radius: 6px;
-  border-radius: 6px;
-  text-align: center;
+  border-left: #ff9a2e 5px solid;
 }
 #wordlift-edit-post-wrapper .classification-box .box-header .wl-selected-item.wl-thing {
-  padding: 3px 3px 3px 6px;
-  margin-right: 5px;
-  font-size: 0.8em;
-  color: #333;
-  border: #000000 1px solid;
-  -webkit-border-radius: 6px;
-  -moz-border-radius: 6px;
-  border-radius: 6px;
-  text-align: center;
+  border-left: #000000 5px solid;
 }
 #wordlift-edit-post-wrapper .classification-box .box-header .wl-selected-item.wl-creative-work {
-  padding: 3px 3px 3px 6px;
-  margin-right: 5px;
-  font-size: 0.8em;
-  color: #333;
-  border: #f9f81e 1px solid;
-  -webkit-border-radius: 6px;
-  -moz-border-radius: 6px;
-  border-radius: 6px;
-  text-align: center;
+  border-left: #f9f81e 5px solid;
 }
 #wordlift-edit-post-wrapper .classification-box .box-header .wl-selected-item.wl-event {
-  padding: 3px 3px 3px 6px;
-  margin-right: 5px;
-  font-size: 0.8em;
-  color: #333;
-  border: #642994 1px solid;
-  -webkit-border-radius: 6px;
-  -moz-border-radius: 6px;
-  border-radius: 6px;
-  text-align: center;
+  border-left: #642994 5px solid;
 }
 #wordlift-edit-post-wrapper .classification-box .box-header .wl-selected-item.wl-organization {
-  padding: 3px 3px 3px 6px;
-  margin-right: 5px;
-  font-size: 0.8em;
-  color: #333;
-  border: #8fd22a 1px solid;
-  -webkit-border-radius: 6px;
-  -moz-border-radius: 6px;
-  border-radius: 6px;
-  text-align: center;
+  border-left: #8fd22a 5px solid;
 }
 #wordlift-edit-post-wrapper .classification-box .box-header .wl-selected-item .wl-deselect-item {
   font-family: FontAwesome;
@@ -1795,39 +1753,42 @@ body {
   -moz-osx-font-smoothing: grayscale;
   font-size: 14px;
   padding: 0px 3px;
-  font-size: 0.9em;
+  font-size: 1.2em;
+  color: #bbb;
 }
 #wordlift-edit-post-wrapper .classification-box .box-header .wl-selected-item .wl-deselect-item:before {
   content: "\f00d";
 }
+#wordlift-edit-post-wrapper .classification-box .box-header .wl-selected-item .wl-deselect-item:hover {
+  color: #aa0000;
+  cursor: pointer;
+}
 #wordlift-edit-post-wrapper .wl-entity-form {
-  margin: 4px 0px;
-  padding: 6px;
+  margin: 0px;
+  padding: 0px;
 }
 #wordlift-edit-post-wrapper .wl-entity-form div {
-  margin-top: 4px;
+  margin-top: 2px;
+}
+#wordlift-edit-post-wrapper .wl-entity-form .wl-fields-wrapper {
+  padding: 10px;
+}
+#wordlift-edit-post-wrapper .wl-entity-form .wl-submit-wrapper {
+  margin-top: 10px;
+  padding: 10px;
+  border-top: 1px solid #ddd;
+  background: #f5f5f5;
+  text-align: right;
 }
 #wordlift-edit-post-wrapper .wl-entity-form label {
   display: block;
-  font-size: 0.8em;
-  margin: 0px 0px 5px 0px;
+  margin: 0px 0px 3px 0px;
 }
 #wordlift-edit-post-wrapper .wl-entity-form .wl-entity-id {
   background-color: #e2e2e2;
   color: #999;
   padding: 2px 6px;
   font-size: 0.8em;
-}
-#wordlift-edit-post-wrapper .wl-entity-form input,
-#wordlift-edit-post-wrapper .wl-entity-form textarea,
-#wordlift-edit-post-wrapper .wl-entity-form select {
-  width: 90%;
-  border: #ccc 1px solid;
-  margin: 0px;
-  padding: 3px;
-  -webkit-border-radius: 6px;
-  -moz-border-radius: 6px;
-  border-radius: 6px;
 }
 #wordlift-edit-post-wrapper .wl-spinner {
   font-family: FontAwesome;
@@ -1847,6 +1808,23 @@ body {
 #wordlift-edit-post-wrapper .wl-spinner:before {
   content: "\f110";
 }
+#wordlift-edit-post-wrapper .wl-edit {
+  font-family: FontAwesome;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 14px;
+  padding: 0px 3px;
+  color: #aaa;
+}
+#wordlift-edit-post-wrapper .wl-edit:before {
+  content: "\f040";
+}
+#wordlift-edit-post-wrapper .wl-edit.active {
+  color: #2ea2cc;
+}
 #wordlift-edit-post-wrapper .wl-more {
   font-family: FontAwesome;
   font-style: normal;
@@ -1856,12 +1834,13 @@ body {
   -moz-osx-font-smoothing: grayscale;
   font-size: 14px;
   padding: 0px 3px;
+  color: #aaa;
   position: absolute;
   right: 0px;
   top: 0px;
 }
 #wordlift-edit-post-wrapper .wl-more:before {
-  content: "\f196";
+  content: "\f0d7";
 }
 #wordlift-edit-post-wrapper .wl-less {
   font-family: FontAwesome;
@@ -1872,15 +1851,16 @@ body {
   -moz-osx-font-smoothing: grayscale;
   font-size: 14px;
   padding: 0px 3px;
+  color: #aaa;
   position: absolute;
   right: 0px;
   top: 0px;
 }
 #wordlift-edit-post-wrapper .wl-less:before {
-  content: "\f147";
+  content: "\f0d8";
 }
 #wordlift-edit-post-wrapper .wl-without-annotation .wl-selected {
-  padding: 0px 3px;
+  color: #444;
   font-family: FontAwesome;
   font-style: normal;
   font-weight: normal;
@@ -1888,12 +1868,13 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-size: 14px;
-  padding: 4px 0px;
+  padding: 0px 3px;
 }
 #wordlift-edit-post-wrapper .wl-without-annotation .wl-selected:before {
   content: "\f05d";
 }
 #wordlift-edit-post-wrapper .wl-with-annotation .wl-selected {
+  color: #444;
   font-family: FontAwesome;
   font-style: normal;
   font-weight: normal;
@@ -1906,8 +1887,8 @@ body {
 #wordlift-edit-post-wrapper .wl-with-annotation .wl-selected:before {
   content: "\f0c1";
 }
-#wordlift-edit-post-wrapper .wl-unselected {
-  padding: 0px 3px;
+#wordlift-edit-post-wrapper .wl-without-annotation .wl-unselected {
+  color: #888;
   font-family: FontAwesome;
   font-style: normal;
   font-weight: normal;
@@ -1915,12 +1896,13 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-size: 14px;
-  padding: 4px 0px;
+  padding: 0px 3px;
 }
-#wordlift-edit-post-wrapper .wl-unselected:before {
+#wordlift-edit-post-wrapper .wl-without-annotation .wl-unselected:before {
   content: "\f10c";
 }
 #wordlift-edit-post-wrapper .wl-with-annotation .wl-unselected {
+  color: #888;
   font-family: FontAwesome;
   font-style: normal;
   font-weight: normal;

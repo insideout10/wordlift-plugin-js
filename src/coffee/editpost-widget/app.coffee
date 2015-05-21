@@ -23,10 +23,9 @@ angular.module('wordlift.editpost.widget', [
 $(
   container = $("""
   	<div ng-show="analysis" id="wordlift-edit-post-wrapper" ng-controller="EditPostWidgetController">
-  		<div ng-click="createTextAnnotationFromCurrentSelection()">
-        <span class="wl-new-entity-button" ng-class="{ 'selected' : !isSelectionCollapsed }">
-          <i class="wl-annotation-label-icon"></i> add entity 
-        </span>
+  		<div ng-click="createTextAnnotationFromCurrentSelection()" id="wl-add-entity-button-wrapper">
+        <span class="preview button" ng-class="{ 'selected' : !isSelectionCollapsed }">Add entity</span>
+        <div class="clear" />     
       </div>
       
       <div ng-show="annotation">

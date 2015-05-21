@@ -3,111 +3,131 @@
 
 #wordlift-faceted-entity-search-widget {
 
-	font-size: 0.6em;
 	border:#e2e2e2 1px solid;
 
-.fa-icon(@icon) {
-    
-    &:before {
-      content: @icon; 
-    }
-    font-family: FontAwesome;
-    font-style: normal;
-    font-weight: normal;
-    line-height: 14px;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    font-size: 14px;
-    padding: 0px 3px;
-  }
-
-
-// Set a tile color background, foreground and icons.
-.tile(@color, @icon) {
-  
-  .type {
-    text-align: center;
-    &:before {
-      content: @icon;
-      color: @color; 
-    }
-  }
-  &.selected {
-    background-color: @color;
-    color: contrast(@color);
-  }
-}
-
-	.facets {
-		float:left;
-		width: 40%;
-		background-color:#e2e2e2;
-		padding: 1em;
-
-		fieldset {
-			border: #999 1px solid;
-			padding: 0.2em;
-		}
-		legend {
-			padding: 0.2em 0.6em;
-			text-transform: uppercase;
-			font-weight: bold;
-		}
-		li {
-			list-style-type: none;
-			padding: 0.2em;
-			
-			span.label {
-			 text-transform: capitalize;
-			}
-		
-			.type {
-    			font-family: FontAwesome;
-    			font-style: normal;
-    			font-weight: normal;
-    			line-height: 14px;
-	  			-webkit-font-smoothing: antialiased;
-  				-moz-osx-font-smoothing: grayscale;
-    			font-size: 14px;
-   				padding: 4px;
-  			}
-  			.checkbox {
-  				.fa-icon(@fa-var-circle-o);
-  				&.selected {
-	  				.fa-icon(@fa-var-check-circle-o);  					
-  				}
-  			}
-
-  			&.wl-fs-creative-work { .tile(@wl-creative-work-color, @fa-var-lightbulb-o) }
-  			&.wl-fs-event { .tile(@wl-event-color, @fa-var-calendar) }
-  			&.wl-fs-organization { .tile(@wl-organization-color, @fa-var-building-o) }
-  			&.wl-fs-person { .tile(@wl-person-color, @fa-var-user) }
-  			&.wl-fs-place { .tile(@wl-place-color, @fa-var-map-marker) }
-  			&.wl-fs-thing { .tile(@wl-thing-color, @fa-var-file-o) }
-
-		}
-
+	div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed,  figure, figcaption, footer, header, hgroup,  menu, nav, output, ruby, section, summary, time, mark, audio, video {
+		margin: 0;
+		padding: 0;
+		border: 0;
+		font-size: 100%;
+		font: inherit;
+		vertical-align: baseline;
 	}
-	h3 {
-		margin: 1em 0em;
-		font-size: 1.6em;
+	article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
+		display: block;
 	}
+	body {
+		line-height: 1;
+	}
+	ol, ul {
+		list-style: none;
+	}
+	blockquote, q {
+		quotes: none;
+	}
+	blockquote:before, blockquote:after, q:before, q:after {
+		content: '';
+		content: none;
+	}
+	table {
+		border-collapse: collapse;
+		border-spacing: 0;
+	}
+
 	h5 {
-		margin: 1em 0em;
-		font-size: 0.8em;
+		margin: 0.2em 0.4em;
+		
 	}
 
-	.posts {
-		float:right;
-		width: 60%;
-		padding: 1em;
-		font-size: 1.4em;
+	.fa-icon(@icon) {
+    
+    	&:before {
+      	content: @icon; 
+    	}
+    	font-family: FontAwesome;
+    	font-style: normal;
+    	font-weight: normal;
+    	line-height: 14px;
+	    -webkit-font-smoothing: antialiased;
+	    -moz-osx-font-smoothing: grayscale;
+	    font-size: 14px;
+	    padding: 0px 3px;
+	  }
+
+	// Set a tile color background, foreground and icons.
+	.tile(@color, @icon) {
+  
+		.type {
+    		text-align: center;
+    		&:before {
+      			content: @icon;
+      			color: @color; 
+    		}
+  		}
+  		&.selected {
+    		background-color: @color;
+    		color: contrast(@color);
+  		}
+	}
+
+	.wl-facets {
+
+		background-color:#e2e2e2;
+		padding: 0.6em;
+		x-overflow:auto;
+			
+
+		.wl-facets-container {
+			font-size: 0.6em;
+			
+			h6 {
+
+				text-transform: uppercase;
+				
+				.type {
+    				font-family: FontAwesome;
+    				font-style: normal;
+    				font-weight: normal;
+    				-webkit-font-smoothing: antialiased;
+  					-moz-osx-font-smoothing: grayscale;
+  					font-size:1.2em;
+  					margin-right: 0.3em;
+  				}
+
+				&.wl-fs-creative-work { .tile(@wl-creative-work-color, @fa-var-lightbulb-o) }
+  				&.wl-fs-event { .tile(@wl-event-color, @fa-var-calendar) }
+  				&.wl-fs-organization { .tile(@wl-organization-color, @fa-var-building-o) }
+  				&.wl-fs-person { .tile(@wl-person-color, @fa-var-user) }
+  				&.wl-fs-place { .tile(@wl-place-color, @fa-var-map-marker) }
+  				&.wl-fs-thing { .tile(@wl-thing-color, @fa-var-file-o) }
+			}
+			
+			li {
+				padding: 0.2em;
+				display: inline;
+
+				span.wl-label {
+					text-transform: capitalize;
+					line-height: 0.8em;
+					cursor: pointer;
+
+				}
+
+			}
+		}
+
+	}
+
+	.wl-posts {
+		padding: 0.6em;
+		font-size: 0.8em;
+		clear:both;
 
 		a {
 			border:none !important;
 		}
 
-		.post {
+		.wl-post {
 			border-bottom: #e2e2e2 1px solid;
 			position: relative;
 
@@ -118,7 +138,7 @@
 			}
 		}
 
-		.condition {
+		.wl-condition {
 			padding: 0px 0px;
 			text-transform: capitalize;
 
@@ -130,7 +150,7 @@
 	.clear {
 		clear:both;
 	}
-	.conditions {
+	.wl-conditions {
 		border-bottom: #666 1px solid;
 		margin-bottom: 10px;
 	}

@@ -1337,170 +1337,255 @@
   content: "\f196";
 }
 #wordlift-faceted-entity-search-widget {
-  font-size: 0.6em;
   border: #e2e2e2 1px solid;
 }
-#wordlift-faceted-entity-search-widget .facets {
-  float: left;
-  width: 40%;
+#wordlift-faceted-entity-search-widget div,
+#wordlift-faceted-entity-search-widget span,
+#wordlift-faceted-entity-search-widget applet,
+#wordlift-faceted-entity-search-widget object,
+#wordlift-faceted-entity-search-widget iframe,
+#wordlift-faceted-entity-search-widget h1,
+#wordlift-faceted-entity-search-widget h2,
+#wordlift-faceted-entity-search-widget h3,
+#wordlift-faceted-entity-search-widget h4,
+#wordlift-faceted-entity-search-widget h5,
+#wordlift-faceted-entity-search-widget h6,
+#wordlift-faceted-entity-search-widget p,
+#wordlift-faceted-entity-search-widget blockquote,
+#wordlift-faceted-entity-search-widget pre,
+#wordlift-faceted-entity-search-widget a,
+#wordlift-faceted-entity-search-widget abbr,
+#wordlift-faceted-entity-search-widget acronym,
+#wordlift-faceted-entity-search-widget address,
+#wordlift-faceted-entity-search-widget big,
+#wordlift-faceted-entity-search-widget cite,
+#wordlift-faceted-entity-search-widget code,
+#wordlift-faceted-entity-search-widget del,
+#wordlift-faceted-entity-search-widget dfn,
+#wordlift-faceted-entity-search-widget em,
+#wordlift-faceted-entity-search-widget img,
+#wordlift-faceted-entity-search-widget ins,
+#wordlift-faceted-entity-search-widget kbd,
+#wordlift-faceted-entity-search-widget q,
+#wordlift-faceted-entity-search-widget s,
+#wordlift-faceted-entity-search-widget samp,
+#wordlift-faceted-entity-search-widget small,
+#wordlift-faceted-entity-search-widget strike,
+#wordlift-faceted-entity-search-widget strong,
+#wordlift-faceted-entity-search-widget sub,
+#wordlift-faceted-entity-search-widget sup,
+#wordlift-faceted-entity-search-widget tt,
+#wordlift-faceted-entity-search-widget var,
+#wordlift-faceted-entity-search-widget b,
+#wordlift-faceted-entity-search-widget u,
+#wordlift-faceted-entity-search-widget i,
+#wordlift-faceted-entity-search-widget center,
+#wordlift-faceted-entity-search-widget dl,
+#wordlift-faceted-entity-search-widget dt,
+#wordlift-faceted-entity-search-widget dd,
+#wordlift-faceted-entity-search-widget ol,
+#wordlift-faceted-entity-search-widget ul,
+#wordlift-faceted-entity-search-widget li,
+#wordlift-faceted-entity-search-widget fieldset,
+#wordlift-faceted-entity-search-widget form,
+#wordlift-faceted-entity-search-widget label,
+#wordlift-faceted-entity-search-widget legend,
+#wordlift-faceted-entity-search-widget table,
+#wordlift-faceted-entity-search-widget caption,
+#wordlift-faceted-entity-search-widget tbody,
+#wordlift-faceted-entity-search-widget tfoot,
+#wordlift-faceted-entity-search-widget thead,
+#wordlift-faceted-entity-search-widget tr,
+#wordlift-faceted-entity-search-widget th,
+#wordlift-faceted-entity-search-widget td,
+#wordlift-faceted-entity-search-widget article,
+#wordlift-faceted-entity-search-widget aside,
+#wordlift-faceted-entity-search-widget canvas,
+#wordlift-faceted-entity-search-widget details,
+#wordlift-faceted-entity-search-widget embed,
+#wordlift-faceted-entity-search-widget figure,
+#wordlift-faceted-entity-search-widget figcaption,
+#wordlift-faceted-entity-search-widget footer,
+#wordlift-faceted-entity-search-widget header,
+#wordlift-faceted-entity-search-widget hgroup,
+#wordlift-faceted-entity-search-widget menu,
+#wordlift-faceted-entity-search-widget nav,
+#wordlift-faceted-entity-search-widget output,
+#wordlift-faceted-entity-search-widget ruby,
+#wordlift-faceted-entity-search-widget section,
+#wordlift-faceted-entity-search-widget summary,
+#wordlift-faceted-entity-search-widget time,
+#wordlift-faceted-entity-search-widget mark,
+#wordlift-faceted-entity-search-widget audio,
+#wordlift-faceted-entity-search-widget video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+#wordlift-faceted-entity-search-widget article,
+#wordlift-faceted-entity-search-widget aside,
+#wordlift-faceted-entity-search-widget details,
+#wordlift-faceted-entity-search-widget figcaption,
+#wordlift-faceted-entity-search-widget figure,
+#wordlift-faceted-entity-search-widget footer,
+#wordlift-faceted-entity-search-widget header,
+#wordlift-faceted-entity-search-widget hgroup,
+#wordlift-faceted-entity-search-widget menu,
+#wordlift-faceted-entity-search-widget nav,
+#wordlift-faceted-entity-search-widget section {
+  display: block;
+}
+#wordlift-faceted-entity-search-widget body {
+  line-height: 1;
+}
+#wordlift-faceted-entity-search-widget ol,
+#wordlift-faceted-entity-search-widget ul {
+  list-style: none;
+}
+#wordlift-faceted-entity-search-widget blockquote,
+#wordlift-faceted-entity-search-widget q {
+  quotes: none;
+}
+#wordlift-faceted-entity-search-widget blockquote:before,
+#wordlift-faceted-entity-search-widget blockquote:after,
+#wordlift-faceted-entity-search-widget q:before,
+#wordlift-faceted-entity-search-widget q:after {
+  content: '';
+  content: none;
+}
+#wordlift-faceted-entity-search-widget table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+#wordlift-faceted-entity-search-widget h5 {
+  margin: 0.2em 0.4em;
+}
+#wordlift-faceted-entity-search-widget .wl-facets {
   background-color: #e2e2e2;
-  padding: 1em;
+  padding: 0.6em;
+  x-overflow: auto;
 }
-#wordlift-faceted-entity-search-widget .facets fieldset {
-  border: #999 1px solid;
-  padding: 0.2em;
+#wordlift-faceted-entity-search-widget .wl-facets .wl-facets-container {
+  font-size: 0.6em;
 }
-#wordlift-faceted-entity-search-widget .facets legend {
-  padding: 0.2em 0.6em;
+#wordlift-faceted-entity-search-widget .wl-facets .wl-facets-container h6 {
   text-transform: uppercase;
-  font-weight: bold;
 }
-#wordlift-faceted-entity-search-widget .facets li {
-  list-style-type: none;
-  padding: 0.2em;
-}
-#wordlift-faceted-entity-search-widget .facets li span.label {
-  text-transform: capitalize;
-}
-#wordlift-faceted-entity-search-widget .facets li .type {
+#wordlift-faceted-entity-search-widget .wl-facets .wl-facets-container h6 .type {
   font-family: FontAwesome;
   font-style: normal;
   font-weight: normal;
-  line-height: 14px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-size: 14px;
-  padding: 4px;
+  font-size: 1.2em;
+  margin-right: 0.3em;
 }
-#wordlift-faceted-entity-search-widget .facets li .checkbox {
-  font-family: FontAwesome;
-  font-style: normal;
-  font-weight: normal;
-  line-height: 14px;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  font-size: 14px;
-  padding: 0px 3px;
-}
-#wordlift-faceted-entity-search-widget .facets li .checkbox:before {
-  content: "\f10c";
-}
-#wordlift-faceted-entity-search-widget .facets li .checkbox.selected {
-  font-family: FontAwesome;
-  font-style: normal;
-  font-weight: normal;
-  line-height: 14px;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  font-size: 14px;
-  padding: 0px 3px;
-}
-#wordlift-faceted-entity-search-widget .facets li .checkbox.selected:before {
-  content: "\f05d";
-}
-#wordlift-faceted-entity-search-widget .facets li.wl-fs-creative-work .type {
+#wordlift-faceted-entity-search-widget .wl-facets .wl-facets-container h6.wl-fs-creative-work .type {
   text-align: center;
 }
-#wordlift-faceted-entity-search-widget .facets li.wl-fs-creative-work .type:before {
+#wordlift-faceted-entity-search-widget .wl-facets .wl-facets-container h6.wl-fs-creative-work .type:before {
   content: "\f0eb";
   color: #f9f81e;
 }
-#wordlift-faceted-entity-search-widget .facets li.wl-fs-creative-work.selected {
+#wordlift-faceted-entity-search-widget .wl-facets .wl-facets-container h6.wl-fs-creative-work.selected {
   background-color: #f9f81e;
   color: #000000;
 }
-#wordlift-faceted-entity-search-widget .facets li.wl-fs-event .type {
+#wordlift-faceted-entity-search-widget .wl-facets .wl-facets-container h6.wl-fs-event .type {
   text-align: center;
 }
-#wordlift-faceted-entity-search-widget .facets li.wl-fs-event .type:before {
+#wordlift-faceted-entity-search-widget .wl-facets .wl-facets-container h6.wl-fs-event .type:before {
   content: "\f073";
   color: #642994;
 }
-#wordlift-faceted-entity-search-widget .facets li.wl-fs-event.selected {
+#wordlift-faceted-entity-search-widget .wl-facets .wl-facets-container h6.wl-fs-event.selected {
   background-color: #642994;
   color: #ffffff;
 }
-#wordlift-faceted-entity-search-widget .facets li.wl-fs-organization .type {
+#wordlift-faceted-entity-search-widget .wl-facets .wl-facets-container h6.wl-fs-organization .type {
   text-align: center;
 }
-#wordlift-faceted-entity-search-widget .facets li.wl-fs-organization .type:before {
+#wordlift-faceted-entity-search-widget .wl-facets .wl-facets-container h6.wl-fs-organization .type:before {
   content: "\f0f7";
   color: #8fd22a;
 }
-#wordlift-faceted-entity-search-widget .facets li.wl-fs-organization.selected {
+#wordlift-faceted-entity-search-widget .wl-facets .wl-facets-container h6.wl-fs-organization.selected {
   background-color: #8fd22a;
   color: #000000;
 }
-#wordlift-faceted-entity-search-widget .facets li.wl-fs-person .type {
+#wordlift-faceted-entity-search-widget .wl-facets .wl-facets-container h6.wl-fs-person .type {
   text-align: center;
 }
-#wordlift-faceted-entity-search-widget .facets li.wl-fs-person .type:before {
+#wordlift-faceted-entity-search-widget .wl-facets .wl-facets-container h6.wl-fs-person .type:before {
   content: "\f007";
   color: #f20f62;
 }
-#wordlift-faceted-entity-search-widget .facets li.wl-fs-person.selected {
+#wordlift-faceted-entity-search-widget .wl-facets .wl-facets-container h6.wl-fs-person.selected {
   background-color: #f20f62;
   color: #ffffff;
 }
-#wordlift-faceted-entity-search-widget .facets li.wl-fs-place .type {
+#wordlift-faceted-entity-search-widget .wl-facets .wl-facets-container h6.wl-fs-place .type {
   text-align: center;
 }
-#wordlift-faceted-entity-search-widget .facets li.wl-fs-place .type:before {
+#wordlift-faceted-entity-search-widget .wl-facets .wl-facets-container h6.wl-fs-place .type:before {
   content: "\f041";
   color: #ff9a2e;
 }
-#wordlift-faceted-entity-search-widget .facets li.wl-fs-place.selected {
+#wordlift-faceted-entity-search-widget .wl-facets .wl-facets-container h6.wl-fs-place.selected {
   background-color: #ff9a2e;
   color: #000000;
 }
-#wordlift-faceted-entity-search-widget .facets li.wl-fs-thing .type {
+#wordlift-faceted-entity-search-widget .wl-facets .wl-facets-container h6.wl-fs-thing .type {
   text-align: center;
 }
-#wordlift-faceted-entity-search-widget .facets li.wl-fs-thing .type:before {
+#wordlift-faceted-entity-search-widget .wl-facets .wl-facets-container h6.wl-fs-thing .type:before {
   content: "\f016";
   color: #000000;
 }
-#wordlift-faceted-entity-search-widget .facets li.wl-fs-thing.selected {
+#wordlift-faceted-entity-search-widget .wl-facets .wl-facets-container h6.wl-fs-thing.selected {
   background-color: #000000;
   color: #ffffff;
 }
-#wordlift-faceted-entity-search-widget h3 {
-  margin: 1em 0em;
-  font-size: 1.6em;
+#wordlift-faceted-entity-search-widget .wl-facets .wl-facets-container li {
+  padding: 0.2em;
+  display: inline;
 }
-#wordlift-faceted-entity-search-widget h5 {
-  margin: 1em 0em;
+#wordlift-faceted-entity-search-widget .wl-facets .wl-facets-container li span.wl-label {
+  text-transform: capitalize;
+  line-height: 0.8em;
+  cursor: pointer;
+}
+#wordlift-faceted-entity-search-widget .wl-posts {
+  padding: 0.6em;
   font-size: 0.8em;
+  clear: both;
 }
-#wordlift-faceted-entity-search-widget .posts {
-  float: right;
-  width: 60%;
-  padding: 1em;
-  font-size: 1.4em;
-}
-#wordlift-faceted-entity-search-widget .posts a {
+#wordlift-faceted-entity-search-widget .wl-posts a {
   border: none !important;
 }
-#wordlift-faceted-entity-search-widget .posts .post {
+#wordlift-faceted-entity-search-widget .wl-posts .wl-post {
   border-bottom: #e2e2e2 1px solid;
   position: relative;
 }
-#wordlift-faceted-entity-search-widget .posts .post img {
+#wordlift-faceted-entity-search-widget .wl-posts .wl-post img {
   width: 60px;
   /* float: left; */
   margin: 5px;
 }
-#wordlift-faceted-entity-search-widget .posts .condition {
+#wordlift-faceted-entity-search-widget .wl-posts .wl-condition {
   padding: 0px 0px;
   text-transform: capitalize;
 }
-#wordlift-faceted-entity-search-widget .posts .condition.main {
+#wordlift-faceted-entity-search-widget .wl-posts .wl-condition.main {
   font-weight: bold;
 }
 #wordlift-faceted-entity-search-widget .clear {
   clear: both;
 }
-#wordlift-faceted-entity-search-widget .conditions {
+#wordlift-faceted-entity-search-widget .wl-conditions {
   border-bottom: #666 1px solid;
   margin-bottom: 10px;
 }

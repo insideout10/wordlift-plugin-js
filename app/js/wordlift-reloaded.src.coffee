@@ -302,12 +302,13 @@ angular.module('wordlift.editpost.widget.directives.wlClassificationBox', [])
           <h5 class="label">{{box.label}}
             <span class="wl-suggestion-tools" ng-show="hasSelectedEntities()">
               <i ng-class="'wl-' + widget" title="{{widget}}" ng-click="toggleWidget(widget)" ng-repeat="widget in box.registeredWidgets" class="wl-widget-icon"></i>
-            </span>
-            <span ng-show="isWidgetOpened" class="wl-widget-label">{{currentWidget}}
-              <i ng-click="toggleWidget(currentWidget)" class="wl-deselect-widget"></i>
-            </span>  
+            </span> 
           </h5>
           <div ng-show="isWidgetOpened" class="box-widgets">
+            <div ng-show="isWidgetOpened" class="wl-widget-label">
+              {{currentWidget}}
+              <i ng-click="toggleWidget(currentWidget)" class="wl-deselect-widget"></i>
+            </div> 
             <div ng-show="currentWidget == widget" ng-repeat="widget in box.registeredWidgets">
               <img ng-click="embedImageInEditor(item.uri)"ng-src="{{ item.uri }}" ng-repeat="item in widgets[ box.id ][ widget ]" />
             </div>
@@ -317,6 +318,7 @@ angular.module('wordlift.editpost.widget.directives.wlClassificationBox', [])
               {{ entity.label}}
               <i class="wl-deselect-item" ng-click="onSelectedEntityTile(entity, box)"></i>
             </span>
+            <div class="clear" /> 
           </div>
         </div>
   			<div class="box-tiles">
@@ -377,6 +379,9 @@ angular.module('wordlift.editpost.widget.directives.wlEntityForm', [])
       onSubmit: '&'
     template: """
       <div name="wordlift" class="wl-entity-form">
+      <div ng-show="entity.images.length > 0">
+          <img ng-src="{{entity.images[0]}}" />
+      </div>
       <div>
           <label>Entity label</label>
           <input type="text" ng-model="entity.label" />
@@ -391,13 +396,17 @@ angular.module('wordlift.editpost.widget.directives.wlEntityForm', [])
       </div>
       <div ng-show="checkEntityId(entity.id)">
           <label>Entity Id</label>
-          <small class="wl-entity-id">{{entity.id}}</small>
+          <input type="text" ng-model="entity.id" disabled="true" />
       </div>
       <div>
           <label>Entity Same as (*)</label>
           <input type="text" ng-model="entity.sameAs" />
       </div>
-      <h3 ng-click="onSubmit()">Save</h3>
+      
+      <div class="wl-submit-wrapper">
+        <span class="button button-primary" ng-click="onSubmit()">Save</span>
+      </div>
+
       </div>
     """
     link: ($scope, $element, $attrs, $ctrl) ->  
@@ -426,19 +435,20 @@ angular.module('wordlift.editpost.widget.directives.wlEntityTile', [])
       onEntitySelect: '&'
     template: """
   	  <div ng-class="'wl-' + entity.mainType" class="entity">
-  	    <i ng-hide="annotation" ng-class="{ 'wl-selected' : isSelected, 'wl-unselected' : !isSelected }"></i>
-        <i class="type"></i>
-        <span class="label" ng-click="onEntitySelect()">{{entity.label}}</span>     
-        <small ng-show="entity.occurrences.length > 0">({{entity.occurrences.length}})</small>
-        <span ng-show="isInternal()">*</span>  
-        <i ng-class="{ 'wl-more': isOpened == false, 'wl-less': isOpened == true }" ng-click="toggle()"></i>
-  	    <span ng-class="{ 'active' : editingModeOn }" ng-click="toggleEditingMode()" ng-show="isOpened" class="wl-edit-button">Edit</span>
+        <div class="entity-header">
+  	      
+          <i ng-click="onEntitySelect()" ng-hide="annotation" ng-class="{ 'wl-selected' : isSelected, 'wl-unselected' : !isSelected }"></i>
+          <i ng-click="onEntitySelect()" class="type"></i>
+          <span class="label" ng-click="onEntitySelect()">{{entity.label}}</span>
+
+          <small ng-show="entity.occurrences.length > 0">({{entity.occurrences.length}})</small>
+          <span ng-show="isInternal()">*</span>  
+          <i ng-class="{ 'wl-more': isOpened == false, 'wl-less': isOpened == true }" ng-click="toggle()"></i>
+  	    </div>
         <div class="details" ng-show="isOpened">
-          <p ng-hide="editingModeOn"><img class="thumbnail" ng-src="{{ entity.images[0] }}" />{{entity.description}}</p>
-          <wl-entity-form entity="entity" ng-show="editingModeOn" on-submit="toggleEditingMode()"></wl-entity-form>
+          <wl-entity-form entity="entity" on-submit="toggle()"></wl-entity-form>
         </div>
   	  </div>
-
   	"""
     link: ($scope, $element, $attrs, $boxCtrl) ->				      
       
@@ -446,16 +456,12 @@ angular.module('wordlift.editpost.widget.directives.wlEntityTile', [])
       $boxCtrl.addTile $scope
 
       $scope.isOpened = false
-      $scope.editingModeOn = false
       
       $scope.isInternal = ()->
         if $scope.entity.id.match /redlink/
           return true
         return false 
-       
-      $scope.toggleEditingMode = ()->
-        $scope.editingModeOn = !$scope.editingModeOn
-
+      
       $scope.open = ()->
       	$scope.isOpened = true
       $scope.close = ()->
@@ -905,10 +911,9 @@ angular.module('wordlift.editpost.widget', [
 $(
   container = $("""
   	<div ng-show="analysis" id="wordlift-edit-post-wrapper" ng-controller="EditPostWidgetController">
-  		<div ng-click="createTextAnnotationFromCurrentSelection()">
-        <span class="wl-new-entity-button" ng-class="{ 'selected' : !isSelectionCollapsed }">
-          <i class="wl-annotation-label-icon"></i> add entity 
-        </span>
+  		<div ng-click="createTextAnnotationFromCurrentSelection()" id="wl-add-entity-button-wrapper">
+        <span class="preview button" ng-class="{ 'selected' : !isSelectionCollapsed }">Add entity</span>
+        <div class="clear" />     
       </div>
       
       <div ng-show="annotation">

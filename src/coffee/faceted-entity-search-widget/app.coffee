@@ -25,6 +25,19 @@ angular.module('wordlift.facetedsearch.widget', [])
     filtered
 
 ])
+.directive('wlTruncate', ['$log', ($log)->
+    restrict: 'A'
+    scope:
+      text: '='
+      charsThreshold: '='
+    link: ($scope, $element, $attrs) ->  
+      CHARS_THRESHOLD = parseInt( $scope.charsThreshold )
+      $scope.label = $scope.text
+      if $scope.text.length > CHARS_THRESHOLD
+        $scope.label = $scope.text.substr( 0, CHARS_THRESHOLD ) + ' ...'
+      $element.append $scope.label
+])
+
 .controller('FacetedSearchWidgetController', [ 'DataRetrieverService', 'configuration', '$scope', '$log', (DataRetrieverService, configuration, $scope, $log)-> 
 
     $scope.entity = undefined
@@ -56,6 +69,7 @@ angular.module('wordlift.facetedsearch.widget', [])
 
     $scope.$on "facetsLoaded", (event, facets) -> 
       $log.debug "Referencing facets for entity #{configuration.entity_id} ..."
+      $log.debug facets
       for entity in facets
         if entity.id is configuration.entity_uri
           $scope.entity = entity
@@ -87,6 +101,49 @@ angular.module('wordlift.facetedsearch.widget', [])
   service
 
 ])
+.directive('wlCarousel', ['$log', ($log)->
+    restrict: 'A'
+    scope: true
+    transclude: true      
+    template: """
+      <div ng-transclude></div>
+      <br class="clear" />
+      <ul>
+      <li ng-repeat="item in items">{{item.$id}}</li>
+      </ul>
+      <h4>{{currentItemId}}</h4>
+    """
+    controller: ($scope, $element, $attrs) ->
+      $scope.items = []
+      
+      $scope.startAt = 0
+      $scope.maxItems = 3 
+
+      $scope.calculateDimensions = ()->
+        for index, item of $scope.items
+          $log.debug index
+          $log.debug item
+
+      ctrl = @
+      ctrl.registerItem = (scope, element)->
+        item =
+          'scope': scope
+          'element': element
+
+        $scope.items.push item
+        $scope.calculateDimensions()
+])
+.directive('wlCarouselItem', ['$log', ($log)->
+    require: '^wlCarousel'
+    restrict: 'A'
+    transclude: true      
+    template: """
+      <div ng-transclude></div>
+    """
+    link: ($scope, $element, $attrs, $ctrl) ->
+      $log.debug "Going to add item with id #{$scope.$id} to carousel"
+      $ctrl.registerItem $scope, $element
+])
 .config((configurationProvider)->
   configurationProvider.setConfiguration window.wl_faceted_search_params
 )
@@ -94,27 +151,28 @@ angular.module('wordlift.facetedsearch.widget', [])
 $(
   container = $("""
   	<div ng-controller="FacetedSearchWidgetController">
-      <div class="facets">
-        <fieldset ng-repeat="type in supportedTypes">
-          <legend>{{type}}</legend>
+      <h5>Contenuti associati a <strong>{{entity.label}}</strong></h5>
+      <div class="wl-facets">
+        <div class="wl-facets-container" ng-repeat="type in supportedTypes">
+          <h6 ng-class="'wl-fs-' + type"><i class="type" />{{type}}</h6>
           <ul>
-            <li ng-class="'wl-fs-' + entity.mainType" class="entity" ng-repeat="entity in facets | filterEntitiesByType:type" ng-click="addCondition(entity)">
-              <i class="checkbox" ng-class=" { 'selected' : isInConditions(entity) }" /><i class="type" /><span class="label">{{entity.label}}</span>
+            <li class="entity" ng-repeat="entity in facets | filterEntitiesByType:type" ng-click="addCondition(entity)">     
+                <span class="wl-label" ng-class=" { 'selected' : isInConditions(entity) }" wl-truncate text="entity.label" chars-threshold="100"></span>
+                <span class="counter">({{entity.counter}})</span>
             </li>
           </ul>
-        </fieldset>
-      </div>
-      <div class="posts">
-        <div class="conditions">
-          Contenuti associati a <strong>{{entity.label}}</strong><br />
-          <span>Filtri:</span>
-          <strong class="condition" ng-repeat="(condition, entity) in conditions">{{entity.label}}. </strong>
         </div>
-        <div class="post" ng-repeat="post in posts">
+      </div>
+      <div class="wl-posts">
+        <div class="wl-conditions">
+          <span>Filtri:</span>
+          <strong class="wl-condition" ng-repeat="(condition, entity) in conditions">{{entity.label}}. </strong>
+        </div>
+        <div class="wl-post" ng-repeat="post in posts">
           <a ng-href="/?p={{post.ID}}">{{post.post_title}}</a>
         </div>   
       </div>
-      <br class="clear" />
+     
     </div>
   """)
   .appendTo('#wordlift-faceted-entity-search-widget')
