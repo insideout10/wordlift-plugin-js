@@ -58,7 +58,7 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
     
     merge defaults, params
   
-  service.parse = (data, brokenEntities = []) ->
+  service.parse = (data) ->
     
     # Add local entities
     # Add id to entity obj
@@ -76,8 +76,9 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
       
       if not entity.label
         $log.warn "Label missing for entity #{id}"
-        brokenEntities.push id
-
+      if not entity.description
+        $log.warn "Description missing for entity #{id}"
+        
       if entity.mainType not in @._supportedTypes
         $log.warn "Schema.org type #{entity.mainType} for entity #{id} is not supported from current classification boxes configuration"
         entity.mainType = @._defaultType
@@ -94,6 +95,10 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
       
       for ea, index in annotation.entityMatches
         
+        if not data.entities[ ea.entityId ].label 
+          data.entities[ ea.entityId ].label = annotation.text
+          $log.debug "Missing label retrived from related annotation for entity #{ea.entityId}"
+
         data.entities[ ea.entityId ].annotations[ id ] = annotation
         data.annotations[ id ].entities[ ea.entityId ] = data.entities[ ea.entityId ]
 
@@ -106,27 +111,6 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
             local_confidence = em.confidence
         entity.confidence = entity.confidence * local_confidence
     
-
-    # Clean broken entities
-    for entityId in brokenEntities
-      $log.warn "Going to remove #{entityId}"
-      
-      brokenMatches = []
-
-      for id, annotation of data.entities[ entityId ].annotations
-        for ea, index in annotation.entityMatches
-
-          if ea.entityId is entityId
-            brokenMatches.push index
-        
-          delete data.annotations[ id ].entities[ entityId ]
-
-      for bmIndex in brokenMatches
-          data.annotations[ id ].entityMatches.splice(bmIndex, 1)
-        
-      delete data.entities[ entityId ]
-
-    $log.debug data
     data
 
   service.getSuggestedSameAs = (content)->

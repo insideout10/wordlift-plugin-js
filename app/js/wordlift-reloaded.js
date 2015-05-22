@@ -524,11 +524,8 @@
         };
         return merge(defaults, params);
       };
-      service.parse = function(data, brokenEntities) {
-        var annotation, annotationId, bmIndex, brokenMatches, ea, em, entity, entityId, id, index, localEntity, local_confidence, _k, _l, _len2, _len3, _len4, _len5, _len6, _m, _n, _o, _ref10, _ref11, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
-        if (brokenEntities == null) {
-          brokenEntities = [];
-        }
+      service.parse = function(data) {
+        var annotation, annotationId, ea, em, entity, id, index, localEntity, local_confidence, _k, _l, _len2, _len3, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
         _ref2 = configuration.entities;
         for (id in _ref2) {
           localEntity = _ref2[id];
@@ -544,7 +541,9 @@
           entity = _ref3[id];
           if (!entity.label) {
             $log.warn("Label missing for entity " + id);
-            brokenEntities.push(id);
+          }
+          if (!entity.description) {
+            $log.warn("Description missing for entity " + id);
           }
           if (_ref4 = entity.mainType, __indexOf.call(this._supportedTypes, _ref4) < 0) {
             $log.warn("Schema.org type " + entity.mainType + " for entity " + id + " is not supported from current classification boxes configuration");
@@ -564,6 +563,10 @@
           _ref6 = annotation.entityMatches;
           for (index = _k = 0, _len2 = _ref6.length; _k < _len2; index = ++_k) {
             ea = _ref6[index];
+            if (!data.entities[ea.entityId].label) {
+              data.entities[ea.entityId].label = annotation.text;
+              $log.debug("Missing label retrived from related annotation for entity " + ea.entityId);
+            }
             data.entities[ea.entityId].annotations[id] = annotation;
             data.annotations[id].entities[ea.entityId] = data.entities[ea.entityId];
           }
@@ -585,29 +588,6 @@
             entity.confidence = entity.confidence * local_confidence;
           }
         }
-        for (_m = 0, _len4 = brokenEntities.length; _m < _len4; _m++) {
-          entityId = brokenEntities[_m];
-          $log.warn("Going to remove " + entityId);
-          brokenMatches = [];
-          _ref10 = data.entities[entityId].annotations;
-          for (id in _ref10) {
-            annotation = _ref10[id];
-            _ref11 = annotation.entityMatches;
-            for (index = _n = 0, _len5 = _ref11.length; _n < _len5; index = ++_n) {
-              ea = _ref11[index];
-              if (ea.entityId === entityId) {
-                brokenMatches.push(index);
-              }
-              delete data.annotations[id].entities[entityId];
-            }
-          }
-          for (_o = 0, _len6 = brokenMatches.length; _o < _len6; _o++) {
-            bmIndex = brokenMatches[_o];
-            data.annotations[id].entityMatches.splice(bmIndex, 1);
-          }
-          delete data.entities[entityId];
-        }
-        $log.debug(data);
         return data;
       };
       service.getSuggestedSameAs = function(content) {
