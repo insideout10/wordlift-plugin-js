@@ -216,10 +216,11 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     return ($scope.annotation in entity.occurrences)
 
   $scope.addNewEntityToAnalysis = ()->
-    # Keep the sameAs as Tmp id
-    sameAs = $scope.newEntity.sameAs
-    $scope.newEntity.id = sameAs
-    $scope.newEntity.sameAs = [ sameAs ]
+    
+    # Keep the sameAs as Tmp id if available
+    if $scope.newEntity.sameAs
+      $scope.newEntity.sameAs = [ $scope.newEntity.sameAs ]
+    
     delete $scope.newEntity.suggestedSameAs
     
     $log.debug $scope.newEntity
@@ -257,7 +258,7 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     # Set the annotation text as label for the new entity
     $scope.newEntity.label = annotation.text
     # Set the annotation id as id for the new entity
-    $scope.newEntity.id = annotation.id
+    # $scope.newEntity.id = annotation.id
     # Ask for SameAs suggestions
     AnalysisService.getSuggestedSameAs annotation.text
 

@@ -199,10 +199,10 @@
         return (_ref2 = $scope.annotation, __indexOf.call(entity.occurrences, _ref2) >= 0);
       };
       $scope.addNewEntityToAnalysis = function() {
-        var annotation, sameAs;
-        sameAs = $scope.newEntity.sameAs;
-        $scope.newEntity.id = sameAs;
-        $scope.newEntity.sameAs = [sameAs];
+        var annotation;
+        if ($scope.newEntity.sameAs) {
+          $scope.newEntity.sameAs = [$scope.newEntity.sameAs];
+        }
         delete $scope.newEntity.suggestedSameAs;
         $log.debug($scope.newEntity);
         $scope.analysis.entities[$scope.newEntity.id] = $scope.newEntity;
@@ -240,7 +240,6 @@
         $scope.analysis.annotations[annotation.id] = annotation;
         $scope.annotation = annotation.id;
         $scope.newEntity.label = annotation.text;
-        $scope.newEntity.id = annotation.id;
         return AnalysisService.getSuggestedSameAs(annotation.text);
       });
       $scope.$on("sameAsRetrieved", function(event, sameAs) {
