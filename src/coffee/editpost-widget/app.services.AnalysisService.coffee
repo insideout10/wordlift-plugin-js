@@ -120,8 +120,11 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
     .success (data) ->
       
       suggestions = []
+
       for id, entity of data.entities
-        suggestions.push id
+        if id.startsWith('http')
+          suggestions.push id
+      
       $rootScope.$broadcast "sameAsRetrieved", suggestions
 
     .error (data, status) ->

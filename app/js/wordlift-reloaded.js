@@ -597,7 +597,9 @@
           _ref2 = data.entities;
           for (id in _ref2) {
             entity = _ref2[id];
-            suggestions.push(id);
+            if (id.startsWith('http')) {
+              suggestions.push(id);
+            }
           }
           return $rootScope.$broadcast("sameAsRetrieved", suggestions);
         }).error(function(data, status) {
