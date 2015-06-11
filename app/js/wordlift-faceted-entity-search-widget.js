@@ -72,13 +72,13 @@
       };
       $scope.$on("postsLoaded", function(event, posts) {
         $log.debug("Referencing posts for entity " + configuration.entity_id + " ...");
+        $log.debug(posts);
         $scope.posts = posts;
         return $log.debug($scope.posts);
       });
       return $scope.$on("facetsLoaded", function(event, facets) {
         var entity, _i, _len;
         $log.debug("Referencing facets for entity " + configuration.entity_id + " ...");
-        $log.debug(facets);
         for (_i = 0, _len = facets.length; _i < _len; _i++) {
           entity = facets[_i];
           if (entity.id === configuration.entity_uri) {
@@ -113,42 +113,78 @@
       return service;
     }
   ]).directive('wlCarousel', [
-    '$log', function($log) {
+    '$window', '$log', function($window, $log) {
       return {
         restrict: 'A',
         scope: true,
         transclude: true,
-        template: "<div ng-transclude></div>\n<br class=\"clear\" />\n<ul>\n<li ng-repeat=\"item in items\">{{item.$id}}</li>\n</ul>\n<h4>{{currentItemId}}</h4>",
+        template: "<div class=\"wl-carousel\">\n  <div class=\"wl-panes\" style=\"width:{{panesWidth}}px; left:{{position}}px;\" ng-transclude ng-swipe-right=\"next()\"></div>\n  <span class=\"wl-next\" ng-click=\"next()\">&gt;</span>\n  <span class=\"wl-prev\" ng-click=\"prev()\">&lt;</span>\n</div>      ",
         controller: function($scope, $element, $attrs) {
-          var ctrl;
-          $scope.items = [];
-          $scope.startAt = 0;
-          $scope.maxItems = 3;
-          $scope.calculateDimensions = function() {
-            var index, item, _ref, _results;
-            _ref = $scope.items;
-            _results = [];
-            for (index in _ref) {
-              item = _ref[index];
-              $log.debug(index);
-              _results.push($log.debug(item));
+          var ctrl, w;
+          w = angular.element($window);
+          $scope.visibleElements = function() {
+            if ($element.width() > 460) {
+              return 3;
             }
-            return _results;
+            if ($element.width() > 1024) {
+              return 5;
+            }
+            return 1;
           };
+          $scope.itemWidth = $element.width() / $scope.visibleElements();
+          $scope.panesWidth = void 0;
+          $scope.panes = [];
+          $scope.position = 0;
+          $scope.next = function() {
+            return $scope.position = $scope.position - $scope.itemWidth;
+          };
+          $scope.prev = function() {
+            return $scope.position = $scope.position + $scope.itemWidth;
+          };
+          $scope.setPanesWrapperWidth = function() {
+            return $scope.panesWidth = $scope.panes.length * $scope.itemWidth;
+          };
+          w.bind('resize', function() {
+            var pane, _i, _len, _ref;
+            $scope.itemWidth = $element.width() / $scope.visibleElements();
+            $scope.setPanesWrapperWidth();
+            _ref = $scope.panes;
+            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+              pane = _ref[_i];
+              pane.scope.setWidth($scope.itemWidth);
+            }
+            return $scope.$apply();
+          });
           ctrl = this;
-          return ctrl.registerItem = function(scope, element) {
-            var item;
-            item = {
+          ctrl.registerPane = function(scope, element) {
+            var pane;
+            scope.setWidth($scope.itemWidth);
+            pane = {
               'scope': scope,
               'element': element
             };
-            $scope.items.push(item);
-            return $scope.calculateDimensions();
+            $scope.panes.push(pane);
+            return $scope.setPanesWrapperWidth();
+          };
+          return ctrl.unregisterPane = function(scope) {
+            var index, pane, unregisterPaneIndex, _i, _len, _ref;
+            unregisterPaneIndex = void 0;
+            _ref = $scope.panes;
+            for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
+              pane = _ref[index];
+              if (pane.scope.$id === scope.$id) {
+                unregisterPaneIndex = index;
+              }
+            }
+            if (unregisterPaneIndex) {
+              $scope.panes.splice(unregisterPaneIndex, 1);
+            }
+            return $scope.setPanesWrapperWidth();
           };
         }
       };
     }
-  ]).directive('wlCarouselItem', [
+  ]).directive('wlCarouselPane', [
     '$log', function($log) {
       return {
         require: '^wlCarousel',
@@ -156,8 +192,15 @@
         transclude: true,
         template: "<div ng-transclude></div>",
         link: function($scope, $element, $attrs, $ctrl) {
-          $log.debug("Going to add item with id " + $scope.$id + " to carousel");
-          return $ctrl.registerItem($scope, $element);
+          $log.debug("Going to add carousel pane with id " + $scope.$id + " to carousel");
+          $element.addClass("wl-carousel-item");
+          $scope.setWidth = function(size) {
+            return $element.css('width', "" + size + "px");
+          };
+          $scope.$on('$destroy', function() {
+            return $ctrl.unregisterPane($scope);
+          });
+          return $ctrl.registerPane($scope, $element);
         }
       };
     }
@@ -165,7 +208,7 @@
     return configurationProvider.setConfiguration(window.wl_faceted_search_params);
   });
 
-  $(container = $("<div ng-controller=\"FacetedSearchWidgetController\">\n      <h5>Contenuti associati a <strong>{{entity.label}}</strong></h5>\n      <div class=\"wl-facets\">\n        <div class=\"wl-facets-container\" ng-repeat=\"type in supportedTypes\">\n          <h6 ng-class=\"'wl-fs-' + type\"><i class=\"type\" />{{type}}</h6>\n          <ul>\n            <li class=\"entity\" ng-repeat=\"entity in facets | filterEntitiesByType:type\" ng-click=\"addCondition(entity)\">     \n                <span class=\"wl-label\" ng-class=\" { 'selected' : isInConditions(entity) }\" wl-truncate text=\"entity.label\" chars-threshold=\"100\"></span>\n                <span class=\"counter\">({{entity.counter}})</span>\n            </li>\n          </ul>\n        </div>\n      </div>\n      <div class=\"wl-posts\">\n        <div class=\"wl-conditions\">\n          <span>Filtri:</span>\n          <strong class=\"wl-condition\" ng-repeat=\"(condition, entity) in conditions\">{{entity.label}}. </strong>\n        </div>\n        <div class=\"wl-post\" ng-repeat=\"post in posts\">\n          <a ng-href=\"/?p={{post.ID}}\">{{post.post_title}}</a>\n        </div>   \n      </div>\n     \n    </div>").appendTo('#wordlift-faceted-entity-search-widget'), injector = angular.bootstrap($('#wordlift-faceted-entity-search-widget'), ['wordlift.facetedsearch.widget']));
+  $(container = $("	<div ng-controller=\"FacetedSearchWidgetController\">\n    <h5>Contenuti associati a <strong>{{entity.label}}</strong></h5>\n    <div class=\"wl-facets\" wl-carousel>\n      <div class=\"wl-facets-container\" ng-repeat=\"type in supportedTypes\" wl-carousel-pane>\n        <h6 ng-class=\"'wl-fs-' + type\"><i class=\"type\" />{{type}}</h6>\n        <ul>\n          <li class=\"entity\" ng-repeat=\"entity in facets | filterEntitiesByType:type\" ng-click=\"addCondition(entity)\">     \n              <span class=\"wl-label\" ng-class=\" { 'selected' : isInConditions(entity) }\" wl-truncate text=\"entity.label\" chars-threshold=\"100\"></span>\n              <span class=\"counter\">({{entity.counter}})</span>\n          </li>\n        </ul>\n      </div>\n    </div>\n    <div class=\"wl-posts\">\n      <div class=\"wl-conditions\">\n        <span>Filtri:</span>\n        <strong class=\"wl-condition\" ng-repeat=\"(condition, entity) in conditions\">{{entity.label}}. </strong>\n      </div>\n      <div wl-carousel>\n        <div class=\"wl-post\" ng-repeat=\"post in posts\" wl-carousel-pane>\n          <img ng-src=\"{{post.thumbnail}}\" />\n          <div class=\"wl-post-title\"> \n            <a ng-href=\"/?p={{post.ID}}\">{{post.post_title}}</a>\n          </div>\n        </div>\n      </div>\n\n    </div>\n   \n  </div>").appendTo('#wordlift-faceted-entity-search-widget'), injector = angular.bootstrap($('#wordlift-faceted-entity-search-widget'), ['wordlift.facetedsearch.widget']));
 
   injector.invoke([
     'DataRetrieverService', '$rootScope', '$log', function(DataRetrieverService, $rootScope, $log) {

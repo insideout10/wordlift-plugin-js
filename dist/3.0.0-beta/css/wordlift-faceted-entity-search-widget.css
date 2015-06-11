@@ -1464,12 +1464,12 @@
   margin: 0.2em 0.4em;
 }
 #wordlift-faceted-entity-search-widget .wl-facets {
-  background-color: #e2e2e2;
-  padding: 0.6em;
-  x-overflow: auto;
+  padding: 1rem;
+  background-color: #fff;
 }
 #wordlift-faceted-entity-search-widget .wl-facets .wl-facets-container {
   font-size: 0.6em;
+  border-left: #e2e2e2 1px solid;
 }
 #wordlift-faceted-entity-search-widget .wl-facets .wl-facets-container h6 {
   text-transform: uppercase;
@@ -1549,17 +1549,77 @@
   background-color: #000000;
   color: #ffffff;
 }
-#wordlift-faceted-entity-search-widget .wl-facets .wl-facets-container li {
-  padding: 0.2em;
-  display: inline;
-}
 #wordlift-faceted-entity-search-widget .wl-facets .wl-facets-container li span.wl-label {
   text-transform: capitalize;
   line-height: 0.8em;
   cursor: pointer;
 }
+#wordlift-faceted-entity-search-widget .wl-carousel {
+  overflow: hidden;
+  width: 100%;
+  position: relative;
+}
+#wordlift-faceted-entity-search-widget .wl-post-title {
+  position: absolute;
+  width: 100%;
+  bottom: 0px;
+  left: 0px;
+  background-color: #fff;
+  height: 40px;
+  min-height: 40px;
+  line-height: 1em;
+  padding: 0em;
+  border-top: #999 1px solid;
+}
+#wordlift-faceted-entity-search-widget .wl-post-title a {
+  color: #666;
+  font-size: 0.8em;
+}
+#wordlift-faceted-entity-search-widget .wl-panes {
+  position: relative;
+  overflow: hidden;
+  /* This is used solely to clear floats, it does not add functionality. */
+  left: 0;
+  transition-property: left;
+  transition-duration: 0.3s;
+  transition-timing-function: linear;
+}
+#wordlift-faceted-entity-search-widget .wl-panes .wl-carousel-item {
+  position: relative;
+  float: left;
+  max-height: 120px;
+}
+#wordlift-faceted-entity-search-widget .wl-carousel img {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+}
+#wordlift-faceted-entity-search-widget .wl-next {
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  cursor: pointer;
+  width: 1.5em;
+  text-align: center;
+  font-size: 2rem;
+  font-weight: bold;
+  z-index: 1;
+  display: block;
+}
+#wordlift-faceted-entity-search-widget .wl-prev {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  cursor: pointer;
+  width: 1.5em;
+  text-align: center;
+  font-size: 2rem;
+  font-weight: bold;
+  z-index: 2;
+  display: block;
+}
 #wordlift-faceted-entity-search-widget .wl-posts {
-  padding: 0.6em;
+  padding: 1rem;
   font-size: 0.8em;
   clear: both;
 }
@@ -1569,11 +1629,6 @@
 #wordlift-faceted-entity-search-widget .wl-posts .wl-post {
   border-bottom: #e2e2e2 1px solid;
   position: relative;
-}
-#wordlift-faceted-entity-search-widget .wl-posts .wl-post img {
-  width: 60px;
-  /* float: left; */
-  margin: 5px;
 }
 #wordlift-faceted-entity-search-widget .wl-posts .wl-condition {
   padding: 0px 0px;
