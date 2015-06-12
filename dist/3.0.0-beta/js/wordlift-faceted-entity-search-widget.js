@@ -77,7 +77,7 @@
     '$log', function($log) {
       return {
         require: '^wlCarousel',
-        restrict: 'A',
+        restrict: 'EA',
         transclude: true,
         template: "<div ng-transclude></div>",
         link: function($scope, $element, $attrs, $ctrl) {

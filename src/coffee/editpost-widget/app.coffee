@@ -4,7 +4,8 @@ $ = jQuery
 # Create the main AngularJS module, and set it dependent on controllers and directives.
 angular.module('wordlift.editpost.widget', [
 
-	'wordlift.editpost.widget.providers.ConfigurationProvider', 
+	'wordlift.ui.carousel'
+  'wordlift.editpost.widget.providers.ConfigurationProvider', 
 	'wordlift.editpost.widget.controllers.EditPostWidgetController', 
 	'wordlift.editpost.widget.directives.wlClassificationBox', 
 	'wordlift.editpost.widget.directives.wlEntityForm', 
@@ -46,7 +47,12 @@ $(
           <wl-entity-tile is-selected="isLinkedToCurrentAnnotation(entity)" on-entity-select="onSelectedEntityTile(entity, box)" entity="entity" ng-repeat="entity in analysis.annotations[annotation].entities | filterEntitiesByTypes:box.registeredTypes"" ></wl-entity>
         </div>  
       </wl-classification-box>
-
+      <div wl-carousel>
+        <div ng-repeat="entity in analysis.entities | isEntitySelected" wl-carousel-pane>
+          <img ng-src="{{entity.images[0]}}" />
+        </div>
+      </div>
+      
       <div class="wl-entity-input-boxes">
         <wl-entity-input-box annotation="annotation" entity="entity" ng-repeat="entity in analysis.entities | isEntitySelected"></wl-entity-input-box>
         <div ng-repeat="(box, entities) in selectedEntities">

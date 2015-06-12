@@ -106,6 +106,100 @@
 
   window.Traslator = Traslator;
 
+  angular.module('wordlift.ui.carousel', []).directive('wlCarousel', [
+    '$window', '$log', function($window, $log) {
+      return {
+        restrict: 'A',
+        scope: true,
+        transclude: true,
+        template: "<div class=\"wl-carousel\">\n  <div class=\"wl-panes\" style=\"width:{{panesWidth}}px; left:{{position}}px;\" ng-transclude ng-swipe-right=\"next()\"></div>\n  <span class=\"wl-carousel-arrow wl-next\" ng-click=\"next()\">&gt;</span>\n  <span class=\"wl-carousel-arrow wl-prev\" ng-click=\"prev()\">&lt;</span>\n</div>      ",
+        controller: function($scope, $element, $attrs) {
+          var ctrl, w;
+          w = angular.element($window);
+          $scope.visibleElements = function() {
+            if ($element.width() > 460) {
+              return 3;
+            }
+            if ($element.width() > 1024) {
+              return 5;
+            }
+            return 1;
+          };
+          $scope.itemWidth = $element.width() / $scope.visibleElements();
+          $scope.panesWidth = void 0;
+          $scope.panes = [];
+          $scope.position = 0;
+          $scope.next = function() {
+            return $scope.position = $scope.position - $scope.itemWidth;
+          };
+          $scope.prev = function() {
+            return $scope.position = $scope.position + $scope.itemWidth;
+          };
+          $scope.setPanesWrapperWidth = function() {
+            return $scope.panesWidth = $scope.panes.length * $scope.itemWidth;
+          };
+          w.bind('resize', function() {
+            var pane, _i, _len, _ref;
+            $scope.itemWidth = $element.width() / $scope.visibleElements();
+            $scope.setPanesWrapperWidth();
+            _ref = $scope.panes;
+            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+              pane = _ref[_i];
+              pane.scope.setWidth($scope.itemWidth);
+            }
+            return $scope.$apply();
+          });
+          ctrl = this;
+          ctrl.registerPane = function(scope, element) {
+            var pane;
+            scope.setWidth($scope.itemWidth);
+            pane = {
+              'scope': scope,
+              'element': element
+            };
+            $scope.panes.push(pane);
+            return $scope.setPanesWrapperWidth();
+          };
+          return ctrl.unregisterPane = function(scope) {
+            var index, pane, unregisterPaneIndex, _i, _len, _ref;
+            unregisterPaneIndex = void 0;
+            _ref = $scope.panes;
+            for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
+              pane = _ref[index];
+              if (pane.scope.$id === scope.$id) {
+                unregisterPaneIndex = index;
+              }
+            }
+            if (unregisterPaneIndex) {
+              $scope.panes.splice(unregisterPaneIndex, 1);
+            }
+            return $scope.setPanesWrapperWidth();
+          };
+        }
+      };
+    }
+  ]).directive('wlCarouselPane', [
+    '$log', function($log) {
+      return {
+        require: '^wlCarousel',
+        restrict: 'EA',
+        transclude: true,
+        template: "<div ng-transclude></div>",
+        link: function($scope, $element, $attrs, $ctrl) {
+          $log.debug("Going to add carousel pane with id " + $scope.$id + " to carousel");
+          $element.addClass("wl-carousel-item");
+          $scope.setWidth = function(size) {
+            return $element.css('width', "" + size + "px");
+          };
+          $scope.$on('$destroy', function() {
+            return $ctrl.unregisterPane($scope);
+          });
+          return $ctrl.registerPane($scope, $element);
+        }
+      };
+    }
+  ]);
+
   angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', ['wordlift.editpost.widget.services.AnalysisService', 'wordlift.editpost.widget.services.EditorService', 'wordlift.editpost.widget.providers.ConfigurationProvider']).filter('filterEntitiesByTypesAndRelevance', [
     '$log', function($log) {
       return function(items, types) {
@@ -301,7 +395,7 @@
         restrict: 'E',
         scope: true,
         transclude: true,
-        template: "<div class=\"classification-box\">\n	<div class=\"box-header\">\n          <h5 class=\"label\">{{box.label}}\n            <span class=\"wl-suggestion-tools\" ng-show=\"hasSelectedEntities()\">\n              <i ng-class=\"'wl-' + widget\" title=\"{{widget}}\" ng-click=\"toggleWidget(widget)\" ng-repeat=\"widget in box.registeredWidgets\" class=\"wl-widget-icon\"></i>\n            </span> \n          </h5>\n          <div ng-show=\"isWidgetOpened\" class=\"box-widgets\">\n            <div ng-show=\"isWidgetOpened\" class=\"wl-widget-label\">\n              {{currentWidget}}\n              <i ng-click=\"toggleWidget(currentWidget)\" class=\"wl-deselect-widget\"></i>\n            </div> \n            <div ng-show=\"currentWidget == widget\" ng-repeat=\"widget in box.registeredWidgets\">\n              <img ng-click=\"embedImageInEditor(item.uri)\"ng-src=\"{{ item.uri }}\" ng-repeat=\"item in widgets[ box.id ][ widget ]\" />\n            </div>\n          </div>\n          <div class=\"selected-entities\">\n            <span ng-class=\"'wl-' + entity.mainType\" ng-repeat=\"(id, entity) in selectedEntities[box.id]\" class=\"wl-selected-item\">\n              {{ entity.label}}\n              <i class=\"wl-deselect-item\" ng-click=\"onSelectedEntityTile(entity, box)\"></i>\n            </span>\n            <div class=\"clear\" /> \n          </div>\n        </div>\n  			<div class=\"box-tiles\">\n          <div ng-transclude></div>\n  		  </div>\n      </div>	",
+        template: "<div class=\"classification-box\">\n	<div class=\"box-header\">\n          <h5 class=\"label\">{{box.label}}</h5>\n          <div class=\"selected-entities\">\n            <span ng-class=\"'wl-' + entity.mainType\" ng-repeat=\"(id, entity) in selectedEntities[box.id]\" class=\"wl-selected-item\">\n              {{ entity.label}}\n              <i class=\"wl-deselect-item\" ng-click=\"onSelectedEntityTile(entity, box)\"></i>\n            </span>\n            <div class=\"clear\" /> \n          </div>\n        </div>\n  			<div class=\"box-tiles\">\n          <div ng-transclude></div>\n  		  </div>\n      </div>	",
         link: function($scope, $element, $attrs, $ctrl) {
           $scope.currentWidget = void 0;
           $scope.isWidgetOpened = false;
@@ -913,11 +1007,11 @@
 
   $ = jQuery;
 
-  angular.module('wordlift.editpost.widget', ['wordlift.editpost.widget.providers.ConfigurationProvider', 'wordlift.editpost.widget.controllers.EditPostWidgetController', 'wordlift.editpost.widget.directives.wlClassificationBox', 'wordlift.editpost.widget.directives.wlEntityForm', 'wordlift.editpost.widget.directives.wlEntityTile', 'wordlift.editpost.widget.directives.wlEntityInputBox', 'wordlift.editpost.widget.services.AnalysisService', 'wordlift.editpost.widget.services.EditorService', 'wordlift.editpost.widget.services.ImageSuggestorDataRetrieverService']).config(function(configurationProvider) {
+  angular.module('wordlift.editpost.widget', ['wordlift.ui.carousel', 'wordlift.editpost.widget.providers.ConfigurationProvider', 'wordlift.editpost.widget.controllers.EditPostWidgetController', 'wordlift.editpost.widget.directives.wlClassificationBox', 'wordlift.editpost.widget.directives.wlEntityForm', 'wordlift.editpost.widget.directives.wlEntityTile', 'wordlift.editpost.widget.directives.wlEntityInputBox', 'wordlift.editpost.widget.services.AnalysisService', 'wordlift.editpost.widget.services.EditorService', 'wordlift.editpost.widget.services.ImageSuggestorDataRetrieverService']).config(function(configurationProvider) {
     return configurationProvider.setConfiguration(window.wordlift);
   });
 
-  $(container = $("<div ng-show=\"analysis\" id=\"wordlift-edit-post-wrapper\" ng-controller=\"EditPostWidgetController\">\n	<div ng-click=\"createTextAnnotationFromCurrentSelection()\" id=\"wl-add-entity-button-wrapper\">\n        <span class=\"preview button\" ng-class=\"{ 'selected' : !isSelectionCollapsed }\">Add entity</span>\n        <div class=\"clear\" />     \n      </div>\n      \n      <div ng-show=\"annotation\">\n        <h4 class=\"wl-annotation-label\">\n          <i class=\"wl-annotation-label-icon\"></i>\n          {{ analysis.annotations[ annotation ].text }} \n          <small>[ {{ analysis.annotations[ annotation ].start }}, {{ analysis.annotations[ annotation ].end }} ]</small>\n          <i class=\"wl-annotation-label-remove-icon\" ng-click=\"selectAnnotation(undefined)\"></i>\n        </h4>\n        <wl-entity-form entity=\"newEntity\" on-submit=\"addNewEntityToAnalysis()\" ng-show=\"analysis.annotations[annotation].entityMatches.length == 0\"></wl-entity-form>\n      </div>\n\n      <wl-classification-box ng-repeat=\"box in configuration.classificationBoxes\">\n        <div ng-hide=\"annotation\" class=\"wl-without-annotation\">\n          <wl-entity-tile is-selected=\"isEntitySelected(entity, box)\" on-entity-select=\"onSelectedEntityTile(entity, box)\" entity=\"entity\" ng-repeat=\"entity in analysis.entities | filterEntitiesByTypesAndRelevance:box.registeredTypes\"></wl-entity>\n        </div>  \n        <div ng-show=\"annotation\" class=\"wl-with-annotation\">\n          <wl-entity-tile is-selected=\"isLinkedToCurrentAnnotation(entity)\" on-entity-select=\"onSelectedEntityTile(entity, box)\" entity=\"entity\" ng-repeat=\"entity in analysis.annotations[annotation].entities | filterEntitiesByTypes:box.registeredTypes\"\" ></wl-entity>\n        </div>  \n      </wl-classification-box>\n\n      <div class=\"wl-entity-input-boxes\">\n        <wl-entity-input-box annotation=\"annotation\" entity=\"entity\" ng-repeat=\"entity in analysis.entities | isEntitySelected\"></wl-entity-input-box>\n        <div ng-repeat=\"(box, entities) in selectedEntities\">\n          <input type='text' name='wl_boxes[{{box}}][]' value='{{id}}' ng-repeat=\"(id, entity) in entities\">\n        </div> \n      </div>   \n    </div>").appendTo('#wordlift-edit-post-outer-wrapper'), injector = angular.bootstrap($('#wordlift-edit-post-wrapper'), ['wordlift.editpost.widget']), tinymce.PluginManager.add('wordlift', function(editor, url) {
+  $(container = $("<div ng-show=\"analysis\" id=\"wordlift-edit-post-wrapper\" ng-controller=\"EditPostWidgetController\">\n	<div ng-click=\"createTextAnnotationFromCurrentSelection()\" id=\"wl-add-entity-button-wrapper\">\n        <span class=\"preview button\" ng-class=\"{ 'selected' : !isSelectionCollapsed }\">Add entity</span>\n        <div class=\"clear\" />     \n      </div>\n      \n      <div ng-show=\"annotation\">\n        <h4 class=\"wl-annotation-label\">\n          <i class=\"wl-annotation-label-icon\"></i>\n          {{ analysis.annotations[ annotation ].text }} \n          <small>[ {{ analysis.annotations[ annotation ].start }}, {{ analysis.annotations[ annotation ].end }} ]</small>\n          <i class=\"wl-annotation-label-remove-icon\" ng-click=\"selectAnnotation(undefined)\"></i>\n        </h4>\n        <wl-entity-form entity=\"newEntity\" on-submit=\"addNewEntityToAnalysis()\" ng-show=\"analysis.annotations[annotation].entityMatches.length == 0\"></wl-entity-form>\n      </div>\n\n      <wl-classification-box ng-repeat=\"box in configuration.classificationBoxes\">\n        <div ng-hide=\"annotation\" class=\"wl-without-annotation\">\n          <wl-entity-tile is-selected=\"isEntitySelected(entity, box)\" on-entity-select=\"onSelectedEntityTile(entity, box)\" entity=\"entity\" ng-repeat=\"entity in analysis.entities | filterEntitiesByTypesAndRelevance:box.registeredTypes\"></wl-entity>\n        </div>  \n        <div ng-show=\"annotation\" class=\"wl-with-annotation\">\n          <wl-entity-tile is-selected=\"isLinkedToCurrentAnnotation(entity)\" on-entity-select=\"onSelectedEntityTile(entity, box)\" entity=\"entity\" ng-repeat=\"entity in analysis.annotations[annotation].entities | filterEntitiesByTypes:box.registeredTypes\"\" ></wl-entity>\n        </div>  \n      </wl-classification-box>\n      <div wl-carousel>\n        <div ng-repeat=\"entity in analysis.entities | isEntitySelected\" wl-carousel-pane>\n          <img ng-src=\"{{entity.images[0]}}\" />\n        </div>\n      </div>\n      \n      <div class=\"wl-entity-input-boxes\">\n        <wl-entity-input-box annotation=\"annotation\" entity=\"entity\" ng-repeat=\"entity in analysis.entities | isEntitySelected\"></wl-entity-input-box>\n        <div ng-repeat=\"(box, entities) in selectedEntities\">\n          <input type='text' name='wl_boxes[{{box}}][]' value='{{id}}' ng-repeat=\"(id, entity) in entities\">\n        </div> \n      </div>   \n    </div>").appendTo('#wordlift-edit-post-outer-wrapper'), injector = angular.bootstrap($('#wordlift-edit-post-wrapper'), ['wordlift.editpost.widget']), tinymce.PluginManager.add('wordlift', function(editor, url) {
     editor.onLoadContent.add(function(ed, o) {
       return injector.invoke([
         'AnalysisService', '$rootScope', function(AnalysisService, $rootScope) {

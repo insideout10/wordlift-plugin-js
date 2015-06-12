@@ -6,20 +6,7 @@ angular.module('wordlift.editpost.widget.directives.wlClassificationBox', [])
     template: """
     	<div class="classification-box">
     		<div class="box-header">
-          <h5 class="label">{{box.label}}
-            <span class="wl-suggestion-tools" ng-show="hasSelectedEntities()">
-              <i ng-class="'wl-' + widget" title="{{widget}}" ng-click="toggleWidget(widget)" ng-repeat="widget in box.registeredWidgets" class="wl-widget-icon"></i>
-            </span> 
-          </h5>
-          <div ng-show="isWidgetOpened" class="box-widgets">
-            <div ng-show="isWidgetOpened" class="wl-widget-label">
-              {{currentWidget}}
-              <i ng-click="toggleWidget(currentWidget)" class="wl-deselect-widget"></i>
-            </div> 
-            <div ng-show="currentWidget == widget" ng-repeat="widget in box.registeredWidgets">
-              <img ng-click="embedImageInEditor(item.uri)"ng-src="{{ item.uri }}" ng-repeat="item in widgets[ box.id ][ widget ]" />
-            </div>
-          </div>
+          <h5 class="label">{{box.label}}</h5>
           <div class="selected-entities">
             <span ng-class="'wl-' + entity.mainType" ng-repeat="(id, entity) in selectedEntities[box.id]" class="wl-selected-item">
               {{ entity.label}}

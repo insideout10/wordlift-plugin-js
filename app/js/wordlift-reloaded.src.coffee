@@ -129,6 +129,93 @@ class Traslator
     @_text
 
 window.Traslator = Traslator
+angular.module('wordlift.ui.carousel', [])
+.directive('wlCarousel', ['$window', '$log', ($window, $log)->
+  restrict: 'A'
+  scope: true
+  transclude: true      
+  template: """
+      <div class="wl-carousel">
+        <div class="wl-panes" style="width:{{panesWidth}}px; left:{{position}}px;" ng-transclude ng-swipe-right="next()"></div>
+        <span class="wl-carousel-arrow wl-next" ng-click="next()">&gt;</span>
+        <span class="wl-carousel-arrow wl-prev" ng-click="prev()">&lt;</span>
+      </div>      
+  """
+  controller: ($scope, $element, $attrs) ->
+      
+    w = angular.element $window
+
+    $scope.visibleElements = ()->
+      if $element.width() > 460
+        return 3
+      if $element.width() > 1024
+        return 5
+      return 1
+
+    $scope.itemWidth =  $element.width() / $scope.visibleElements();
+    $scope.panesWidth = undefined
+    $scope.panes = []
+    $scope.position = 0;
+
+    $scope.next = ()->
+      $scope.position = $scope.position - $scope.itemWidth
+    $scope.prev = ()->
+      $scope.position = $scope.position + $scope.itemWidth
+
+    $scope.setPanesWrapperWidth = ()->
+      $scope.panesWidth = $scope.panes.length * $scope.itemWidth
+
+    w.bind 'resize', ()->
+        
+      $scope.itemWidth =  $element.width() / $scope.visibleElements();
+      $scope.setPanesWrapperWidth()
+      for pane in $scope.panes
+        pane.scope.setWidth $scope.itemWidth
+      $scope.$apply()
+
+    ctrl = @
+    ctrl.registerPane = (scope, element)->
+      # Set the proper width for the element
+      scope.setWidth $scope.itemWidth
+        
+      pane =
+        'scope': scope
+        'element': element
+
+      $scope.panes.push pane
+      $scope.setPanesWrapperWidth()
+
+    ctrl.unregisterPane = (scope)->
+        
+      unregisterPaneIndex = undefined
+      for pane, index in $scope.panes
+        if pane.scope.$id is scope.$id
+          unregisterPaneIndex = index
+
+      if unregisterPaneIndex
+        $scope.panes.splice unregisterPaneIndex, 1
+      $scope.setPanesWrapperWidth()
+])
+.directive('wlCarouselPane', ['$log', ($log)->
+  require: '^wlCarousel'
+  restrict: 'EA'
+  transclude: true 
+  template: """
+      <div ng-transclude></div>
+  """
+  link: ($scope, $element, $attrs, $ctrl) ->
+
+    $log.debug "Going to add carousel pane with id #{$scope.$id} to carousel"
+    $element.addClass "wl-carousel-item"
+      
+    $scope.setWidth = (size)->
+      $element.css('width', "#{size}px")
+
+    $scope.$on '$destroy', ()->
+      $ctrl.unregisterPane $scope
+
+    $ctrl.registerPane $scope, $element
+])
 angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', [
   'wordlift.editpost.widget.services.AnalysisService'
   'wordlift.editpost.widget.services.EditorService'
@@ -307,20 +394,7 @@ angular.module('wordlift.editpost.widget.directives.wlClassificationBox', [])
     template: """
     	<div class="classification-box">
     		<div class="box-header">
-          <h5 class="label">{{box.label}}
-            <span class="wl-suggestion-tools" ng-show="hasSelectedEntities()">
-              <i ng-class="'wl-' + widget" title="{{widget}}" ng-click="toggleWidget(widget)" ng-repeat="widget in box.registeredWidgets" class="wl-widget-icon"></i>
-            </span> 
-          </h5>
-          <div ng-show="isWidgetOpened" class="box-widgets">
-            <div ng-show="isWidgetOpened" class="wl-widget-label">
-              {{currentWidget}}
-              <i ng-click="toggleWidget(currentWidget)" class="wl-deselect-widget"></i>
-            </div> 
-            <div ng-show="currentWidget == widget" ng-repeat="widget in box.registeredWidgets">
-              <img ng-click="embedImageInEditor(item.uri)"ng-src="{{ item.uri }}" ng-repeat="item in widgets[ box.id ][ widget ]" />
-            </div>
-          </div>
+          <h5 class="label">{{box.label}}</h5>
           <div class="selected-entities">
             <span ng-class="'wl-' + entity.mainType" ng-repeat="(id, entity) in selectedEntities[box.id]" class="wl-selected-item">
               {{ entity.label}}
@@ -952,7 +1026,8 @@ $ = jQuery
 # Create the main AngularJS module, and set it dependent on controllers and directives.
 angular.module('wordlift.editpost.widget', [
 
-	'wordlift.editpost.widget.providers.ConfigurationProvider', 
+	'wordlift.ui.carousel'
+  'wordlift.editpost.widget.providers.ConfigurationProvider', 
 	'wordlift.editpost.widget.controllers.EditPostWidgetController', 
 	'wordlift.editpost.widget.directives.wlClassificationBox', 
 	'wordlift.editpost.widget.directives.wlEntityForm', 
@@ -994,7 +1069,12 @@ $(
           <wl-entity-tile is-selected="isLinkedToCurrentAnnotation(entity)" on-entity-select="onSelectedEntityTile(entity, box)" entity="entity" ng-repeat="entity in analysis.annotations[annotation].entities | filterEntitiesByTypes:box.registeredTypes"" ></wl-entity>
         </div>  
       </wl-classification-box>
-
+      <div wl-carousel>
+        <div ng-repeat="entity in analysis.entities | isEntitySelected" wl-carousel-pane>
+          <img ng-src="{{entity.images[0]}}" />
+        </div>
+      </div>
+      
       <div class="wl-entity-input-boxes">
         <wl-entity-input-box annotation="annotation" entity="entity" ng-repeat="entity in analysis.entities | isEntitySelected"></wl-entity-input-box>
         <div ng-repeat="(box, entities) in selectedEntities">

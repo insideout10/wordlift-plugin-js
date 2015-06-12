@@ -67,7 +67,7 @@ angular.module('wordlift.ui.carousel', [])
 ])
 .directive('wlCarouselPane', ['$log', ($log)->
   require: '^wlCarousel'
-  restrict: 'A'
+  restrict: 'EA'
   transclude: true 
   template: """
       <div ng-transclude></div>
