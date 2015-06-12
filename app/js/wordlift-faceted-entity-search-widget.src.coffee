@@ -201,7 +201,7 @@ $(
           <strong class="wl-condition" ng-repeat="(condition, entity) in conditions">{{entity.label}}. </strong>
         </div>
         <div wl-carousel>
-          <div class="wl-post" ng-repeat="post in posts" wl-carousel-pane>
+          <div class="wl-post wl-card" ng-repeat="post in posts" wl-carousel-pane>
             <img ng-src="{{post.thumbnail}}" />
             <div class="wl-post-title"> 
               <a ng-href="/?p={{post.ID}}">{{post.post_title}}</a>

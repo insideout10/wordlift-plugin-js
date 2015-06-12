@@ -1070,7 +1070,7 @@ $(
         </div>  
       </wl-classification-box>
       <div wl-carousel>
-        <div ng-repeat="entity in analysis.entities | isEntitySelected" wl-carousel-pane>
+        <div ng-repeat="entity in analysis.entities | isEntitySelected" class="wl-card" wl-carousel-pane>
           <img ng-src="{{entity.images[0]}}" />
         </div>
       </div>

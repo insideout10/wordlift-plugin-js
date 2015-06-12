@@ -1352,7 +1352,6 @@
 .wl-carousel .wl-panes .wl-carousel-item {
   position: relative;
   float: left;
-  max-height: 120px;
 }
 .wl-carousel img {
   display: block;
@@ -1377,6 +1376,23 @@
   left: 0px;
   top: 0px;
   z-index: 2;
+}
+.wl-card {
+  height: 140px;
+  max-height: 140px;
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
+  overflow: hidden;
+  border-bottom: #e2e2e2 1px solid;
+}
+.wl-card img {
+  position: absolute;
+  margin: auto;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 .wl-entity-input-boxes,
 .wl-entity-props {
