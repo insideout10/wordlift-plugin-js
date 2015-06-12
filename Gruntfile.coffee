@@ -51,6 +51,7 @@ module.exports = (grunt) ->
             'src/coffee/ui/geomap.coffee'
           ]
           'app/js/wordlift-faceted-entity-search-widget.js': [
+            'src/coffee/ui/carousel.coffee'
             'src/coffee/faceted-entity-search-widget/app.coffee'
           ]
     uglify:
