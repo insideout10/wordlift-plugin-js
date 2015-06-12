@@ -29,25 +29,6 @@
         return filtered;
       };
     }
-  ]).directive('wlTruncate', [
-    '$log', function($log) {
-      return {
-        restrict: 'A',
-        scope: {
-          text: '=',
-          charsThreshold: '='
-        },
-        link: function($scope, $element, $attrs) {
-          var CHARS_THRESHOLD;
-          CHARS_THRESHOLD = parseInt($scope.charsThreshold);
-          $scope.label = $scope.text;
-          if ($scope.text.length > CHARS_THRESHOLD) {
-            $scope.label = $scope.text.substr(0, CHARS_THRESHOLD) + ' ...';
-          }
-          return $element.append($scope.label);
-        }
-      };
-    }
   ]).controller('FacetedSearchWidgetController', [
     'DataRetrieverService', 'configuration', '$scope', '$log', function(DataRetrieverService, configuration, $scope, $log) {
       $scope.entity = void 0;
@@ -118,7 +99,7 @@
         restrict: 'A',
         scope: true,
         transclude: true,
-        template: "<div class=\"wl-carousel\">\n  <div class=\"wl-panes\" style=\"width:{{panesWidth}}px; left:{{position}}px;\" ng-transclude ng-swipe-right=\"next()\"></div>\n  <span class=\"wl-next\" ng-click=\"next()\">&gt;</span>\n  <span class=\"wl-prev\" ng-click=\"prev()\">&lt;</span>\n</div>      ",
+        template: "<div class=\"wl-carousel\">\n  <div class=\"wl-panes\" style=\"width:{{panesWidth}}px; left:{{position}}px;\" ng-transclude ng-swipe-right=\"next()\"></div>\n  <span class=\"wl-carousel-arrow wl-next\" ng-click=\"next()\">&gt;</span>\n  <span class=\"wl-carousel-arrow wl-prev\" ng-click=\"prev()\">&lt;</span>\n</div>      ",
         controller: function($scope, $element, $attrs) {
           var ctrl, w;
           w = angular.element($window);
@@ -208,7 +189,7 @@
     return configurationProvider.setConfiguration(window.wl_faceted_search_params);
   });
 
-  $(container = $("	<div ng-controller=\"FacetedSearchWidgetController\">\n    <h5>Contenuti associati a <strong>{{entity.label}}</strong></h5>\n    <div class=\"wl-facets\" wl-carousel>\n      <div class=\"wl-facets-container\" ng-repeat=\"type in supportedTypes\" wl-carousel-pane>\n        <h6 ng-class=\"'wl-fs-' + type\"><i class=\"type\" />{{type}}</h6>\n        <ul>\n          <li class=\"entity\" ng-repeat=\"entity in facets | filterEntitiesByType:type\" ng-click=\"addCondition(entity)\">     \n              <span class=\"wl-label\" ng-class=\" { 'selected' : isInConditions(entity) }\" wl-truncate text=\"entity.label\" chars-threshold=\"100\"></span>\n              <span class=\"counter\">({{entity.counter}})</span>\n          </li>\n        </ul>\n      </div>\n    </div>\n    <div class=\"wl-posts\">\n      <div class=\"wl-conditions\">\n        <span>Filtri:</span>\n        <strong class=\"wl-condition\" ng-repeat=\"(condition, entity) in conditions\">{{entity.label}}. </strong>\n      </div>\n      <div wl-carousel>\n        <div class=\"wl-post\" ng-repeat=\"post in posts\" wl-carousel-pane>\n          <img ng-src=\"{{post.thumbnail}}\" />\n          <div class=\"wl-post-title\"> \n            <a ng-href=\"/?p={{post.ID}}\">{{post.post_title}}</a>\n          </div>\n        </div>\n      </div>\n\n    </div>\n   \n  </div>").appendTo('#wordlift-faceted-entity-search-widget'), injector = angular.bootstrap($('#wordlift-faceted-entity-search-widget'), ['wordlift.facetedsearch.widget']));
+  $(container = $("	<div ng-controller=\"FacetedSearchWidgetController\">\n    <h5>Contenuti associati a <strong>{{entity.label}}</strong></h5>\n    <div class=\"wl-facets\" wl-carousel>\n      <div class=\"wl-facets-container\" ng-repeat=\"type in supportedTypes\" wl-carousel-pane>\n        <h6 ng-class=\"'wl-fs-' + type\"><i class=\"type\" />{{type}}</h6>\n        <ul>\n          <li class=\"entity\" ng-repeat=\"entity in facets | filterEntitiesByType:type\" ng-click=\"addCondition(entity)\">     \n              <span class=\"wl-label\" ng-class=\" { 'selected' : isInConditions(entity) }\">{{entity.label}}</span>\n              <span class=\"counter\">({{entity.counter}})</span>\n          </li>\n        </ul>\n      </div>\n    </div>\n    <div class=\"wl-posts\">\n      <div class=\"wl-conditions\">\n        <span>Filtri:</span>\n        <strong class=\"wl-condition\" ng-repeat=\"(condition, entity) in conditions\">{{entity.label}}. </strong>\n      </div>\n      <div wl-carousel>\n        <div class=\"wl-post\" ng-repeat=\"post in posts\" wl-carousel-pane>\n          <img ng-src=\"{{post.thumbnail}}\" />\n          <div class=\"wl-post-title\"> \n            <a ng-href=\"/?p={{post.ID}}\">{{post.post_title}}</a>\n          </div>\n        </div>\n      </div>\n\n    </div>\n   \n  </div>").appendTo('#wordlift-faceted-entity-search-widget'), injector = angular.bootstrap($('#wordlift-faceted-entity-search-widget'), ['wordlift.facetedsearch.widget']));
 
   injector.invoke([
     'DataRetrieverService', '$rootScope', '$log', function(DataRetrieverService, $rootScope, $log) {

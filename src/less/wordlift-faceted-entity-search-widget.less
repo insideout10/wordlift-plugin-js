@@ -1,5 +1,6 @@
 @import '../../bower_components/components-font-awesome/less/font-awesome.less';
 @import 'colors.less';
+@import 'wordlift-carousel.less';
 
 #wordlift-faceted-entity-search-widget {
 
@@ -116,12 +117,6 @@
 
 	}
 
-.wl-carousel{
-    overflow:hidden;
-    width:100%;
-    position:relative;
-}
-
 .wl-post-title {
 	position: absolute;
 	width: 100%;
@@ -140,54 +135,6 @@
 		color:#666;
 		font-size: 0.8em;
 	}
-}
-
-.wl-panes{
-    position:relative;
-    overflow:hidden; /* This is used solely to clear floats, it does not add functionality. */
-    left:0;
-    
-    transition-property: left;
-    transition-duration: 0.3s;
-    transition-timing-function: linear;
-
-}
-.wl-panes .wl-carousel-item {
-    position:relative;
-    float:left;
-        max-height: 120px;
-
-}
-.wl-carousel img{
-    display:block;
-    width:100%;
-    max-width:100%;
-}
-
-.wl-next {
-	position: absolute;
-	right:0px;
-	top:0px;
-	cursor: pointer;
-	width:1.5em;
-	text-align: center;
-	font-size: 2rem;
-	font-weight: bold;
-	z-index: 1;
-	display: block;
-
-}
-.wl-prev {
-	position: absolute;
-	left:0px;
-	top:0px;
-	cursor: pointer;
-	width:1.5em;
-	text-align: center;
-	font-size: 2rem;
-	font-weight: bold;
-	z-index: 2;
-	display: block;
 }
 
 	.wl-posts {

@@ -1336,6 +1336,48 @@
 .fa-plus-square-o:before {
   content: "\f196";
 }
+.wl-carousel {
+  overflow: hidden;
+  width: 100%;
+  position: relative;
+}
+.wl-carousel .wl-panes {
+  position: relative;
+  overflow: hidden;
+  left: 0;
+  transition-property: left;
+  transition-duration: 0.3s;
+  transition-timing-function: linear;
+}
+.wl-carousel .wl-panes .wl-carousel-item {
+  position: relative;
+  float: left;
+  max-height: 120px;
+}
+.wl-carousel img {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+}
+.wl-carousel .wl-carousel-arrow {
+  position: absolute;
+  cursor: pointer;
+  width: 1.5em;
+  text-align: center;
+  font-size: 2rem;
+  font-weight: bold;
+  display: block;
+}
+.wl-carousel .wl-carousel-arrow.wl-next {
+  right: 0px;
+  top: 0px;
+  z-index: 1;
+}
+.wl-carousel .wl-carousel-arrow.wl-prev {
+  left: 0px;
+  top: 0px;
+  z-index: 2;
+}
 #wordlift-faceted-entity-search-widget {
   border: #e2e2e2 1px solid;
 }
@@ -1554,11 +1596,6 @@
   line-height: 0.8em;
   cursor: pointer;
 }
-#wordlift-faceted-entity-search-widget .wl-carousel {
-  overflow: hidden;
-  width: 100%;
-  position: relative;
-}
 #wordlift-faceted-entity-search-widget .wl-post-title {
   position: absolute;
   width: 100%;
@@ -1574,49 +1611,6 @@
 #wordlift-faceted-entity-search-widget .wl-post-title a {
   color: #666;
   font-size: 0.8em;
-}
-#wordlift-faceted-entity-search-widget .wl-panes {
-  position: relative;
-  overflow: hidden;
-  /* This is used solely to clear floats, it does not add functionality. */
-  left: 0;
-  transition-property: left;
-  transition-duration: 0.3s;
-  transition-timing-function: linear;
-}
-#wordlift-faceted-entity-search-widget .wl-panes .wl-carousel-item {
-  position: relative;
-  float: left;
-  max-height: 120px;
-}
-#wordlift-faceted-entity-search-widget .wl-carousel img {
-  display: block;
-  width: 100%;
-  max-width: 100%;
-}
-#wordlift-faceted-entity-search-widget .wl-next {
-  position: absolute;
-  right: 0px;
-  top: 0px;
-  cursor: pointer;
-  width: 1.5em;
-  text-align: center;
-  font-size: 2rem;
-  font-weight: bold;
-  z-index: 1;
-  display: block;
-}
-#wordlift-faceted-entity-search-widget .wl-prev {
-  position: absolute;
-  left: 0px;
-  top: 0px;
-  cursor: pointer;
-  width: 1.5em;
-  text-align: center;
-  font-size: 2rem;
-  font-weight: bold;
-  z-index: 2;
-  display: block;
 }
 #wordlift-faceted-entity-search-widget .wl-posts {
   padding: 1rem;

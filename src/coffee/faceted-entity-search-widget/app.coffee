@@ -25,18 +25,6 @@ angular.module('wordlift.facetedsearch.widget', [])
     filtered
 
 ])
-.directive('wlTruncate', ['$log', ($log)->
-    restrict: 'A'
-    scope:
-      text: '='
-      charsThreshold: '='
-    link: ($scope, $element, $attrs) ->  
-      CHARS_THRESHOLD = parseInt( $scope.charsThreshold )
-      $scope.label = $scope.text
-      if $scope.text.length > CHARS_THRESHOLD
-        $scope.label = $scope.text.substr( 0, CHARS_THRESHOLD ) + ' ...'
-      $element.append $scope.label
-])
 
 .controller('FacetedSearchWidgetController', [ 'DataRetrieverService', 'configuration', '$scope', '$log', (DataRetrieverService, configuration, $scope, $log)-> 
 
@@ -108,8 +96,8 @@ angular.module('wordlift.facetedsearch.widget', [])
     template: """
       <div class="wl-carousel">
         <div class="wl-panes" style="width:{{panesWidth}}px; left:{{position}}px;" ng-transclude ng-swipe-right="next()"></div>
-        <span class="wl-next" ng-click="next()">&gt;</span>
-        <span class="wl-prev" ng-click="prev()">&lt;</span>
+        <span class="wl-carousel-arrow wl-next" ng-click="next()">&gt;</span>
+        <span class="wl-carousel-arrow wl-prev" ng-click="prev()">&lt;</span>
       </div>      
     """
     controller: ($scope, $element, $attrs) ->
@@ -202,7 +190,7 @@ $(
           <h6 ng-class="'wl-fs-' + type"><i class="type" />{{type}}</h6>
           <ul>
             <li class="entity" ng-repeat="entity in facets | filterEntitiesByType:type" ng-click="addCondition(entity)">     
-                <span class="wl-label" ng-class=" { 'selected' : isInConditions(entity) }" wl-truncate text="entity.label" chars-threshold="100"></span>
+                <span class="wl-label" ng-class=" { 'selected' : isInConditions(entity) }">{{entity.label}}</span>
                 <span class="counter">({{entity.counter}})</span>
             </li>
           </ul>

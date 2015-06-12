@@ -1,0 +1,50 @@
+.wl-carousel {
+
+    overflow:hidden;
+    width:100%;
+    position:relative;
+
+    .wl-panes {
+        position:relative;
+        overflow:hidden; 
+        left:0;
+        transition-property: left;
+        transition-duration: 0.3s;
+        transition-timing-function: linear;
+    }
+
+    .wl-panes .wl-carousel-item {
+        position:relative;
+        float:left;
+        max-height: 120px;
+    }
+
+    img{
+        display:block;
+        width:100%;
+        max-width:100%;
+    }
+
+    .wl-carousel-arrow {
+
+        position: absolute;
+        cursor: pointer;
+        width:1.5em;
+        text-align: center;
+        font-size: 2rem;
+        font-weight: bold;
+        display: block;
+
+        &.wl-next {
+            right:0px;
+            top:0px;
+            z-index: 1;
+        }
+        
+        &.wl-prev {
+            left:0px;
+            top:0px;
+            z-index: 2;
+        }
+    }
+}
