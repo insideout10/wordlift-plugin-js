@@ -45,7 +45,8 @@
               pane = _ref[_i];
               pane.scope.setWidth($scope.itemWidth);
             }
-            return $scope.$apply();
+            $scope.$apply();
+            return $scope.position = 0;
           });
           ctrl = this;
           ctrl.registerPane = function(scope, element) {
