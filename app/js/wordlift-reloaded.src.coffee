@@ -135,7 +135,7 @@ angular.module('wordlift.ui.carousel', [])
   scope: true
   transclude: true      
   template: """
-      <div class="wl-carousel">
+      <div class="wl-carousel" ng-show="panes.length > 0">
         <div class="wl-panes" style="width:{{panesWidth}}px; left:{{position}}px;" ng-transclude ng-swipe-right="next()"></div>
         <div class="wl-carousel-arrow wl-prev" ng-click="prev()" ng-show="currentPaneIndex > 0">
           <i class="wl-angle-left" />
