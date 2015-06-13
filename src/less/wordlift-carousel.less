@@ -1,3 +1,18 @@
+.fa-icon(@icon) {
+    
+    &:before {
+      content: @icon; 
+    }
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    line-height: 14px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-size: 14px;
+    padding: 0px 3px;
+}
+
 .wl-carousel {
 
     overflow:hidden;
@@ -30,20 +45,41 @@
         cursor: pointer;
         width:1.5em;
         text-align: center;
-        font-size: 2rem;
         font-weight: bold;
-        display: block;
-
+        display: inline-block;
+        background-color:#f00;
+        height: 100%;
+        opacity: 0.7;
+        background-color:#ccc;
+        
         &.wl-next {
             right:0px;
             top:0px;
             z-index: 1;
         }
-
         &.wl-prev {
             left:0px;
             top:0px;
             z-index: 2;
+        }
+
+        .wl-angle-left { 
+            .fa-icon(@fa-var-angle-left);
+            color:#555;
+            position: absolute;
+            left:50%;
+            top:50%;
+            font-size: 24px !important;
+
+        }
+        .wl-angle-right { 
+            .fa-icon(@fa-var-angle-right);
+            color:#555;
+            position: absolute;
+            right:50%;
+            top:50%;
+            font-size: 24px !important;
+
         }
     }
 }

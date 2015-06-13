@@ -137,8 +137,12 @@ angular.module('wordlift.ui.carousel', [])
   template: """
       <div class="wl-carousel">
         <div class="wl-panes" style="width:{{panesWidth}}px; left:{{position}}px;" ng-transclude ng-swipe-right="next()"></div>
-        <span class="wl-carousel-arrow wl-next" ng-click="next()">&gt;</span>
-        <span class="wl-carousel-arrow wl-prev" ng-click="prev()">&lt;</span>
+        <div class="wl-carousel-arrow wl-next" ng-click="next()">
+          <i class="wl-angle-right" />
+        </div>
+        <div class="wl-carousel-arrow wl-prev" ng-click="prev()">
+          <i class="wl-angle-left" />
+        </div>
       </div>      
   """
   controller: ($scope, $element, $attrs) ->
@@ -281,6 +285,7 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
   $scope.widgets = {}
   $scope.annotation = undefined
   $scope.boxes = []
+  $scope.images = {}
   $scope.isSelectionCollapsed = true
   $scope.configuration = configuration
 
@@ -360,18 +365,12 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
       for entityId in box.selectedEntities  
         if entity = analysis.entities[ entityId ]
           $scope.selectedEntities[ box.id ][ entityId ] = analysis.entities[ entityId ]
+          for uri in entity.images
+            if uri
+              $scope.images[ uri ] = entity.label
         else
           $log.warn "Entity with id #{entityId} should be linked to #{box.id} but is missing"
 
-  $scope.updateWidget = (widget, scope)->
-    $log.debug "Going to updated widget #{widget} for box #{scope}"
-    # Retrieve the proper DatarRetriever
-    retriever = $injector.get "#{widget}DataRetrieverService"
-    # Load widget items
-    items = retriever.loadData $scope.selectedEntities[ scope ]
-    # Assign items to the widget scope
-    $scope.widgets[ scope ][ widget ] = items
-    
   $scope.onSelectedEntityTile = (entity, scope)->
     $log.debug "Entity tile selected for entity #{entity.id} within '#{scope.id}' scope"
     
@@ -381,9 +380,14 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     
     if not $scope.selectedEntities[ scope.id ][ entity.id ]?
       $scope.selectedEntities[ scope.id ][ entity.id ] = entity
+      for uri in entity.images
+        if uri 
+          $scope.images[ uri ] = entity.label
       $scope.$emit "entitySelected", entity, $scope.annotation
     else
-      $scope.$emit "entityDeselected", entity, $scope.annotation  
+      for uri in entity.images
+        delete $scope.images[ uri ]
+      $scope.$emit "entityDeselected", entity, $scope.annotation 
       
 ])
 angular.module('wordlift.editpost.widget.directives.wlClassificationBox', [])
@@ -1070,8 +1074,8 @@ $(
         </div>  
       </wl-classification-box>
       <div wl-carousel>
-        <div ng-repeat="entity in analysis.entities | isEntitySelected" class="wl-card" wl-carousel-pane>
-          <img ng-src="{{entity.images[0]}}" />
+        <div ng-repeat="(image, label) in images" class="wl-card" wl-carousel-pane>
+          <img ng-src="{{image}}" />
         </div>
       </div>
       

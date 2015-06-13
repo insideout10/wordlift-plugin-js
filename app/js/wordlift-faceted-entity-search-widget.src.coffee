@@ -6,8 +6,12 @@ angular.module('wordlift.ui.carousel', [])
   template: """
       <div class="wl-carousel">
         <div class="wl-panes" style="width:{{panesWidth}}px; left:{{position}}px;" ng-transclude ng-swipe-right="next()"></div>
-        <span class="wl-carousel-arrow wl-next" ng-click="next()">&gt;</span>
-        <span class="wl-carousel-arrow wl-prev" ng-click="prev()">&lt;</span>
+        <div class="wl-carousel-arrow wl-next" ng-click="next()">
+          <i class="wl-angle-right" />
+        </div>
+        <div class="wl-carousel-arrow wl-prev" ng-click="prev()">
+          <i class="wl-angle-left" />
+        </div>
       </div>      
   """
   controller: ($scope, $element, $attrs) ->

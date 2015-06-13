@@ -63,6 +63,7 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
   $scope.widgets = {}
   $scope.annotation = undefined
   $scope.boxes = []
+  $scope.images = {}
   $scope.isSelectionCollapsed = true
   $scope.configuration = configuration
 
@@ -142,18 +143,12 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
       for entityId in box.selectedEntities  
         if entity = analysis.entities[ entityId ]
           $scope.selectedEntities[ box.id ][ entityId ] = analysis.entities[ entityId ]
+          for uri in entity.images
+            if uri
+              $scope.images[ uri ] = entity.label
         else
           $log.warn "Entity with id #{entityId} should be linked to #{box.id} but is missing"
 
-  $scope.updateWidget = (widget, scope)->
-    $log.debug "Going to updated widget #{widget} for box #{scope}"
-    # Retrieve the proper DatarRetriever
-    retriever = $injector.get "#{widget}DataRetrieverService"
-    # Load widget items
-    items = retriever.loadData $scope.selectedEntities[ scope ]
-    # Assign items to the widget scope
-    $scope.widgets[ scope ][ widget ] = items
-    
   $scope.onSelectedEntityTile = (entity, scope)->
     $log.debug "Entity tile selected for entity #{entity.id} within '#{scope.id}' scope"
     
@@ -163,8 +158,13 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     
     if not $scope.selectedEntities[ scope.id ][ entity.id ]?
       $scope.selectedEntities[ scope.id ][ entity.id ] = entity
+      for uri in entity.images
+        if uri 
+          $scope.images[ uri ] = entity.label
       $scope.$emit "entitySelected", entity, $scope.annotation
     else
-      $scope.$emit "entityDeselected", entity, $scope.annotation  
+      for uri in entity.images
+        delete $scope.images[ uri ]
+      $scope.$emit "entityDeselected", entity, $scope.annotation 
       
 ])
