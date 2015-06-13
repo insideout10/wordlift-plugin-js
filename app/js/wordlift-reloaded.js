@@ -362,11 +362,7 @@
                   _results2 = [];
                   for (_m = 0, _len4 = _ref4.length; _m < _len4; _m++) {
                     uri = _ref4[_m];
-                    if (uri) {
-                      _results2.push($scope.images[uri] = entity.label);
-                    } else {
-                      _results2.push(void 0);
-                    }
+                    _results2.push($scope.images[uri] = entity.label);
                   }
                   return _results2;
                 })());
@@ -392,9 +388,7 @@
           _ref3 = entity.images;
           for (_k = 0, _len2 = _ref3.length; _k < _len2; _k++) {
             uri = _ref3[_k];
-            if (uri) {
-              $scope.images[uri] = entity.label;
-            }
+            $scope.images[uri] = entity.label;
           }
           return $scope.$emit("entitySelected", entity, $scope.annotation);
         } else {

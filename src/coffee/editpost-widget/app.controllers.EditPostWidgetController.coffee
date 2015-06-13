@@ -144,8 +144,7 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
         if entity = analysis.entities[ entityId ]
           $scope.selectedEntities[ box.id ][ entityId ] = analysis.entities[ entityId ]
           for uri in entity.images
-            if uri
-              $scope.images[ uri ] = entity.label
+            $scope.images[ uri ] = entity.label
         else
           $log.warn "Entity with id #{entityId} should be linked to #{box.id} but is missing"
 
@@ -159,8 +158,8 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     if not $scope.selectedEntities[ scope.id ][ entity.id ]?
       $scope.selectedEntities[ scope.id ][ entity.id ] = entity
       for uri in entity.images
-        if uri 
-          $scope.images[ uri ] = entity.label
+        $scope.images[ uri ] = entity.label
+      
       $scope.$emit "entitySelected", entity, $scope.annotation
     else
       for uri in entity.images
