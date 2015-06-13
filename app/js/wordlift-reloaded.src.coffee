@@ -338,6 +338,7 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     if occurrences.length is 0
       for box, entities of $scope.selectedEntities
         delete $scope.selectedEntities[ box ][ entityId ]
+        $scope.updateRelatedPosts()
 
   $scope.$on "textAnnotationClicked", (event, annotationId) ->
     $scope.annotation = annotationId
@@ -375,13 +376,13 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
             $scope.images[ uri ] = entity.label
         else
           $log.warn "Entity with id #{entityId} should be linked to #{box.id} but is missing"
+    $scope.updateRelatedPosts()
 
+  $scope.updateRelatedPosts = ()->
     entityIds = []
-    
     for box, entities of $scope.selectedEntities
       for id, entity of entities
         entityIds.push id
-
     RelatedPostDataRetrieverService.load entityIds
 
   $scope.onSelectedEntityTile = (entity, scope)->
@@ -392,11 +393,15 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
       for uri in entity.images
         $scope.images[ uri ] = entity.label
       
+      $scope.updateRelatedPosts()
       $scope.$emit "entitySelected", entity, $scope.annotation
     else
       for uri in entity.images
         delete $scope.images[ uri ]
-      $scope.$emit "entityDeselected", entity, $scope.annotation 
+      $scope.$emit "entityDeselected", entity, $scope.annotation
+
+    
+ 
       
 ])
 angular.module('wordlift.editpost.widget.directives.wlClassificationBox', [])
@@ -1010,7 +1015,7 @@ angular.module('wordlift.editpost.widget.services.RelatedPostDataRetrieverServic
   service.load = ( entityIds = [] )->
     uri = "admin-ajax.php?action=wordlift_related_posts"
     $log.debug "Going to find related posts"
-
+    $log.debug entityIds
     $http(
       method: 'post'
       url: uri
@@ -1106,6 +1111,9 @@ $(
       <div wl-carousel>
         <div ng-repeat="post in relatedPosts" class="wl-card" wl-carousel-pane>
           <img ng-src="{{post.thumbnail}}" />
+          <div class="wl-card-title">
+            <a ng-href="/?p={{post.ID}}">{{post.post_title}}</a>
+          </div>
         </div>
       </div>
       

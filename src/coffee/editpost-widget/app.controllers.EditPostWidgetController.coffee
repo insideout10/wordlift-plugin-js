@@ -111,6 +111,7 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     if occurrences.length is 0
       for box, entities of $scope.selectedEntities
         delete $scope.selectedEntities[ box ][ entityId ]
+        $scope.updateRelatedPosts()
 
   $scope.$on "textAnnotationClicked", (event, annotationId) ->
     $scope.annotation = annotationId
@@ -148,13 +149,13 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
             $scope.images[ uri ] = entity.label
         else
           $log.warn "Entity with id #{entityId} should be linked to #{box.id} but is missing"
+    $scope.updateRelatedPosts()
 
+  $scope.updateRelatedPosts = ()->
     entityIds = []
-    
     for box, entities of $scope.selectedEntities
       for id, entity of entities
         entityIds.push id
-
     RelatedPostDataRetrieverService.load entityIds
 
   $scope.onSelectedEntityTile = (entity, scope)->
@@ -165,10 +166,14 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
       for uri in entity.images
         $scope.images[ uri ] = entity.label
       
+      $scope.updateRelatedPosts()
       $scope.$emit "entitySelected", entity, $scope.annotation
     else
       for uri in entity.images
         delete $scope.images[ uri ]
-      $scope.$emit "entityDeselected", entity, $scope.annotation 
+      $scope.$emit "entityDeselected", entity, $scope.annotation
+
+    
+ 
       
 ])
