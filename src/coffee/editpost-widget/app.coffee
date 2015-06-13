@@ -13,7 +13,7 @@ angular.module('wordlift.editpost.widget', [
   'wordlift.editpost.widget.directives.wlEntityInputBox', 
 	'wordlift.editpost.widget.services.AnalysisService', 
 	'wordlift.editpost.widget.services.EditorService', 
-	'wordlift.editpost.widget.services.ImageSuggestorDataRetrieverService' 		
+	'wordlift.editpost.widget.services.RelatedPostDataRetrieverService' 		
 	
 	])
 
@@ -59,6 +59,11 @@ $(
       </div>
 
       <h3 class="wl-widget-headline"><span>Related posts</span></h3>
+      <div wl-carousel>
+        <div ng-repeat="post in relatedPosts" class="wl-card" wl-carousel-pane>
+          <img ng-src="{{post.thumbnail}}" />
+        </div>
+      </div>
       
       <div class="wl-entity-input-boxes">
         <wl-entity-input-box annotation="annotation" entity="entity" ng-repeat="entity in analysis.entities | isEntitySelected"></wl-entity-input-box>

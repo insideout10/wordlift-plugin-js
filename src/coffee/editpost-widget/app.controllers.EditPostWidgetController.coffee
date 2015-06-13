@@ -55,12 +55,12 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     
     filtered
 ])
-.controller('EditPostWidgetController', [ 'EditorService', 'AnalysisService', 'configuration', '$log', '$scope', '$rootScope', '$injector', (EditorService, AnalysisService, configuration, $log, $scope, $rootScope, $injector)-> 
+.controller('EditPostWidgetController', ['RelatedPostDataRetrieverService', 'EditorService', 'AnalysisService', 'configuration', '$log', '$scope', '$rootScope', '$injector', (RelatedPostDataRetrieverService, EditorService, AnalysisService, configuration, $log, $scope, $rootScope, $injector)-> 
 
   $scope.analysis = undefined
+  $scope.relatedPosts = undefined
   $scope.newEntity = AnalysisService.createEntity()
   $scope.selectedEntities = {}
-  $scope.widgets = {}
   $scope.annotation = undefined
   $scope.boxes = []
   $scope.images = {}
@@ -69,11 +69,7 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
 
   for box in $scope.configuration.classificationBoxes
     $scope.selectedEntities[ box.id ] = {}
-    $scope.widgets[ box.id ] = {}
-
-    for widget in box.registeredWidgets
-      $scope.widgets[ box.id ][ widget ] = []
-              
+          
   # Delegate to EditorService
   $scope.createTextAnnotationFromCurrentSelection = ()->
     EditorService.createTextAnnotationFromCurrentSelection()
@@ -128,7 +124,6 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     # Set the annotation text as label for the new entity
     $scope.newEntity.label = annotation.text
     # Set the annotation id as id for the new entity
-    # $scope.newEntity.id = annotation.id
     # Ask for SameAs suggestions
     AnalysisService.getSuggestedSameAs annotation.text
 
@@ -136,24 +131,34 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     $log.debug "Retrieved sameAs #{sameAs}"
     $scope.newEntity.suggestedSameAs = sameAs
   
+  $scope.$on "relatedPostsLoaded", (event, posts) ->
+    $scope.relatedPosts = posts
+  
   $scope.$on "analysisPerformed", (event, analysis) -> 
     $scope.analysis = analysis
+
+
     # Preselect 
     for box in $scope.configuration.classificationBoxes
       for entityId in box.selectedEntities  
         if entity = analysis.entities[ entityId ]
           $scope.selectedEntities[ box.id ][ entityId ] = analysis.entities[ entityId ]
+          
           for uri in entity.images
             $scope.images[ uri ] = entity.label
         else
           $log.warn "Entity with id #{entityId} should be linked to #{box.id} but is missing"
 
+    entityIds = []
+    
+    for box, entities of $scope.selectedEntities
+      for id, entity of entities
+        entityIds.push id
+
+    RelatedPostDataRetrieverService.load entityIds
+
   $scope.onSelectedEntityTile = (entity, scope)->
     $log.debug "Entity tile selected for entity #{entity.id} within '#{scope.id}' scope"
-    
-    # Close all opened widgets ...
-    for id, box of $scope.boxes
-      box.closeWidgets()
     
     if not $scope.selectedEntities[ scope.id ][ entity.id ]?
       $scope.selectedEntities[ scope.id ][ entity.id ] = entity

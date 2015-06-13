@@ -282,12 +282,12 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     
     filtered
 ])
-.controller('EditPostWidgetController', [ 'EditorService', 'AnalysisService', 'configuration', '$log', '$scope', '$rootScope', '$injector', (EditorService, AnalysisService, configuration, $log, $scope, $rootScope, $injector)-> 
+.controller('EditPostWidgetController', ['RelatedPostDataRetrieverService', 'EditorService', 'AnalysisService', 'configuration', '$log', '$scope', '$rootScope', '$injector', (RelatedPostDataRetrieverService, EditorService, AnalysisService, configuration, $log, $scope, $rootScope, $injector)-> 
 
   $scope.analysis = undefined
+  $scope.relatedPosts = undefined
   $scope.newEntity = AnalysisService.createEntity()
   $scope.selectedEntities = {}
-  $scope.widgets = {}
   $scope.annotation = undefined
   $scope.boxes = []
   $scope.images = {}
@@ -296,11 +296,7 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
 
   for box in $scope.configuration.classificationBoxes
     $scope.selectedEntities[ box.id ] = {}
-    $scope.widgets[ box.id ] = {}
-
-    for widget in box.registeredWidgets
-      $scope.widgets[ box.id ][ widget ] = []
-              
+          
   # Delegate to EditorService
   $scope.createTextAnnotationFromCurrentSelection = ()->
     EditorService.createTextAnnotationFromCurrentSelection()
@@ -355,7 +351,6 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     # Set the annotation text as label for the new entity
     $scope.newEntity.label = annotation.text
     # Set the annotation id as id for the new entity
-    # $scope.newEntity.id = annotation.id
     # Ask for SameAs suggestions
     AnalysisService.getSuggestedSameAs annotation.text
 
@@ -363,24 +358,34 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     $log.debug "Retrieved sameAs #{sameAs}"
     $scope.newEntity.suggestedSameAs = sameAs
   
+  $scope.$on "relatedPostsLoaded", (event, posts) ->
+    $scope.relatedPosts = posts
+  
   $scope.$on "analysisPerformed", (event, analysis) -> 
     $scope.analysis = analysis
+
+
     # Preselect 
     for box in $scope.configuration.classificationBoxes
       for entityId in box.selectedEntities  
         if entity = analysis.entities[ entityId ]
           $scope.selectedEntities[ box.id ][ entityId ] = analysis.entities[ entityId ]
+          
           for uri in entity.images
             $scope.images[ uri ] = entity.label
         else
           $log.warn "Entity with id #{entityId} should be linked to #{box.id} but is missing"
 
+    entityIds = []
+    
+    for box, entities of $scope.selectedEntities
+      for id, entity of entities
+        entityIds.push id
+
+    RelatedPostDataRetrieverService.load entityIds
+
   $scope.onSelectedEntityTile = (entity, scope)->
     $log.debug "Entity tile selected for entity #{entity.id} within '#{scope.id}' scope"
-    
-    # Close all opened widgets ...
-    for id, box of $scope.boxes
-      box.closeWidgets()
     
     if not $scope.selectedEntities[ scope.id ][ entity.id ]?
       $scope.selectedEntities[ scope.id ][ entity.id ] = entity
@@ -997,17 +1002,26 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
 
   service
 ])
-angular.module('wordlift.editpost.widget.services.ImageSuggestorDataRetrieverService', [])
+angular.module('wordlift.editpost.widget.services.RelatedPostDataRetrieverService', [])
 # Manage redlink analysis responses
-.service('ImageSuggestorDataRetrieverService', [ '$log', '$http', '$rootScope', ($log, $http, $rootScope)-> 
+.service('RelatedPostDataRetrieverService', [ 'configuration', '$log', '$http', '$rootScope', (configuration, $log, $http, $rootScope)-> 
   
   service = {}
-  service.loadData = (entities)->
-    items = []
-    for id, entity of entities
-      for image in entity.images
-        items.push { 'uri': image }
-    items
+  service.load = ( entityIds = [] )->
+    uri = "admin-ajax.php?action=wordlift_related_posts"
+    $log.debug "Going to find related posts"
+
+    $http(
+      method: 'post'
+      url: uri
+      data: entityIds
+    )
+    # If successful, broadcast an *analysisReceived* event.
+    .success (data) ->
+      $log.debug data
+      $rootScope.$broadcast "relatedPostsLoaded", data
+    .error (data, status) ->
+      $log.warn "Error loading related posts"
 
   service
 
@@ -1043,7 +1057,7 @@ angular.module('wordlift.editpost.widget', [
   'wordlift.editpost.widget.directives.wlEntityInputBox', 
 	'wordlift.editpost.widget.services.AnalysisService', 
 	'wordlift.editpost.widget.services.EditorService', 
-	'wordlift.editpost.widget.services.ImageSuggestorDataRetrieverService' 		
+	'wordlift.editpost.widget.services.RelatedPostDataRetrieverService' 		
 	
 	])
 
@@ -1089,6 +1103,11 @@ $(
       </div>
 
       <h3 class="wl-widget-headline"><span>Related posts</span></h3>
+      <div wl-carousel>
+        <div ng-repeat="post in relatedPosts" class="wl-card" wl-carousel-pane>
+          <img ng-src="{{post.thumbnail}}" />
+        </div>
+      </div>
       
       <div class="wl-entity-input-boxes">
         <wl-entity-input-box annotation="annotation" entity="entity" ng-repeat="entity in analysis.entities | isEntitySelected"></wl-entity-input-box>

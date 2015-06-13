@@ -42,7 +42,7 @@ module.exports = (grunt) ->
             'src/coffee/editpost-widget/app.directives.wlEntityInputBox.coffee'
             'src/coffee/editpost-widget/app.services.AnalysisService.coffee'
             'src/coffee/editpost-widget/app.services.EditorService.coffee'
-            'src/coffee/editpost-widget/app.services.ImageSuggestorDataRetrieverService.coffee'
+            'src/coffee/editpost-widget/app.services.RelatedPostDataRetrieverService.coffee'
             'src/coffee/editpost-widget/app.providers.ConfigurationProvider.coffee'   
             'src/coffee/editpost-widget/app.coffee'
           ]
