@@ -1054,7 +1054,10 @@ angular.module('wordlift.editpost.widget', [
 $(
   container = $("""
   	<div ng-show="analysis" id="wordlift-edit-post-wrapper" ng-controller="EditPostWidgetController">
-  		<div ng-click="createTextAnnotationFromCurrentSelection()" id="wl-add-entity-button-wrapper">
+  		
+      <h3 class="wl-widget-headline"><span>Semantic tagging</span></h3>
+      
+      <div ng-click="createTextAnnotationFromCurrentSelection()" id="wl-add-entity-button-wrapper">
         <span class="preview button" ng-class="{ 'selected' : !isSelectionCollapsed }">Add entity</span>
         <div class="clear" />     
       </div>
@@ -1077,11 +1080,15 @@ $(
           <wl-entity-tile is-selected="isLinkedToCurrentAnnotation(entity)" on-entity-select="onSelectedEntityTile(entity, box)" entity="entity" ng-repeat="entity in analysis.annotations[annotation].entities | filterEntitiesByTypes:box.registeredTypes"" ></wl-entity>
         </div>  
       </wl-classification-box>
+
+      <h3 class="wl-widget-headline"><span>Suggested images</span></h3>
       <div wl-carousel>
         <div ng-repeat="(image, label) in images" class="wl-card" wl-carousel-pane>
           <img ng-src="{{image}}" />
         </div>
       </div>
+
+      <h3 class="wl-widget-headline"><span>Related posts</span></h3>
       
       <div class="wl-entity-input-boxes">
         <wl-entity-input-box annotation="annotation" entity="entity" ng-repeat="entity in analysis.entities | isEntitySelected"></wl-entity-input-box>
