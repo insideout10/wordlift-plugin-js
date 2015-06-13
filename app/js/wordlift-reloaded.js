@@ -112,7 +112,7 @@
         restrict: 'A',
         scope: true,
         transclude: true,
-        template: "<div class=\"wl-carousel\">\n  <div class=\"wl-panes\" style=\"width:{{panesWidth}}px; left:{{position}}px;\" ng-transclude ng-swipe-right=\"next()\"></div>\n  <div class=\"wl-carousel-arrow wl-next\" ng-click=\"next()\">\n    <i class=\"wl-angle-right\" />\n  </div>\n  <div class=\"wl-carousel-arrow wl-prev\" ng-click=\"prev()\">\n    <i class=\"wl-angle-left\" />\n  </div>\n</div>      ",
+        template: "<div class=\"wl-carousel\">\n  <div class=\"wl-panes\" style=\"width:{{panesWidth}}px; left:{{position}}px;\" ng-transclude ng-swipe-right=\"next()\"></div>\n  <div class=\"wl-carousel-arrow wl-prev\" ng-click=\"prev()\" ng-show=\"currentPaneIndex > 0\">\n    <i class=\"wl-angle-left\" />\n  </div>\n  <div class=\"wl-carousel-arrow wl-next\" ng-click=\"next()\" ng-hide=\"(currentPaneIndex + visibleElements()) == panes.length\">\n    <i class=\"wl-angle-right\" />\n  </div>\n</div>      ",
         controller: function($scope, $element, $attrs) {
           var ctrl, w;
           w = angular.element($window);
@@ -129,11 +129,14 @@
           $scope.panesWidth = void 0;
           $scope.panes = [];
           $scope.position = 0;
+          $scope.currentPaneIndex = 0;
           $scope.next = function() {
-            return $scope.position = $scope.position - $scope.itemWidth;
+            $scope.position = $scope.position - $scope.itemWidth;
+            return $scope.currentPaneIndex = $scope.currentPaneIndex + 1;
           };
           $scope.prev = function() {
-            return $scope.position = $scope.position + $scope.itemWidth;
+            $scope.position = $scope.position + $scope.itemWidth;
+            return $scope.currentPaneIndex = $scope.currentPaneIndex - 1;
           };
           $scope.setPanesWrapperWidth = function() {
             return $scope.panesWidth = $scope.panes.length * $scope.itemWidth;

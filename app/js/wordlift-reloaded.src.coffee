@@ -137,11 +137,11 @@ angular.module('wordlift.ui.carousel', [])
   template: """
       <div class="wl-carousel">
         <div class="wl-panes" style="width:{{panesWidth}}px; left:{{position}}px;" ng-transclude ng-swipe-right="next()"></div>
-        <div class="wl-carousel-arrow wl-next" ng-click="next()">
-          <i class="wl-angle-right" />
-        </div>
-        <div class="wl-carousel-arrow wl-prev" ng-click="prev()">
+        <div class="wl-carousel-arrow wl-prev" ng-click="prev()" ng-show="currentPaneIndex > 0">
           <i class="wl-angle-left" />
+        </div>
+        <div class="wl-carousel-arrow wl-next" ng-click="next()" ng-hide="(currentPaneIndex + visibleElements()) == panes.length">
+          <i class="wl-angle-right" />
         </div>
       </div>      
   """
@@ -160,11 +160,14 @@ angular.module('wordlift.ui.carousel', [])
     $scope.panesWidth = undefined
     $scope.panes = []
     $scope.position = 0;
+    $scope.currentPaneIndex = 0
 
     $scope.next = ()->
       $scope.position = $scope.position - $scope.itemWidth
+      $scope.currentPaneIndex = $scope.currentPaneIndex + 1
     $scope.prev = ()->
       $scope.position = $scope.position + $scope.itemWidth
+      $scope.currentPaneIndex = $scope.currentPaneIndex - 1
 
     $scope.setPanesWrapperWidth = ()->
       $scope.panesWidth = $scope.panes.length * $scope.itemWidth
