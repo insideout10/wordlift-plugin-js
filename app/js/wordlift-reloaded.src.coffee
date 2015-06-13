@@ -180,7 +180,8 @@ angular.module('wordlift.ui.carousel', [])
         pane.scope.setWidth $scope.itemWidth
       $scope.$apply()
       $scope.position = 0;
-    
+      $scope.currentPaneIndex = 0
+
     ctrl = @
     ctrl.registerPane = (scope, element)->
       # Set the proper width for the element
