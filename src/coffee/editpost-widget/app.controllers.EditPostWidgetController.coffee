@@ -111,7 +111,7 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     if occurrences.length is 0
       for box, entities of $scope.selectedEntities
         delete $scope.selectedEntities[ box ][ entityId ]
-        $scope.updateRelatedPosts()
+        #$scope.updateRelatedPosts()
 
   $scope.$on "textAnnotationClicked", (event, annotationId) ->
     $scope.annotation = annotationId
@@ -138,7 +138,6 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
   $scope.$on "analysisPerformed", (event, analysis) -> 
     $scope.analysis = analysis
 
-
     # Preselect 
     for box in $scope.configuration.classificationBoxes
       for entityId in box.selectedEntities  
@@ -152,6 +151,7 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     $scope.updateRelatedPosts()
 
   $scope.updateRelatedPosts = ()->
+    $log.debug "Going to update related posts box ..."
     entityIds = []
     for box, entities of $scope.selectedEntities
       for id, entity of entities
@@ -165,14 +165,14 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
       $scope.selectedEntities[ scope.id ][ entity.id ] = entity
       for uri in entity.images
         $scope.images[ uri ] = entity.label
-      
-      $scope.updateRelatedPosts()
       $scope.$emit "entitySelected", entity, $scope.annotation
     else
       for uri in entity.images
         delete $scope.images[ uri ]
       $scope.$emit "entityDeselected", entity, $scope.annotation
 
+    $scope.updateRelatedPosts()
+      
     
  
       

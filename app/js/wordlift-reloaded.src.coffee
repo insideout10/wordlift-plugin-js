@@ -143,7 +143,7 @@ angular.module('wordlift.ui.carousel', [])
         <div class="wl-carousel-arrow wl-next" ng-click="next()" ng-hide="(currentPaneIndex + visibleElements()) == panes.length">
           <i class="wl-angle-right" />
         </div>
-      </div>      
+      </div>  
   """
   controller: ($scope, $element, $attrs) ->
       
@@ -170,7 +170,10 @@ angular.module('wordlift.ui.carousel', [])
       $scope.currentPaneIndex = $scope.currentPaneIndex - 1
 
     $scope.setPanesWrapperWidth = ()->
+      $log.debug "panes count #{$scope.panes.length}"
       $scope.panesWidth = $scope.panes.length * $scope.itemWidth
+      $scope.position = 0;
+      $scope.currentPaneIndex = 0
 
     w.bind 'resize', ()->
         
@@ -179,8 +182,6 @@ angular.module('wordlift.ui.carousel', [])
       for pane in $scope.panes
         pane.scope.setWidth $scope.itemWidth
       $scope.$apply()
-      $scope.position = 0;
-      $scope.currentPaneIndex = 0
 
     ctrl = @
     ctrl.registerPane = (scope, element)->
@@ -201,9 +202,9 @@ angular.module('wordlift.ui.carousel', [])
         if pane.scope.$id is scope.$id
           unregisterPaneIndex = index
 
-      if unregisterPaneIndex
-        $scope.panes.splice unregisterPaneIndex, 1
+      $scope.panes.splice unregisterPaneIndex, 1
       $scope.setPanesWrapperWidth()
+      
 ])
 .directive('wlCarouselPane', ['$log', ($log)->
   require: '^wlCarousel'
@@ -221,6 +222,7 @@ angular.module('wordlift.ui.carousel', [])
       $element.css('width', "#{size}px")
 
     $scope.$on '$destroy', ()->
+      $log.debug "Destroy #{$scope.$id}"
       $ctrl.unregisterPane $scope
 
     $ctrl.registerPane $scope, $element
@@ -338,7 +340,7 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     if occurrences.length is 0
       for box, entities of $scope.selectedEntities
         delete $scope.selectedEntities[ box ][ entityId ]
-        $scope.updateRelatedPosts()
+        #$scope.updateRelatedPosts()
 
   $scope.$on "textAnnotationClicked", (event, annotationId) ->
     $scope.annotation = annotationId
@@ -365,7 +367,6 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
   $scope.$on "analysisPerformed", (event, analysis) -> 
     $scope.analysis = analysis
 
-
     # Preselect 
     for box in $scope.configuration.classificationBoxes
       for entityId in box.selectedEntities  
@@ -379,6 +380,7 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     $scope.updateRelatedPosts()
 
   $scope.updateRelatedPosts = ()->
+    $log.debug "Going to update related posts box ..."
     entityIds = []
     for box, entities of $scope.selectedEntities
       for id, entity of entities
@@ -392,14 +394,14 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
       $scope.selectedEntities[ scope.id ][ entity.id ] = entity
       for uri in entity.images
         $scope.images[ uri ] = entity.label
-      
-      $scope.updateRelatedPosts()
       $scope.$emit "entitySelected", entity, $scope.annotation
     else
       for uri in entity.images
         delete $scope.images[ uri ]
       $scope.$emit "entityDeselected", entity, $scope.annotation
 
+    $scope.updateRelatedPosts()
+      
     
  
       
@@ -1016,6 +1018,7 @@ angular.module('wordlift.editpost.widget.services.RelatedPostDataRetrieverServic
     uri = "admin-ajax.php?action=wordlift_related_posts"
     $log.debug "Going to find related posts"
     $log.debug entityIds
+    
     $http(
       method: 'post'
       url: uri

@@ -12,7 +12,7 @@ angular.module('wordlift.ui.carousel', [])
         <div class="wl-carousel-arrow wl-next" ng-click="next()" ng-hide="(currentPaneIndex + visibleElements()) == panes.length">
           <i class="wl-angle-right" />
         </div>
-      </div>      
+      </div>  
   """
   controller: ($scope, $element, $attrs) ->
       
@@ -39,7 +39,10 @@ angular.module('wordlift.ui.carousel', [])
       $scope.currentPaneIndex = $scope.currentPaneIndex - 1
 
     $scope.setPanesWrapperWidth = ()->
+      $log.debug "panes count #{$scope.panes.length}"
       $scope.panesWidth = $scope.panes.length * $scope.itemWidth
+      $scope.position = 0;
+      $scope.currentPaneIndex = 0
 
     w.bind 'resize', ()->
         
@@ -48,8 +51,6 @@ angular.module('wordlift.ui.carousel', [])
       for pane in $scope.panes
         pane.scope.setWidth $scope.itemWidth
       $scope.$apply()
-      $scope.position = 0;
-      $scope.currentPaneIndex = 0
 
     ctrl = @
     ctrl.registerPane = (scope, element)->
@@ -70,9 +71,9 @@ angular.module('wordlift.ui.carousel', [])
         if pane.scope.$id is scope.$id
           unregisterPaneIndex = index
 
-      if unregisterPaneIndex
-        $scope.panes.splice unregisterPaneIndex, 1
+      $scope.panes.splice unregisterPaneIndex, 1
       $scope.setPanesWrapperWidth()
+      
 ])
 .directive('wlCarouselPane', ['$log', ($log)->
   require: '^wlCarousel'
@@ -90,6 +91,7 @@ angular.module('wordlift.ui.carousel', [])
       $element.css('width', "#{size}px")
 
     $scope.$on '$destroy', ()->
+      $log.debug "Destroy #{$scope.$id}"
       $ctrl.unregisterPane $scope
 
     $ctrl.registerPane $scope, $element

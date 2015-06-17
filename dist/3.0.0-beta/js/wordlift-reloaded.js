@@ -112,7 +112,7 @@
         restrict: 'A',
         scope: true,
         transclude: true,
-        template: "<div class=\"wl-carousel\" ng-show=\"panes.length > 0\">\n  <div class=\"wl-panes\" style=\"width:{{panesWidth}}px; left:{{position}}px;\" ng-transclude ng-swipe-right=\"next()\"></div>\n  <div class=\"wl-carousel-arrow wl-prev\" ng-click=\"prev()\" ng-show=\"currentPaneIndex > 0\">\n    <i class=\"wl-angle-left\" />\n  </div>\n  <div class=\"wl-carousel-arrow wl-next\" ng-click=\"next()\" ng-hide=\"(currentPaneIndex + visibleElements()) == panes.length\">\n    <i class=\"wl-angle-right\" />\n  </div>\n</div>      ",
+        template: "<div class=\"wl-carousel\" ng-show=\"panes.length > 0\">\n  <div class=\"wl-panes\" style=\"width:{{panesWidth}}px; left:{{position}}px;\" ng-transclude ng-swipe-right=\"next()\"></div>\n  <div class=\"wl-carousel-arrow wl-prev\" ng-click=\"prev()\" ng-show=\"currentPaneIndex > 0\">\n    <i class=\"wl-angle-left\" />\n  </div>\n  <div class=\"wl-carousel-arrow wl-next\" ng-click=\"next()\" ng-hide=\"(currentPaneIndex + visibleElements()) == panes.length\">\n    <i class=\"wl-angle-right\" />\n  </div>\n</div>  ",
         controller: function($scope, $element, $attrs) {
           var ctrl, w;
           w = angular.element($window);
@@ -139,7 +139,10 @@
             return $scope.currentPaneIndex = $scope.currentPaneIndex - 1;
           };
           $scope.setPanesWrapperWidth = function() {
-            return $scope.panesWidth = $scope.panes.length * $scope.itemWidth;
+            $log.debug("panes count " + $scope.panes.length);
+            $scope.panesWidth = $scope.panes.length * $scope.itemWidth;
+            $scope.position = 0;
+            return $scope.currentPaneIndex = 0;
           };
           w.bind('resize', function() {
             var pane, _i, _len, _ref;
@@ -150,9 +153,7 @@
               pane = _ref[_i];
               pane.scope.setWidth($scope.itemWidth);
             }
-            $scope.$apply();
-            $scope.position = 0;
-            return $scope.currentPaneIndex = 0;
+            return $scope.$apply();
           });
           ctrl = this;
           ctrl.registerPane = function(scope, element) {
@@ -175,9 +176,7 @@
                 unregisterPaneIndex = index;
               }
             }
-            if (unregisterPaneIndex) {
-              $scope.panes.splice(unregisterPaneIndex, 1);
-            }
+            $scope.panes.splice(unregisterPaneIndex, 1);
             return $scope.setPanesWrapperWidth();
           };
         }
@@ -197,6 +196,7 @@
             return $element.css('width', "" + size + "px");
           };
           $scope.$on('$destroy', function() {
+            $log.debug("Destroy " + $scope.$id);
             return $ctrl.unregisterPane($scope);
           });
           return $ctrl.registerPane($scope, $element);
@@ -321,8 +321,7 @@
           _results = [];
           for (box in _ref1) {
             entities = _ref1[box];
-            delete $scope.selectedEntities[box][entityId];
-            _results.push($scope.updateRelatedPosts());
+            _results.push(delete $scope.selectedEntities[box][entityId]);
           }
           return _results;
         }
@@ -369,6 +368,7 @@
       });
       $scope.updateRelatedPosts = function() {
         var entities, entity, entityIds, id, _ref1;
+        $log.debug("Going to update related posts box ...");
         entityIds = [];
         _ref1 = $scope.selectedEntities;
         for (box in _ref1) {
@@ -390,16 +390,16 @@
             uri = _ref1[_j];
             $scope.images[uri] = entity.label;
           }
-          $scope.updateRelatedPosts();
-          return $scope.$emit("entitySelected", entity, $scope.annotation);
+          $scope.$emit("entitySelected", entity, $scope.annotation);
         } else {
           _ref2 = entity.images;
           for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
             uri = _ref2[_k];
             delete $scope.images[uri];
           }
-          return $scope.$emit("entityDeselected", entity, $scope.annotation);
+          $scope.$emit("entityDeselected", entity, $scope.annotation);
         }
+        return $scope.updateRelatedPosts();
       };
     }
   ]);

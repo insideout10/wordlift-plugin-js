@@ -7,7 +7,7 @@
         restrict: 'A',
         scope: true,
         transclude: true,
-        template: "<div class=\"wl-carousel\" ng-show=\"panes.length > 0\">\n  <div class=\"wl-panes\" style=\"width:{{panesWidth}}px; left:{{position}}px;\" ng-transclude ng-swipe-right=\"next()\"></div>\n  <div class=\"wl-carousel-arrow wl-prev\" ng-click=\"prev()\" ng-show=\"currentPaneIndex > 0\">\n    <i class=\"wl-angle-left\" />\n  </div>\n  <div class=\"wl-carousel-arrow wl-next\" ng-click=\"next()\" ng-hide=\"(currentPaneIndex + visibleElements()) == panes.length\">\n    <i class=\"wl-angle-right\" />\n  </div>\n</div>      ",
+        template: "<div class=\"wl-carousel\" ng-show=\"panes.length > 0\">\n  <div class=\"wl-panes\" style=\"width:{{panesWidth}}px; left:{{position}}px;\" ng-transclude ng-swipe-right=\"next()\"></div>\n  <div class=\"wl-carousel-arrow wl-prev\" ng-click=\"prev()\" ng-show=\"currentPaneIndex > 0\">\n    <i class=\"wl-angle-left\" />\n  </div>\n  <div class=\"wl-carousel-arrow wl-next\" ng-click=\"next()\" ng-hide=\"(currentPaneIndex + visibleElements()) == panes.length\">\n    <i class=\"wl-angle-right\" />\n  </div>\n</div>  ",
         controller: function($scope, $element, $attrs) {
           var ctrl, w;
           w = angular.element($window);
@@ -34,7 +34,10 @@
             return $scope.currentPaneIndex = $scope.currentPaneIndex - 1;
           };
           $scope.setPanesWrapperWidth = function() {
-            return $scope.panesWidth = $scope.panes.length * $scope.itemWidth;
+            $log.debug("panes count " + $scope.panes.length);
+            $scope.panesWidth = $scope.panes.length * $scope.itemWidth;
+            $scope.position = 0;
+            return $scope.currentPaneIndex = 0;
           };
           w.bind('resize', function() {
             var pane, _i, _len, _ref;
@@ -45,9 +48,7 @@
               pane = _ref[_i];
               pane.scope.setWidth($scope.itemWidth);
             }
-            $scope.$apply();
-            $scope.position = 0;
-            return $scope.currentPaneIndex = 0;
+            return $scope.$apply();
           });
           ctrl = this;
           ctrl.registerPane = function(scope, element) {
@@ -70,9 +71,7 @@
                 unregisterPaneIndex = index;
               }
             }
-            if (unregisterPaneIndex) {
-              $scope.panes.splice(unregisterPaneIndex, 1);
-            }
+            $scope.panes.splice(unregisterPaneIndex, 1);
             return $scope.setPanesWrapperWidth();
           };
         }
@@ -92,6 +91,7 @@
             return $element.css('width', "" + size + "px");
           };
           $scope.$on('$destroy', function() {
+            $log.debug("Destroy " + $scope.$id);
             return $ctrl.unregisterPane($scope);
           });
           return $ctrl.registerPane($scope, $element);
