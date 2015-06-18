@@ -139,7 +139,6 @@
             return $scope.currentPaneIndex = $scope.currentPaneIndex - 1;
           };
           $scope.setPanesWrapperWidth = function() {
-            $log.debug("panes count " + $scope.panes.length);
             $scope.panesWidth = $scope.panes.length * $scope.itemWidth;
             $scope.position = 0;
             return $scope.currentPaneIndex = 0;
@@ -992,7 +991,7 @@
         if (entityIds == null) {
           entityIds = [];
         }
-        uri = "admin-ajax.php?action=wordlift_related_posts";
+        uri = "admin-ajax.php?action=wordlift_related_posts&post_id=" + configuration.currentPostId;
         $log.debug("Going to find related posts");
         $log.debug(entityIds);
         return $http({

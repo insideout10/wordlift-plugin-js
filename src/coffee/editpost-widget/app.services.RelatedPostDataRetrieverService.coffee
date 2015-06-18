@@ -4,7 +4,7 @@ angular.module('wordlift.editpost.widget.services.RelatedPostDataRetrieverServic
   
   service = {}
   service.load = ( entityIds = [] )->
-    uri = "admin-ajax.php?action=wordlift_related_posts"
+    uri = "admin-ajax.php?action=wordlift_related_posts&post_id=#{configuration.currentPostId}"
     $log.debug "Going to find related posts"
     $log.debug entityIds
     

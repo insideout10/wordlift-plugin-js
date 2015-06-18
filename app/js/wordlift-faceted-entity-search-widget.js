@@ -34,7 +34,6 @@
             return $scope.currentPaneIndex = $scope.currentPaneIndex - 1;
           };
           $scope.setPanesWrapperWidth = function() {
-            $log.debug("panes count " + $scope.panes.length);
             $scope.panesWidth = $scope.panes.length * $scope.itemWidth;
             $scope.position = 0;
             return $scope.currentPaneIndex = 0;

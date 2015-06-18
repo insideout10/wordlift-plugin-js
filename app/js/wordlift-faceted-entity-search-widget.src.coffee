@@ -39,7 +39,6 @@ angular.module('wordlift.ui.carousel', [])
       $scope.currentPaneIndex = $scope.currentPaneIndex - 1
 
     $scope.setPanesWrapperWidth = ()->
-      $log.debug "panes count #{$scope.panes.length}"
       $scope.panesWidth = $scope.panes.length * $scope.itemWidth
       $scope.position = 0;
       $scope.currentPaneIndex = 0
