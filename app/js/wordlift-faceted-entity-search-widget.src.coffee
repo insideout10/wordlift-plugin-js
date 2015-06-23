@@ -95,11 +95,25 @@ angular.module('wordlift.ui.carousel', [])
 
     $ctrl.registerPane $scope, $element
 ])
+angular.module('wordlift.utils.directives', [])
+.directive('wlSrc', ['$window', '$log', ($window, $log)->
+  restrict: 'A'
+  priority: 99 # it needs to run after the attributes are interpolated
+  link: ($scope, $element, $attrs, $ctrl) ->  
+    $element.bind('error', ()->
+      unless $attrs.src is $attrs.wlSrc
+        $log.warn "Error on #{$attrs.src}! Going to fallback on #{$attrs.wlSrc}"
+        $attrs.$set 'src', $attrs.wlSrc
+    )
+])
 # Set the well-known $ reference to jQuery.
 $ = jQuery
 
 # Create the main AngularJS module, and set it dependent on controllers and directives.
-angular.module('wordlift.facetedsearch.widget', ['wordlift.ui.carousel'])
+angular.module('wordlift.facetedsearch.widget', [
+  'wordlift.ui.carousel'
+  'wordlift.utils.directives'
+])
 .provider("configuration", ()->
   
   _configuration = undefined
@@ -130,7 +144,8 @@ angular.module('wordlift.facetedsearch.widget', ['wordlift.ui.carousel'])
     $scope.facets = []
     $scope.conditions = {}
     $scope.supportedTypes = ['thing', 'person', 'organization', 'place', 'event']
-
+    $scope.configuration = configuration
+    
     $scope.isInConditions = (entity)->
       if $scope.conditions[ entity.id ]
         return true
@@ -149,10 +164,8 @@ angular.module('wordlift.facetedsearch.widget', ['wordlift.ui.carousel'])
         
     $scope.$on "postsLoaded", (event, posts) -> 
       $log.debug "Referencing posts for entity #{configuration.entity_id} ..."
-      $log.debug posts
       $scope.posts = posts
-      $log.debug $scope.posts
-
+      
     $scope.$on "facetsLoaded", (event, facets) -> 
       $log.debug "Referencing facets for entity #{configuration.entity_id} ..."
       for entity in facets
@@ -170,8 +183,7 @@ angular.module('wordlift.facetedsearch.widget', ['wordlift.ui.carousel'])
     uri = "#{configuration.ajax_url}?action=#{configuration.action}&entity_id=#{configuration.entity_id}&type=#{type}"
     
     $log.debug "Going to search #{type} with conditions"
-    $log.debug conditions
-
+    
     $http(
       method: 'post'
       url: uri
@@ -212,7 +224,7 @@ $(
         </div>
         <div wl-carousel>
           <div class="wl-post wl-card" ng-repeat="post in posts" wl-carousel-pane>
-            <img ng-src="{{post.thumbnail}}" />
+            <img ng-src="{{post.thumbnail}}" wl-src="{{configuration.defaultThumbnailPath}}" />
             <div class="wl-card-title"> 
               <a ng-href="/?p={{post.ID}}">{{post.post_title}}</a>
             </div>

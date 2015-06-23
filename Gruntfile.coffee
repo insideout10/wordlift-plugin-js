@@ -34,6 +34,7 @@ module.exports = (grunt) ->
           ]
           'app/js/wordlift-reloaded.js': [
             'src/coffee/traslator.coffee'
+            'src/coffee/utils/app.utils.directives.coffee'
             'src/coffee/ui/carousel.coffee'
             'src/coffee/editpost-widget/app.controllers.EditPostWidgetController.coffee'
             'src/coffee/editpost-widget/app.directives.wlClassificationBox.coffee'
@@ -53,6 +54,7 @@ module.exports = (grunt) ->
           ]
           'app/js/wordlift-faceted-entity-search-widget.js': [
             'src/coffee/ui/carousel.coffee'
+            'src/coffee/utils/app.utils.directives.coffee'
             'src/coffee/faceted-entity-search-widget/app.coffee'
           ]
     uglify:

@@ -5,6 +5,7 @@ $ = jQuery
 angular.module('wordlift.editpost.widget', [
 
 	'wordlift.ui.carousel'
+  'wordlift.utils.directives'
   'wordlift.editpost.widget.providers.ConfigurationProvider', 
 	'wordlift.editpost.widget.controllers.EditPostWidgetController', 
 	'wordlift.editpost.widget.directives.wlClassificationBox', 
@@ -61,7 +62,7 @@ $(
       <h3 class="wl-widget-headline"><span>Related posts</span></h3>
       <div wl-carousel>
         <div ng-repeat="post in relatedPosts" class="wl-card" wl-carousel-pane>
-          <img ng-src="{{post.thumbnail}}" />
+          <img ng-src="{{post.thumbnail}}" wl-src="{{configuration.defaultThumbnailPath}}" />
           <div class="wl-card-title">
             <a ng-href="/?p={{post.ID}}">{{post.post_title}}</a>
           </div>
