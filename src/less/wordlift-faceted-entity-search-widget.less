@@ -1,101 +1,60 @@
 @import '../../bower_components/components-font-awesome/less/font-awesome.less';
 @import 'colors.less';
+@import 'wordlift-functions.less';
 @import 'wordlift-carousel.less';
 @import 'wordlift-card.less';
+@import 'wordlift-label.less';
 
 #wordlift-faceted-entity-search-widget {
 
+	font-size:13px !important;
+	
 	border:#e2e2e2 1px solid;
-
-	div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed,  figure, figcaption, footer, header, hgroup,  menu, nav, output, ruby, section, summary, time, mark, audio, video {
-		margin: 0;
-		padding: 0;
-		border: 0;
-		font-size: 100%;
-		font: inherit;
-		vertical-align: baseline;
-	}
-	article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
-		display: block;
-	}
-	body {
-		line-height: 1;
-	}
-	ol, ul {
-		list-style: none;
-	}
-	blockquote, q {
-		quotes: none;
-	}
-	blockquote:before, blockquote:after, q:before, q:after {
-		content: '';
-		content: none;
-	}
-	table {
-		border-collapse: collapse;
-		border-spacing: 0;
-	}
+	padding: 0.6em;
+	margin: 0.6em 0em;
 
 	h5 {
-		margin: 0.2em 0.4em;
-		
+		font-size: 1.2em;
+		padding: 0em;
+		margin: 0;
+		font-weight: normal;
+
+		.wl-filter-button { 
+			.fa-icon(@fa-var-filter);
+			position: absolute;
+			right:0;
+			top:0;
+			color:#ccc;
+			cursor:pointer;
+
+			&.selected {
+			  color:@wp-cta-color;
+			}
+		}
+
 	}
 
-	.fa-icon(@icon) {
-    
-    	&:before {
-      	content: @icon; 
-    	}
-    	font-family: FontAwesome;
-    	font-style: normal;
-    	font-weight: normal;
-    	line-height: 14px;
-	    -webkit-font-smoothing: antialiased;
-	    -moz-osx-font-smoothing: grayscale;
-	    font-size: 14px;
-	    padding: 0px 3px;
-	  }
-
-	// Set a tile color background, foreground and icons.
-	.tile(@color, @icon) {
-  
-		.type {
-    		text-align: center;
-    		&:before {
-      			content: @icon;
-      			color: @color; 
-    		}
-  		}
-  		&.selected {
-    		background-color: @color;
-    		color: contrast(@color);
-  		}
+	h6 {
+		text-transform: uppercase;
+		font-size: 0.86em;
+		padding: 0.6em 0.6em 0em 0.6em;
+		margin: 0;
 	}
 
+	ul {
+		margin:0;
+		padding:0.6em;
+		list-style-type:none;
+	}
 	.wl-facets {
 
-		padding: 1rem;
 		background-color:#fff;
+		margin: 0em 0em 0.6em 0em;
 					
-
 		.wl-facets-container {
-			font-size: 0.6em;
-			border-left:#e2e2e2 1px solid;
-	
+			
 			h6 {
-
-				text-transform: uppercase;
-				
-				.type {
-    				font-family: FontAwesome;
-    				font-style: normal;
-    				font-weight: normal;
-    				-webkit-font-smoothing: antialiased;
-  					-moz-osx-font-smoothing: grayscale;
-  					font-size:1.2em;
-  					margin-right: 0.3em;
-  				}
-
+  				
 				&.wl-fs-creative-work { .tile(@wl-creative-work-color, @fa-var-lightbulb-o) }
   				&.wl-fs-event { .tile(@wl-event-color, @fa-var-calendar) }
   				&.wl-fs-organization { .tile(@wl-organization-color, @fa-var-building-o) }
@@ -106,11 +65,18 @@
 
 			li {
 				
-				span.wl-label {
+				padding: 0em;
+				margin: 0em;
+				line-height: 1.4em;
+				font-size: 0.8em;
+					
+				.wl-label {
 					text-transform: capitalize;
-					line-height: 0.8em;
 					cursor: pointer;
 
+				}
+				.wl-counter {
+					cursor: pointer;
 				}
 
 			}
@@ -118,54 +84,13 @@
 
 	}
 
-.wl-post-title {
-	position: absolute;
-	width: 100%;
-	bottom:0px;
-	left:0px;
-	background-color:#fff;
-	
-	height:40px;
-	min-height:40px;
-	line-height: 1em;
+	.wl-filters {
+		margin: 0em 0em 0.6em 0em;
 
-	padding: 0em;
-	border-top:#999 1px solid;
 
-	a {
-		color:#666;
-		font-size: 0.8em;
 	}
-}
-
 	.wl-posts {
-		padding: 1rem;
-		font-size: 0.8em;
-		clear:both;
-
-		a {
-			border:none !important;
-		}
-
-		.wl-post {
-			position: relative;
-		}
-
-		.wl-condition {
-			padding: 0px 0px;
-			text-transform: capitalize;
-
-			&.main {
-				font-weight: bold;
-			}
-		}
+		padding: 0em;
+		margin: 0.6em 0em 0em 0em;
 	}
-	.clear {
-		clear:both;
-	}
-	.wl-conditions {
-		border-bottom: #666 1px solid;
-		margin-bottom: 10px;
-	}
-
 }

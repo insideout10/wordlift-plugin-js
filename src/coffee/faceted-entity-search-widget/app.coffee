@@ -37,7 +37,11 @@ angular.module('wordlift.facetedsearch.widget', [
     $scope.conditions = {}
     $scope.supportedTypes = ['thing', 'person', 'organization', 'place', 'event']
     $scope.configuration = configuration
-    
+    $scope.filteringEnabled = false
+
+    $scope.toggleFiltering = ()->
+      $scope.filteringEnabled = !$scope.filteringEnabled
+
     $scope.isInConditions = (entity)->
       if $scope.conditions[ entity.id ]
         return true
@@ -97,23 +101,28 @@ angular.module('wordlift.facetedsearch.widget', [
 $(
   container = $("""
   	<div ng-controller="FacetedSearchWidgetController">
-      <h5>Contenuti associati a <strong>{{entity.label}}</strong></h5>
-      <div class="wl-facets" wl-carousel>
+      <h5 class="wl-selected-items-wrapper">
+        <span class="wl-title">Posts related to <strong>{{entity.label}}</strong></span>
+        <i ng-click="toggleFiltering()" ng-class="{ 'selected' : filteringEnabled }"class="wl-filter-button"></i>
+      </h5>
+      <div class="wl-filters wl-selected-items-wrapper">
+        <span ng-class="'wl-' + entity.mainType" ng-repeat="(condition, entity) in conditions" class="wl-selected-item">
+          {{ entity.label}}
+          <i class="wl-deselect" ng-click="addCondition(entity)"></i>
+        </span>
+      </div>
+      <div class="wl-facets" wl-carousel ng-show="filteringEnabled">
         <div class="wl-facets-container" ng-repeat="type in supportedTypes" wl-carousel-pane>
           <h6 ng-class="'wl-fs-' + type"><i class="type" />{{type}}</h6>
           <ul>
             <li class="entity" ng-repeat="entity in facets | filterEntitiesByType:type" ng-click="addCondition(entity)">     
                 <span class="wl-label" ng-class=" { 'selected' : isInConditions(entity) }">{{entity.label}}</span>
-                <span class="counter">({{entity.counter}})</span>
+                <span class="wl-counter">({{entity.counter}})</span>
             </li>
           </ul>
         </div>
       </div>
       <div class="wl-posts">
-        <div class="wl-conditions">
-          <span>Filtri:</span>
-          <strong class="wl-condition" ng-repeat="(condition, entity) in conditions">{{entity.label}}. </strong>
-        </div>
         <div wl-carousel>
           <div class="wl-post wl-card" ng-repeat="post in posts" wl-carousel-pane>
             <img ng-src="{{post.thumbnail}}" wl-src="{{configuration.defaultThumbnailPath}}" />
