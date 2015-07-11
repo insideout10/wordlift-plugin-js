@@ -179,8 +179,9 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
       textAnnotation = findAnnotation analysis.annotations, annotation.start, annotation.end
       
       # If there is no textAnnotation then create it and add to the current analysis
+      # It can be normal for new entities that are queued for Redlink re-indexing
       if not textAnnotation?
-        $log.debug "There is no annotation with start #{annotation.start} and end #{annotation.end}"
+        $log.warn "Annotation #{annotation.start}:#{annotation.end} for entityId #{annotation.uri} misses in the analysis"
         textAnnotation = @createAnnotation({
           start: annotation.start
           end: annotation.end

@@ -779,7 +779,7 @@
           }
           textAnnotation = findAnnotation(analysis.annotations, annotation.start, annotation.end);
           if (textAnnotation == null) {
-            $log.debug("There is no annotation with start " + annotation.start + " and end " + annotation.end);
+            $log.warn("Annotation " + annotation.start + ":" + annotation.end + " for entityId " + annotation.uri + " misses in the analysis");
             textAnnotation = this.createAnnotation({
               start: annotation.start,
               end: annotation.end,
