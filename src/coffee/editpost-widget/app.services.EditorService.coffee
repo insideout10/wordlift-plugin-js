@@ -11,16 +11,18 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
     # Prepare a traslator instance that will traslate Html and Text positions.
     traslator = Traslator.create html
     # Set the pattern to look for *itemid* attributes.
-    pattern = /<(\w+)[^>]*\sitemid="([^"]+)"[^>]*>([^<]+)<\/\1>/gim
+    pattern = /<(\w+)[^>]*\sitemid="([^"]+)"[^>]*>([^<]*)<\/\1>/gim
 
     # Get the matches and return them.
     (while match = pattern.exec html
-      {
+      
+      annotation = 
         start: traslator.html2text match.index
         end: traslator.html2text (match.index + match[0].length)
         uri: match[2]
         label: match[3]
-      }
+      
+      annotation
     )
 
   editor = ->
@@ -165,7 +167,10 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
 
       # Remove existing text annotations (the while-match is necessary to remove nested spans).
       while html.match(/<(\w+)[^>]*\sclass="textannotation[^"]*"[^>]*>([^<]+)<\/\1>/gim, '$2')
-        html = html.replace(/<(\w+)[^>]*\sclass="textannotation[^"]*"[^>]*>([^<]+)<\/\1>/gim, '$2')
+        html = html.replace(/<(\w+)[^>]*\sclass="textannotation[^"]*"[^>]*>([^<]*)<\/\1>/gim, '$2')
+
+      # Remove blank disambiguated annotations.
+      #html = html.replace(/<(\w+)[^>]*\sitemid="([^"]+)"[^>]*><\/\1>/gim, '')
 
       # Prepare a traslator instance that will traslate Html and Text positions.
       traslator = Traslator.create html

@@ -142,12 +142,18 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     for box in $scope.configuration.classificationBoxes
       for entityId in box.selectedEntities  
         if entity = analysis.entities[ entityId ]
+
+          if entity.occurrences.length is 0
+            $log.warn "Entity #{entityId} selected as #{box.label} without valid occurences!"
+            continue
+
           $scope.selectedEntities[ box.id ][ entityId ] = analysis.entities[ entityId ]
           
           for uri in entity.images
             $scope.images[ uri ] = entity.label
         else
           $log.warn "Entity with id #{entityId} should be linked to #{box.id} but is missing"
+    
     $scope.updateRelatedPosts()
 
   $scope.updateRelatedPosts = ()->

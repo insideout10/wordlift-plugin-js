@@ -170,6 +170,11 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
 
     # Find the existing entities in the html
     for annotation in annotations
+
+      if annotation.start is annotation.end
+        $log.warn "There is a broken empty annotation for entityId #{annotation.uri}"
+        continue
+
       # Find the proper annotation  
       textAnnotation = findAnnotation analysis.annotations, annotation.start, annotation.end
       

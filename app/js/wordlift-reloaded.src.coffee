@@ -381,12 +381,18 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     for box in $scope.configuration.classificationBoxes
       for entityId in box.selectedEntities  
         if entity = analysis.entities[ entityId ]
+
+          if entity.occurrences.length is 0
+            $log.warn "Entity #{entityId} selected as #{box.label} without valid occurences!"
+            continue
+
           $scope.selectedEntities[ box.id ][ entityId ] = analysis.entities[ entityId ]
           
           for uri in entity.images
             $scope.images[ uri ] = entity.label
         else
           $log.warn "Entity with id #{entityId} should be linked to #{box.id} but is missing"
+    
     $scope.updateRelatedPosts()
 
   $scope.updateRelatedPosts = ()->
@@ -787,6 +793,11 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
 
     # Find the existing entities in the html
     for annotation in annotations
+
+      if annotation.start is annotation.end
+        $log.warn "There is a broken empty annotation for entityId #{annotation.uri}"
+        continue
+
       # Find the proper annotation  
       textAnnotation = findAnnotation analysis.annotations, annotation.start, annotation.end
       
@@ -833,16 +844,18 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
     # Prepare a traslator instance that will traslate Html and Text positions.
     traslator = Traslator.create html
     # Set the pattern to look for *itemid* attributes.
-    pattern = /<(\w+)[^>]*\sitemid="([^"]+)"[^>]*>([^<]+)<\/\1>/gim
+    pattern = /<(\w+)[^>]*\sitemid="([^"]+)"[^>]*>([^<]*)<\/\1>/gim
 
     # Get the matches and return them.
     (while match = pattern.exec html
-      {
+      
+      annotation = 
         start: traslator.html2text match.index
         end: traslator.html2text (match.index + match[0].length)
         uri: match[2]
         label: match[3]
-      }
+      
+      annotation
     )
 
   editor = ->
@@ -987,7 +1000,10 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
 
       # Remove existing text annotations (the while-match is necessary to remove nested spans).
       while html.match(/<(\w+)[^>]*\sclass="textannotation[^"]*"[^>]*>([^<]+)<\/\1>/gim, '$2')
-        html = html.replace(/<(\w+)[^>]*\sclass="textannotation[^"]*"[^>]*>([^<]+)<\/\1>/gim, '$2')
+        html = html.replace(/<(\w+)[^>]*\sclass="textannotation[^"]*"[^>]*>([^<]*)<\/\1>/gim, '$2')
+
+      # Remove blank disambiguated annotations.
+      #html = html.replace(/<(\w+)[^>]*\sitemid="([^"]+)"[^>]*><\/\1>/gim, '')
 
       # Prepare a traslator instance that will traslate Html and Text positions.
       traslator = Traslator.create html

@@ -369,6 +369,10 @@
           for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
             entityId = _ref2[_k];
             if (entity = analysis.entities[entityId]) {
+              if (entity.occurrences.length === 0) {
+                $log.warn("Entity " + entityId + " selected as " + box.label + " without valid occurences!");
+                continue;
+              }
               $scope.selectedEntities[box.id][entityId] = analysis.entities[entityId];
               _ref3 = entity.images;
               for (_l = 0, _len3 = _ref3.length; _l < _len3; _l++) {
@@ -769,6 +773,10 @@
         _results = [];
         for (_k = 0, _len2 = annotations.length; _k < _len2; _k++) {
           annotation = annotations[_k];
+          if (annotation.start === annotation.end) {
+            $log.warn("There is a broken empty annotation for entityId " + annotation.uri);
+            continue;
+          }
           textAnnotation = findAnnotation(analysis.annotations, annotation.start, annotation.end);
           if (textAnnotation == null) {
             $log.debug("There is no annotation with start " + annotation.start + " and end " + annotation.end);
@@ -813,17 +821,18 @@
     'AnalysisService', '$log', '$http', '$rootScope', function(AnalysisService, $log, $http, $rootScope) {
       var currentOccurencesForEntity, dedisambiguate, disambiguate, editor, findEntities, service;
       findEntities = function(html) {
-        var match, pattern, traslator, _results;
+        var annotation, match, pattern, traslator, _results;
         traslator = Traslator.create(html);
-        pattern = /<(\w+)[^>]*\sitemid="([^"]+)"[^>]*>([^<]+)<\/\1>/gim;
+        pattern = /<(\w+)[^>]*\sitemid="([^"]+)"[^>]*>([^<]*)<\/\1>/gim;
         _results = [];
         while (match = pattern.exec(html)) {
-          _results.push({
+          annotation = {
             start: traslator.html2text(match.index),
             end: traslator.html2text(match.index + match[0].length),
             uri: match[2],
             label: match[3]
-          });
+          };
+          _results.push(annotation);
         }
         return _results;
       };
@@ -967,7 +976,7 @@
             entities = findEntities(html);
             AnalysisService.preselect(analysis, entities);
             while (html.match(/<(\w+)[^>]*\sclass="textannotation[^"]*"[^>]*>([^<]+)<\/\1>/gim, '$2')) {
-              html = html.replace(/<(\w+)[^>]*\sclass="textannotation[^"]*"[^>]*>([^<]+)<\/\1>/gim, '$2');
+              html = html.replace(/<(\w+)[^>]*\sclass="textannotation[^"]*"[^>]*>([^<]*)<\/\1>/gim, '$2');
             }
             traslator = Traslator.create(html);
             _ref = analysis.annotations;
