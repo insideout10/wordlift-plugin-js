@@ -66,11 +66,7 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
     # Add occurences as a blank array
     # Add annotation references to each entity
     for id, localEntity of configuration.entities
-      if data.entities[ id ]?
-        $log.debug "LocalEntity #{id} found into the analysis"
-      else
-        $log.debug "Going to add localEntity #{id} to the analysis"
-        data.entities[ id ] = localEntity
+      data.entities[ id ] = localEntity
 
     for id, entity of data.entities
       
@@ -78,10 +74,17 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
         $log.warn "Label missing for entity #{id}"
       if not entity.description
         $log.warn "Description missing for entity #{id}"
-        
+
+      if not entity.sameAs
+        $log.warn "sameAs missing for entity #{id}"
+        entity.sameAs = []
+        configuration.entities[ id ]?.sameAs = []
+        $log.debug "Schema.org sameAs overridden for entity #{id}"
+    
       if entity.mainType not in @._supportedTypes
         $log.warn "Schema.org type #{entity.mainType} for entity #{id} is not supported from current classification boxes configuration"
         entity.mainType = @._defaultType
+        configuration.entities[ id ]?.mainType = @._defaultType
         $log.debug "Schema.org type overridden for entity #{id}"
         
       entity.id = id
@@ -182,7 +185,6 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
         
       # Look for the entity in the current analysis result
       # Local entities are merged previously during the analysis parsing
-      # Local entities have higher priority
       entity = analysis.entities[ annotation.uri ]
       for id, e of configuration.entities
         entity = analysis.entities[ e.id ] if annotation.uri in e.sameAs

@@ -649,16 +649,11 @@
         return merge(defaults, params);
       };
       service.parse = function(data) {
-        var annotation, annotationId, ea, em, entity, id, index, localEntity, local_confidence, _k, _l, _len2, _len3, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
+        var annotation, annotationId, ea, em, entity, id, index, localEntity, local_confidence, _k, _l, _len2, _len3, _ref10, _ref11, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
         _ref2 = configuration.entities;
         for (id in _ref2) {
           localEntity = _ref2[id];
-          if (data.entities[id] != null) {
-            $log.debug("LocalEntity " + id + " found into the analysis");
-          } else {
-            $log.debug("Going to add localEntity " + id + " to the analysis");
-            data.entities[id] = localEntity;
-          }
+          data.entities[id] = localEntity;
         }
         _ref3 = data.entities;
         for (id in _ref3) {
@@ -669,9 +664,20 @@
           if (!entity.description) {
             $log.warn("Description missing for entity " + id);
           }
-          if (_ref4 = entity.mainType, __indexOf.call(this._supportedTypes, _ref4) < 0) {
+          if (!entity.sameAs) {
+            $log.warn("sameAs missing for entity " + id);
+            entity.sameAs = [];
+            if ((_ref4 = configuration.entities[id]) != null) {
+              _ref4.sameAs = [];
+            }
+            $log.debug("Schema.org sameAs overridden for entity " + id);
+          }
+          if (_ref5 = entity.mainType, __indexOf.call(this._supportedTypes, _ref5) < 0) {
             $log.warn("Schema.org type " + entity.mainType + " for entity " + id + " is not supported from current classification boxes configuration");
             entity.mainType = this._defaultType;
+            if ((_ref6 = configuration.entities[id]) != null) {
+              _ref6.mainType = this._defaultType;
+            }
             $log.debug("Schema.org type overridden for entity " + id);
           }
           entity.id = id;
@@ -679,14 +685,14 @@
           entity.annotations = {};
           entity.confidence = 1;
         }
-        _ref5 = data.annotations;
-        for (id in _ref5) {
-          annotation = _ref5[id];
+        _ref7 = data.annotations;
+        for (id in _ref7) {
+          annotation = _ref7[id];
           annotation.id = id;
           annotation.entities = {};
-          _ref6 = annotation.entityMatches;
-          for (index = _k = 0, _len2 = _ref6.length; _k < _len2; index = ++_k) {
-            ea = _ref6[index];
+          _ref8 = annotation.entityMatches;
+          for (index = _k = 0, _len2 = _ref8.length; _k < _len2; index = ++_k) {
+            ea = _ref8[index];
             if (!data.entities[ea.entityId].label) {
               data.entities[ea.entityId].label = annotation.text;
               $log.debug("Missing label retrived from related annotation for entity " + ea.entityId);
@@ -695,16 +701,16 @@
             data.annotations[id].entities[ea.entityId] = data.entities[ea.entityId];
           }
         }
-        _ref7 = data.entities;
-        for (id in _ref7) {
-          entity = _ref7[id];
-          _ref8 = data.annotations;
-          for (annotationId in _ref8) {
-            annotation = _ref8[annotationId];
+        _ref9 = data.entities;
+        for (id in _ref9) {
+          entity = _ref9[id];
+          _ref10 = data.annotations;
+          for (annotationId in _ref10) {
+            annotation = _ref10[annotationId];
             local_confidence = 1;
-            _ref9 = annotation.entityMatches;
-            for (_l = 0, _len3 = _ref9.length; _l < _len3; _l++) {
-              em = _ref9[_l];
+            _ref11 = annotation.entityMatches;
+            for (_l = 0, _len3 = _ref11.length; _l < _len3; _l++) {
+              em = _ref11[_l];
               if ((em.entityId != null) && em.entityId === id) {
                 local_confidence = em.confidence;
               }
