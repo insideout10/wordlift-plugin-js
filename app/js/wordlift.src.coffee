@@ -22,6 +22,13 @@ class Traslator
     @_textPositions = []
     @_text = ''
 
+    # The pattern matchs both html tags and html entities
+    # Old pattern -> /([^<]*)(<[^>]*>)([^<]*)/gim
+    # pattern = /([^&#<>]*)(&[^&;]*;|<[^>]*>)([^&#<>]*)/gim
+    # If the current element is an html entity add '1' as placeholder for the char
+    # if /^&[^&;]*;$/gim.test htmlElem
+    #  textLength += 1 
+
     # TODO: the pattern should consider that HTML has also HTML entities.
     # Remove non-breaking spaces.
     @_html = @_html.replace /&nbsp;/gim, ' '

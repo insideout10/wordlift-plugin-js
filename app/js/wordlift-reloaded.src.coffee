@@ -22,6 +22,13 @@ class Traslator
     @_textPositions = []
     @_text = ''
 
+    # The pattern matchs both html tags and html entities
+    # Old pattern -> /([^<]*)(<[^>]*>)([^<]*)/gim
+    # pattern = /([^&#<>]*)(&[^&;]*;|<[^>]*>)([^&#<>]*)/gim
+    # If the current element is an html entity add '1' as placeholder for the char
+    # if /^&[^&;]*;$/gim.test htmlElem
+    #  textLength += 1 
+
     # TODO: the pattern should consider that HTML has also HTML entities.
     # Remove non-breaking spaces.
     @_html = @_html.replace /&nbsp;/gim, ' '
@@ -489,7 +496,7 @@ angular.module('wordlift.editpost.widget.directives.wlClassificationBox', [])
       
   ])
 angular.module('wordlift.editpost.widget.directives.wlEntityForm', [])
-.directive('wlEntityForm', ['$log', ($log)->
+.directive('wlEntityForm', ['configuration', '$log', (configuration, $log)->
     restrict: 'E'
     scope:
       entity: '='
@@ -497,7 +504,7 @@ angular.module('wordlift.editpost.widget.directives.wlEntityForm', [])
     template: """
       <div name="wordlift" class="wl-entity-form">
       <div ng-show="entity.images.length > 0">
-          <img ng-src="{{entity.images[0]}}" />
+          <img ng-src="{{entity.images[0]}}" wl-src="{{configuration.defaultThumbnailPath}}" />
       </div>
       <div>
           <label>Entity label</label>

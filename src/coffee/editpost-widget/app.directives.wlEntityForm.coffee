@@ -1,5 +1,5 @@
 angular.module('wordlift.editpost.widget.directives.wlEntityForm', [])
-.directive('wlEntityForm', ['$log', ($log)->
+.directive('wlEntityForm', ['configuration', '$log', (configuration, $log)->
     restrict: 'E'
     scope:
       entity: '='
@@ -7,7 +7,7 @@ angular.module('wordlift.editpost.widget.directives.wlEntityForm', [])
     template: """
       <div name="wordlift" class="wl-entity-form">
       <div ng-show="entity.images.length > 0">
-          <img ng-src="{{entity.images[0]}}" />
+          <img ng-src="{{entity.images[0]}}" wl-src="{{configuration.defaultThumbnailPath}}" />
       </div>
       <div>
           <label>Entity label</label>
