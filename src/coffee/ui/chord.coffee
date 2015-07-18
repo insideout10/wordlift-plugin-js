@@ -162,14 +162,14 @@ $.fn.extend
           # get the current element
           text = d3.select(this)
             .attr("dy", n.length / 3 - (n.length-1) * 0.9 + 'em')
-            .html(n[0])
+            .text(n[0])
     
           # now loop
           for i in [1..n.length]
             text.append("tspan")
             .attr('x', 0)
             .attr('dy', '1em')
-            .html(n[i])
+            .text(n[i])
     
           text.attr('transform', (d) ->
             alpha = d.startAngle - Math.PI/2 + Math.abs((d.endAngle - d.startAngle)/2)

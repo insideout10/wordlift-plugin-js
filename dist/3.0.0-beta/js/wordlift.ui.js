@@ -154,9 +154,9 @@
         }).each(function(d) {
           var i, n, text, _k, _ref2;
           n = beautifyLabel(data.entities[d.index].label);
-          text = d3.select(this).attr("dy", n.length / 3 - (n.length - 1) * 0.9 + 'em').html(n[0]);
+          text = d3.select(this).attr("dy", n.length / 3 - (n.length - 1) * 0.9 + 'em').text(n[0]);
           for (i = _k = 1, _ref2 = n.length; 1 <= _ref2 ? _k <= _ref2 : _k >= _ref2; i = 1 <= _ref2 ? ++_k : --_k) {
-            text.append("tspan").attr('x', 0).attr('dy', '1em').html(n[i]);
+            text.append("tspan").attr('x', 0).attr('dy', '1em').text(n[i]);
           }
           return text.attr('transform', function(d) {
             var alpha, labelAngle, labelWidth, r;
