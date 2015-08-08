@@ -85,8 +85,8 @@ injector = angular.bootstrap $('#wordlift-edit-post-wrapper'), ['wordlift.editpo
   tinymce.PluginManager.add 'wordlift', (editor, url) ->
     # Perform analysis once tinymce is loaded
     editor.onLoadContent.add((ed, o) ->
-      injector.invoke(['AnalysisService', '$rootScope',
-       (AnalysisService, $rootScope) ->
+      injector.invoke(['AnalysisService', '$rootScope', '$log'
+       (AnalysisService, $rootScope, $log) ->
         # execute the following commands in the angular js context.
         $rootScope.$apply(->    
           # Get the html content of the editor.
@@ -94,6 +94,13 @@ injector = angular.bootstrap $('#wordlift-edit-post-wrapper'), ['wordlift.editpo
 
           # Get the text content from the Html.
           text = Traslator.create(html).getText()
+          # Tmp: check Traslator with tinymce default value
+          text = text.replace(/(\r\n|\n|\r)/gm,'')
+
+          if not text
+            $log.info "Blank content: nothing to do"
+            return
+          
           AnalysisService.perform text
         )
       ])

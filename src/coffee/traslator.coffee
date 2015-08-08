@@ -134,5 +134,4 @@ class Traslator
   # Return the text.
   getText: ->
     @_text
-
 window.Traslator = Traslator

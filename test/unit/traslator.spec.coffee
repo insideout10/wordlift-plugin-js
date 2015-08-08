@@ -16,3 +16,7 @@ describe "Traslator tests", ->
  		<p>Sto collaborando con <strong><span id="urn:enhancement-86adde59-0246-c85c-1985-fefc0f1d2efd" class="textannotation highlight wl-organization" itemscope="itemscope" itemid="http://dbpedia.org/resource/A.S._Roma">Roma</span></strong> adesso.</p>
    '''
    expect(t.html2text(32)).toBe(21)
+
+#  it "test tinymce default value", ->
+#   t = Traslator.create '<p><br data-mce-bogus="1"></p>'
+#   expect(t.getText()).toBe('')

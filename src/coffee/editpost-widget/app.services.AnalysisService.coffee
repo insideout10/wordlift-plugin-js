@@ -138,11 +138,6 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
   service._innerPerform = (content)->
 
     $log.info "Start to performing analysis"
-    $log.debug content
-
-    if not content?
-      $log.warn "content missing: nothing to do"
-      return
 
     return $http(
       method: 'post'
