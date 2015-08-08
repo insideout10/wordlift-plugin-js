@@ -64,7 +64,7 @@ $(
         <div ng-repeat="post in relatedPosts" class="wl-card" wl-carousel-pane>
           <img ng-src="{{post.thumbnail}}" wl-src="{{configuration.defaultThumbnailPath}}" />
           <div class="wl-card-title">
-            <a ng-href="/?p={{post.ID}}">{{post.post_title}}</a>
+            <a ng-href="{{post.link}}">{{post.post_title}}</a>
           </div>
         </div>
       </div>
