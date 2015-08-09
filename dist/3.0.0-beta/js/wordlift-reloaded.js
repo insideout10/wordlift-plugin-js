@@ -1066,12 +1066,11 @@
               format: 'raw'
             });
             text = Traslator.create(html).getText();
-            text = text.replace(/(\r\n|\n|\r)/gm, '');
-            if (!text) {
-              $log.info("Blank content: nothing to do");
-              return;
+            if (text.match(/[a-zA-Z0-9]+/)) {
+              return AnalysisService.perform(text);
+            } else {
+              return $log.info("Blank content: nothing to do!");
             }
-            return AnalysisService.perform(text);
           });
         }
       ]);
