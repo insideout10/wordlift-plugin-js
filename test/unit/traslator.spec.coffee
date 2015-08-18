@@ -40,4 +40,22 @@ describe "Traslator tests", ->
    t = Traslator.create '''
 <div class="dnd-atom-wrapper type-image context-side_image atom-align-right" contenteditable="false"><div class="dnd-drop-wrapper">&nbsp;<br></div><div class="dnd-legend-wrapper"><div class="caption">Planning for <span id="urn:enhancement-76811302-ab1e-4a10-9b3e-fe0f990918b7" class="textannotation disambiguated wl-organization" itemid="http://data.redlink.io/91/be2/entity/NASA">NASA</span>'s.</div><div class="link">&nbsp;<br></div></div></div><p>&nbsp;<br></p>
 '''
-   expect(t.html2text(381)).toBe(13)
+   expect(t.html2text(381)).toBe(14)
+
+  it "detect text pos from html one properly - case 7 (with a named html entity)", ->
+   content = '''
+Sono andato da Bogot&agrave; a <span>Roma</span>
+'''
+   t = Traslator.create content
+   expect(t.html2text(37)).toBe(24)
+   expect(t.getHtml()).toBe(content)
+   expect(t.getText()).toBe('Sono andato da Bogotà a Roma')
+
+  it "detect text pos from html one properly - case 8 (with a numered html entity)", ->
+   content = '''
+Sono andato da Bogot&#224; a <span>Roma</span>
+'''
+   t = Traslator.create content
+   expect(t.html2text(35)).toBe(24)
+   expect(t.getHtml()).toBe(content)
+   expect(t.getText()).toBe('Sono andato da Bogotà a Roma')

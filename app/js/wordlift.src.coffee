@@ -8,6 +8,11 @@ class Traslator
   _html: ''
   _text: ''
 
+  decodeHtml = (html)-> 
+    txt = document.createElement("textarea")
+    txt.innerHTML = html
+    txt.value
+
   # Create an instance of the traslator.
   @create: (html) ->
     traslator = new Traslator(html)
@@ -43,8 +48,8 @@ class Traslator
       # Sum the lengths to the existing lengths.
       textLength += textPre.length
 
-      #if /^&[^&;]*;$/gim.test htmlElem
-      # textLength += 1
+      if /^&[^&;]*;$/gim.test htmlElem
+       textLength += 1
 
       # For html add the length of the html element.
       htmlLength += htmlPre.length + htmlElem.length
@@ -56,8 +61,12 @@ class Traslator
       textLength += textPost.length
       htmlLength += htmlPost.length
 
+      htmlProcessed = ''
+      if /^&[^&;]*;$/gim.test htmlElem
+        htmlProcessed = decodeHtml htmlElem
+
       # Add the textual parts to the text.
-      @_text += textPre + textPost
+      @_text += textPre + htmlProcessed + textPost
 
 
     # In case the regex didn't find any tag, copy the html over the text.

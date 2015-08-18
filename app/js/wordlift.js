@@ -3,6 +3,8 @@
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   Traslator = (function() {
+    var decodeHtml;
+
     Traslator.prototype._htmlPositions = [];
 
     Traslator.prototype._textPositions = [];
@@ -10,6 +12,13 @@
     Traslator.prototype._html = '';
 
     Traslator.prototype._text = '';
+
+    decodeHtml = function(html) {
+      var txt;
+      txt = document.createElement("textarea");
+      txt.innerHTML = html;
+      return txt.value;
+    };
 
     Traslator.create = function(html) {
       var traslator;
@@ -23,7 +32,7 @@
     }
 
     Traslator.prototype.parse = function() {
-      var htmlElem, htmlLength, htmlPost, htmlPre, match, pattern, textLength, textPost, textPre;
+      var htmlElem, htmlLength, htmlPost, htmlPre, htmlProcessed, match, pattern, textLength, textPost, textPre;
       this._htmlPositions = [];
       this._textPositions = [];
       this._text = '';
@@ -37,12 +46,19 @@
         textPre = htmlPre + ('</p>' === htmlElem.toLowerCase() ? '\n\n' : '');
         textPost = htmlPost;
         textLength += textPre.length;
+        if (/^&[^&;]*;$/gim.test(htmlElem)) {
+          textLength += 1;
+        }
         htmlLength += htmlPre.length + htmlElem.length;
         this._htmlPositions.push(htmlLength);
         this._textPositions.push(textLength);
         textLength += textPost.length;
         htmlLength += htmlPost.length;
-        this._text += textPre + textPost;
+        htmlProcessed = '';
+        if (/^&[^&;]*;$/gim.test(htmlElem)) {
+          htmlProcessed = decodeHtml(htmlElem);
+        }
+        this._text += textPre + htmlProcessed + textPost;
       }
       if ('' === this._text && '' !== this._html) {
         this._text = new String(this._html);

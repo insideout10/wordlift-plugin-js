@@ -94,7 +94,7 @@ injector = angular.bootstrap $('#wordlift-edit-post-wrapper'), ['wordlift.editpo
 
           # Get the text content from the Html.
           text = Traslator.create(html).getText()
-          
+
           if text.match /[a-zA-Z0-9]+/
             AnalysisService.perform text
           else

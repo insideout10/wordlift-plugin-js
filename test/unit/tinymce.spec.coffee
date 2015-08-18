@@ -477,7 +477,7 @@ describe 'TinyMCE', ->
 
     # Check for consistency
     expect(analysis.entityAnnotations).not.toBe undefined
-    expect(Object.keys(analysis.entityAnnotations).length).toEqual 27
+    expect(Object.keys(analysis.entityAnnotations).length).toEqual 24
     for entityAnnotationId, entityAnnotation of analysis.entityAnnotations
       expect(entityAnnotation.entity).not.toBe undefined
       expect(entityAnnotation.relation).not.toBe undefined
