@@ -16,6 +16,8 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
       object[key] = val
     object
  
+#  setAnnotationsPriority = (annotations)->
+
   findAnnotation = (annotations, start, end) ->
     return annotation for id, annotation of annotations when annotation.start is start and annotation.end is end
 
@@ -25,6 +27,28 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
   service._supportedTypes = []
   service._defaultType = "thing"
   
+  service.cleanAnnotations = (analysis, positions = []) ->
+    # Take existing entities as mandatory 
+    for id, annotation of analysis.annotations
+      if annotation.start > 0 and annotation.end > annotation.start
+        annotationRange = [ annotation.start..annotation.end ]
+        # TODO Replace with an Array intersection check
+        isOverlapping = false
+        for pos in annotationRange
+          if pos in positions
+            isOverlapping = true
+          break
+        
+        if isOverlapping
+          $log.warn "Annotation with id: #{id} start: #{annotation.start} end: #{annotation.end} overlaps an existing annotation"
+          for ea, index in annotation.entityMatches
+            delete analysis.entities[ ea.entityId ].annotations[ id ]
+          delete analysis.annotations[ id ]
+        else 
+          positions = positions.concat annotationRange 
+
+    return analysis
+
   # Retrieve supported type from current classification boxes configuration
   for box in configuration.classificationBoxes
     for type in box.registeredTypes

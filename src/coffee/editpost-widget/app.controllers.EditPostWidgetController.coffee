@@ -15,8 +15,11 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     
     for id, entity of items
       if  entity.mainType in types
-        
+              
         annotations_count = Object.keys( entity.annotations ).length
+        if annotations_count is 0
+          continue
+          
         if annotations_count > treshold and entity.confidence is 1
           filtered.push entity
           continue
