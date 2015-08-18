@@ -20,3 +20,26 @@ describe "Traslator tests", ->
 #  it "test tinymce default value", ->
 #   t = Traslator.create '<p><br data-mce-bogus="1"></p>'
 #   expect(t.getText()).toBe('')
+
+  it "detect text pos from html one properly - case 4", ->
+   t = Traslator.create '''
+<div class="dnd-atom-wrapper type-image context-side_image atom-align-right" contenteditable="false"> <div class="dnd-drop-wrapper"></div> <div class="dnd-legend-wrapper"> <div class="caption"><span id="urn:enhancement-9de5d4e0-a428-4ece-a9b3-8792ad667ffb" class="textannotation">Planning</span> <span id="urn:enhancement-26f94354-a8ba-f73a-d3a8-fac1e5950fae" class="textannotation">for</span> <span id="urn:enhancement-16b8bd6e-4bee-f1e4-d19c-021e1fe55936" class="textannotation disambiguated wl-organization" itemid="http://data.redlink.io/91/be2/entity/NASA">NASA</span>'s.</div> <div class="link"></div> </div> </div>
+'''
+   expect(t.html2text(562)).toBe(16)
+
+  it "detect text pos from html one properly - case 5", ->
+   content = '''
+<div class="dnd-atom-wrapper type-image context-side_image atom-align-right" contenteditable="false">
+<div class="dnd-drop-wrapper"></div>
+<div class="dnd-legend-wrapper">
+<div class="caption"><span id="urn:enhancement-9de5d4e0-a428-4ece-a9b3-8792ad667ffb" class="textannotation">Planning</span> <span id="urn:enhancement-26f94354-a8ba-f73a-d3a8-fac1e5950fae" class="textannotation">for</span> <span id="urn:enhancement-16b8bd6e-4bee-f1e4-d19c-021e1fe55936" class="textannotation disambiguated wl-organization" itemid="http://data.redlink.io/91/be2/entity/NASA">NASA</span>'s.</div>
+<div class="link"></div>
+</div>
+</div>
+'''
+   t = Traslator.create content
+   expect(t.html2text(562)).toBe(16)
+
+
+
+

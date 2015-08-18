@@ -113,7 +113,8 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
       # If the current selection is collapsed / blank, then nothing to do
       if ed.selection.isCollapsed()
         $log.warn "Invalid selection! The text annotation cannot be created"
-        return 
+        return
+
       # Retrieve the selected text
       # Notice that toString() method of browser native selection obj is used
       text = "#{ed.selection.getSel()}"
@@ -127,7 +128,7 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
       # Update the content within the editor
       ed.selection.setContent(textAnnotationSpan)
       # Retrieve the current heml content
-      content = ed.getContent({format: "html"})
+      content = ed.getContent format: 'html'
       # Create a Traslator instance
       traslator =  Traslator.create content
       # Retrieve the index position of the new span
@@ -138,9 +139,6 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
       # Set start & end text annotation properties
       textAnnotation.start = textPosition 
       textAnnotation.end = textAnnotation.start + text.length
-          
-      $log.debug "New text annotation created!"
-      $log.debug textAnnotation
           
       # Send a message about the new textAnnotation.
       $rootScope.$broadcast 'textAnnotationAdded', textAnnotation
@@ -164,15 +162,17 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
       # A reference to the editor.
       ed = editor()
       # Get the TinyMCE editor html content.
-      html = ed.getContent format: 'raw'
+      html = ed.getContent format: 'html'
       # Find existing entities.
       entities = findEntities html
+      
+      $log.debug "Internal entities"
+      $log.debug html
+      $log.debug entities
 
       # Remove overlapping annotations preserving selected entities
       AnalysisService.cleanAnnotations analysis, findPositions(entities)
 
-      $log.debug "Analysis after clean up"
-      $log.debug analysis
       # Preselect entities found in html.
       AnalysisService.preselect analysis, entities
 

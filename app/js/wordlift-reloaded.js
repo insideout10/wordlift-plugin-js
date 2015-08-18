@@ -992,15 +992,13 @@
           textAnnotationSpan = "<span id=\"" + textAnnotation.id + "\" class=\"textannotation selected\">" + (ed.selection.getContent()) + "</span>";
           ed.selection.setContent(textAnnotationSpan);
           content = ed.getContent({
-            format: "html"
+            format: 'html'
           });
           traslator = Traslator.create(content);
           htmlPosition = content.indexOf(textAnnotationSpan);
           textPosition = traslator.html2text(htmlPosition);
           textAnnotation.start = textPosition;
           textAnnotation.end = textAnnotation.start + text.length;
-          $log.debug("New text annotation created!");
-          $log.debug(textAnnotation);
           return $rootScope.$broadcast('textAnnotationAdded', textAnnotation);
         },
         selectAnnotation: function(annotationId) {
@@ -1022,12 +1020,13 @@
             var annotation, annotationId, ed, element, em, entities, entity, html, isDirty, traslator, _i, _len, _ref, _ref1;
             ed = editor();
             html = ed.getContent({
-              format: 'raw'
+              format: 'html'
             });
             entities = findEntities(html);
+            $log.debug("Internal entities");
+            $log.debug(html);
+            $log.debug(entities);
             AnalysisService.cleanAnnotations(analysis, findPositions(entities));
-            $log.debug("Analysis after clean up");
-            $log.debug(analysis);
             AnalysisService.preselect(analysis, entities);
             while (html.match(/<(\w+)[^>]*\sclass="textannotation[^"]*"[^>]*>([^<]+)<\/\1>/gim, '$2')) {
               html = html.replace(/<(\w+)[^>]*\sclass="textannotation[^"]*"[^>]*>([^<]*)<\/\1>/gim, '$2');
