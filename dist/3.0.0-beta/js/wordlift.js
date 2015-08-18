@@ -27,8 +27,7 @@
       this._htmlPositions = [];
       this._textPositions = [];
       this._text = '';
-      this._html = this._html.replace(/&nbsp;/gim, ' ');
-      pattern = /([^<]*)(<[^>]*>)([^<]*)/gim;
+      pattern = /([^&#<>]*)(&[^&;]*;|<[^>]*>)([^&#<>]*)/gim;
       textLength = 0;
       htmlLength = 0;
       while (match = pattern.exec(this._html)) {

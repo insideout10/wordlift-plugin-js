@@ -128,7 +128,7 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
       # Update the content within the editor
       ed.selection.setContent(textAnnotationSpan)
       # Retrieve the current heml content
-      content = ed.getContent format: 'html'
+      content = ed.getContent format: 'raw'
       # Create a Traslator instance
       traslator =  Traslator.create content
       # Retrieve the index position of the new span
@@ -162,7 +162,8 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
       # A reference to the editor.
       ed = editor()
       # Get the TinyMCE editor html content.
-      html = ed.getContent format: 'html'
+      html = ed.getContent format: 'raw'
+
       # Find existing entities.
       entities = findEntities html
       

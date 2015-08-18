@@ -22,19 +22,9 @@ class Traslator
     @_textPositions = []
     @_text = ''
 
-    # The pattern matchs both html tags and html entities
-    # Old pattern -> /([^<]*)(<[^>]*>)([^<]*)/gim
-    # pattern = /([^&#<>]*)(&[^&;]*;|<[^>]*>)([^&#<>]*)/gim
-    # If the current element is an html entity add '1' as placeholder for the char
-    # if /^&[^&;]*;$/gim.test htmlElem
-    #  textLength += 1 
-
-    # TODO: the pattern should consider that HTML has also HTML entities.
-    # Remove non-breaking spaces.
-    @_html = @_html.replace /&nbsp;/gim, ' '
-
-    pattern = /([^<]*)(<[^>]*>)([^<]*)/gim
-
+    # OLD pattern = /([^<]*)(<[^>]*>)([^<]*)/gim
+    pattern = /([^&#<>]*)(&[^&;]*;|<[^>]*>)([^&#<>]*)/gim
+     
     textLength = 0
     htmlLength = 0
 
@@ -52,6 +42,10 @@ class Traslator
 
       # Sum the lengths to the existing lengths.
       textLength += textPre.length
+
+      #if /^&[^&;]*;$/gim.test htmlElem
+      # textLength += 1
+
       # For html add the length of the html element.
       htmlLength += htmlPre.length + htmlElem.length
 
@@ -673,6 +667,7 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
         
         if isOverlapping
           $log.warn "Annotation with id: #{id} start: #{annotation.start} end: #{annotation.end} overlaps an existing annotation"
+          $log.debug annotation
           for ea, index in annotation.entityMatches
             delete analysis.entities[ ea.entityId ].annotations[ id ]
           delete analysis.annotations[ id ]
@@ -995,7 +990,7 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
       # Update the content within the editor
       ed.selection.setContent(textAnnotationSpan)
       # Retrieve the current heml content
-      content = ed.getContent format: 'html'
+      content = ed.getContent format: 'raw'
       # Create a Traslator instance
       traslator =  Traslator.create content
       # Retrieve the index position of the new span
@@ -1029,7 +1024,8 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
       # A reference to the editor.
       ed = editor()
       # Get the TinyMCE editor html content.
-      html = ed.getContent format: 'html'
+      html = ed.getContent format: 'raw'
+
       # Find existing entities.
       entities = findEntities html
       

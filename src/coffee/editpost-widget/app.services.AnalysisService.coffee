@@ -41,6 +41,7 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
         
         if isOverlapping
           $log.warn "Annotation with id: #{id} start: #{annotation.start} end: #{annotation.end} overlaps an existing annotation"
+          $log.debug annotation
           for ea, index in annotation.entityMatches
             delete analysis.entities[ ea.entityId ].annotations[ id ]
           delete analysis.annotations[ id ]

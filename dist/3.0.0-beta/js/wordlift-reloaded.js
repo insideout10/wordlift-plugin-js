@@ -27,8 +27,7 @@
       this._htmlPositions = [];
       this._textPositions = [];
       this._text = '';
-      this._html = this._html.replace(/&nbsp;/gim, ' ');
-      pattern = /([^<]*)(<[^>]*>)([^<]*)/gim;
+      pattern = /([^&#<>]*)(&[^&;]*;|<[^>]*>)([^&#<>]*)/gim;
       textLength = 0;
       htmlLength = 0;
       while (match = pattern.exec(this._html)) {
@@ -635,6 +634,7 @@
             }
             if (isOverlapping) {
               $log.warn("Annotation with id: " + id + " start: " + annotation.start + " end: " + annotation.end + " overlaps an existing annotation");
+              $log.debug(annotation);
               _ref3 = annotation.entityMatches;
               for (index = _k = 0, _len1 = _ref3.length; _k < _len1; index = ++_k) {
                 ea = _ref3[index];
@@ -992,7 +992,7 @@
           textAnnotationSpan = "<span id=\"" + textAnnotation.id + "\" class=\"textannotation selected\">" + (ed.selection.getContent()) + "</span>";
           ed.selection.setContent(textAnnotationSpan);
           content = ed.getContent({
-            format: 'html'
+            format: 'raw'
           });
           traslator = Traslator.create(content);
           htmlPosition = content.indexOf(textAnnotationSpan);
@@ -1020,7 +1020,7 @@
             var annotation, annotationId, ed, element, em, entities, entity, html, isDirty, traslator, _i, _len, _ref, _ref1;
             ed = editor();
             html = ed.getContent({
-              format: 'html'
+              format: 'raw'
             });
             entities = findEntities(html);
             $log.debug("Internal entities");
