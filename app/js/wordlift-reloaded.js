@@ -654,6 +654,8 @@
       };
       service.parse = function(data) {
         var annotation, annotationId, ea, em, entity, id, index, localEntity, local_confidence, _k, _l, _len2, _len3, _ref10, _ref11, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
+        $log.debug("Incoming entities");
+        $log.debug(data.entities);
         _ref2 = configuration.entities;
         for (id in _ref2) {
           localEntity = _ref2[id];
@@ -765,6 +767,7 @@
       };
       service.preselect = function(analysis, annotations) {
         var annotation, e, entity, id, textAnnotation, _k, _len2, _ref2, _ref3, _results;
+        $log.debug("Going to perform annotations preselection");
         _results = [];
         for (_k = 0, _len2 = annotations.length; _k < _len2; _k++) {
           annotation = annotations[_k];
@@ -814,7 +817,7 @@
 
   angular.module('wordlift.editpost.widget.services.EditorService', ['wordlift.editpost.widget.services.AnalysisService']).service('EditorService', [
     'AnalysisService', '$log', '$http', '$rootScope', function(AnalysisService, $log, $http, $rootScope) {
-      var currentOccurencesForEntity, dedisambiguate, disambiguate, editor, findEntities, service;
+      var cleanAnnotations, currentOccurencesForEntity, dedisambiguate, disambiguate, editor, findEntities, findPositions, service;
       findEntities = function(html) {
         var annotation, match, pattern, traslator, _results;
         traslator = Traslator.create(html);
@@ -830,6 +833,56 @@
           _results.push(annotation);
         }
         return _results;
+      };
+      findPositions = function(entities) {
+        var entityAnnotation, positions, _i, _j, _len, _ref, _ref1, _results;
+        positions = [];
+        for (_i = 0, _len = entities.length; _i < _len; _i++) {
+          entityAnnotation = entities[_i];
+          positions = positions.concat((function() {
+            _results = [];
+            for (var _j = _ref = entityAnnotation.start, _ref1 = entityAnnotation.end; _ref <= _ref1 ? _j <= _ref1 : _j >= _ref1; _ref <= _ref1 ? _j++ : _j--){ _results.push(_j); }
+            return _results;
+          }).apply(this));
+        }
+        return positions;
+      };
+      cleanAnnotations = function(analysis, positions) {
+        var annotation, annotationRange, ea, id, index, isOverlapping, pos, _i, _j, _k, _len, _len1, _ref, _ref1, _ref2, _ref3, _results;
+        if (positions == null) {
+          positions = [];
+        }
+        _ref = analysis.annotations;
+        for (id in _ref) {
+          annotation = _ref[id];
+          if (annotation.start > 0 && annotation.end > annotation.start) {
+            annotationRange = (function() {
+              _results = [];
+              for (var _i = _ref1 = annotation.start, _ref2 = annotation.end; _ref1 <= _ref2 ? _i <= _ref2 : _i >= _ref2; _ref1 <= _ref2 ? _i++ : _i--){ _results.push(_i); }
+              return _results;
+            }).apply(this);
+            isOverlapping = false;
+            for (_j = 0, _len = annotationRange.length; _j < _len; _j++) {
+              pos = annotationRange[_j];
+              if (__indexOf.call(positions, pos) >= 0) {
+                isOverlapping = true;
+              }
+              break;
+            }
+            if (isOverlapping) {
+              $log.warn("Annotation with id: " + id + " start: " + annotation.start + " end: " + annotation.end + " overlaps an existing annotation");
+              _ref3 = annotation.entityMatches;
+              for (index = _k = 0, _len1 = _ref3.length; _k < _len1; index = ++_k) {
+                ea = _ref3[index];
+                delete analysis.entities[ea.entityId].annotations[id];
+              }
+              delete analysis.annotations[id];
+            } else {
+              positions = positions.concat(annotationRange);
+            }
+          }
+        }
+        return analysis;
       };
       editor = function() {
         return tinyMCE.get('content');
@@ -969,6 +1022,7 @@
               format: 'raw'
             });
             entities = findEntities(html);
+            cleanAnnotations(analysis, findPositions(entities));
             AnalysisService.preselect(analysis, entities);
             while (html.match(/<(\w+)[^>]*\sclass="textannotation[^"]*"[^>]*>([^<]+)<\/\1>/gim, '$2')) {
               html = html.replace(/<(\w+)[^>]*\sclass="textannotation[^"]*"[^>]*>([^<]*)<\/\1>/gim, '$2');

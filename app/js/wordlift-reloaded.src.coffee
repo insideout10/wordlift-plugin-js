@@ -686,7 +686,7 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
       entityMatches: []
     
     merge defaults, params
-  
+
   service.parse = (data) ->
     
     # Add local entities
@@ -694,6 +694,10 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
     # Add id to annotation obj
     # Add occurences as a blank array
     # Add annotation references to each entity
+
+    $log.debug "Incoming entities"
+    $log.debug data.entities
+    
     for id, localEntity of configuration.entities
       data.entities[ id ] = localEntity
 
@@ -792,6 +796,7 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
   # Preselect entity annotations in the provided analysis using the provided collection of annotations.
   service.preselect = (analysis, annotations) ->
 
+    $log.debug "Going to perform annotations preselection"
     # Find the existing entities in the html
     for annotation in annotations
 
@@ -859,6 +864,35 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
       
       annotation
     )
+
+  findPositions = ( entities ) ->
+    positions = []
+    for entityAnnotation in entities 
+      positions = positions.concat [ entityAnnotation.start..entityAnnotation.end ]
+    positions
+
+  cleanAnnotations = (analysis, positions = []) ->
+    # Take existing entities as mandatory 
+    for id, annotation of analysis.annotations
+      if annotation.start > 0 and annotation.end > annotation.start
+        annotationRange = [ annotation.start..annotation.end ]
+        # TODO Replace with an Array intersection check
+        isOverlapping = false
+        for pos in annotationRange
+          if pos in positions
+            isOverlapping = true
+          break
+        
+        if isOverlapping
+          $log.warn "Annotation with id: #{id} start: #{annotation.start} end: #{annotation.end} overlaps an existing annotation"
+          for ea, index in annotation.entityMatches
+            delete analysis.entities[ ea.entityId ].annotations[ id ]
+            # TODO Update the entity confidence
+          delete analysis.annotations[ id ]
+        else 
+          positions = positions.concat annotationRange 
+
+    return analysis   
 
   editor = ->
     tinyMCE.get('content')
@@ -996,6 +1030,9 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
       html = ed.getContent format: 'raw'
       # Find existing entities.
       entities = findEntities html
+
+      # Remove overlapping annotations preserving selected entities
+      cleanAnnotations analysis, findPositions(entities)
 
       # Preselect entities found in html.
       AnalysisService.preselect analysis, entities

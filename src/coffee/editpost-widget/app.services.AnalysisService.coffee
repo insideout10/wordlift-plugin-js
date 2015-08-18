@@ -57,7 +57,7 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
       entityMatches: []
     
     merge defaults, params
-  
+
   service.parse = (data) ->
     
     # Add local entities
@@ -65,6 +65,10 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
     # Add id to annotation obj
     # Add occurences as a blank array
     # Add annotation references to each entity
+
+    $log.debug "Incoming entities"
+    $log.debug data.entities
+    
     for id, localEntity of configuration.entities
       data.entities[ id ] = localEntity
 
@@ -163,6 +167,7 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
   # Preselect entity annotations in the provided analysis using the provided collection of annotations.
   service.preselect = (analysis, annotations) ->
 
+    $log.debug "Going to perform annotations preselection"
     # Find the existing entities in the html
     for annotation in annotations
 
