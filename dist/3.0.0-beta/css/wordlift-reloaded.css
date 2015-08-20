@@ -1893,17 +1893,11 @@
 }
 #wordlift-edit-post-wrapper #wl-add-entity-button-wrapper .button {
   color: #ccc;
-  border-color: #ccc;
   cursor: not-allowed;
 }
-#wordlift-edit-post-wrapper #wl-add-entity-button-wrapper .button:hover {
-  border-color: #ccc;
-}
 #wordlift-edit-post-wrapper #wl-add-entity-button-wrapper .button.selected {
-  color: #fff;
-  background-color: #2ea2cc;
-  border-color: #0074a2;
   cursor: pointer;
+  color: #fff;
 }
 #wordlift-edit-post-wrapper .wl-annotation-label {
   border-bottom: #ccc 1px solid;

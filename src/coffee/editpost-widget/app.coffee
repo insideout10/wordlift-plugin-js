@@ -29,7 +29,7 @@ $(
       <h3 class="wl-widget-headline"><span>Semantic tagging</span></h3>
       
       <div ng-click="createTextAnnotationFromCurrentSelection()" id="wl-add-entity-button-wrapper">
-        <span class="preview button" ng-class="{ 'selected' : isThereASelection }">Add entity</span>
+        <span class="button" ng-class="{ 'button-primary selected' : isThereASelection, 'preview' : !isThereASelection }">Add entity</span>
         <div class="clear" />     
       </div>
       
