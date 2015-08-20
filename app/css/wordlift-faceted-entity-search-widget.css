@@ -1489,6 +1489,9 @@
 .wl-selected-item.wl-organization {
   border-left: #8fd22a 5px solid;
 }
+.wl-selected-item.wl-local-business {
+  border-left: #8fd22a 5px solid;
+}
 .wl-selected-item .wl-deselect {
   font-family: FontAwesome;
   font-style: normal;
@@ -1604,6 +1607,23 @@
   color: #8fd22a;
 }
 #wordlift-faceted-entity-search-widget .wl-facets .wl-facets-container h6.wl-fs-organization.selected {
+  background-color: #8fd22a;
+  color: #000000;
+}
+#wordlift-faceted-entity-search-widget .wl-facets .wl-facets-container h6.wl-fs-local-business .type {
+  text-align: center;
+  font-family: FontAwesome;
+  font-style: normal;
+  font-weight: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  padding: 0em 0.3em;
+}
+#wordlift-faceted-entity-search-widget .wl-facets .wl-facets-container h6.wl-fs-local-business .type:before {
+  content: "\f0f7";
+  color: #8fd22a;
+}
+#wordlift-faceted-entity-search-widget .wl-facets .wl-facets-container h6.wl-fs-local-business.selected {
   background-color: #8fd22a;
   color: #000000;
 }

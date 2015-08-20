@@ -1489,6 +1489,9 @@
 .wl-selected-item.wl-organization {
   border-left: #8fd22a 5px solid;
 }
+.wl-selected-item.wl-local-business {
+  border-left: #8fd22a 5px solid;
+}
 .wl-selected-item .wl-deselect {
   font-family: FontAwesome;
   font-style: normal;
@@ -1705,6 +1708,45 @@
   color: #000000;
 }
 .entity.wl-organization .thumbnail {
+  background-color: #8fd22a;
+  color: #000000;
+}
+.entity.wl-local-business {
+  border-color: #8fd22a;
+  color: #444;
+}
+.entity.wl-local-business .type {
+  text-align: center;
+  font-family: FontAwesome;
+  font-style: normal;
+  font-weight: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  padding: 0em 0.3em;
+}
+.entity.wl-local-business .type:before {
+  content: "\f0f7";
+  color: #8fd22a;
+}
+.entity.wl-local-business.selected {
+  background-color: #8fd22a;
+  color: #000000;
+}
+.entity.wl-local-business .type {
+  text-align: center;
+}
+.entity.wl-local-business .type:before {
+  content: "\f0f7";
+  color: #8fd22a;
+}
+.entity.wl-local-business .more:before {
+  content: "\f0f7";
+}
+.entity.wl-local-business.selected {
+  background-color: #8fd22a;
+  color: #000000;
+}
+.entity.wl-local-business .thumbnail {
   background-color: #8fd22a;
   color: #000000;
 }
@@ -2296,6 +2338,12 @@ body#tinymce .textannotation.selected.wl-organization {
   background-color: #8fd22a;
   vertical-align: center;
 }
+body#tinymce .textannotation.selected.wl-local-business {
+  border: 0 !important;
+  color: #000000;
+  background-color: #8fd22a;
+  vertical-align: center;
+}
 body#tinymce .textannotation.selected.wl-person {
   border: 0 !important;
   color: #ffffff;
@@ -2321,6 +2369,9 @@ body#tinymce .textannotation.wl-event {
   border-color: #642994 !important;
 }
 body#tinymce .textannotation.wl-organization {
+  border-color: #8fd22a !important;
+}
+body#tinymce .textannotation.wl-local-business {
   border-color: #8fd22a !important;
 }
 body#tinymce .textannotation.wl-person {

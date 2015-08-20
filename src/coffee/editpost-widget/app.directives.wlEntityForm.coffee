@@ -43,20 +43,13 @@ angular.module('wordlift.editpost.widget.directives.wlEntityForm', [])
     link: ($scope, $element, $attrs, $ctrl) ->  
 
       $scope.configuration = configuration
-      
+
       $scope.setSameAs = (uri)->
         $scope.entity.sameAs = uri
       
       $scope.checkEntityId = (uri)->
         /^(f|ht)tps?:\/\//i.test(uri)
 
-      # TMP
-      $scope.supportedTypes = [
-        { id: 'person', name: 'http://schema.org/Person' },
-        { id: 'place', name: 'http://schema.org/Place' },
-        { id: 'organization', name: 'http://schema.org/Organization' },
-        { id: 'event', name: 'http://schema.org/Event' },
-        { id: 'creative-work', name: 'http://schema.org/CreativeWork' },
-        { id: 'thing', name: 'http://schema.org/Thing' }
-      ]
+      $scope.supportedTypes = ({ id: type.css.replace('wl-',''), name: type.uri } for type in configuration.types)
+
 ])

@@ -510,6 +510,7 @@
         },
         template: "<div name=\"wordlift\" class=\"wl-entity-form\">\n<div ng-show=\"entity.images.length > 0\">\n    <img ng-src=\"{{entity.images[0]}}\" wl-src=\"{{configuration.defaultThumbnailPath}}\" />\n</div>\n<div>\n    <label>Entity label</label>\n    <input type=\"text\" ng-model=\"entity.label\" />\n</div>\n<div>\n    <label>Entity type</label>\n    <select ng-model=\"entity.mainType\" ng-options=\"type.id as type.name for type in supportedTypes\" ></select>\n</div>\n<div>\n    <label>Entity Description</label>\n    <textarea ng-model=\"entity.description\" rows=\"6\"></textarea>\n</div>\n<div ng-show=\"checkEntityId(entity.id)\">\n    <label>Entity Id</label>\n    <input type=\"text\" ng-model=\"entity.id\" disabled=\"true\" />\n</div>\n<div class=\"wl-suggested-sameas-wrapper\">\n    <label>Entity Same as (*)</label>\n    <input type=\"text\" ng-model=\"entity.sameAs\" />\n    <h5 ng-show=\"entity.suggestedSameAs.length > 0\">same as suggestions</h5>\n    <div ng-click=\"setSameAs(sameAs)\" ng-class=\"{ 'active': entity.sameAs == sameAs }\" class=\"wl-sameas\" ng-repeat=\"sameAs in entity.suggestedSameAs\">\n      {{sameAs}}\n    </div>\n</div>\n\n<div class=\"wl-submit-wrapper\">\n  <span class=\"button button-primary\" ng-click=\"onSubmit()\">Save</span>\n</div>\n\n</div>",
         link: function($scope, $element, $attrs, $ctrl) {
+          var type;
           $scope.configuration = configuration;
           $scope.setSameAs = function(uri) {
             return $scope.entity.sameAs = uri;
@@ -517,27 +518,19 @@
           $scope.checkEntityId = function(uri) {
             return /^(f|ht)tps?:\/\//i.test(uri);
           };
-          return $scope.supportedTypes = [
-            {
-              id: 'person',
-              name: 'http://schema.org/Person'
-            }, {
-              id: 'place',
-              name: 'http://schema.org/Place'
-            }, {
-              id: 'organization',
-              name: 'http://schema.org/Organization'
-            }, {
-              id: 'event',
-              name: 'http://schema.org/Event'
-            }, {
-              id: 'creative-work',
-              name: 'http://schema.org/CreativeWork'
-            }, {
-              id: 'thing',
-              name: 'http://schema.org/Thing'
+          return $scope.supportedTypes = (function() {
+            var _i, _len, _ref, _results;
+            _ref = configuration.types;
+            _results = [];
+            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+              type = _ref[_i];
+              _results.push({
+                id: type.css.replace('wl-', ''),
+                name: type.uri
+              });
             }
-          ];
+            return _results;
+          })();
         }
       };
     }
