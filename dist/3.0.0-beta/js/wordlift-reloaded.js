@@ -1003,10 +1003,18 @@
       });
       service = {
         hasSelection: function() {
-          var ed;
+          var ed, pattern;
           ed = editor();
           if (ed != null) {
-            return !ed.selection.isCollapsed();
+            if (ed.selection.isCollapsed()) {
+              return false;
+            }
+            pattern = /<([\/]*[a-z]+)([^<]+)*>/gim;
+            if (pattern.test(ed.selection.getContent())) {
+              $log.warn("The selection overlaps html code");
+              return false;
+            }
+            return true;
           }
           return false;
         },

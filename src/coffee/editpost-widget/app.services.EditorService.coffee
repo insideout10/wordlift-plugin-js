@@ -110,7 +110,14 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
       # A reference to the editor.
       ed = editor()
       if ed?
-        return !ed.selection.isCollapsed()
+        if ed.selection.isCollapsed()
+          return false
+        pattern = /<([\/]*[a-z]+)([^<]+)*>/gim
+        if pattern.test ed.selection.getContent()
+          $log.warn "The selection overlaps html code"
+          return false
+        return true 
+
       false
 
     # Create a textAnnotation starting from the current selection
