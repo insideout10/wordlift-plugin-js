@@ -29,7 +29,7 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
   
   service.cleanAnnotations = (analysis, positions = []) ->
     # Take existing entities as mandatory 
-    for id, annotation of analysis.annotations
+    for annotationId, annotation of analysis.annotations
       if annotation.start > 0 and annotation.end > annotation.start
         annotationRange = [ annotation.start..annotation.end ]
         # TODO Replace with an Array intersection check
@@ -40,11 +40,9 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
           break
         
         if isOverlapping
-          $log.warn "Annotation with id: #{id} start: #{annotation.start} end: #{annotation.end} overlaps an existing annotation"
+          $log.warn "Annotation with id: #{annotationId} start: #{annotation.start} end: #{annotation.end} overlaps an existing annotation"
           $log.debug annotation
-          for ea, index in annotation.entityMatches
-            delete analysis.entities[ ea.entityId ].annotations[ id ]
-          delete analysis.annotations[ id ]
+          @.deleteAnnotation analysis, annotationId
         else 
           positions = positions.concat annotationRange 
 
@@ -70,6 +68,18 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
       annotations: {}
     
     merge defaults, params
+    
+  # Delete an annotation from a given analyis and an annotationId
+  service.deleteAnnotation = (analysis, annotationId)->
+
+    $log.warn "Going to remove overlapping annotation with id #{annotationId}"
+    
+    if analysis.annotations[ annotationId ]?
+      for ea, index in analysis.annotations[ annotationId ].entityMatches
+        delete analysis.entities[ ea.entityId ].annotations[ annotationId ]
+      delete analysis.annotations[ annotationId ]
+
+    analysis
 
   service.createAnnotation = (params = {}) ->
     # Set the defalut values.

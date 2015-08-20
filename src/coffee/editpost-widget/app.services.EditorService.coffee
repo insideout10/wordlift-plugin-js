@@ -5,7 +5,6 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
 # Manage redlink analysis responses
 .service('EditorService', [ 'AnalysisService', '$log', '$http', '$rootScope', (AnalysisService, $log, $http, $rootScope)-> 
   
-  
   # Find existing entities selected in the html content (by looking for *itemid* attributes).
   findEntities = (html) ->
     # Prepare a traslator instance that will traslate Html and Text positions.
@@ -106,6 +105,14 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
     $rootScope.$broadcast "updateOccurencesForEntity", entity.id, occurrences
         
   service =
+    # Detect if there is a current selection
+    hasSelection: ()->
+      # A reference to the editor.
+      ed = editor()
+      if ed?
+        return !ed.selection.isCollapsed()
+      false
+
     # Create a textAnnotation starting from the current selection
     createTextAnnotationFromCurrentSelection: ()->
       # A reference to the editor.
@@ -126,7 +133,8 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
       # Prepare span wrapper for the new text annotation
       textAnnotationSpan = "<span id=\"#{textAnnotation.id}\" class=\"textannotation selected\">#{ed.selection.getContent()}</span>"
       # Update the content within the editor
-      ed.selection.setContent(textAnnotationSpan)
+      ed.selection.setContent textAnnotationSpan 
+      
       # Retrieve the current heml content
       content = ed.getContent format: 'raw'
       # Create a Traslator instance
@@ -134,12 +142,12 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
       # Retrieve the index position of the new span
       htmlPosition = content.indexOf(textAnnotationSpan);
       # Detect the coresponding text position
-      textPosition = traslator.html2text(htmlPosition)
+      textPosition = traslator.html2text htmlPosition 
           
       # Set start & end text annotation properties
       textAnnotation.start = textPosition 
       textAnnotation.end = textAnnotation.start + text.length
-          
+      
       # Send a message about the new textAnnotation.
       $rootScope.$broadcast 'textAnnotationAdded', textAnnotation
 
@@ -166,23 +174,14 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
 
       # Find existing entities.
       entities = findEntities html
-      
-      $log.debug "Internal entities"
-      $log.debug html
-      $log.debug entities
-
       # Remove overlapping annotations preserving selected entities
       AnalysisService.cleanAnnotations analysis, findPositions(entities)
-
       # Preselect entities found in html.
       AnalysisService.preselect analysis, entities
 
       # Remove existing text annotations (the while-match is necessary to remove nested spans).
       while html.match(/<(\w+)[^>]*\sclass="textannotation[^"]*"[^>]*>([^<]+)<\/\1>/gim, '$2')
         html = html.replace(/<(\w+)[^>]*\sclass="textannotation[^"]*"[^>]*>([^<]*)<\/\1>/gim, '$2')
-
-      # Remove blank disambiguated annotations.
-      #html = html.replace(/<(\w+)[^>]*\sitemid="([^"]+)"[^>]*><\/\1>/gim, '')
 
       # Prepare a traslator instance that will traslate Html and Text positions.
       traslator = Traslator.create html
@@ -200,10 +199,7 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
             element += " disambiguated wl-#{entity.mainType}\" itemid=\"#{entity.id}"
         
         element += "\">"
-        #$log.debug element
-        #$log.debug annotation.entityMatches
-        
-            
+              
         # Finally insert the HTML code.
         traslator.insertHtml element, text: annotation.start
         traslator.insertHtml '</span>', text: annotation.end

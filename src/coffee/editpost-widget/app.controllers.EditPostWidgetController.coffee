@@ -19,7 +19,7 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
         annotations_count = Object.keys( entity.annotations ).length
         if annotations_count is 0
           continue
-          
+
         if annotations_count > treshold and entity.confidence is 1
           filtered.push entity
           continue
@@ -67,8 +67,12 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
   $scope.annotation = undefined
   $scope.boxes = []
   $scope.images = {}
-  $scope.isSelectionCollapsed = true
+  $scope.isThereASelection = false
   $scope.configuration = configuration
+  
+  # Watch editor selection status
+  $rootScope.$watch 'selectionStatus', ()->
+    $scope.isThereASelection = $rootScope.selectionStatus
 
   for box in $scope.configuration.classificationBoxes
     $scope.selectedEntities[ box.id ] = {}
@@ -103,9 +107,6 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     # Create new entity object
     $scope.newEntity = AnalysisService.createEntity()
 
-  $scope.$on "isSelectionCollapsed", (event, status) ->
-    $scope.isSelectionCollapsed = status
-
   $scope.$on "updateOccurencesForEntity", (event, entityId, occurrences) ->
     
     $log.debug "Occurrences #{occurrences.length} for #{entityId}"
@@ -114,13 +115,14 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     if occurrences.length is 0
       for box, entities of $scope.selectedEntities
         delete $scope.selectedEntities[ box ][ entityId ]
-        #$scope.updateRelatedPosts()
+        
 
   $scope.$on "textAnnotationClicked", (event, annotationId) ->
     $scope.annotation = annotationId
 
   $scope.$on "textAnnotationAdded", (event, annotation) ->
     $log.debug "added a new annotation with Id #{annotation.id}"
+    
     # Add the new annotation to the current analysis
     $scope.analysis.annotations[ annotation.id ] = annotation
     # Set the annotation scope

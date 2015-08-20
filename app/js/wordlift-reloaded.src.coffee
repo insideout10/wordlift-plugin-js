@@ -267,7 +267,7 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
         annotations_count = Object.keys( entity.annotations ).length
         if annotations_count is 0
           continue
-          
+
         if annotations_count > treshold and entity.confidence is 1
           filtered.push entity
           continue
@@ -315,8 +315,12 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
   $scope.annotation = undefined
   $scope.boxes = []
   $scope.images = {}
-  $scope.isSelectionCollapsed = true
+  $scope.isThereASelection = false
   $scope.configuration = configuration
+  
+  # Watch editor selection status
+  $rootScope.$watch 'selectionStatus', ()->
+    $scope.isThereASelection = $rootScope.selectionStatus
 
   for box in $scope.configuration.classificationBoxes
     $scope.selectedEntities[ box.id ] = {}
@@ -351,9 +355,6 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     # Create new entity object
     $scope.newEntity = AnalysisService.createEntity()
 
-  $scope.$on "isSelectionCollapsed", (event, status) ->
-    $scope.isSelectionCollapsed = status
-
   $scope.$on "updateOccurencesForEntity", (event, entityId, occurrences) ->
     
     $log.debug "Occurrences #{occurrences.length} for #{entityId}"
@@ -362,13 +363,14 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     if occurrences.length is 0
       for box, entities of $scope.selectedEntities
         delete $scope.selectedEntities[ box ][ entityId ]
-        #$scope.updateRelatedPosts()
+        
 
   $scope.$on "textAnnotationClicked", (event, annotationId) ->
     $scope.annotation = annotationId
 
   $scope.$on "textAnnotationAdded", (event, annotation) ->
     $log.debug "added a new annotation with Id #{annotation.id}"
+    
     # Add the new annotation to the current analysis
     $scope.analysis.annotations[ annotation.id ] = annotation
     # Set the annotation scope
@@ -664,7 +666,7 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
   
   service.cleanAnnotations = (analysis, positions = []) ->
     # Take existing entities as mandatory 
-    for id, annotation of analysis.annotations
+    for annotationId, annotation of analysis.annotations
       if annotation.start > 0 and annotation.end > annotation.start
         annotationRange = [ annotation.start..annotation.end ]
         # TODO Replace with an Array intersection check
@@ -675,11 +677,9 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
           break
         
         if isOverlapping
-          $log.warn "Annotation with id: #{id} start: #{annotation.start} end: #{annotation.end} overlaps an existing annotation"
+          $log.warn "Annotation with id: #{annotationId} start: #{annotation.start} end: #{annotation.end} overlaps an existing annotation"
           $log.debug annotation
-          for ea, index in annotation.entityMatches
-            delete analysis.entities[ ea.entityId ].annotations[ id ]
-          delete analysis.annotations[ id ]
+          @.deleteAnnotation analysis, annotationId
         else 
           positions = positions.concat annotationRange 
 
@@ -705,6 +705,18 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
       annotations: {}
     
     merge defaults, params
+    
+  # Delete an annotation from a given analyis and an annotationId
+  service.deleteAnnotation = (analysis, annotationId)->
+
+    $log.warn "Going to remove overlapping annotation with id #{annotationId}"
+    
+    if analysis.annotations[ annotationId ]?
+      for ea, index in analysis.annotations[ annotationId ].entityMatches
+        delete analysis.entities[ ea.entityId ].annotations[ annotationId ]
+      delete analysis.annotations[ annotationId ]
+
+    analysis
 
   service.createAnnotation = (params = {}) ->
     # Set the defalut values.
@@ -876,7 +888,6 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
 # Manage redlink analysis responses
 .service('EditorService', [ 'AnalysisService', '$log', '$http', '$rootScope', (AnalysisService, $log, $http, $rootScope)-> 
   
-  
   # Find existing entities selected in the html content (by looking for *itemid* attributes).
   findEntities = (html) ->
     # Prepare a traslator instance that will traslate Html and Text positions.
@@ -977,6 +988,14 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
     $rootScope.$broadcast "updateOccurencesForEntity", entity.id, occurrences
         
   service =
+    # Detect if there is a current selection
+    hasSelection: ()->
+      # A reference to the editor.
+      ed = editor()
+      if ed?
+        return !ed.selection.isCollapsed()
+      false
+
     # Create a textAnnotation starting from the current selection
     createTextAnnotationFromCurrentSelection: ()->
       # A reference to the editor.
@@ -997,7 +1016,8 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
       # Prepare span wrapper for the new text annotation
       textAnnotationSpan = "<span id=\"#{textAnnotation.id}\" class=\"textannotation selected\">#{ed.selection.getContent()}</span>"
       # Update the content within the editor
-      ed.selection.setContent(textAnnotationSpan)
+      ed.selection.setContent textAnnotationSpan 
+      
       # Retrieve the current heml content
       content = ed.getContent format: 'raw'
       # Create a Traslator instance
@@ -1005,12 +1025,12 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
       # Retrieve the index position of the new span
       htmlPosition = content.indexOf(textAnnotationSpan);
       # Detect the coresponding text position
-      textPosition = traslator.html2text(htmlPosition)
+      textPosition = traslator.html2text htmlPosition 
           
       # Set start & end text annotation properties
       textAnnotation.start = textPosition 
       textAnnotation.end = textAnnotation.start + text.length
-          
+      
       # Send a message about the new textAnnotation.
       $rootScope.$broadcast 'textAnnotationAdded', textAnnotation
 
@@ -1037,23 +1057,14 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
 
       # Find existing entities.
       entities = findEntities html
-      
-      $log.debug "Internal entities"
-      $log.debug html
-      $log.debug entities
-
       # Remove overlapping annotations preserving selected entities
       AnalysisService.cleanAnnotations analysis, findPositions(entities)
-
       # Preselect entities found in html.
       AnalysisService.preselect analysis, entities
 
       # Remove existing text annotations (the while-match is necessary to remove nested spans).
       while html.match(/<(\w+)[^>]*\sclass="textannotation[^"]*"[^>]*>([^<]+)<\/\1>/gim, '$2')
         html = html.replace(/<(\w+)[^>]*\sclass="textannotation[^"]*"[^>]*>([^<]*)<\/\1>/gim, '$2')
-
-      # Remove blank disambiguated annotations.
-      #html = html.replace(/<(\w+)[^>]*\sitemid="([^"]+)"[^>]*><\/\1>/gim, '')
 
       # Prepare a traslator instance that will traslate Html and Text positions.
       traslator = Traslator.create html
@@ -1071,10 +1082,7 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
             element += " disambiguated wl-#{entity.mainType}\" itemid=\"#{entity.id}"
         
         element += "\">"
-        #$log.debug element
-        #$log.debug annotation.entityMatches
-        
-            
+              
         # Finally insert the HTML code.
         traslator.insertHtml element, text: annotation.start
         traslator.insertHtml '</span>', text: annotation.end
@@ -1158,7 +1166,7 @@ $(
       <h3 class="wl-widget-headline"><span>Semantic tagging</span></h3>
       
       <div ng-click="createTextAnnotationFromCurrentSelection()" id="wl-add-entity-button-wrapper">
-        <span class="preview button" ng-class="{ 'selected' : !isSelectionCollapsed }">Add entity</span>
+        <span class="preview button" ng-class="{ 'selected' : isThereASelection }">Add entity</span>
         <div class="clear" />     
       </div>
       
@@ -1220,28 +1228,26 @@ injector = angular.bootstrap $('#wordlift-edit-post-wrapper'), ['wordlift.editpo
         $rootScope.$apply(->    
           # Get the html content of the editor.
           html = editor.getContent format: 'raw'
-
           # Get the text content from the Html.
           text = Traslator.create(html).getText()
 
           if text.match /[a-zA-Z0-9]+/
             AnalysisService.perform text
           else
-            $log.info "Blank content: nothing to do!"
-
+            $log.warn "Blank content: nothing to do!"
         )
       ])
     )
 
     # Fires when the user changes node location using the mouse or keyboard in the TinyMCE editor.
     editor.onNodeChange.add (editor, e) ->        
-      injector.invoke(['$rootScope', ($rootScope) ->
-        # execute the following commands in the angular js context.      
-        $rootScope.$apply(->
-          $rootScope.$broadcast 'isSelectionCollapsed', editor.selection.isCollapsed()
+      injector.invoke(['EditorService','$rootScope', (EditorService, $rootScope) ->
+        # execute the following commands in the angular js context.
+        $rootScope.$apply(->          
+          $rootScope.selectionStatus = EditorService.hasSelection() 
         )
       ])
-              
+             
     # this event is raised when a textannotation is selected in the TinyMCE editor.
     editor.onClick.add (editor, e) ->
       injector.invoke(['EditorService','$rootScope', (EditorService, $rootScope) ->

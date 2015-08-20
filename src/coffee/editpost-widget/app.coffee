@@ -29,7 +29,7 @@ $(
       <h3 class="wl-widget-headline"><span>Semantic tagging</span></h3>
       
       <div ng-click="createTextAnnotationFromCurrentSelection()" id="wl-add-entity-button-wrapper">
-        <span class="preview button" ng-class="{ 'selected' : !isSelectionCollapsed }">Add entity</span>
+        <span class="preview button" ng-class="{ 'selected' : isThereASelection }">Add entity</span>
         <div class="clear" />     
       </div>
       
@@ -91,28 +91,26 @@ injector = angular.bootstrap $('#wordlift-edit-post-wrapper'), ['wordlift.editpo
         $rootScope.$apply(->    
           # Get the html content of the editor.
           html = editor.getContent format: 'raw'
-
           # Get the text content from the Html.
           text = Traslator.create(html).getText()
 
           if text.match /[a-zA-Z0-9]+/
             AnalysisService.perform text
           else
-            $log.info "Blank content: nothing to do!"
-
+            $log.warn "Blank content: nothing to do!"
         )
       ])
     )
 
     # Fires when the user changes node location using the mouse or keyboard in the TinyMCE editor.
     editor.onNodeChange.add (editor, e) ->        
-      injector.invoke(['$rootScope', ($rootScope) ->
-        # execute the following commands in the angular js context.      
-        $rootScope.$apply(->
-          $rootScope.$broadcast 'isSelectionCollapsed', editor.selection.isCollapsed()
+      injector.invoke(['EditorService','$rootScope', (EditorService, $rootScope) ->
+        # execute the following commands in the angular js context.
+        $rootScope.$apply(->          
+          $rootScope.selectionStatus = EditorService.hasSelection() 
         )
       ])
-              
+             
     # this event is raised when a textannotation is selected in the TinyMCE editor.
     editor.onClick.add (editor, e) ->
       injector.invoke(['EditorService','$rootScope', (EditorService, $rootScope) ->
