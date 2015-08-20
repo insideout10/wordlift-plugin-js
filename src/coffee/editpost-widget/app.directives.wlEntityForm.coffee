@@ -42,6 +42,8 @@ angular.module('wordlift.editpost.widget.directives.wlEntityForm', [])
     """
     link: ($scope, $element, $attrs, $ctrl) ->  
 
+      $scope.configuration = configuration
+      
       $scope.setSameAs = (uri)->
         $scope.entity.sameAs = uri
       

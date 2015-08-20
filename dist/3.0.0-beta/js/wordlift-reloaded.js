@@ -510,6 +510,7 @@
         },
         template: "<div name=\"wordlift\" class=\"wl-entity-form\">\n<div ng-show=\"entity.images.length > 0\">\n    <img ng-src=\"{{entity.images[0]}}\" wl-src=\"{{configuration.defaultThumbnailPath}}\" />\n</div>\n<div>\n    <label>Entity label</label>\n    <input type=\"text\" ng-model=\"entity.label\" />\n</div>\n<div>\n    <label>Entity type</label>\n    <select ng-model=\"entity.mainType\" ng-options=\"type.id as type.name for type in supportedTypes\" ></select>\n</div>\n<div>\n    <label>Entity Description</label>\n    <textarea ng-model=\"entity.description\" rows=\"6\"></textarea>\n</div>\n<div ng-show=\"checkEntityId(entity.id)\">\n    <label>Entity Id</label>\n    <input type=\"text\" ng-model=\"entity.id\" disabled=\"true\" />\n</div>\n<div class=\"wl-suggested-sameas-wrapper\">\n    <label>Entity Same as (*)</label>\n    <input type=\"text\" ng-model=\"entity.sameAs\" />\n    <h5 ng-show=\"entity.suggestedSameAs.length > 0\">same as suggestions</h5>\n    <div ng-click=\"setSameAs(sameAs)\" ng-class=\"{ 'active': entity.sameAs == sameAs }\" class=\"wl-sameas\" ng-repeat=\"sameAs in entity.suggestedSameAs\">\n      {{sameAs}}\n    </div>\n</div>\n\n<div class=\"wl-submit-wrapper\">\n  <span class=\"button button-primary\" ng-click=\"onSubmit()\">Save</span>\n</div>\n\n</div>",
         link: function($scope, $element, $attrs, $ctrl) {
+          $scope.configuration = configuration;
           $scope.setSameAs = function(uri) {
             return $scope.entity.sameAs = uri;
           };
