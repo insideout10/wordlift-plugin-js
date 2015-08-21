@@ -11,7 +11,7 @@ angular.module('wordlift.editpost.widget.directives.wlEntityForm', [])
       </div>
       <div>
           <label>Entity label</label>
-          <input type="text" ng-model="entity.label" />
+          <input type="text" ng-model="entity.label" ng-disabled="checkEntityId(entity.id)" />
       </div>
       <div>
           <label>Entity type</label>
