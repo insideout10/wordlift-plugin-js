@@ -15,7 +15,8 @@ angular.module('wordlift.editpost.widget.directives.wlEntityForm', [])
       </div>
       <div>
           <label>Entity type</label>
-          <select ng-model="entity.mainType" ng-options="type.id as type.name for type in supportedTypes" ></select>
+          <select ng-hide="hasOccurences()" ng-model="entity.mainType" ng-options="type.id as type.name for type in supportedTypes" ></select>
+          <input ng-show="hasOccurences()" type="text" ng-value="getCurrentTypeUri()" disabled="true" />
       </div>
       <div>
           <label>Entity Description</label>
@@ -44,6 +45,13 @@ angular.module('wordlift.editpost.widget.directives.wlEntityForm', [])
 
       $scope.configuration = configuration
 
+      $scope.getCurrentTypeUri = ()->
+        for type in configuration.types
+          if type.css is "wl-#{$scope.entity.mainType}"
+            return type.uri
+
+      $scope.hasOccurences = ()->
+        $scope.entity.occurrences.length > 0
       $scope.setSameAs = (uri)->
         $scope.entity.sameAs = uri
       
