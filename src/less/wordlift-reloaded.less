@@ -356,14 +356,16 @@
     }
 
   }
-  .wl-spinner { 
-    .fa-icon(@fa-var-spinner);
-    -webkit-animation: spin 2s infinite linear;
-    -moz-animation: spin 2s infinite linear;
-    -o-animation: spin 2s infinite linear;
-    animation: spin 2s infinite linear;
-    display:inline-block;
-  }
+.wl-spinner {
+  background: url('/wp-admin/images/spinner.gif') no-repeat;
+  background-size: 16px 16px;
+  float: right;
+  opacity: .7;
+  filter: alpha(opacity=70);
+  width: 16px;
+  height: 16px;
+  margin: 2px -3px 0;
+}
 
   .wl-edit { 
     .fa-icon(@fa-var-pencil);

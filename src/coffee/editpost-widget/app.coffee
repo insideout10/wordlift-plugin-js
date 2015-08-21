@@ -24,10 +24,9 @@ angular.module('wordlift.editpost.widget', [
 
 $(
   container = $("""
-  	<div ng-show="analysis" id="wordlift-edit-post-wrapper" ng-controller="EditPostWidgetController">
+  	<div id="wordlift-edit-post-wrapper" ng-controller="EditPostWidgetController">
   		
-      <h3 class="wl-widget-headline"><span>Semantic tagging</span></h3>
-      
+      <h3 class="wl-widget-headline"><span>Semantic tagging</span> <span ng-hide="analysis" class="wl-spinner"></span></h3>
       <div ng-click="createTextAnnotationFromCurrentSelection()" id="wl-add-entity-button-wrapper">
         <span class="button" ng-class="{ 'button-primary selected' : isThereASelection, 'preview' : !isThereASelection }">Add entity</span>
         <div class="clear" />     
