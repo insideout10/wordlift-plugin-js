@@ -1351,8 +1351,9 @@
   transition-timing-function: linear;
 }
 .wl-carousel .wl-panes .wl-carousel-item {
-  position: relative;
   float: left;
+  margin: 0;
+  padding: 0;
 }
 .wl-carousel img {
   display: block;

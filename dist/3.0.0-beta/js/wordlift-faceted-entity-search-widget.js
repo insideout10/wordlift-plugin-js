@@ -7,7 +7,7 @@
         restrict: 'A',
         scope: true,
         transclude: true,
-        template: "<div class=\"wl-carousel\" ng-show=\"panes.length > 0\">\n  <div class=\"wl-panes\" style=\"width:{{panesWidth}}px; left:{{position}}px;\" ng-transclude ng-swipe-right=\"next()\"></div>\n  <div class=\"wl-carousel-arrow wl-prev\" ng-click=\"prev()\" ng-show=\"currentPaneIndex > 0\">\n    <i class=\"wl-angle-left\" />\n  </div>\n  <div class=\"wl-carousel-arrow wl-next\" ng-click=\"next()\" ng-hide=\"(currentPaneIndex + visibleElements()) == panes.length\">\n    <i class=\"wl-angle-right\" />\n  </div>\n</div>  ",
+        template: "<div class=\"wl-carousel\" ng-show=\"panes.length > 0\">\n  <div class=\"wl-panes\" ng-style=\"{ width: panesWidth, left: position }\" ng-transclude ng-swipe-right=\"next()\"></div>\n  <div class=\"wl-carousel-arrow wl-prev\" ng-click=\"prev()\" ng-show=\"currentPaneIndex > 0\">\n    <i class=\"wl-angle-left\" />\n  </div>\n  <div class=\"wl-carousel-arrow wl-next\" ng-click=\"next()\" ng-hide=\"(currentPaneIndex + visibleElements()) == panes.length\">\n    <i class=\"wl-angle-right\" />\n  </div>\n</div>",
         controller: function($scope, $element, $attrs) {
           var ctrl, w;
           w = angular.element($window);
@@ -20,7 +20,10 @@
             }
             return 1;
           };
-          $scope.itemWidth = $element.width() / $scope.visibleElements();
+          $scope.setItemWidth = function() {
+            return $element.width() / $scope.visibleElements();
+          };
+          $scope.itemWidth = $scope.setItemWidth();
           $scope.panesWidth = void 0;
           $scope.panes = [];
           $scope.position = 0;
@@ -40,7 +43,7 @@
           };
           w.bind('resize', function() {
             var pane, _i, _len, _ref;
-            $scope.itemWidth = $element.width() / $scope.visibleElements();
+            $scope.itemWidth = $scope.setItemWidth();
             $scope.setPanesWrapperWidth();
             _ref = $scope.panes;
             for (_i = 0, _len = _ref.length; _i < _len; _i++) {

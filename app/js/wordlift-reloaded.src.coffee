@@ -156,14 +156,14 @@ angular.module('wordlift.ui.carousel', [])
   transclude: true      
   template: """
       <div class="wl-carousel" ng-show="panes.length > 0">
-        <div class="wl-panes" style="width:{{panesWidth}}px; left:{{position}}px;" ng-transclude ng-swipe-right="next()"></div>
+        <div class="wl-panes" ng-style="{ width: panesWidth, left: position }" ng-transclude ng-swipe-right="next()"></div>
         <div class="wl-carousel-arrow wl-prev" ng-click="prev()" ng-show="currentPaneIndex > 0">
           <i class="wl-angle-left" />
         </div>
         <div class="wl-carousel-arrow wl-next" ng-click="next()" ng-hide="(currentPaneIndex + visibleElements()) == panes.length">
           <i class="wl-angle-right" />
         </div>
-      </div>  
+      </div>
   """
   controller: ($scope, $element, $attrs) ->
       
@@ -176,7 +176,10 @@ angular.module('wordlift.ui.carousel', [])
         return 5
       return 1
 
-    $scope.itemWidth =  $element.width() / $scope.visibleElements();
+    $scope.setItemWidth = ()->
+      $element.width() / $scope.visibleElements() 
+
+    $scope.itemWidth =  $scope.setItemWidth()
     $scope.panesWidth = undefined
     $scope.panes = []
     $scope.position = 0;
@@ -188,15 +191,15 @@ angular.module('wordlift.ui.carousel', [])
     $scope.prev = ()->
       $scope.position = $scope.position + $scope.itemWidth
       $scope.currentPaneIndex = $scope.currentPaneIndex - 1
-
+    
     $scope.setPanesWrapperWidth = ()->
-      $scope.panesWidth = $scope.panes.length * $scope.itemWidth
+      $scope.panesWidth = ( $scope.panes.length * $scope.itemWidth ) 
       $scope.position = 0;
       $scope.currentPaneIndex = 0
 
     w.bind 'resize', ()->
         
-      $scope.itemWidth =  $element.width() / $scope.visibleElements();
+      $scope.itemWidth = $scope.setItemWidth();
       $scope.setPanesWrapperWidth()
       for pane in $scope.panes
         pane.scope.setWidth $scope.itemWidth
