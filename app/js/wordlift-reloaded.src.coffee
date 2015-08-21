@@ -160,7 +160,7 @@ angular.module('wordlift.ui.carousel', [])
         <div class="wl-carousel-arrow wl-prev" ng-click="prev()" ng-show="currentPaneIndex > 0">
           <i class="wl-angle-left" />
         </div>
-        <div class="wl-carousel-arrow wl-next" ng-click="next()" ng-hide="(currentPaneIndex + visibleElements()) == panes.length">
+        <div class="wl-carousel-arrow wl-next" ng-click="next()" ng-show="isNextArrowVisible()">
           <i class="wl-angle-right" />
         </div>
       </div>
@@ -185,6 +185,9 @@ angular.module('wordlift.ui.carousel', [])
     $scope.position = 0;
     $scope.currentPaneIndex = 0
 
+    $scope.isNextArrowVisible = ()->
+      ($scope.panes.length - $scope.currentPaneIndex) > $scope.visibleElements()
+    
     $scope.next = ()->
       $scope.position = $scope.position - $scope.itemWidth
       $scope.currentPaneIndex = $scope.currentPaneIndex + 1
