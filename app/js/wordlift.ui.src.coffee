@@ -364,12 +364,13 @@ $.fn.extend
       # Create a map
       map = L.map container.attr('id')
 
+      # Fit map bounds for our set of points
       # With a single feature sets the map center accordingly to feature coordinates.
       # With more than one feature sets baundaries instead.
-      if data.features?.length is 1
-        map.setView data.features[0].geometry.coordinates, settings.zoom
+      if data.boundaries?.length is 1
+        map.setView data.boundaries[0], settings.zoom
       else
-        map.fitBounds data.boundaries
+        map.fitBounds L.latLngBounds(data.boundaries)
 
       # Add an OpenStreetMap tile layer
       L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png',

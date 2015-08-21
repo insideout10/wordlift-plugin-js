@@ -323,10 +323,10 @@
           return;
         }
         map = L.map(container.attr('id'));
-        if (((_ref1 = data.features) != null ? _ref1.length : void 0) === 1) {
-          map.setView(data.features[0].geometry.coordinates, settings.zoom);
+        if (((_ref1 = data.boundaries) != null ? _ref1.length : void 0) === 1) {
+          map.setView(data.boundaries[0], settings.zoom);
         } else {
-          map.fitBounds(data.boundaries);
+          map.fitBounds(L.latLngBounds(data.boundaries));
         }
         L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
           attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
