@@ -215,15 +215,12 @@ angular.module('wordlift.facetedsearch.widget', [
 $(
   container = $("""
   	<div ng-controller="FacetedSearchWidgetController">
-      <h5 class="wl-selected-items-wrapper">
-        <span class="wl-title">Posts related to <strong>{{entity.label}}</strong></span>
-        <i ng-click="toggleFiltering()" ng-class="{ 'selected' : filteringEnabled }"class="wl-filter-button"></i>
-      </h5>
       <div class="wl-filters wl-selected-items-wrapper">
         <span ng-class="'wl-' + entity.mainType" ng-repeat="(condition, entity) in conditions" class="wl-selected-item">
           {{ entity.label}}
           <i class="wl-deselect" ng-click="addCondition(entity)"></i>
         </span>
+        <span class="wl-filter-button" ng-class="{ 'selected' : filteringEnabled }" ng-click="toggleFiltering()"><i></i>Add a filter</span>
       </div>
       <div class="wl-facets" wl-carousel ng-show="filteringEnabled">
         <div class="wl-facets-container" ng-repeat="type in supportedTypes" wl-carousel-pane>
