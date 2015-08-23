@@ -16,8 +16,6 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
       object[key] = val
     object
  
-#  setAnnotationsPriority = (annotations)->
-
   findAnnotation = (annotations, start, end) ->
     return annotation for id, annotation of annotations when annotation.start is start and annotation.end is end
 
