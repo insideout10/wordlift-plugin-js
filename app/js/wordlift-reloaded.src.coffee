@@ -314,6 +314,7 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
 ])
 .controller('EditPostWidgetController', ['RelatedPostDataRetrieverService', 'EditorService', 'AnalysisService', 'configuration', '$log', '$scope', '$rootScope', '$injector', (RelatedPostDataRetrieverService, EditorService, AnalysisService, configuration, $log, $scope, $rootScope, $injector)-> 
 
+  $scope.isRunning = false
   $scope.analysis = undefined
   $scope.relatedPosts = undefined
   $scope.newEntity = AnalysisService.createEntity()
@@ -324,6 +325,9 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
   $scope.isThereASelection = false
   $scope.configuration = configuration
   
+  $rootScope.$on "analysisServiceStatusUpdated", (event, newStatus) ->
+    $scope.isRunning = newStatus
+
   # Watch editor selection status
   $rootScope.$watch 'selectionStatus', ()->
     $scope.isThereASelection = $rootScope.selectionStatus
@@ -395,6 +399,7 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     $scope.relatedPosts = posts
   
   $scope.$on "analysisPerformed", (event, analysis) -> 
+    
     $scope.analysis = analysis
 
     # Preselect 
@@ -665,11 +670,11 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
   findAnnotation = (annotations, start, end) ->
     return annotation for id, annotation of annotations when annotation.start is start and annotation.end is end
 
-  service = 
-    _currentAnalysis = {}
-
-  service._supportedTypes = []
-  service._defaultType = "thing"
+  service =
+    _isRunning: false
+    _currentAnalysis: {}
+    _supportedTypes: []
+    _defaultType: "thing"
   
   service.cleanAnnotations = (analysis, positions = []) ->
     # Take existing entities as mandatory 
@@ -828,20 +833,28 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
       data: content      
     )
   
+  service._updateStatus = (status)->
+    service._isRunning = status
+    $rootScope.$broadcast "analysisServiceStatusUpdated", status
+
   service.perform = (content)->
     
+    service._updateStatus true
     promise = @._innerPerform content
     # If successful, broadcast an *analysisReceived* event.
     .success (data) ->
-      
+
+      service._updateStatus false
       if typeof data is 'string'
         $log.warn "Invalid data returned"
         $log.debug data
         return
-
-       $rootScope.$broadcast "analysisPerformed", service.parse( data )
+       
+      $rootScope.$broadcast "analysisPerformed", service.parse( data )
     .error (data, status) ->
-       $log.warn "Error on analysis, statut #{status}"
+      
+      service._updateStatus false
+      $log.warn "Error on analysis, statut #{status}"
 
   # Preselect entity annotations in the provided analysis using the provided collection of annotations.
   service.preselect = (analysis, annotations) ->
@@ -1177,7 +1190,7 @@ $(
   container = $("""
   	<div id="wordlift-edit-post-wrapper" ng-controller="EditPostWidgetController">
   		
-      <h3 class="wl-widget-headline"><span>Semantic tagging</span> <span ng-hide="analysis" class="wl-spinner"></span></h3>
+      <h3 class="wl-widget-headline"><span>Semantic tagging</span> <span ng-show="isRunning" class="wl-spinner"></span></h3>
       <div ng-click="createTextAnnotationFromCurrentSelection()" id="wl-add-entity-button-wrapper">
         <span class="button" ng-class="{ 'button-primary selected' : isThereASelection, 'preview' : !isThereASelection }">Add entity</span>
         <div class="clear" />     

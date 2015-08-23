@@ -60,6 +60,7 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
 ])
 .controller('EditPostWidgetController', ['RelatedPostDataRetrieverService', 'EditorService', 'AnalysisService', 'configuration', '$log', '$scope', '$rootScope', '$injector', (RelatedPostDataRetrieverService, EditorService, AnalysisService, configuration, $log, $scope, $rootScope, $injector)-> 
 
+  $scope.isRunning = false
   $scope.analysis = undefined
   $scope.relatedPosts = undefined
   $scope.newEntity = AnalysisService.createEntity()
@@ -70,6 +71,9 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
   $scope.isThereASelection = false
   $scope.configuration = configuration
   
+  $rootScope.$on "analysisServiceStatusUpdated", (event, newStatus) ->
+    $scope.isRunning = newStatus
+
   # Watch editor selection status
   $rootScope.$watch 'selectionStatus', ()->
     $scope.isThereASelection = $rootScope.selectionStatus
@@ -141,6 +145,7 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     $scope.relatedPosts = posts
   
   $scope.$on "analysisPerformed", (event, analysis) -> 
+    
     $scope.analysis = analysis
 
     # Preselect 

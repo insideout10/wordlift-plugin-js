@@ -19,11 +19,11 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
   findAnnotation = (annotations, start, end) ->
     return annotation for id, annotation of annotations when annotation.start is start and annotation.end is end
 
-  service = 
-    _currentAnalysis = {}
-
-  service._supportedTypes = []
-  service._defaultType = "thing"
+  service =
+    _isRunning: false
+    _currentAnalysis: {}
+    _supportedTypes: []
+    _defaultType: "thing"
   
   service.cleanAnnotations = (analysis, positions = []) ->
     # Take existing entities as mandatory 
@@ -182,20 +182,28 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
       data: content      
     )
   
+  service._updateStatus = (status)->
+    service._isRunning = status
+    $rootScope.$broadcast "analysisServiceStatusUpdated", status
+
   service.perform = (content)->
     
+    service._updateStatus true
     promise = @._innerPerform content
     # If successful, broadcast an *analysisReceived* event.
     .success (data) ->
-      
+
+      service._updateStatus false
       if typeof data is 'string'
         $log.warn "Invalid data returned"
         $log.debug data
         return
-
-       $rootScope.$broadcast "analysisPerformed", service.parse( data )
+       
+      $rootScope.$broadcast "analysisPerformed", service.parse( data )
     .error (data, status) ->
-       $log.warn "Error on analysis, statut #{status}"
+      
+      service._updateStatus false
+      $log.warn "Error on analysis, statut #{status}"
 
   # Preselect entity annotations in the provided analysis using the provided collection of annotations.
   service.preselect = (analysis, annotations) ->
