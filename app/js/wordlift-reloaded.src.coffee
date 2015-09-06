@@ -1242,44 +1242,47 @@ $(
   """)
   .appendTo('#wordlift-edit-post-outer-wrapper')
 
+
+
 injector = angular.bootstrap $('#wordlift-edit-post-wrapper'), ['wordlift.editpost.widget']
 
 # Add WordLift as a plugin of the TinyMCE editor.
-  tinymce.PluginManager.add 'wordlift', (editor, url) ->
-    # Perform analysis once tinymce is loaded
-    editor.onLoadContent.add((ed, o) ->
-      injector.invoke(['AnalysisService', '$rootScope', '$log'
-       (AnalysisService, $rootScope, $log) ->
-        # execute the following commands in the angular js context.
-        $rootScope.$apply(->    
-          # Get the html content of the editor.
-          html = editor.getContent format: 'raw'
-          # Get the text content from the Html.
-          text = Traslator.create(html).getText()
+tinymce.PluginManager.add 'wordlift', (editor, url) ->
+  # Perform analysis once tinymce is loaded
+  editor.onLoadContent.add((ed, o) ->
+    injector.invoke(['AnalysisService', '$timeout', '$log'
+     (AnalysisService, $timeout, $log) ->
+      # execute the following commands in the angular js context.
+      $timeout(->    
+        # Get the html content of the editor.
+        html = editor.getContent format: 'raw'
+        # Get the text content from the Html.
+        text = Traslator.create(html).getText()
+          
+        if text.match /[a-zA-Z0-9]+/
+          AnalysisService.perform text
+        else
+          $log.warn "Blank content: nothing to do!"
 
-          if text.match /[a-zA-Z0-9]+/
-            AnalysisService.perform text
-          else
-            $log.warn "Blank content: nothing to do!"
-        )
-      ])
-    )
+      , 2000)
+    ])
+  )
 
-    # Fires when the user changes node location using the mouse or keyboard in the TinyMCE editor.
-    editor.onNodeChange.add (editor, e) ->        
-      injector.invoke(['EditorService','$rootScope', (EditorService, $rootScope) ->
-        # execute the following commands in the angular js context.
-        $rootScope.$apply(->          
-          $rootScope.selectionStatus = EditorService.hasSelection() 
-        )
-      ])
-             
-    # this event is raised when a textannotation is selected in the TinyMCE editor.
-    editor.onClick.add (editor, e) ->
-      injector.invoke(['EditorService','$rootScope', (EditorService, $rootScope) ->
-        # execute the following commands in the angular js context.
-        $rootScope.$apply(->          
-          EditorService.selectAnnotation e.target.id 
-        )
-      ])
+  # Fires when the user changes node location using the mouse or keyboard in the TinyMCE editor.
+  editor.onNodeChange.add (editor, e) ->        
+    injector.invoke(['EditorService','$rootScope', (EditorService, $rootScope) ->
+      # execute the following commands in the angular js context.
+      $rootScope.$apply(->          
+        $rootScope.selectionStatus = EditorService.hasSelection() 
+      )
+    ])
+           
+  # this event is raised when a textannotation is selected in the TinyMCE editor.
+  editor.onClick.add (editor, e) ->
+    injector.invoke(['EditorService','$rootScope', (EditorService, $rootScope) ->
+      # execute the following commands in the angular js context.
+      $rootScope.$apply(->          
+        EditorService.selectAnnotation e.target.id 
+      )
+    ])
 )
