@@ -78,18 +78,49 @@ $(
   """)
   .appendTo('#wordlift-edit-post-outer-wrapper')
 
-
-
 injector = angular.bootstrap $('#wordlift-edit-post-wrapper'), ['wordlift.editpost.widget']
 
 # Add WordLift as a plugin of the TinyMCE editor.
 tinymce.PluginManager.add 'wordlift', (editor, url) ->
+  
+  # Register event depending on tinymce major version
+  fireEvent = (editor, eventName, callback)->
+    injector.invoke([ '$log', ($log) ->
+      $log.debug "Going to register a callback on #{eventName} event"
+      switch tinymce.majorVersion  
+        when '4' then editor.on eventName, callback
+        when '3' then editor[ "on#{eventName}" ].add callback
+    ])
+
+  # Hack wp.mce.views to prevent shorcodes rendering 
+  # starts before the analysis is properly embedded
+  injector.invoke(['$rootScope', '$log', ($rootScope, $log) ->
+    
+    $log.debug "Going to hack wp.mce.views api ..."
+    # wp.mce.views uses toViews() method from WP 3.8 to 4.1
+    # and setMarkers() method from WP 4.2 to 4.3 to replace 
+    # available shortcodes with coresponding views markup
+    for method in [ 'setMarkers', 'toViews' ]
+      if wp.mce.views[ method ]?
+        
+        originalMethod = wp.mce.views[ method ]
+        $log.warn "Override wp.mce.views method #{method}() to prevent shortcodes rendering"
+        wp.mce.views[ method ] = (content)->
+          return content
+        
+        $rootScope.$on "analysisEmbedded", (event) ->
+          $log.info "Going to restore wp.mce.views method #{method}()"
+          wp.mce.views[ method ] = originalMethod
+        
+        break
+  ])
+
   # Perform analysis once tinymce is loaded
-  editor.onLoadContent.add((ed, o) ->
-    injector.invoke(['AnalysisService', '$timeout', '$log'
-     (AnalysisService, $timeout, $log) ->
+  fireEvent( editor, "LoadContent", (e) ->
+    injector.invoke(['AnalysisService', '$rootScope', '$log'
+     (AnalysisService, $rootScope, $log) ->  
       # execute the following commands in the angular js context.
-      $timeout(->    
+      $rootScope.$apply(->    
         # Get the html content of the editor.
         html = editor.getContent format: 'raw'
         # Get the text content from the Html.
@@ -99,26 +130,27 @@ tinymce.PluginManager.add 'wordlift', (editor, url) ->
           AnalysisService.perform text
         else
           $log.warn "Blank content: nothing to do!"
-
-      , 2000)
+      )
     ])
   )
 
   # Fires when the user changes node location using the mouse or keyboard in the TinyMCE editor.
-  editor.onNodeChange.add (editor, e) ->        
+  fireEvent( editor, "NodeChange", (e) ->        
     injector.invoke(['EditorService','$rootScope', (EditorService, $rootScope) ->
       # execute the following commands in the angular js context.
       $rootScope.$apply(->          
         $rootScope.selectionStatus = EditorService.hasSelection() 
       )
     ])
-           
+  )
+
   # this event is raised when a textannotation is selected in the TinyMCE editor.
-  editor.onClick.add (editor, e) ->
+  fireEvent( editor, "Click", (e) ->
     injector.invoke(['EditorService','$rootScope', (EditorService, $rootScope) ->
       # execute the following commands in the angular js context.
       $rootScope.$apply(->          
         EditorService.selectAnnotation e.target.id 
       )
     ])
+  )
 )

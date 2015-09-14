@@ -211,6 +211,8 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
         traslator.insertHtml element, text: annotation.start
         traslator.insertHtml '</span>', text: annotation.end
 
+      $rootScope.$broadcast "analysisEmbedded"
+
       # Update the editor Html code.
       isDirty = ed.isDirty()
       ed.setContent traslator.getHtml(), format: 'raw'
