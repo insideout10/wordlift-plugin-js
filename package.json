@@ -1,7 +1,7 @@
 {
   "name": "WordLift",
   "description": "WordLift JavaScript library",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "author": "Some very proud people...",
   "homepage": "http://wordift.it/",
   "repository": {
@@ -23,6 +23,7 @@
     "grunt-contrib-watch": "^0.5.3",
     "grunt-contrib-uglify": "^0.4.0",
     "grunt-contrib-less": "^0.10.0",
+    "grunt-contrib-symlink": "^0.3.0",
     "karma-script-launcher": "^0.1.0",
     "karma-chrome-launcher": "^0.1.2",
     "karma-firefox-launcher": "^0.1.3",

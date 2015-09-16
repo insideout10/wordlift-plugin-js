@@ -69,7 +69,6 @@ module.exports = (grunt) ->
           beautify: false
         files:
           'app/js/wordlift.min.js': 'app/js/wordlift.js'
-          'app/js/wordlift.<%= pkg.version %>.min.js': 'app/js/wordlift.js'
       'wordlift-ui':
         options:
           sourceMap: true
@@ -81,7 +80,6 @@ module.exports = (grunt) ->
           beautify: false
         files:
           'app/js/wordlift.ui.min.js': 'app/js/wordlift.ui.js'
-          'app/js/wordlift.ui.<%= pkg.version %>.min.js': 'app/js/wordlift.ui.js'
       'wordlift-reloaded':
         options:
           sourceMap: true
@@ -93,7 +91,6 @@ module.exports = (grunt) ->
           beautify: false
         files:
           'app/js/wordlift-reloaded.min.js': 'app/js/wordlift-reloaded.js'
-          'app/js/wordlift-reloaded.<%= pkg.version %>.min.js': 'app/js/wordlift-reloaded.js'
       'wordlift-faceted-entity-search-widget':
         options:
           sourceMap: true
@@ -105,7 +102,6 @@ module.exports = (grunt) ->
           beautify: false
         files:
           'app/js/wordlift-faceted-entity-search-widget.min.js': 'app/js/wordlift-faceted-entity-search-widget.js'
-          'app/js/wordlift-faceted-entity-search-widget.<%= pkg.version %>.min.js': 'app/js/wordlift-faceted-entity-search-widget.js'
     less:
       development:
         files:
@@ -120,13 +116,9 @@ module.exports = (grunt) ->
           sourceMapFilename: 'app/css/wordlift.min.css.map'
         files:
           'app/css/wordlift.min.css': 'src/less/wordlift.less'
-          'app/css/wordlift.<%= pkg.version %>.min.css': 'src/less/wordlift.less'
           'app/css/wordlift.ui.min.css': 'src/less/wordlift.ui.less'
-          'app/css/wordlift.ui.<%= pkg.version %>.min.css': 'src/less/wordlift.ui.less'
           'app/css/wordlift-reloaded.min.css': 'src/less/wordlift-reloaded.less'
-          'app/css/wordlift-reloaded.ui.<%= pkg.version %>.min.css': 'src/less/wordlift-reloaded.less'
           'app/css/wordlift-faceted-entity-search-widget.min.css': 'src/less/wordlift-faceted-entity-search-widget.less'
-          'app/css/wordlift-faceted-entity-search-widget.<%= pkg.version %>.min.css': 'src/less/wordlift-faceted-entity-search-widget.less'
 
     copy:
       fonts:
@@ -191,6 +183,12 @@ module.exports = (grunt) ->
         dest: 'dist/<%= pkg.version %>/fonts/'
         flatten: true
 
+    symlink:
+      options:
+        overwrite: true
+      explicit:
+        src: 'dist/<%= pkg.version %>'
+        dest: 'dist/latest'
 
     docco:
       doc:
@@ -219,7 +217,8 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks('grunt-contrib-less')
   grunt.loadNpmTasks('grunt-contrib-uglify')
   grunt.loadNpmTasks('grunt-contrib-copy')
+  grunt.loadNpmTasks('grunt-contrib-symlink')
   grunt.loadNpmTasks('grunt-docco')
 
   # Default task(s).
-  grunt.registerTask('default', ['coffee', 'uglify', 'less', 'copy', 'docco'])
+  grunt.registerTask('default', ['coffee', 'uglify', 'less', 'copy', 'symlink', 'docco'])
