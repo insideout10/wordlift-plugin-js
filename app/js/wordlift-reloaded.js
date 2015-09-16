@@ -1197,27 +1197,29 @@
     injector.invoke([
       '$rootScope', '$log', function($rootScope, $log) {
         var method, originalMethod, _i, _len, _ref, _results;
-        $log.debug("Going to hack wp.mce.views api ...");
-        _ref = ['setMarkers', 'toViews'];
-        _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          method = _ref[_i];
-          if (wp.mce.views[method] != null) {
-            originalMethod = wp.mce.views[method];
-            $log.warn("Override wp.mce.views method " + method + "() to prevent shortcodes rendering");
-            wp.mce.views[method] = function(content) {
-              return content;
-            };
-            $rootScope.$on("analysisEmbedded", function(event) {
-              $log.info("Going to restore wp.mce.views method " + method + "()");
-              return wp.mce.views[method] = originalMethod;
-            });
-            break;
-          } else {
-            _results.push(void 0);
+        if (editor.id === "content") {
+          $log.debug("Going to hack wp.mce.views api from editor with id '" + editor.id + "' ...");
+          _ref = ['setMarkers', 'toViews'];
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            method = _ref[_i];
+            if (wp.mce.views[method] != null) {
+              originalMethod = wp.mce.views[method];
+              $log.warn("Override wp.mce.views method " + method + "() to prevent shortcodes rendering");
+              wp.mce.views[method] = function(content) {
+                return content;
+              };
+              $rootScope.$on("analysisEmbedded", function(event) {
+                $log.info("Going to restore wp.mce.views method " + method + "()");
+                return wp.mce.views[method] = originalMethod;
+              });
+              break;
+            } else {
+              _results.push(void 0);
+            }
           }
+          return _results;
         }
-        return _results;
       }
     ]);
     fireEvent(editor, "LoadContent", function(e) {

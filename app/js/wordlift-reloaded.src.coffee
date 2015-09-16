@@ -1262,23 +1262,25 @@ tinymce.PluginManager.add 'wordlift', (editor, url) ->
   # starts before the analysis is properly embedded
   injector.invoke(['$rootScope', '$log', ($rootScope, $log) ->
     
-    $log.debug "Going to hack wp.mce.views api ..."
-    # wp.mce.views uses toViews() method from WP 3.8 to 4.1
-    # and setMarkers() method from WP 4.2 to 4.3 to replace 
-    # available shortcodes with coresponding views markup
-    for method in [ 'setMarkers', 'toViews' ]
-      if wp.mce.views[ method ]?
-        
-        originalMethod = wp.mce.views[ method ]
-        $log.warn "Override wp.mce.views method #{method}() to prevent shortcodes rendering"
-        wp.mce.views[ method ] = (content)->
-          return content
-        
-        $rootScope.$on "analysisEmbedded", (event) ->
-          $log.info "Going to restore wp.mce.views method #{method}()"
-          wp.mce.views[ method ] = originalMethod
-        
-        break
+    if editor.id is "content"
+
+      $log.debug "Going to hack wp.mce.views api from editor with id '#{editor.id}' ..."
+      # wp.mce.views uses toViews() method from WP 3.8 to 4.1
+      # and setMarkers() method from WP 4.2 to 4.3 to replace 
+      # available shortcodes with coresponding views markup
+      for method in [ 'setMarkers', 'toViews' ]
+        if wp.mce.views[ method ]?
+          
+          originalMethod = wp.mce.views[ method ]
+          $log.warn "Override wp.mce.views method #{method}() to prevent shortcodes rendering"
+          wp.mce.views[ method ] = (content)->
+            return content
+          
+          $rootScope.$on "analysisEmbedded", (event) ->
+            $log.info "Going to restore wp.mce.views method #{method}()"
+            wp.mce.views[ method ] = originalMethod
+          
+          break
   ])
 
   # Perform analysis once tinymce is loaded
