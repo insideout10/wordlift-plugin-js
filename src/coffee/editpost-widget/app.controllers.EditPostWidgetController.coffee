@@ -3,7 +3,7 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
   'wordlift.editpost.widget.services.EditorService'
   'wordlift.editpost.widget.providers.ConfigurationProvider'
 ])
-.filter('filterEntitiesByTypesAndRelevance', [ '$log', ($log)->
+.filter('filterEntitiesByTypesAndRelevance', [ 'configuration', '$log', (configuration, $log)->
   return (items, types)->
     
     filtered = []
@@ -26,7 +26,7 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
         if entity.occurrences.length > 0
           filtered.push entity
           continue
-        if entity.id.match(/redlink/)
+        if entity.id.startsWith configuration.datasetUri
           filtered.push entity
         
         # TODO se è una entità di wordlift la mostro

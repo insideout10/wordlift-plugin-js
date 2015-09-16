@@ -243,7 +243,7 @@
   ]);
 
   angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', ['wordlift.editpost.widget.services.AnalysisService', 'wordlift.editpost.widget.services.EditorService', 'wordlift.editpost.widget.providers.ConfigurationProvider']).filter('filterEntitiesByTypesAndRelevance', [
-    '$log', function($log) {
+    'configuration', '$log', function(configuration, $log) {
       return function(items, types) {
         var annotations_count, entity, filtered, id, treshold, _ref;
         filtered = [];
@@ -266,7 +266,7 @@
               filtered.push(entity);
               continue;
             }
-            if (entity.id.match(/redlink/)) {
+            if (entity.id.startsWith(configuration.datasetUri)) {
               filtered.push(entity);
             }
           }
@@ -560,7 +560,7 @@
   ]);
 
   angular.module('wordlift.editpost.widget.directives.wlEntityTile', []).directive('wlEntityTile', [
-    '$log', function($log) {
+    'configuration', '$log', function(configuration, $log) {
       return {
         require: '^wlClassificationBox',
         restrict: 'E',
@@ -574,7 +574,7 @@
           $boxCtrl.addTile($scope);
           $scope.isOpened = false;
           $scope.isInternal = function() {
-            if ($scope.entity.id.match(/redlink/)) {
+            if ($scope.entity.id.startsWith(configuration.datasetUri)) {
               return true;
             }
             return false;

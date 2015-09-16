@@ -1,5 +1,5 @@
 angular.module('wordlift.editpost.widget.directives.wlEntityTile', [])
-.directive('wlEntityTile', ['$log', ($log)->
+.directive('wlEntityTile', [ 'configuration','$log', (configuration, $log)->
     require: '^wlClassificationBox'
     restrict: 'E'
     scope:
@@ -31,7 +31,7 @@ angular.module('wordlift.editpost.widget.directives.wlEntityTile', [])
       $scope.isOpened = false
       
       $scope.isInternal = ()->
-        if $scope.entity.id.match /redlink/
+        if $scope.entity.id.startsWith configuration.datasetUri
           return true
         return false 
       

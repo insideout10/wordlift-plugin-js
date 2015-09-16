@@ -257,7 +257,7 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
   'wordlift.editpost.widget.services.EditorService'
   'wordlift.editpost.widget.providers.ConfigurationProvider'
 ])
-.filter('filterEntitiesByTypesAndRelevance', [ '$log', ($log)->
+.filter('filterEntitiesByTypesAndRelevance', [ 'configuration', '$log', (configuration, $log)->
   return (items, types)->
     
     filtered = []
@@ -280,7 +280,7 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
         if entity.occurrences.length > 0
           filtered.push entity
           continue
-        if entity.id.match(/redlink/)
+        if entity.id.startsWith configuration.datasetUri
           filtered.push entity
         
         # TODO se è una entità di wordlift la mostro
@@ -578,7 +578,7 @@ angular.module('wordlift.editpost.widget.directives.wlEntityForm', [])
 ])
 
 angular.module('wordlift.editpost.widget.directives.wlEntityTile', [])
-.directive('wlEntityTile', ['$log', ($log)->
+.directive('wlEntityTile', [ 'configuration','$log', (configuration, $log)->
     require: '^wlClassificationBox'
     restrict: 'E'
     scope:
@@ -610,7 +610,7 @@ angular.module('wordlift.editpost.widget.directives.wlEntityTile', [])
       $scope.isOpened = false
       
       $scope.isInternal = ()->
-        if $scope.entity.id.match /redlink/
+        if $scope.entity.id.startsWith configuration.datasetUri
           return true
         return false 
       
