@@ -27,10 +27,6 @@ $(
   	<div id="wordlift-edit-post-wrapper" ng-controller="EditPostWidgetController">
   		
       <h3 class="wl-widget-headline"><span>Semantic tagging</span> <span ng-show="isRunning" class="wl-spinner"></span></h3>
-      <div ng-click="createTextAnnotationFromCurrentSelection()" id="wl-add-entity-button-wrapper">
-        <span class="button" ng-class="{ 'button-primary selected' : isThereASelection, 'preview' : !isThereASelection }">Add entity</span>
-        <div class="clear" />     
-      </div>
       
       <div ng-show="annotation">
         <h4 class="wl-annotation-label">
@@ -39,7 +35,6 @@ $(
           <small>[ {{ analysis.annotations[ annotation ].start }}, {{ analysis.annotations[ annotation ].end }} ]</small>
           <i class="wl-annotation-label-remove-icon" ng-click="selectAnnotation(undefined)"></i>
         </h4>
-        <wl-entity-form entity="newEntity" on-submit="addNewEntityToAnalysis()" ng-show="analysis.annotations[annotation].entityMatches.length == 0"></wl-entity-form>
       </div>
 
       <wl-classification-box ng-repeat="box in configuration.classificationBoxes">

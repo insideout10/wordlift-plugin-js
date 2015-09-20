@@ -168,16 +168,6 @@
   #wl-add-entity-button-wrapper {
     padding: 4px 0px 0px 0px;
     text-align: right;
-
-    .button {
-      color: #ccc;
-      cursor: not-allowed;
-
-      &.selected {
-        cursor: pointer;
-        color:#fff;
-      }
-    }
   }
 
   .wl-annotation-label {
@@ -237,6 +227,24 @@
         
         font-size: 0.8em;
         text-transform: capitalize;
+        h5 {
+          .button {
+
+            color: #ccc;
+            text-transform: none;
+            cursor: not-allowed;
+            line-height:20px;
+            height:22px;
+            font-size:11px;
+            margin-top: -1px;
+            float:right;
+
+            &.selected {
+              cursor: pointer;
+              color:#fff;
+            }
+          }
+        }
 
         .label {
           position: relative;

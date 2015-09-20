@@ -6,7 +6,11 @@ angular.module('wordlift.editpost.widget.directives.wlClassificationBox', [])
     template: """
     	<div class="classification-box">
     		<div class="box-header">
-          <h5 class="label">{{box.label}}</h5>
+          <h5 class="label">
+            {{box.label}}
+            <span ng-click="openAddEntityForm()" class="button" ng-class="{ 'button-primary selected' : isThereASelection, 'preview' : !isThereASelection }">Add entity</span>
+          </h5>
+          <wl-entity-form ng-show="addEntityFormIsVisible" entity="newEntity" box="box" on-submit="closeAddEntityForm()"></wl-entity-form>
           <div class="wl-selected-items-wrapper">
             <span ng-class="'wl-' + entity.mainType" ng-repeat="(id, entity) in selectedEntities[box.id]" class="wl-selected-item">
               {{ entity.label}}
@@ -23,6 +27,16 @@ angular.module('wordlift.editpost.widget.directives.wlClassificationBox', [])
   	  
       $scope.currentWidget = undefined
       $scope.isWidgetOpened = false
+      $scope.addEntityFormIsVisible = false
+
+      $scope.openAddEntityForm = ()->
+        if $scope.isThereASelection
+          $scope.addEntityFormIsVisible = true
+          $scope.createTextAnnotationFromCurrentSelection()
+      
+      $scope.closeAddEntityForm = ()->
+        $scope.addEntityFormIsVisible = false
+        $scope.addNewEntityToAnalysis $scope.box
 
       $scope.closeWidgets = ()->
         $scope.currentWidget = undefined

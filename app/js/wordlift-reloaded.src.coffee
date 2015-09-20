@@ -346,15 +346,13 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
   $scope.isLinkedToCurrentAnnotation = (entity)->
     return ($scope.annotation in entity.occurrences)
 
-  $scope.addNewEntityToAnalysis = ()->
+  $scope.addNewEntityToAnalysis = (scope)->
     
-    # Keep the sameAs as Tmp id if available
     if $scope.newEntity.sameAs
       $scope.newEntity.sameAs = [ $scope.newEntity.sameAs ]
     
     delete $scope.newEntity.suggestedSameAs
     
-    $log.debug $scope.newEntity
     # Add new entity to the analysis
     $scope.analysis.entities[ $scope.newEntity.id ] = $scope.newEntity
     annotation = $scope.analysis.annotations[ $scope.annotation ]
@@ -362,8 +360,12 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     $scope.analysis.entities[ $scope.newEntity.id ].annotations[ annotation.id ] = annotation
     $scope.analysis.annotations[ $scope.annotation ].entities[ $scope.newEntity.id ] = $scope.newEntity
     
+    # Select the new entity
+    $scope.onSelectedEntityTile $scope.analysis.entities[ $scope.newEntity.id ], scope
     # Create new entity object
     $scope.newEntity = AnalysisService.createEntity()
+
+  
 
   $scope.$on "updateOccurencesForEntity", (event, entityId, occurrences) ->
     
@@ -430,12 +432,16 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
 
   $scope.onSelectedEntityTile = (entity, scope)->
     $log.debug "Entity tile selected for entity #{entity.id} within '#{scope.id}' scope"
-    
+    $log.debug entity
+    $log.debug scope
+
     if not $scope.selectedEntities[ scope.id ][ entity.id ]?
       $scope.selectedEntities[ scope.id ][ entity.id ] = entity
       for uri in entity.images
         $scope.images[ uri ] = entity.label
       $scope.$emit "entitySelected", entity, $scope.annotation
+      # Reset current annotation
+      $scope.selectAnnotation undefined
     else
       for uri in entity.images
         delete $scope.images[ uri ]
@@ -455,7 +461,11 @@ angular.module('wordlift.editpost.widget.directives.wlClassificationBox', [])
     template: """
     	<div class="classification-box">
     		<div class="box-header">
-          <h5 class="label">{{box.label}}</h5>
+          <h5 class="label">
+            {{box.label}}
+            <span ng-click="openAddEntityForm()" class="button" ng-class="{ 'button-primary selected' : isThereASelection, 'preview' : !isThereASelection }">Add entity</span>
+          </h5>
+          <wl-entity-form ng-show="addEntityFormIsVisible" entity="newEntity" box="box" on-submit="closeAddEntityForm()"></wl-entity-form>
           <div class="wl-selected-items-wrapper">
             <span ng-class="'wl-' + entity.mainType" ng-repeat="(id, entity) in selectedEntities[box.id]" class="wl-selected-item">
               {{ entity.label}}
@@ -472,6 +482,16 @@ angular.module('wordlift.editpost.widget.directives.wlClassificationBox', [])
   	  
       $scope.currentWidget = undefined
       $scope.isWidgetOpened = false
+      $scope.addEntityFormIsVisible = false
+
+      $scope.openAddEntityForm = ()->
+        if $scope.isThereASelection
+          $scope.addEntityFormIsVisible = true
+          $scope.createTextAnnotationFromCurrentSelection()
+      
+      $scope.closeAddEntityForm = ()->
+        $scope.addEntityFormIsVisible = false
+        $scope.addNewEntityToAnalysis $scope.box
 
       $scope.closeWidgets = ()->
         $scope.currentWidget = undefined
@@ -519,6 +539,8 @@ angular.module('wordlift.editpost.widget.directives.wlEntityForm', [])
     scope:
       entity: '='
       onSubmit: '&'
+      box: '='
+
     template: """
       <div name="wordlift" class="wl-entity-form">
       <div ng-show="entity.images.length > 0">
@@ -573,7 +595,14 @@ angular.module('wordlift.editpost.widget.directives.wlEntityForm', [])
       $scope.checkEntityId = (uri)->
         /^(f|ht)tps?:\/\//i.test(uri)
 
+      availableTypes = [] 
+      for type in configuration.types
+        availableTypes[ type.css.replace('wl-','') ] = type.uri
+
       $scope.supportedTypes = ({ id: type.css.replace('wl-',''), name: type.uri } for type in configuration.types)
+      if $scope.box
+        $scope.supportedTypes = ({ id: type, name: availableTypes[ type ] } for type in $scope.box.registeredTypes)
+        
 
 ])
 
@@ -1193,10 +1222,6 @@ $(
   	<div id="wordlift-edit-post-wrapper" ng-controller="EditPostWidgetController">
   		
       <h3 class="wl-widget-headline"><span>Semantic tagging</span> <span ng-show="isRunning" class="wl-spinner"></span></h3>
-      <div ng-click="createTextAnnotationFromCurrentSelection()" id="wl-add-entity-button-wrapper">
-        <span class="button" ng-class="{ 'button-primary selected' : isThereASelection, 'preview' : !isThereASelection }">Add entity</span>
-        <div class="clear" />     
-      </div>
       
       <div ng-show="annotation">
         <h4 class="wl-annotation-label">
@@ -1205,7 +1230,6 @@ $(
           <small>[ {{ analysis.annotations[ annotation ].start }}, {{ analysis.annotations[ annotation ].end }} ]</small>
           <i class="wl-annotation-label-remove-icon" ng-click="selectAnnotation(undefined)"></i>
         </h4>
-        <wl-entity-form entity="newEntity" on-submit="addNewEntityToAnalysis()" ng-show="analysis.annotations[annotation].entityMatches.length == 0"></wl-entity-form>
       </div>
 
       <wl-classification-box ng-repeat="box in configuration.classificationBoxes">

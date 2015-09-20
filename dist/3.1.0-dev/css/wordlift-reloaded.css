@@ -1892,14 +1892,6 @@
   padding: 4px 0px 0px 0px;
   text-align: right;
 }
-#wordlift-edit-post-wrapper #wl-add-entity-button-wrapper .button {
-  color: #ccc;
-  cursor: not-allowed;
-}
-#wordlift-edit-post-wrapper #wl-add-entity-button-wrapper .button.selected {
-  cursor: pointer;
-  color: #fff;
-}
 #wordlift-edit-post-wrapper .wl-annotation-label {
   border-bottom: #ccc 1px solid;
   margin: 0px;
@@ -1962,6 +1954,20 @@
 #wordlift-edit-post-wrapper .classification-box .box-header {
   font-size: 0.8em;
   text-transform: capitalize;
+}
+#wordlift-edit-post-wrapper .classification-box .box-header h5 .button {
+  color: #ccc;
+  text-transform: none;
+  cursor: not-allowed;
+  line-height: 20px;
+  height: 22px;
+  font-size: 11px;
+  margin-top: -1px;
+  float: right;
+}
+#wordlift-edit-post-wrapper .classification-box .box-header h5 .button.selected {
+  cursor: pointer;
+  color: #fff;
 }
 #wordlift-edit-post-wrapper .classification-box .box-header .label {
   position: relative;

@@ -4,6 +4,8 @@ angular.module('wordlift.editpost.widget.directives.wlEntityForm', [])
     scope:
       entity: '='
       onSubmit: '&'
+      box: '='
+
     template: """
       <div name="wordlift" class="wl-entity-form">
       <div ng-show="entity.images.length > 0">
@@ -58,6 +60,13 @@ angular.module('wordlift.editpost.widget.directives.wlEntityForm', [])
       $scope.checkEntityId = (uri)->
         /^(f|ht)tps?:\/\//i.test(uri)
 
+      availableTypes = [] 
+      for type in configuration.types
+        availableTypes[ type.css.replace('wl-','') ] = type.uri
+
       $scope.supportedTypes = ({ id: type.css.replace('wl-',''), name: type.uri } for type in configuration.types)
+      if $scope.box
+        $scope.supportedTypes = ({ id: type, name: availableTypes[ type ] } for type in $scope.box.registeredTypes)
+        
 
 ])

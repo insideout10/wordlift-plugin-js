@@ -92,15 +92,13 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
   $scope.isLinkedToCurrentAnnotation = (entity)->
     return ($scope.annotation in entity.occurrences)
 
-  $scope.addNewEntityToAnalysis = ()->
+  $scope.addNewEntityToAnalysis = (scope)->
     
-    # Keep the sameAs as Tmp id if available
     if $scope.newEntity.sameAs
       $scope.newEntity.sameAs = [ $scope.newEntity.sameAs ]
     
     delete $scope.newEntity.suggestedSameAs
     
-    $log.debug $scope.newEntity
     # Add new entity to the analysis
     $scope.analysis.entities[ $scope.newEntity.id ] = $scope.newEntity
     annotation = $scope.analysis.annotations[ $scope.annotation ]
@@ -108,8 +106,12 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
     $scope.analysis.entities[ $scope.newEntity.id ].annotations[ annotation.id ] = annotation
     $scope.analysis.annotations[ $scope.annotation ].entities[ $scope.newEntity.id ] = $scope.newEntity
     
+    # Select the new entity
+    $scope.onSelectedEntityTile $scope.analysis.entities[ $scope.newEntity.id ], scope
     # Create new entity object
     $scope.newEntity = AnalysisService.createEntity()
+
+  
 
   $scope.$on "updateOccurencesForEntity", (event, entityId, occurrences) ->
     
@@ -176,12 +178,16 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
 
   $scope.onSelectedEntityTile = (entity, scope)->
     $log.debug "Entity tile selected for entity #{entity.id} within '#{scope.id}' scope"
-    
+    $log.debug entity
+    $log.debug scope
+
     if not $scope.selectedEntities[ scope.id ][ entity.id ]?
       $scope.selectedEntities[ scope.id ][ entity.id ] = entity
       for uri in entity.images
         $scope.images[ uri ] = entity.label
       $scope.$emit "entitySelected", entity, $scope.annotation
+      # Reset current annotation
+      $scope.selectAnnotation undefined
     else
       for uri in entity.images
         delete $scope.images[ uri ]
