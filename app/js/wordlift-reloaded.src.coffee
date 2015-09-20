@@ -672,7 +672,7 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
 
   service =
     _isRunning: false
-    _currentAnalysis: {}
+    _currentAnalysis: undefined
     _supportedTypes: []
     _defaultType: "thing"
   
@@ -839,6 +839,10 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
 
   service.perform = (content)->
     
+    if service._currentAnalysis
+      $log.warn "Analysis already runned! Nothing to do ..."
+      return
+
     service._updateStatus true
     promise = @._innerPerform content
     # If successful, broadcast an *analysisReceived* event.
@@ -849,7 +853,10 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
         $log.warn "Invalid data returned"
         $log.debug data
         return
-       
+      
+      # Store current analysis obj
+      service._currentAnalysis = data
+
       $rootScope.$broadcast "analysisPerformed", service.parse( data )
     .error (data, status) ->
       
