@@ -678,7 +678,7 @@
       };
       service = {
         _isRunning: false,
-        _currentAnalysis: {},
+        _currentAnalysis: void 0,
         _supportedTypes: [],
         _defaultType: "thing"
       };
@@ -878,6 +878,10 @@
       };
       service.perform = function(content) {
         var promise;
+        if (service._currentAnalysis) {
+          $log.warn("Analysis already runned! Nothing to do ...");
+          return;
+        }
         service._updateStatus(true);
         return promise = this._innerPerform(content).success(function(data) {
           service._updateStatus(false);
@@ -886,6 +890,7 @@
             $log.debug(data);
             return;
           }
+          service._currentAnalysis = data;
           return $rootScope.$broadcast("analysisPerformed", service.parse(data));
         }).error(function(data, status) {
           service._updateStatus(false);
