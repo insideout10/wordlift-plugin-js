@@ -62,7 +62,7 @@ module.exports = (grunt) ->
         options:
           sourceMap: true
           sourceMapIn: 'app/js/wordlift.js.map'
-          compress: true
+          compress: {}
           drop_console: true
           dead_code: true
           mangle: true
@@ -73,7 +73,7 @@ module.exports = (grunt) ->
         options:
           sourceMap: true
           sourceMapIn: 'app/js/wordlift.ui.js.map'
-          compress: true
+          compress: {}
           drop_console: true
           dead_code: true
           mangle: true
@@ -84,7 +84,7 @@ module.exports = (grunt) ->
         options:
           sourceMap: true
           sourceMapIn: 'app/js/wordlift-reloaded.js.map'
-          compress: true
+          compress: {}
           drop_console: true
           dead_code: true
           mangle: true
@@ -95,7 +95,7 @@ module.exports = (grunt) ->
         options:
           sourceMap: true
           sourceMapIn: 'app/js/wordlift-faceted-entity-search-widget.js.map'
-          compress: true
+          compress: {}
           drop_console: true
           dead_code: true
           mangle: true
