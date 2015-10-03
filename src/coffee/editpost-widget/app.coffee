@@ -139,7 +139,12 @@ tinymce.PluginManager.add 'wordlift', (editor, url) ->
 
   # Fires when the user changes node location using the mouse or keyboard in the TinyMCE editor.
   fireEvent( editor, "NodeChange", (e) ->        
-    injector.invoke(['EditorService','$rootScope', (EditorService, $rootScope) ->
+    injector.invoke(['AnalysisService', 'EditorService','$rootScope', '$log', (AnalysisService, EditorService, $rootScope, $log) ->
+      
+      if not AnalysisService._currentAnalysis
+        $log.warn "Analysis not performed! Nothing to do ..."
+        return
+      
       # execute the following commands in the angular js context.
       $rootScope.$apply(->          
         $rootScope.selectionStatus = EditorService.hasSelection() 
@@ -149,7 +154,12 @@ tinymce.PluginManager.add 'wordlift', (editor, url) ->
 
   # this event is raised when a textannotation is selected in the TinyMCE editor.
   fireEvent( editor, "Click", (e) ->
-    injector.invoke(['EditorService','$rootScope', (EditorService, $rootScope) ->
+    injector.invoke(['AnalysisService', 'EditorService','$rootScope', '$log', (AnalysisService, EditorService, $rootScope, $log) ->
+      
+      if not AnalysisService._currentAnalysis
+        $log.warn "Analysis not performed! Nothing to do ..."
+        return
+      
       # execute the following commands in the angular js context.
       $rootScope.$apply(->          
         EditorService.selectAnnotation e.target.id 
