@@ -253,7 +253,7 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
         analysis.entities[ entity.id ].annotations[ textAnnotation.id ] = textAnnotation 
         analysis.annotations[ textAnnotation.id ].entityMatches.push { entityId: entity.id, confidence: 1 } 
         analysis.annotations[ textAnnotation.id ].entities[ entity.id ] = analysis.entities[ entity.id ]            
-        
+  
   service
 
 ])

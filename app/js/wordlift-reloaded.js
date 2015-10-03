@@ -316,7 +316,8 @@
       $scope.isThereASelection = false;
       $scope.configuration = configuration;
       $rootScope.$on("analysisServiceStatusUpdated", function(event, newStatus) {
-        return $scope.isRunning = newStatus;
+        $scope.isRunning = newStatus;
+        return EditorService.updateContentEditableStatus(!status);
       });
       $rootScope.$watch('selectionStatus', function() {
         return $scope.isThereASelection = $rootScope.selectionStatus;
@@ -1050,6 +1051,12 @@
           }
           return false;
         },
+        updateContentEditableStatus: function(status) {
+          var ed;
+          ed = editor();
+          $log.debug("Going to set contenteditable attribute on " + status);
+          return ed.getBody().setAttribute('contenteditable', status);
+        },
         createTextAnnotationFromCurrentSelection: function() {
           var content, ed, htmlPosition, text, textAnnotation, textAnnotationSpan, textPosition, traslator;
           ed = editor();
@@ -1229,9 +1236,10 @@
     ]);
     fireEvent(editor, "LoadContent", function(e) {
       return injector.invoke([
-        'AnalysisService', '$rootScope', '$log', function(AnalysisService, $rootScope, $log) {
+        'AnalysisService', 'EditorService', '$rootScope', '$log', function(AnalysisService, EditorService, $rootScope, $log) {
           return $rootScope.$apply(function() {
             var html, text;
+            EditorService.updateContentEditableStatus(false);
             html = editor.getContent({
               format: 'raw'
             });

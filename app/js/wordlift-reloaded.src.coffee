@@ -327,6 +327,8 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
   
   $rootScope.$on "analysisServiceStatusUpdated", (event, newStatus) ->
     $scope.isRunning = newStatus
+    # When the analysis is running the editor is disabled and viceversa
+    EditorService.updateContentEditableStatus !status
 
   # Watch editor selection status
   $rootScope.$watch 'selectionStatus', ()->
@@ -904,7 +906,7 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
         analysis.entities[ entity.id ].annotations[ textAnnotation.id ] = textAnnotation 
         analysis.annotations[ textAnnotation.id ].entityMatches.push { entityId: entity.id, confidence: 1 } 
         analysis.annotations[ textAnnotation.id ].entities[ entity.id ] = analysis.entities[ entity.id ]            
-        
+  
   service
 
 ])
@@ -1029,6 +1031,13 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
         return true 
 
       false
+
+    # Update contenteditable status for the editor
+    updateContentEditableStatus: (status)->
+      # A reference to the editor.
+      ed = editor() 
+      $log.debug "Going to set contenteditable attribute on #{status}"
+      ed.getBody().setAttribute 'contenteditable', status
 
     # Create a textAnnotation starting from the current selection
     createTextAnnotationFromCurrentSelection: ()->
@@ -1292,15 +1301,16 @@ tinymce.PluginManager.add 'wordlift', (editor, url) ->
 
   # Perform analysis once tinymce is loaded
   fireEvent( editor, "LoadContent", (e) ->
-    injector.invoke(['AnalysisService', '$rootScope', '$log'
-     (AnalysisService, $rootScope, $log) ->  
+    injector.invoke(['AnalysisService', 'EditorService', '$rootScope', '$log'
+     (AnalysisService, EditorService, $rootScope, $log) ->  
       # execute the following commands in the angular js context.
       $rootScope.$apply(->    
+        # Disable editing
+        EditorService.updateContentEditableStatus false
         # Get the html content of the editor.
         html = editor.getContent format: 'raw'
         # Get the text content from the Html.
-        text = Traslator.create(html).getText()
-          
+        text = Traslator.create(html).getText()   
         if text.match /[a-zA-Z0-9]+/
           AnalysisService.perform text
         else

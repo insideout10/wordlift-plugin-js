@@ -120,6 +120,13 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
 
       false
 
+    # Update contenteditable status for the editor
+    updateContentEditableStatus: (status)->
+      # A reference to the editor.
+      ed = editor() 
+      $log.debug "Going to set contenteditable attribute on #{status}"
+      ed.getBody().setAttribute 'contenteditable', status
+
     # Create a textAnnotation starting from the current selection
     createTextAnnotationFromCurrentSelection: ()->
       # A reference to the editor.

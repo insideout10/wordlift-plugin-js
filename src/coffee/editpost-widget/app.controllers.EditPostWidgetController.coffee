@@ -73,6 +73,8 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
   
   $rootScope.$on "analysisServiceStatusUpdated", (event, newStatus) ->
     $scope.isRunning = newStatus
+    # When the analysis is running the editor is disabled and viceversa
+    EditorService.updateContentEditableStatus !status
 
   # Watch editor selection status
   $rootScope.$watch 'selectionStatus', ()->
