@@ -1256,7 +1256,6 @@
       return injector.invoke([
         'AnalysisService', 'EditorService', '$rootScope', '$log', function(AnalysisService, EditorService, $rootScope, $log) {
           if (!AnalysisService._currentAnalysis) {
-            $log.warn("Analysis not performed! Nothing to do ...");
             return;
           }
           return $rootScope.$apply(function() {
@@ -1269,7 +1268,6 @@
       return injector.invoke([
         'AnalysisService', 'EditorService', '$rootScope', '$log', function(AnalysisService, EditorService, $rootScope, $log) {
           if (!AnalysisService._currentAnalysis) {
-            $log.warn("Analysis not performed! Nothing to do ...");
             return;
           }
           return $rootScope.$apply(function() {

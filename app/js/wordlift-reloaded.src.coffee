@@ -1321,11 +1321,8 @@ tinymce.PluginManager.add 'wordlift', (editor, url) ->
   fireEvent( editor, "NodeChange", (e) ->        
     injector.invoke(['AnalysisService', 'EditorService','$rootScope', '$log', (AnalysisService, EditorService, $rootScope, $log) ->
       
-      if not AnalysisService._currentAnalysis
-        $log.warn "Analysis not performed! Nothing to do ..."
-        return
+      return unless AnalysisService._currentAnalysis
       
-      # execute the following commands in the angular js context.
       $rootScope.$apply(->          
         $rootScope.selectionStatus = EditorService.hasSelection() 
       )
@@ -1336,9 +1333,7 @@ tinymce.PluginManager.add 'wordlift', (editor, url) ->
   fireEvent( editor, "Click", (e) ->
     injector.invoke(['AnalysisService', 'EditorService','$rootScope', '$log', (AnalysisService, EditorService, $rootScope, $log) ->
       
-      if not AnalysisService._currentAnalysis
-        $log.warn "Analysis not performed! Nothing to do ..."
-        return
+      return unless AnalysisService._currentAnalysis
       
       # execute the following commands in the angular js context.
       $rootScope.$apply(->          
