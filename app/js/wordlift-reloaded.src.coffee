@@ -1235,21 +1235,12 @@ $(
   container = $("""
   	<div id="wordlift-edit-post-wrapper" ng-controller="EditPostWidgetController">
   		
-<<<<<<< HEAD
-      <h3 class="wl-widget-headline"><span>Semantic tagging</span> <span ng-show="isRunning" class="wl-spinner"></span></h3>
-=======
       <div class="wl-error" ng-repeat="error in errors">{{error}}</div>
 
       <h3 class="wl-widget-headline">
         <span>Semantic tagging</span>
         <span ng-show="isRunning" class="wl-spinner"></span>
       </h3>
-
-      <div ng-click="createTextAnnotationFromCurrentSelection()" id="wl-add-entity-button-wrapper">
-        <span class="button" ng-class="{ 'button-primary selected' : isThereASelection, 'preview' : !isThereASelection }">Add entity</span>
-        <div class="clear" />     
-      </div>
->>>>>>> master
       
       <div ng-show="annotation">
         <h4 class="wl-annotation-label">
