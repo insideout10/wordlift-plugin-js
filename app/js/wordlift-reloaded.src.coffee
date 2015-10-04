@@ -810,20 +810,15 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
   
     promise = @._innerPerform content
     # If successful, broadcast an *sameAsReceived* event.
-    .success (data) ->
+    .then (response) ->
       
       suggestions = []
 
-      for id, entity of data.entities
+      for id, entity of response.data.entities
         if id.startsWith('http')
           suggestions.push id
       
       $rootScope.$broadcast "sameAsRetrieved", suggestions
-
-    .error (data, status) ->
-       $log.warn "Error on same as retrieving, statut #{status}"
-       $rootScope.$broadcast "sameAsRetrieved", []
-
     
   service._innerPerform = (content)->
 
@@ -846,24 +841,22 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
       return
 
     service._updateStatus true
+
     promise = @._innerPerform content
-    # If successful, broadcast an *analysisReceived* event.
-    .success (data) ->
-
-      service._updateStatus false
-      if typeof data is 'string'
-        $log.warn "Invalid data returned"
-        $log.debug data
-        return
-      
+    # If successful, broadcast an *analysisPerformed* event.
+    promise.then (response) ->
       # Store current analysis obj
-      service._currentAnalysis = data
-
-      $rootScope.$broadcast "analysisPerformed", service.parse( data )
-    .error (data, status) ->
-      
+      service._currentAnalysis = response.data
+      $rootScope.$broadcast "analysisPerformed", service.parse( response.data )
+    
+    # On failure, broadcast an *errorRaised* event.
+    promise.catch (response) ->
+      $log.error response.data
+      $rootScope.$broadcast "analysisFailed", response.data
+    
+    # Update service running status in each case
+    promise.finally (response) ->
       service._updateStatus false
-      $log.warn "Error on analysis, statut #{status}"
 
   # Preselect entity annotations in the provided analysis using the provided collection of annotations.
   service.preselect = (analysis, annotations) ->
@@ -1032,11 +1025,15 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
 
       false
 
+    # Check if the given editor is the current editor
+    isEditor: (editor)->
+      ed = editor()
+      ed.id is editor.id
+
     # Update contenteditable status for the editor
     updateContentEditableStatus: (status)->
       # A reference to the editor.
       ed = editor() 
-      $log.debug "Going to set contenteditable attribute on #{status}"
       ed.getBody().setAttribute 'contenteditable', status
 
     # Create a textAnnotation starting from the current selection
@@ -1276,10 +1273,9 @@ tinymce.PluginManager.add 'wordlift', (editor, url) ->
 
   # Hack wp.mce.views to prevent shorcodes rendering 
   # starts before the analysis is properly embedded
-  injector.invoke(['$rootScope', '$log', ($rootScope, $log) ->
+  injector.invoke(['EditorService','$rootScope', '$log', (EditorService, $rootScope, $log) ->
     
     if editor.id is "content"
-
       $log.debug "Going to hack wp.mce.views api from editor with id '#{editor.id}' ..."
       # wp.mce.views uses toViews() method from WP 3.8 to 4.1
       # and setMarkers() method from WP 4.2 to 4.3 to replace 
@@ -1293,6 +1289,10 @@ tinymce.PluginManager.add 'wordlift', (editor, url) ->
             return content
           
           $rootScope.$on "analysisEmbedded", (event) ->
+            $log.info "Going to restore wp.mce.views method #{method}()"
+            wp.mce.views[ method ] = originalMethod
+          
+          $rootScope.$on "analysisFailed", (event) ->
             $log.info "Going to restore wp.mce.views method #{method}()"
             wp.mce.views[ method ] = originalMethod
           

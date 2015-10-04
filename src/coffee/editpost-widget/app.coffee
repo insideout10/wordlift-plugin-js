@@ -94,10 +94,9 @@ tinymce.PluginManager.add 'wordlift', (editor, url) ->
 
   # Hack wp.mce.views to prevent shorcodes rendering 
   # starts before the analysis is properly embedded
-  injector.invoke(['$rootScope', '$log', ($rootScope, $log) ->
+  injector.invoke(['EditorService','$rootScope', '$log', (EditorService, $rootScope, $log) ->
     
     if editor.id is "content"
-
       $log.debug "Going to hack wp.mce.views api from editor with id '#{editor.id}' ..."
       # wp.mce.views uses toViews() method from WP 3.8 to 4.1
       # and setMarkers() method from WP 4.2 to 4.3 to replace 
@@ -111,6 +110,10 @@ tinymce.PluginManager.add 'wordlift', (editor, url) ->
             return content
           
           $rootScope.$on "analysisEmbedded", (event) ->
+            $log.info "Going to restore wp.mce.views method #{method}()"
+            wp.mce.views[ method ] = originalMethod
+          
+          $rootScope.$on "analysisFailed", (event) ->
             $log.info "Going to restore wp.mce.views method #{method}()"
             wp.mce.views[ method ] = originalMethod
           
