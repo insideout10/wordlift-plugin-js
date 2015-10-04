@@ -324,9 +324,15 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
   $scope.images = {}
   $scope.isThereASelection = false
   $scope.configuration = configuration
+  $scope.errors = []
   
+  $rootScope.$on "analysisFailed", (event, errorMsg) ->
+    $scope.errors.push errorMsg
+
   $rootScope.$on "analysisServiceStatusUpdated", (event, newStatus) ->
     $scope.isRunning = newStatus
+    # When the analysis is running the editor is disabled and viceversa
+    EditorService.updateContentEditableStatus !status
 
   # Watch editor selection status
   $rootScope.$watch 'selectionStatus', ()->
@@ -778,9 +784,6 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
     # Add id to annotation obj
     # Add occurences as a blank array
     # Add annotation references to each entity
-
-    $log.debug "Incoming entities"
-    $log.debug data.entities
     
     for id, localEntity of configuration.entities
       data.entities[ id ] = localEntity
@@ -837,20 +840,15 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
   
     promise = @._innerPerform content
     # If successful, broadcast an *sameAsReceived* event.
-    .success (data) ->
+    .then (response) ->
       
       suggestions = []
 
-      for id, entity of data.entities
+      for id, entity of response.data.entities
         if id.startsWith('http')
           suggestions.push id
       
       $rootScope.$broadcast "sameAsRetrieved", suggestions
-
-    .error (data, status) ->
-       $log.warn "Error on same as retrieving, statut #{status}"
-       $rootScope.$broadcast "sameAsRetrieved", []
-
     
   service._innerPerform = (content)->
 
@@ -873,24 +871,22 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
       return
 
     service._updateStatus true
+
     promise = @._innerPerform content
-    # If successful, broadcast an *analysisReceived* event.
-    .success (data) ->
-
-      service._updateStatus false
-      if typeof data is 'string'
-        $log.warn "Invalid data returned"
-        $log.debug data
-        return
-      
+    # If successful, broadcast an *analysisPerformed* event.
+    promise.then (response) ->
       # Store current analysis obj
-      service._currentAnalysis = data
-
-      $rootScope.$broadcast "analysisPerformed", service.parse( data )
-    .error (data, status) ->
-      
+      service._currentAnalysis = response.data
+      $rootScope.$broadcast "analysisPerformed", service.parse( response.data )
+    
+    # On failure, broadcast an *analysisFailed* event.
+    promise.catch (response) ->
+      $log.error response.data
+      $rootScope.$broadcast "analysisFailed", response.data
+    
+    # Update service running status in each case
+    promise.finally (response) ->
       service._updateStatus false
-      $log.warn "Error on analysis, statut #{status}"
 
   # Preselect entity annotations in the provided analysis using the provided collection of annotations.
   service.preselect = (analysis, annotations) ->
@@ -933,7 +929,7 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
         analysis.entities[ entity.id ].annotations[ textAnnotation.id ] = textAnnotation 
         analysis.annotations[ textAnnotation.id ].entityMatches.push { entityId: entity.id, confidence: 1 } 
         analysis.annotations[ textAnnotation.id ].entities[ entity.id ] = analysis.entities[ entity.id ]            
-        
+  
   service
 
 ])
@@ -1058,6 +1054,17 @@ angular.module('wordlift.editpost.widget.services.EditorService', [
         return true 
 
       false
+
+    # Check if the given editor is the current editor
+    isEditor: (editor)->
+      ed = editor()
+      ed.id is editor.id
+
+    # Update contenteditable status for the editor
+    updateContentEditableStatus: (status)->
+      # A reference to the editor.
+      ed = editor() 
+      ed.getBody().setAttribute 'contenteditable', status
 
     # Create a textAnnotation starting from the current selection
     createTextAnnotationFromCurrentSelection: ()->
@@ -1228,7 +1235,21 @@ $(
   container = $("""
   	<div id="wordlift-edit-post-wrapper" ng-controller="EditPostWidgetController">
   		
+<<<<<<< HEAD
       <h3 class="wl-widget-headline"><span>Semantic tagging</span> <span ng-show="isRunning" class="wl-spinner"></span></h3>
+=======
+      <div class="wl-error" ng-repeat="error in errors">{{error}}</div>
+
+      <h3 class="wl-widget-headline">
+        <span>Semantic tagging</span>
+        <span ng-show="isRunning" class="wl-spinner"></span>
+      </h3>
+
+      <div ng-click="createTextAnnotationFromCurrentSelection()" id="wl-add-entity-button-wrapper">
+        <span class="button" ng-class="{ 'button-primary selected' : isThereASelection, 'preview' : !isThereASelection }">Add entity</span>
+        <div class="clear" />     
+      </div>
+>>>>>>> master
       
       <div ng-show="annotation">
         <h4 class="wl-annotation-label">
@@ -1280,51 +1301,53 @@ injector = angular.bootstrap $('#wordlift-edit-post-wrapper'), ['wordlift.editpo
 # Add WordLift as a plugin of the TinyMCE editor.
 tinymce.PluginManager.add 'wordlift', (editor, url) ->
   
+  # This plugin has to be loaded only with the main WP "content" editor
+  return unless editor.id is "content"
+    
   # Register event depending on tinymce major version
   fireEvent = (editor, eventName, callback)->
-    injector.invoke([ '$log', ($log) ->
-      $log.debug "Going to register a callback on #{eventName} event"
-      switch tinymce.majorVersion  
-        when '4' then editor.on eventName, callback
-        when '3' then editor[ "on#{eventName}" ].add callback
-    ])
-
+    switch tinymce.majorVersion  
+      when '4' then editor.on eventName, callback
+      when '3' then editor[ "on#{eventName}" ].add callback
+      
   # Hack wp.mce.views to prevent shorcodes rendering 
   # starts before the analysis is properly embedded
-  injector.invoke(['$rootScope', '$log', ($rootScope, $log) ->
+  injector.invoke(['EditorService','$rootScope', '$log', (EditorService, $rootScope, $log) ->
     
-    if editor.id is "content"
-
-      $log.debug "Going to hack wp.mce.views api from editor with id '#{editor.id}' ..."
-      # wp.mce.views uses toViews() method from WP 3.8 to 4.1
-      # and setMarkers() method from WP 4.2 to 4.3 to replace 
-      # available shortcodes with coresponding views markup
-      for method in [ 'setMarkers', 'toViews' ]
-        if wp.mce.views[ method ]?
-          
-          originalMethod = wp.mce.views[ method ]
-          $log.warn "Override wp.mce.views method #{method}() to prevent shortcodes rendering"
-          wp.mce.views[ method ] = (content)->
-            return content
-          
-          $rootScope.$on "analysisEmbedded", (event) ->
-            $log.info "Going to restore wp.mce.views method #{method}()"
-            wp.mce.views[ method ] = originalMethod
-          
-          break
+    # wp.mce.views uses toViews() method from WP 3.8 to 4.1
+    # and setMarkers() method from WP 4.2 to 4.3 to replace 
+    # available shortcodes with coresponding views markup
+    for method in [ 'setMarkers', 'toViews' ]
+      if wp.mce.views[ method ]?
+        
+        originalMethod = wp.mce.views[ method ]
+        $log.warn "Override wp.mce.views method #{method}() to prevent shortcodes rendering"
+        wp.mce.views[ method ] = (content)->
+          return content
+        
+        $rootScope.$on "analysisEmbedded", (event) ->
+          $log.info "Going to restore wp.mce.views method #{method}()"
+          wp.mce.views[ method ] = originalMethod
+        
+        $rootScope.$on "analysisFailed", (event) ->
+          $log.info "Going to restore wp.mce.views method #{method}()"
+          wp.mce.views[ method ] = originalMethod
+        
+        break
   ])
 
   # Perform analysis once tinymce is loaded
   fireEvent( editor, "LoadContent", (e) ->
-    injector.invoke(['AnalysisService', '$rootScope', '$log'
-     (AnalysisService, $rootScope, $log) ->  
+    injector.invoke(['AnalysisService', 'EditorService', '$rootScope', '$log'
+     (AnalysisService, EditorService, $rootScope, $log) ->  
       # execute the following commands in the angular js context.
       $rootScope.$apply(->    
+        # Disable editing
+        EditorService.updateContentEditableStatus false
         # Get the html content of the editor.
         html = editor.getContent format: 'raw'
         # Get the text content from the Html.
-        text = Traslator.create(html).getText()
-          
+        text = Traslator.create(html).getText()   
         if text.match /[a-zA-Z0-9]+/
           AnalysisService.perform text
         else
@@ -1335,8 +1358,10 @@ tinymce.PluginManager.add 'wordlift', (editor, url) ->
 
   # Fires when the user changes node location using the mouse or keyboard in the TinyMCE editor.
   fireEvent( editor, "NodeChange", (e) ->        
-    injector.invoke(['EditorService','$rootScope', (EditorService, $rootScope) ->
-      # execute the following commands in the angular js context.
+    injector.invoke(['AnalysisService', 'EditorService','$rootScope', '$log', (AnalysisService, EditorService, $rootScope, $log) ->
+      
+      return unless AnalysisService._currentAnalysis
+      
       $rootScope.$apply(->          
         $rootScope.selectionStatus = EditorService.hasSelection() 
       )
@@ -1345,7 +1370,10 @@ tinymce.PluginManager.add 'wordlift', (editor, url) ->
 
   # this event is raised when a textannotation is selected in the TinyMCE editor.
   fireEvent( editor, "Click", (e) ->
-    injector.invoke(['EditorService','$rootScope', (EditorService, $rootScope) ->
+    injector.invoke(['AnalysisService', 'EditorService','$rootScope', '$log', (AnalysisService, EditorService, $rootScope, $log) ->
+      
+      return unless AnalysisService._currentAnalysis
+      
       # execute the following commands in the angular js context.
       $rootScope.$apply(->          
         EditorService.selectAnnotation e.target.id 

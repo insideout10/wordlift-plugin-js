@@ -98,9 +98,6 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
     # Add id to annotation obj
     # Add occurences as a blank array
     # Add annotation references to each entity
-
-    $log.debug "Incoming entities"
-    $log.debug data.entities
     
     for id, localEntity of configuration.entities
       data.entities[ id ] = localEntity
@@ -157,20 +154,15 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
   
     promise = @._innerPerform content
     # If successful, broadcast an *sameAsReceived* event.
-    .success (data) ->
+    .then (response) ->
       
       suggestions = []
 
-      for id, entity of data.entities
+      for id, entity of response.data.entities
         if id.startsWith('http')
           suggestions.push id
       
       $rootScope.$broadcast "sameAsRetrieved", suggestions
-
-    .error (data, status) ->
-       $log.warn "Error on same as retrieving, statut #{status}"
-       $rootScope.$broadcast "sameAsRetrieved", []
-
     
   service._innerPerform = (content)->
 
@@ -193,24 +185,22 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
       return
 
     service._updateStatus true
+
     promise = @._innerPerform content
-    # If successful, broadcast an *analysisReceived* event.
-    .success (data) ->
-
-      service._updateStatus false
-      if typeof data is 'string'
-        $log.warn "Invalid data returned"
-        $log.debug data
-        return
-      
+    # If successful, broadcast an *analysisPerformed* event.
+    promise.then (response) ->
       # Store current analysis obj
-      service._currentAnalysis = data
-
-      $rootScope.$broadcast "analysisPerformed", service.parse( data )
-    .error (data, status) ->
-      
+      service._currentAnalysis = response.data
+      $rootScope.$broadcast "analysisPerformed", service.parse( response.data )
+    
+    # On failure, broadcast an *analysisFailed* event.
+    promise.catch (response) ->
+      $log.error response.data
+      $rootScope.$broadcast "analysisFailed", response.data
+    
+    # Update service running status in each case
+    promise.finally (response) ->
       service._updateStatus false
-      $log.warn "Error on analysis, statut #{status}"
 
   # Preselect entity annotations in the provided analysis using the provided collection of annotations.
   service.preselect = (analysis, annotations) ->
@@ -253,7 +243,7 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
         analysis.entities[ entity.id ].annotations[ textAnnotation.id ] = textAnnotation 
         analysis.annotations[ textAnnotation.id ].entityMatches.push { entityId: entity.id, confidence: 1 } 
         analysis.annotations[ textAnnotation.id ].entities[ entity.id ] = analysis.entities[ entity.id ]            
-        
+  
   service
 
 ])

@@ -1876,6 +1876,11 @@
   clear: both;
   height: 1px;
 }
+#wordlift-edit-post-wrapper .wl-error {
+  padding: 2px 12px;
+  border-left: #f00 4px solid;
+  font-size: 11px;
+}
 #wordlift-edit-post-wrapper input,
 #wordlift-edit-post-wrapper select,
 #wordlift-edit-post-wrapper textarea {
