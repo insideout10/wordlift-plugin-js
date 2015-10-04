@@ -324,7 +324,11 @@ angular.module('wordlift.editpost.widget.controllers.EditPostWidgetController', 
   $scope.images = {}
   $scope.isThereASelection = false
   $scope.configuration = configuration
+  $scope.errors = []
   
+  $rootScope.$on "analysisFailed", (event, errorMsg) ->
+    $scope.errors.push errorMsg
+
   $rootScope.$on "analysisServiceStatusUpdated", (event, newStatus) ->
     $scope.isRunning = newStatus
     # When the analysis is running the editor is disabled and viceversa
@@ -751,9 +755,6 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
     # Add id to annotation obj
     # Add occurences as a blank array
     # Add annotation references to each entity
-
-    $log.debug "Incoming entities"
-    $log.debug data.entities
     
     for id, localEntity of configuration.entities
       data.entities[ id ] = localEntity
@@ -849,7 +850,7 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
       service._currentAnalysis = response.data
       $rootScope.$broadcast "analysisPerformed", service.parse( response.data )
     
-    # On failure, broadcast an *errorRaised* event.
+    # On failure, broadcast an *analysisFailed* event.
     promise.catch (response) ->
       $log.error response.data
       $rootScope.$broadcast "analysisFailed", response.data
@@ -1205,7 +1206,13 @@ $(
   container = $("""
   	<div id="wordlift-edit-post-wrapper" ng-controller="EditPostWidgetController">
   		
-      <h3 class="wl-widget-headline"><span>Semantic tagging</span> <span ng-show="isRunning" class="wl-spinner"></span></h3>
+      <div class="wl-error" ng-repeat="error in errors">{{error}}</div>
+
+      <h3 class="wl-widget-headline">
+        <span>Semantic tagging</span>
+        <span ng-show="isRunning" class="wl-spinner"></span>
+      </h3>
+
       <div ng-click="createTextAnnotationFromCurrentSelection()" id="wl-add-entity-button-wrapper">
         <span class="button" ng-class="{ 'button-primary selected' : isThereASelection, 'preview' : !isThereASelection }">Add entity</span>
         <div class="clear" />     

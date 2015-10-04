@@ -98,9 +98,6 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
     # Add id to annotation obj
     # Add occurences as a blank array
     # Add annotation references to each entity
-
-    $log.debug "Incoming entities"
-    $log.debug data.entities
     
     for id, localEntity of configuration.entities
       data.entities[ id ] = localEntity
@@ -196,7 +193,7 @@ angular.module('wordlift.editpost.widget.services.AnalysisService', [])
       service._currentAnalysis = response.data
       $rootScope.$broadcast "analysisPerformed", service.parse( response.data )
     
-    # On failure, broadcast an *errorRaised* event.
+    # On failure, broadcast an *analysisFailed* event.
     promise.catch (response) ->
       $log.error response.data
       $rootScope.$broadcast "analysisFailed", response.data
