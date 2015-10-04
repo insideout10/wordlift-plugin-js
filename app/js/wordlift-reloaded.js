@@ -321,7 +321,7 @@
       });
       $rootScope.$on("analysisServiceStatusUpdated", function(event, newStatus) {
         $scope.isRunning = newStatus;
-        return EditorService.updateContentEditableStatus(!status);
+        return EditorService.updateContentEditableStatus(!newStatus);
       });
       $rootScope.$watch('selectionStatus', function() {
         return $scope.isThereASelection = $rootScope.selectionStatus;
