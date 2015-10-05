@@ -1479,7 +1479,7 @@
   border-left: #ff9a2e 5px solid;
 }
 .wl-selected-item.wl-thing {
-  border-left: #000000 5px solid;
+  border-left: #eeeeee 5px solid;
 }
 .wl-selected-item.wl-creative-work {
   border-left: #f9f81e 5px solid;
@@ -1646,11 +1646,11 @@
 }
 #wordlift-faceted-entity-search-widget .wl-facets .wl-facets-container h6.wl-fs-thing .type:before {
   content: "\f016";
-  color: #000000;
+  color: #eeeeee;
 }
 #wordlift-faceted-entity-search-widget .wl-facets .wl-facets-container h6.wl-fs-thing.selected {
-  background-color: #000000;
-  color: #ffffff;
+  background-color: #eeeeee;
+  color: #000000;
 }
 #wordlift-faceted-entity-search-widget .wl-facets .wl-facets-container li {
   padding: 0em;
