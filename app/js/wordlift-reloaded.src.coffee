@@ -1310,13 +1310,13 @@ tinymce.PluginManager.add 'wordlift', (editor, url) ->
      (AnalysisService, EditorService, $rootScope, $log) ->  
       # execute the following commands in the angular js context.
       $rootScope.$apply(->    
-        # Disable editing
-        EditorService.updateContentEditableStatus false
         # Get the html content of the editor.
         html = editor.getContent format: 'raw'
         # Get the text content from the Html.
         text = Traslator.create(html).getText()   
         if text.match /[a-zA-Z0-9]+/
+          # Disable editing
+          EditorService.updateContentEditableStatus false
           AnalysisService.perform text
         else
           $log.warn "Blank content: nothing to do!"

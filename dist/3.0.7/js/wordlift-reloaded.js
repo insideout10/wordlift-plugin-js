@@ -1240,12 +1240,12 @@
         'AnalysisService', 'EditorService', '$rootScope', '$log', function(AnalysisService, EditorService, $rootScope, $log) {
           return $rootScope.$apply(function() {
             var html, text;
-            EditorService.updateContentEditableStatus(false);
             html = editor.getContent({
               format: 'raw'
             });
             text = Traslator.create(html).getText();
             if (text.match(/[a-zA-Z0-9]+/)) {
+              EditorService.updateContentEditableStatus(false);
               return AnalysisService.perform(text);
             } else {
               return $log.warn("Blank content: nothing to do!");
