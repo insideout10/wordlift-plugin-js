@@ -17,7 +17,7 @@ path.wl-event {
   fill: #642994;
 }
 path.wl-thing {
-  fill: #eeeeee;
+  fill: #0073aa;
 }
 .wl-person {
   background-color: #f20f62;
@@ -50,8 +50,8 @@ path.wl-thing {
   padding: 2px;
 }
 .wl-thing {
-  background-color: #eeeeee;
-  color: #000000;
+  background-color: #0073aa;
+  color: #ffffff;
   padding: 2px;
 }
 a.wl-entity-page-link {

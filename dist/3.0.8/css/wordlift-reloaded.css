@@ -1479,7 +1479,7 @@
   border-left: #ff9a2e 5px solid;
 }
 .wl-selected-item.wl-thing {
-  border-left: #eeeeee 5px solid;
+  border-left: #0073aa 5px solid;
 }
 .wl-selected-item.wl-creative-work {
   border-left: #f9f81e 5px solid;
@@ -1830,7 +1830,7 @@
   color: #000000;
 }
 .entity.wl-thing {
-  border-color: #eeeeee;
+  border-color: #0073aa;
   color: #444;
 }
 .entity.wl-thing .type {
@@ -1844,29 +1844,29 @@
 }
 .entity.wl-thing .type:before {
   content: "\f016";
-  color: #eeeeee;
+  color: #0073aa;
 }
 .entity.wl-thing.selected {
-  background-color: #eeeeee;
-  color: #000000;
+  background-color: #0073aa;
+  color: #ffffff;
 }
 .entity.wl-thing .type {
   text-align: center;
 }
 .entity.wl-thing .type:before {
   content: "\f016";
-  color: #eeeeee;
+  color: #0073aa;
 }
 .entity.wl-thing .more:before {
   content: "\f016";
 }
 .entity.wl-thing.selected {
-  background-color: #eeeeee;
-  color: #000000;
+  background-color: #0073aa;
+  color: #ffffff;
 }
 .entity.wl-thing .thumbnail {
-  background-color: #eeeeee;
-  color: #000000;
+  background-color: #0073aa;
+  color: #ffffff;
 }
 #wordlift-edit-post-wrapper {
   margin: 10px 0em;
@@ -2350,8 +2350,8 @@ body#tinymce .textannotation.selected.wl-place {
 }
 body#tinymce .textannotation.selected.wl-thing {
   border: 0 !important;
-  color: #000000;
-  background-color: #eeeeee;
+  color: #ffffff;
+  background-color: #0073aa;
   vertical-align: center;
 }
 body#tinymce .textannotation.wl-creative-work {
@@ -2373,7 +2373,7 @@ body#tinymce .textannotation.wl-place {
   border-color: #ff9a2e !important;
 }
 body#tinymce .textannotation.wl-thing {
-  border-color: #eeeeee !important;
+  border-color: #0073aa !important;
 }
 body#tinymce[contenteditable=false] {
   background-color: #f1f1f1;
