@@ -191,6 +191,16 @@ $.fn.extend
     
             translate(x, y, width, height) + rotate( labelAngle )
           )
+          .attr('text-anchor', (d) ->
+
+            isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1
+            alpha = d.startAngle + Math.abs((d.endAngle - d.startAngle)/2)
+
+            if isFirefox and alpha > Math.PI
+              return 'end'
+
+            return null
+          )
     
       )
     

@@ -176,6 +176,14 @@
             x = 0.5 + (rX * Math.cos(alpha));
             y = 0.5 + (rY * Math.sin(alpha));
             return translate(x, y, width, height) + rotate(labelAngle);
+          }).attr('text-anchor', function(d) {
+            var alpha, isFirefox;
+            isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+            alpha = d.startAngle + Math.abs((d.endAngle - d.startAngle) / 2);
+            if (isFirefox && alpha > Math.PI) {
+              return 'end';
+            }
+            return null;
           });
         });
         tooltip = d3.select('body').append('div').attr('class', 'tooltip').style('background-color', 'white').style('opacity', 0.0).style('position', 'absolute').style('z-index', 100);
