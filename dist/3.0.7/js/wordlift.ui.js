@@ -35,8 +35,8 @@
           log("No data found for the chord.");
           return;
         }
-        translate = function(x, y, size) {
-          return 'translate(' + x * size + ',' + y * size + ')';
+        translate = function(x, y, sizeX, sizeY) {
+          return 'translate(' + x * sizeX + ',' + y * sizeY + ')';
         };
         rotate = function(x) {
           return "rotate(" + x + ")";
@@ -125,14 +125,15 @@
         outerRadius = size * 0.25;
         arc = d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius);
         chord = d3.layout.chord().padding(0.3).matrix(matrix);
-        viz.selectAll('chords').data(chord.chords).enter().append('path').attr('class', 'relation').attr('d', d3.svg.chord().radius(innerRadius)).attr('transform', translate(0.5, 0.5, size)).style('opacity', 0.2).on('mouseover', function() {
+        viz.selectAll('chords').data(chord.chords).enter().append('path').attr('class', 'relation').attr('d', d3.svg.chord().radius(innerRadius)).attr('transform', translate(0.5, 0.5, width, height)).style('opacity', 0.2).on('mouseover', function() {
           return d3.select(this).style('opacity', 0.8);
         }).on('mouseout', function() {
           return d3.select(this).style('opacity', 0.2);
         });
         viz.selectAll('arcs').data(chord.groups).enter().append('path').attr('class', function(d) {
+          console.log(d);
           return "entity " + data.entities[d.index].css_class;
-        }).attr('d', arc).attr('transform', translate(0.5, 0.5, size)).style('fill', function(d) {
+        }).attr('d', arc).attr('transform', translate(0.5, 0.5, width, height)).style('fill', function(d) {
           var baseColor, type;
           baseColor = settings.mainColor;
           type = data.entities[d.index].type;
@@ -154,12 +155,12 @@
         }).each(function(d) {
           var i, n, text, _k, _ref2;
           n = beautifyLabel(data.entities[d.index].label);
-          text = d3.select(this).attr("dy", n.length / 3 - (n.length - 1) * 0.9 + 'em').html(n[0]);
+          text = d3.select(this).attr("dy", n.length / 3 - (n.length - 1) * 0.9 + 'em').text(n[0]);
           for (i = _k = 1, _ref2 = n.length; 1 <= _ref2 ? _k <= _ref2 : _k >= _ref2; i = 1 <= _ref2 ? ++_k : --_k) {
-            text.append("tspan").attr('x', 0).attr('dy', '1em').html(n[i]);
+            text.append("tspan").attr('x', 0).attr('dy', '1em').text(n[i]);
           }
           return text.attr('transform', function(d) {
-            var alpha, labelAngle, labelWidth, r;
+            var alpha, labelAngle, labelWidth, rX, rY;
             alpha = d.startAngle - Math.PI / 2 + Math.abs((d.endAngle - d.startAngle) / 2);
             labelWidth = 3;
             labelAngle = void 0;
@@ -170,10 +171,11 @@
               labelAngle = alpha;
             }
             labelAngle = rad2deg(labelAngle);
-            r = (outerRadius + labelWidth) / size;
-            x = 0.5 + (r * Math.cos(alpha));
-            y = 0.5 + (r * Math.sin(alpha));
-            return translate(x, y, size) + rotate(labelAngle);
+            rX = (outerRadius + labelWidth) / width;
+            rY = (outerRadius + labelWidth) / height;
+            x = 0.5 + (rX * Math.cos(alpha));
+            y = 0.5 + (rY * Math.sin(alpha));
+            return translate(x, y, width, height) + rotate(labelAngle);
           });
         });
         tooltip = d3.select('body').append('div').attr('class', 'tooltip').style('background-color', 'white').style('opacity', 0.0).style('position', 'absolute').style('z-index', 100);

@@ -1546,7 +1546,7 @@
   color: #000000;
 }
 .entity.wl-thing {
-  border-color: #000000;
+  border-color: #0073aa;
   color: black;
 }
 .entity.wl-thing .type:before {
@@ -1554,11 +1554,11 @@
 }
 .entity.wl-thing:hover,
 .entity.wl-thing.selected {
-  background-color: #000000;
+  background-color: #0073aa;
   color: #ffffff;
 }
 .entity.wl-thing .thumbnail {
-  background-color: #000000;
+  background-color: #0073aa;
   color: #ffffff;
 }
 .entity .source {
@@ -1775,7 +1775,7 @@ body#tinymce .textannotation.wl-place {
 body#tinymce .textannotation.wl-thing {
   border: 0 !important;
   color: #ffffff;
-  background-color: #000000;
+  background-color: #0073aa;
   vertical-align: center;
 }
 body#tinymce .textannotation .textannotation {

@@ -36,7 +36,7 @@ $.fn.extend
       
       # define some service functions, then build the chord
       
-      translate = (x, y, size) -> 'translate(' + x * size + ',' + y * size + ')'
+      translate = (x, y, sizeX, sizeY) -> 'translate(' + x * sizeX + ',' + y * sizeY + ')'
     
       rotate = (x) -> "rotate(#{x})"
     
@@ -120,7 +120,7 @@ $.fn.extend
         .append('path')
         .attr('class', 'relation')
         .attr('d', d3.svg.chord().radius(innerRadius))
-        .attr('transform', translate(0.5, 0.5, size) )
+        .attr('transform', translate(0.5, 0.5, width, height) )
         .style('opacity', 0.2)
         .on('mouseover', ->  d3.select(this).style('opacity', 0.8) )
         .on('mouseout', ->  d3.select(this).style('opacity', 0.2) )
@@ -131,10 +131,11 @@ $.fn.extend
         .enter()
         .append('path')
         .attr('class', (d) ->
+          console.log d
           return "entity #{data.entities[d.index].css_class}"
         )
         .attr('d', arc)
-        .attr('transform', translate(0.5, 0.5, size))
+        .attr('transform', translate(0.5, 0.5, width, height))
         .style('fill', (d) ->
           baseColor = settings.mainColor;
           type = data.entities[d.index].type
@@ -162,14 +163,14 @@ $.fn.extend
           # get the current element
           text = d3.select(this)
             .attr("dy", n.length / 3 - (n.length-1) * 0.9 + 'em')
-            .html(n[0])
+            .text(n[0])
     
           # now loop
           for i in [1..n.length]
             text.append("tspan")
             .attr('x', 0)
             .attr('dy', '1em')
-            .html(n[i])
+            .text(n[i])
     
           text.attr('transform', (d) ->
             alpha = d.startAngle - Math.PI/2 + Math.abs((d.endAngle - d.startAngle)/2)
@@ -183,11 +184,22 @@ $.fn.extend
     
             labelAngle = rad2deg( labelAngle )
     
-            r = (outerRadius + labelWidth)/size
-            x = 0.5 + ( r * Math.cos(alpha) )
-            y = 0.5 + ( r * Math.sin(alpha) )
+            rX = (outerRadius + labelWidth)/width
+            rY = (outerRadius + labelWidth)/height
+            x = 0.5 + ( rX * Math.cos(alpha) )
+            y = 0.5 + ( rY * Math.sin(alpha) )
     
-            translate(x, y, size) + rotate( labelAngle )
+            translate(x, y, width, height) + rotate( labelAngle )
+          )
+          .attr('text-anchor', (d) ->
+
+            isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1
+            alpha = d.startAngle + Math.abs((d.endAngle - d.startAngle)/2)
+
+            if isFirefox and alpha > Math.PI
+              return 'end'
+
+            return null
           )
     
       )
