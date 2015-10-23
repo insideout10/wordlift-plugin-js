@@ -135,7 +135,7 @@ tinymce.PluginManager.add 'wordlift', (editor, url) ->
         # Get the text content from the Html.
         text = Traslator.create(html).getText()   
         if text.match /[a-zA-Z0-9]+/
-          # Disable editing
+          # Disable tinymce editing
           EditorService.updateContentEditableStatus false
           AnalysisService.perform text
         else
