@@ -28,7 +28,7 @@ class Traslator
     @_text = ''
 
     # OLD pattern = /([^<]*)(<[^>]*>)([^<]*)/gim
-    pattern = /([^&#<>]*)(&[^&;]*;|<[^>]*>)([^&#<>]*)/gim
+    pattern = /([^&<>]*)(&[^&;]*;|<[^>]*>)([^&<>]*)/gim
      
     textLength = 0
     htmlLength = 0
