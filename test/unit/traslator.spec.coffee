@@ -59,3 +59,12 @@ Sono andato da Bogot&#224; a <span>Roma</span>
    expect(t.html2text(35)).toBe(24)
    expect(t.getHtml()).toBe(content)
    expect(t.getText()).toBe('Sono andato da Bogotà a Roma')
+
+  it "detect text pos from html one properly - case 9 (with an hashtag)", ->
+   content = '''
+Ecco il mio hashtag #daisempre <span>Roma</span>
+'''
+   t = Traslator.create content
+   #expect(t.html2text(38)).toBe(32)
+   expect(t.getHtml()).toBe(content)
+   expect(t.getText()).toBe("Ecco il mio hashtag #daisempre Roma")
