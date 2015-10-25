@@ -1293,24 +1293,24 @@
     fireEvent(editor, "NodeChange", function(e) {
       return injector.invoke([
         'AnalysisService', 'EditorService', '$rootScope', '$log', function(AnalysisService, EditorService, $rootScope, $log) {
-          if (!AnalysisService._currentAnalysis) {
-            return;
+          if (AnalysisService._currentAnalysis) {
+            $rootScope.$apply(function() {
+              return $rootScope.selectionStatus = EditorService.hasSelection();
+            });
           }
-          return $rootScope.$apply(function() {
-            return $rootScope.selectionStatus = EditorService.hasSelection();
-          });
+          return true;
         }
       ]);
     });
     return fireEvent(editor, "Click", function(e) {
       return injector.invoke([
         'AnalysisService', 'EditorService', '$rootScope', '$log', function(AnalysisService, EditorService, $rootScope, $log) {
-          if (!AnalysisService._currentAnalysis) {
-            return;
+          if (AnalysisService._currentAnalysis) {
+            $rootScope.$apply(function() {
+              return EditorService.selectAnnotation(e.target.id);
+            });
           }
-          return $rootScope.$apply(function() {
-            return EditorService.selectAnnotation(e.target.id);
-          });
+          return true;
         }
       ]);
     });
